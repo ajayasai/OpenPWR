@@ -1,0 +1,9 @@
+node_modules/
+dist/
+artifacts/
+*.log
+.DS_Store
+.env*
+!.env.example
+.openai/
+CONTRACT.md

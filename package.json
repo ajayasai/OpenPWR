@@ -1,0 +1,19 @@
+{
+  "name": "openpwr",
+  "version": "0.1.0",
+  "description": "An open, reproducible 1000 MWe PWR system-dynamics laboratory and interactive control room",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs --source",
+    "test": "node --test tests/*.test.js",
+    "verify": "node scripts/verify.mjs",
+    "build": "node scripts/build.mjs",
+    "simulate": "node scripts/simulate.mjs",
+    "check": "npm run test && npm run verify && npm run build"
+  },
+  "repository": { "type": "git", "url": "https://github.com/ajayasai/OpenPWR.git" }
+}

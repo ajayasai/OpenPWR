@@ -1,0 +1,8 @@
+OpenPWR
+Copyright 2026 OpenPWR contributors
+
+Original source code and project documentation are licensed under Apache-2.0.
+No third-party source code or runtime packages are bundled in the application.
+Scientific references describe equations and data; their inclusion is not an endorsement.
+Node.js is optional development tooling, available under its own open-source license.
+GitHub Pages is optional hosting; the built files work on any static HTTP server.
