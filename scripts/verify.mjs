@@ -4,6 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { PWRPlant } from '../src/engine.js';
+import { createColdStartDirector } from '../src/scenarios.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
@@ -71,12 +72,40 @@ const refinement = Math.abs(sf.electricPower - sc.electricPower);
 add('External time-step refinement', refinement < 5 && !sf.domainExceeded && !sc.domainExceeded,
   `At 120 s after 80% demand: net power difference ${f(refinement, 6)} MW for 0.025/0.05 s stepping. Acceptance < 5 MW. See tests for independent pure-kinetics solver checks.`);
 
+const cold = new PWRPlant({ mode: 'cold' });
+const coldInitial = cold.snapshot();
+add('Cold initial condition', coldInitial.coolantTemp === 25 && coldInitial.fuelTemp === 25 && coldInitial.steamTemp === 25
+  && coldInitial.reactivity < 0 && coldInitial.neutronPower > 0 && coldInitial.neutronPower < 1e-6
+  && coldInitial.decayPower === 0 && !coldInitial.gridConnected && coldInitial.turbineSpeed === 0,
+  `25 °C thermal nodes; source-supported neutron fraction ${coldInitial.neutronPower.toExponential(4)}; no prior decay inventory; generator disconnected. This is an assumed long-cooled state, not measured plant data.`);
+const director = createColdStartDirector();
+const startupTrace = [];
+let coldResidual = 0, rotorResidual = 0;
+for (let tick = 1; tick <= 36000 && !cold.snapshot().domainExceeded; tick++) {
+  director.update(cold);
+  const s = cold.step(tick - cold.snapshot().time);
+  coldResidual = Math.max(coldResidual, Math.abs(s.energyResidual));
+  rotorResidual = Math.max(rotorResidual, Math.abs(s.rotorEnergyResidualMW));
+  if (Math.round(s.time) % 60 === 0) startupTrace.push({ time: s.time, stage: s.startupStage,
+    coolantTempC: s.coolantTemp, thermalMW: s.thermalPower, netMWe: s.electricPower,
+    primaryMPa: s.primaryPressure, secondaryMPa: s.steamPressure, turbineRPM: s.turbineSpeed, gridConnected: s.gridConnected });
+}
+const coldFinal = cold.snapshot();
+const connectedAt = director.actions.find(action => action.action === 'connectGrid')?.time;
+add('Cold startup → grid → rated generation', Number.isFinite(connectedAt) && coldFinal.gridConnected
+  && !coldFinal.tripped && !coldFinal.domainExceeded && Math.abs(coldFinal.electricPower - 1000) < 5,
+  `Grid connection at ${f(connectedAt, 0)} s; after ${f(coldFinal.time, 0)} s, net ${f(coldFinal.electricPower)} MWe. Actions follow measured permissives at 1 s boundaries; demand ramps 10 MWe/min after connection. Acceptance: within 5 MW of rated net output, without trip or domain exit. Timing is a generic model result, not a validated plant startup duration.`);
+add('Startup thermal and rotor energy accounting', coldResidual < 1e-5 && rotorResidual < 1e-7 && !coldFinal.domainExceeded,
+  `Maximum sampled thermal residual ${coldResidual.toExponential(3)} MW; rotor residual ${rotorResidual.toExponential(3)} MW. Acceptance: <1e-5 and <1e-7 MW respectively at 1 s observations; thermal boundary includes external auxiliary heat and ambient loss. Thermal and rotor boundaries remain separate.`);
+
 const report = {
   schema: 'openpwr-verification/v1', version: pkg.version, generatedAt: new Date().toISOString(), runtime: `Node ${process.version} / ${process.platform} / ${process.arch}`,
   gitRevision: gitValue(['rev-parse', 'HEAD']), workingTreeDirty: Boolean(gitValue(['status', '--porcelain'])),
   scope: 'Numerical verification and generic response checks, not validation against a real plant. Tests and assumptions are inspectable in the repository.',
   wallTimeSeconds: (performance.now() - start) / 1000,
   passed: checks.filter(c => c.pass).length, checks,
+  startupExperiment: { initialCondition: '25 C, long-cooled generic state', durationS: coldFinal.time,
+    actions: director.actions, sampleIntervalS: 60, trace: startupTrace },
 };
 await mkdir(resolve(root, 'artifacts'), { recursive: true });
 await writeFile(resolve(root, 'artifacts/verification.json'), JSON.stringify(report, null, 2) + '\n');

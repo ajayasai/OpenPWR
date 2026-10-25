@@ -2130,3 +2130,40 @@ dialog::backdrop {
     min-height:40px
   }
 }
+/* Startup controls supplement the operating control room. */
+#speed-achieved{display:block;color:#6f9baf;font-size:9px;letter-spacing:0;margin-top:3px}
+#speed-achieved[hidden]{display:none}
+.startup-panel{background:linear-gradient(120deg,#132330,#111a26)}
+.startup-panel [hidden]{display:none}
+.startup-panel .section-description{margin-top:14px;margin-bottom:17px;max-width:800px;line-height:1.7}
+.startup-stages{list-style:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:0 18px;margin:3px 0 0}
+.startup-stages li{position:relative;color:#657f94;font-size:10px;border-bottom:2px solid #2a3947;padding:9px 5px 11px;line-height:1.45}
+.startup-stages li>span{display:block;font:9px var(--mono);color:#526d81;margin-bottom:5px}
+.startup-stages li.complete{color:#8eb3b1;border-color:#367b77}
+.startup-stages li.current{color:#d8f0e9;border-color:#71d3c9;background:#183034}
+.startup-stages li.current>span{color:#7fb9b5}
+.startup-status{font-size:12px;line-height:1.7;color:#a6c3d0;margin:16px 18px 12px;min-height:21px}
+.startup-readings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:0 18px 17px}
+.startup-readings>div{min-width:0}
+.startup-readings span{display:block;color:#7f99ad;font-size:10px}
+.startup-readings strong{display:block;color:#c1e0e4;font:17px var(--mono);font-weight:400;margin-top:6px;overflow-wrap:anywhere}
+.startup-control-row{display:grid;grid-template-columns:1fr 1fr;gap:30px;padding:16px 18px;background:#101d29;border-top:1px solid #253643;border-bottom:1px solid #253643}
+.startup-power-field label{display:flex;justify-content:space-between;gap:16px;font-size:11px;color:#b2c9d6}
+.startup-power-field output{font:11px var(--mono);color:#91c5c6;white-space:nowrap}
+.startup-power-field small{display:block;color:#69869b;font-size:10px}
+.startup-energy-reading{display:flex;flex-direction:column;justify-content:center;gap:5px;font-size:10px;color:#7995a8}
+.startup-energy-reading strong{font:17px var(--mono);font-weight:400;color:#bcd5dd}
+.startup-energy-reading small{font-size:9px;color:#617e93}
+.startup-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:17px 18px 12px}
+.startup-action{min-width:0}
+.startup-action .button{width:100%;padding:8px 7px;white-space:normal;font-size:10px;line-height:1.5;min-height:42px}
+.startup-action .button:not(:disabled){border-color:#468e88;background:#1a3939;color:#bfeae1}
+.startup-action p{color:#728da1;font-size:9px;line-height:1.6;margin:8px 0 0;overflow-wrap:anywhere}
+.startup-action.permitted p{color:#84b5ac}
+.startup-footer{display:flex;align-items:center;gap:18px;justify-content:space-between;padding:0 18px 17px}
+.startup-footer p{font-size:9px;line-height:1.7;color:#667f93;max-width:650px}
+.startup-footer .text-button{white-space:nowrap;flex-shrink:0}
+@media(max-width:1250px){.startup-readings{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.startup-actions{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.startup-panel .panel-heading{align-items:flex-start}.startup-panel .text-button{font-size:9px;max-width:122px;text-align:right;line-height:1.5}.startup-panel .section-index{display:none}.startup-stages{grid-template-columns:repeat(3,minmax(0,1fr));padding:0 14px;gap:7px}.startup-stages li{font-size:10px;padding:8px 5px}.startup-stages li>span{font-size:9px}.startup-status{font-size:12px;margin:16px 14px}.startup-readings{padding:0 14px 17px}.startup-readings span{font-size:10px;line-height:1.5}.startup-readings strong{font-size:16px}.startup-control-row{grid-template-columns:1fr;gap:15px;padding:16px 14px}.startup-power-field label{font-size:11px}.startup-actions{grid-template-columns:1fr 1fr;gap:15px;padding:17px 14px}.startup-action .button{font-size:11px;min-height:44px}.startup-action p{font-size:10px}.startup-footer{display:block;padding:0 14px 15px}.startup-footer p{font-size:10px}.startup-footer .text-button{max-width:none;text-align:left;margin-top:8px}}
+.bypass-pipe{stroke:#665b42;stroke-width:3;stroke-dasharray:5 4}
+.bypass-flow{stroke:#ddba7e;stroke-width:1.2}

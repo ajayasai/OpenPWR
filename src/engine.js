@@ -5,6 +5,8 @@ import {
 } from './physics.js';
 
 const STEAM_T_NOM = saturationTemperature(6);
+const ATMOSPHERIC_BOILING_T = saturationTemperature(0.101325);
+const HIGH_STEAM_T = saturationTemperature(7.5);
 const FEED_T = 220;
 const FEED_H = liquidEnthalpy(FEED_T);
 const STEAM_DH = vaporEnthalpy(STEAM_T_NOM) - FEED_H;
@@ -46,6 +48,10 @@ export const PARAMETERS = Object.freeze({
   xenonBurnPerS: 2e-5,
   maxStepS: 0.05,
   minInitialThermalFraction: 2 / 7, // 250 MWe net at nominal 35% gross efficiency and 50 MW auxiliaries
+  startupSourcePerS: 1e-6, // illustrative normalized external neutron source, not counts/s
+  startupRateLimitKHour: 50, // educational lumped-energy heatup schedule
+  startupAuxiliaryHeatMW: 5,
+  rotorRatedEnergyMJ: 2000, // lumped train kinetic energy at 3000 rpm
 });
 
 // Illustrative six-exponential decay-power history approximation; NOT ANS-5.1.
@@ -56,16 +62,20 @@ export const DECAY_GROUPS = Object.freeze([
   { fraction: 0.008, tau: 1000 }, { fraction: 0.007, tau: 10000 },
 ].map(Object.freeze));
 const PROMPT_HEAT_FRACTION = 1 - DECAY_GROUPS.reduce((sum, g) => sum + g.fraction, 0);
-const CONTROL_RANGES = Object.freeze({ demand: [0.25, 1], rodReactivity: [-250, 250], primaryPump: [0, 1], feedwater: [0, 1.2], turbineValve: [0, 1], cooling: [0, 1] });
+const CONTROL_RANGES = Object.freeze({ demand: [0.25, 1], rodReactivity: [-250, 250], primaryPump: [0, 1], feedwater: [0, 1.2], turbineValve: [0, 1], cooling: [0, 1], startupPower: [0.005, 0.12] });
 const BOOLEAN_CONTROLS = ['autoReactor', 'autoFeedwater', 'autoTurbine'];
 const FAULT_NAMES = ['primaryPumpTrip', 'feedwaterTrip', 'turbineTrip', 'lossOfHeatSink'];
-const SCHEMA = 'openpwr-state-v1';
+const SCHEMA = 'openpwr-state-v2';
+const MODEL = 'OpenPWR reduced-order PWR 2.0';
+const STARTUP_STAGES = ['cold', 'prepared', 'heatup', 'hotStandby', 'turbineRoll', 'power'];
 const clone = value => JSON.parse(JSON.stringify(value));
 
 export class PWRPlant {
   constructor(options = {}) { this.reset(options); }
 
-  reset({ initialPower = 1 } = {}) {
+  reset({ initialPower = 1, mode = 'hot' } = {}) {
+    if (!['hot', 'cold'].includes(mode)) throw new RangeError('Initialization mode must be hot or cold');
+    if (mode === 'cold') return this._resetCold();
     if (!Number.isFinite(initialPower) || initialPower < PARAMETERS.minInitialThermalFraction || initialPower > 1) {
       throw new RangeError('Initial reactor thermal-power fraction must be between 2/7 (about 28.57%) and 1');
     }
@@ -78,7 +88,7 @@ export class PWRPlant {
     // cooling demand is an independent operator control, not tied to reactor power.
     this.controls = {
       demand: clamp((1050 * n - 50) / 1000, 0.25, 1), autoReactor: true, rodReactivity: 0, primaryPump: 1,
-      autoFeedwater: true, feedwater: n, autoTurbine: true, turbineValve: n, cooling: n,
+      autoFeedwater: true, feedwater: n, autoTurbine: true, turbineValve: n, cooling: n, startupPower: 0.01,
     };
     this.faults = Object.fromEntries(FAULT_NAMES.map(name => [name, false]));
     const feedback = this._feedback(fuel, coolant, xe);
@@ -99,10 +109,104 @@ export class PWRPlant {
       bypassSteamFlow: 0, heatToSteam: n * p.thermalMW,
       heatToCoolant: n * p.thermalMW, condenserHeat: n * 1950,
       coolingHeat: n * 1950, energyInMJ: 0, energyOutMJ: 0,
+      startupMode: false, startupStage: 'power', gridConnected: true,
+      rotorEnergyMJ: p.rotorRatedEnergyMJ, auxiliaryHeatMW: 0, ambientLossMW: 0,
+      sourceStrength: 0, heatupTarget: 0, heatupRateCPerHour: 0,
+      mechanicalPowerMW: n * 1050, rotorLossMW: 0, rotorEnergyResidualMW: 0,
+      feedwaterTemp: FEED_T,
     };
     this.events = [];
     this._event('info', `Initialized at ${(n * 100).toFixed(0)}% reactor power; equilibrium precursor and decay inventory`);
     return this.snapshot();
+  }
+
+  _resetCold() {
+    // Build the same complete schema, then initialize a distinct physical state.
+    // No hot inventory or equilibrium decay heat is imported into the cold case.
+    this.reset({ initialPower: 1, mode: 'hot' });
+    const s = this.state;
+    const source = PARAMETERS.startupSourcePerS;
+    const coldRhoPcm = -1500;
+    const n = source * 1e-4 / (-coldRhoPcm * 1e-5);
+    Object.assign(this.controls, {
+      demand: 0.25, primaryPump: 0, cooling: 0, feedwater: 0,
+      turbineValve: 0, startupPower: 0.01,
+    });
+    Object.assign(s, {
+      neutronPower: n, precursors: Array(6).fill(n), decay: Array(6).fill(0),
+      fuelTemp: 25, coolantTemp: 25, steamTemp: 25, primaryPressure: 0.3,
+      condenserTemp: 25, pumpSpeed: 0, turbineValve: 0, feedFlow: 0,
+      turbineSpeed: 0, iodine: 0, xenon: 0,
+      autoRod: coldRhoPcm - this._feedback(25, 25, 0), reactivity: coldRhoPcm,
+      thermalPower: PARAMETERS.thermalMW * PROMPT_HEAT_FRACTION * n,
+      decayPower: 0, electricPower: -5, grossPower: 0, steamFlow: 0,
+      turbineSteamFlow: 0, bypassSteamFlow: 0, heatToSteam: 0, heatToCoolant: 0,
+      condenserHeat: 0, coolingHeat: 0, startupMode: true, startupStage: 'cold',
+      gridConnected: false, rotorEnergyMJ: 0, sourceStrength: source,
+      mechanicalPowerMW: 0, feedwaterTemp: 25,
+    });
+    this.events = [];
+    this._event('info', 'Cold initialization at 25 C, source-supported subcritical neutron population, no prior decay inventory');
+    return this.snapshot();
+  }
+
+  _startupPermissives() {
+    const s = this.state;
+    const equipment = !Object.values(this.faults).some(Boolean);
+    const safe = !s.tripped && !s.domainExceeded && equipment;
+    const commonReason = s.domainExceeded ? 'Model boundary reached; reset the simulation'
+      : s.tripped ? 'Reactor trip is latched; restore equipment and reset the trip'
+      : !equipment ? 'Clear active equipment faults' : '';
+    const check = (condition, reason) => ({ allowed: safe && condition, reason: commonReason || (condition ? 'Ready' : reason) });
+    const hot = s.coolantTemp >= 275 && s.steamTemp >= 265 && s.primaryPressure >= 14;
+    const inventory = s.steamMass >= 105000 && s.steamMass <= 225000;
+    return {
+      prepare: check(s.startupStage === 'cold', 'Start from the cold initialization'),
+      startHeatup: check(s.startupStage === 'prepared' && s.pumpSpeed >= 0.8 && s.primaryPressure >= 2 && inventory,
+        'Prepare circulation, reach 80% pump speed and 2 MPa primary pressure, and retain 35–75% SG inventory'),
+      holdHotStandby: check(s.startupStage === 'heatup' && hot && inventory,
+        'Heat primary coolant to 275 C, steam generator to 265 C, and pressurize primary to 14 MPa'),
+      rollTurbine: check(s.startupStage === 'hotStandby' && hot && inventory && s.pumpSpeed >= 0.8 && s.condenserTemp < 52,
+        'Hold hot standby with adequate inventory, circulation, and condenser cooling'),
+      connectGrid: check(s.startupStage === 'turbineRoll' && hot && inventory && s.turbineSpeed >= 2950 && s.turbineSpeed <= 3050,
+        'Roll turbine to 2950–3050 rpm with hot steam and adequate inventory'),
+      disconnectGrid: { allowed: s.gridConnected && !s.domainExceeded, reason: s.gridConnected ? 'Load rejection will trip the reactor and close the turbine stop valve' : 'Generator is already disconnected' },
+    };
+  }
+
+  startupAction(action) {
+    const permissives = this._startupPermissives();
+    if (!Object.hasOwn(permissives, action)) throw new TypeError(`Unknown startup action: ${action}`);
+    if (!permissives[action].allowed) {
+      const message = permissives[action].reason;
+      this._event('warning', `Startup action blocked (${action}): ${message}`);
+      return { ok: false, message };
+    }
+    const s = this.state;
+    const c = this.controls;
+    if (action === 'prepare') {
+      s.startupStage = 'prepared';
+      c.primaryPump = 1; c.cooling = 1;
+      c.autoFeedwater = true; c.autoReactor = true; c.autoTurbine = true;
+    } else if (action === 'startHeatup') {
+      s.startupStage = 'heatup'; c.autoReactor = true;
+    } else if (action === 'holdHotStandby') {
+      s.startupStage = 'hotStandby';
+    } else if (action === 'rollTurbine') {
+      s.startupStage = 'turbineRoll'; c.autoTurbine = true;
+    } else if (action === 'connectGrid') {
+      s.startupStage = 'power'; s.gridConnected = true;
+      c.demand = 0.25; c.autoReactor = true; c.autoTurbine = true;
+    } else if (action === 'disconnectGrid') {
+      s.gridConnected = false; s.startupMode = true; s.startupStage = 'hotStandby';
+      s.sourceStrength = PARAMETERS.startupSourcePerS;
+      this.scram('Generator load rejection');
+    }
+    // Actions move controls/state-machine flags only: all temperatures, neutron
+    // population, precursors, decay heat and rotor energy continue uninterrupted.
+    const message = `Startup action accepted: ${action}`;
+    this._event('info', message);
+    return { ok: true, message };
   }
 
   _feedback(fuel, coolant, xenon) {
@@ -127,7 +231,7 @@ export class PWRPlant {
     if (this.controls[key] === value) return;
     // Manual offset is relative to the current rod bank worth. Transfer is bumpless.
     if (key === 'autoReactor' && value === false) this.controls.rodReactivity = 0;
-    if (key === 'autoReactor' && value === true) this.state.autoRod = clamp(this.state.autoRod + this.controls.rodReactivity, -2500, 2500);
+    if (key === 'autoReactor' && value === true) this.state.autoRod = clamp(this.state.autoRod + this.controls.rodReactivity, this.state.startupMode ? -10000 : -2500, 2500);
     this.controls[key] = value;
     this._event('info', `${key}: ${typeof value === 'number' ? Number(value.toFixed(3)) : value}`);
   }
@@ -147,6 +251,16 @@ export class PWRPlant {
     if (this.state.tripped) return;
     this.state.tripped = true;
     this.state.tripReason = reason;
+    this.state.gridConnected = false;
+    // Breaker position and electrical supply are algebraic, even while paused.
+    // Opening the breaker removes generator export immediately; pump draw still
+    // follows the current physical pump speed. No thermal, neutron or rotor
+    // inventory is changed here. A trip also switches off external heat input.
+    this.state.auxiliaryHeatMW = 0;
+    this.state.grossPower = 0;
+    const auxiliaries = (this.state.startupMode && this.state.startupStage === 'cold' ? 5 : 30)
+      + 20 * this.state.pumpSpeed ** 3;
+    this.state.electricPower = -auxiliaries;
     this.state.reactivity = -8000 + this._feedback(this.state.fuelTemp, this.state.coolantTemp, this.state.xenon);
     this._event('critical', `Reactor trip: ${reason}`);
   }
@@ -160,10 +274,12 @@ export class PWRPlant {
       return false;
     }
     // Preserve low power on release; auto controller subsequently withdraws gradually.
-    s.autoRod = clamp(-this._feedback(s.fuelTemp, s.coolantTemp, s.xenon) - 100, -2500, 2500);
+    s.autoRod = clamp(-this._feedback(s.fuelTemp, s.coolantTemp, s.xenon) - 100, s.startupMode ? -10000 : -2500, 2500);
     this.controls.rodReactivity = 0;
     s.tripped = false;
     s.tripReason = '';
+    if (s.startupMode && s.startupStage === 'power') s.startupStage = 'hotStandby';
+    else if (!s.startupMode) s.gridConnected = true;
     this._event('info', 'Reactor trip latch reset; automatic power recovery enabled');
     return true;
   }
@@ -183,17 +299,37 @@ export class PWRPlant {
     const c = this.controls;
     const beforeEnergy = this._storedEnergy();
     const oldCoolant = s.coolantTemp;
+    const startupActive = s.startupMode && s.startupStage !== 'power';
     const targetPump = this.faults.primaryPumpTrip ? 0 : c.primaryPump;
     s.pumpSpeed = relax(s.pumpSpeed, targetPump, h, 7);
     const circulation = 0.08 + 0.92 * s.pumpSpeed; // generic natural-circulation floor
-    const auxiliaries = 30 + 20 * s.pumpSpeed ** 3;
+    const auxiliaries = (s.startupMode && s.startupStage === 'cold' ? 5 : 30) + 20 * s.pumpSpeed ** 3;
     const efficiency = p.turbineEfficiency * (1 - 0.008 * (s.condenserTemp - p.condenserTempC));
     // Net-load feedforward schedule accounts for measured condenser temperature
     // and pump auxiliaries. It moves physical actuators; it never sets power.
     const requestedShaftMW = 1000 * c.demand + auxiliaries;
     const targetThermalFraction = clamp(requestedShaftMW / (efficiency * p.thermalMW), 0.1, 1);
 
-    if (c.autoReactor && !s.tripped) {
+    if (startupActive && !s.tripped) {
+      const heating = ['heatup', 'hotStandby', 'turbineRoll'].includes(s.startupStage);
+      let startupTarget = heating ? c.startupPower : 0;
+      if (s.startupStage === 'hotStandby') startupTarget = clamp(0.01 + 0.005 * (280 - s.coolantTemp), 0.002, 0.03);
+      // Approximate global thermal-inventory schedule limits cold heatup. This is
+      // an energy-based power cap, not an imposed temperature ramp. Local rates
+      // and lag differ; full reactor-specific heatup constraints are not modeled.
+      if (s.coolantTemp < 265) {
+        const effectiveCapacity = p.fuelCapacityMJK + p.coolantCapacityMJK + p.steamMetalCapacityMJK + s.steamMass * 0.0047;
+        const cap = (effectiveCapacity * p.startupRateLimitKHour / 3600 + Math.max(0, s.ambientLossMW)) / p.thermalMW;
+        startupTarget = Math.min(startupTarget, cap);
+      }
+      s.heatupTarget = startupTarget;
+      if (c.autoReactor) {
+        const desiredRho = heating ? clamp(35 * Math.log(Math.max(startupTarget, 1e-9) / Math.max(s.neutronPower, 1e-12)), -200, 150) : -1500;
+        const desiredRod = desiredRho - this._feedback(s.fuelTemp, s.coolantTemp, s.xenon);
+        s.autoRod = clamp(s.autoRod + clamp(desiredRod - s.autoRod, -20 * h, 20 * h), -10000, 2500);
+      }
+    } else if (c.autoReactor && !s.tripped) {
+      s.heatupTarget = 0;
       const targetCoolant = STEAM_T_NOM + targetThermalFraction * (p.coolantTempC - STEAM_T_NOM);
       const rodRate = clamp(0.8 * (targetCoolant - s.coolantTemp) + 18 * (targetThermalFraction - s.neutronPower), -12, 12);
       s.autoRod = clamp(s.autoRod + rodRate * h, -2500, 2500);
@@ -204,7 +340,7 @@ export class PWRPlant {
       this.scram('High positive reactivity (generic protection)');
       s.reactivity = -8000 + this._feedback(s.fuelTemp, s.coolantTemp, s.xenon);
     }
-    const kinetics = stepKinetics(s.neutronPower, s.precursors, s.reactivity, h);
+    const kinetics = stepKinetics(s.neutronPower, s.precursors, s.reactivity, h, { source: s.sourceStrength });
     s.neutronPower = kinetics.n;
     s.precursors = kinetics.precursors;
     s.decay = s.decay.map((d, i) => relax(d, DECAY_GROUPS[i].fraction * s.neutronPower, h, DECAY_GROUPS[i].tau));
@@ -215,17 +351,27 @@ export class PWRPlant {
     const xeSource = (p.xenonDecayPerS + p.xenonBurnPerS) * (0.05 * s.neutronPower + 0.95 * s.iodine);
     s.xenon = relax(s.xenon, xeSource / xeRemoval, h, 1 / xeRemoval);
 
-    const steamPressure = saturationPressure(s.steamTemp);
+    const steamPressure = s.startupMode ? Math.max(0.101325, saturationPressure(s.steamTemp)) : saturationPressure(s.steamTemp);
+    const steamAvailable = !s.startupMode || s.steamTemp >= ATMOSPHERIC_BOILING_T;
+    // Idealized regenerative train: at cold conditions there is no 220 C feed
+    // source. Feed enthalpy grows with recovered exhaust/steam heat, capped at
+    // the original hot-cycle value. Its energy is deducted in the condenser closure.
+    s.feedwaterTemp = s.startupMode ? Math.min(FEED_T, Math.max(s.condenserTemp, s.steamTemp - 35)) : FEED_T;
+    const feedH = liquidEnthalpy(s.feedwaterTemp);
     const availableValveMW = p.nominalSteamFlowKgS * Math.sqrt(steamPressure / p.steamPressureMPa)
-      * (vaporEnthalpy(s.steamTemp) - FEED_H) * efficiency;
+      * (vaporEnthalpy(s.steamTemp) - feedH) * efficiency;
     const automaticValve = clamp(requestedShaftMW / availableValveMW, 0, 1);
-    const valveTarget = (s.tripped || this.faults.turbineTrip) ? 0 : (c.autoTurbine ? automaticValve : c.turbineValve);
-    s.turbineValve = relax(s.turbineValve, valveTarget, h, s.tripped ? 1 : 4);
-    s.turbineSteamFlow = p.nominalSteamFlowKgS * s.turbineValve * Math.sqrt(steamPressure / p.steamPressureMPa);
+    const rotorLoss = s.gridConnected ? 0 : s.rotorEnergyMJ / 600;
+    const rollShaft = clamp(0.008 * (p.rotorRatedEnergyMJ - s.rotorEnergyMJ) + rotorLoss, 0, 25);
+    let valveTarget = c.autoTurbine ? automaticValve : c.turbineValve;
+    if (startupActive) valveTarget = s.startupStage === 'turbineRoll' ? (c.autoTurbine ? clamp(rollShaft / availableValveMW, 0, 0.06) : c.turbineValve) : 0;
+    if (s.tripped || this.faults.turbineTrip || !steamAvailable) valveTarget = 0;
+    s.turbineValve = relax(s.turbineValve, valveTarget, h, s.tripped ? (s.startupMode ? 0.1 : 1) : 4);
+    s.turbineSteamFlow = steamAvailable ? p.nominalSteamFlowKgS * s.turbineValve * Math.sqrt(steamPressure / p.steamPressureMPa) : 0;
     // Passive pressure dump / residual-heat steam path. This is an idealized train,
     // not a model of plant-specific auxiliary feedwater or emergency cooling.
     const bypass = clamp((steamPressure - 6.2) * 0.75, 0, 1.2) + (s.tripped ? 0.055 : 0);
-    s.bypassSteamFlow = p.nominalSteamFlowKgS * bypass * Math.sqrt(steamPressure / p.steamPressureMPa);
+    s.bypassSteamFlow = steamAvailable ? p.nominalSteamFlowKgS * bypass * Math.sqrt(steamPressure / p.steamPressureMPa) : 0;
     s.steamFlow = s.turbineSteamFlow + s.bypassSteamFlow;
     const autoFeed = s.steamFlow + 0.025 * (p.steamMassKg - s.steamMass);
     const feedTarget = this.faults.feedwaterTrip ? 0 : (c.autoFeedwater ? clamp(autoFeed, 0, 1.2 * p.nominalSteamFlowKgS) : c.feedwater * p.nominalSteamFlowKgS);
@@ -233,31 +379,57 @@ export class PWRPlant {
     s.heatToCoolant = p.fuelConductanceMWK * circulation ** 0.8 * (s.fuelTemp - s.coolantTemp);
     s.heatToSteam = p.steamConductanceMWK * circulation ** 0.8 * (s.coolantTemp - s.steamTemp);
     const vaporH = vaporEnthalpy(s.steamTemp);
-    const incomingEnergy = s.thermalPower + s.feedFlow * FEED_H;
-    const outgoingEnergy = s.steamFlow * vaporH;
+    s.auxiliaryHeatMW = s.startupMode && s.startupStage === 'prepared' && !s.tripped ? p.startupAuxiliaryHeatMW : 0;
+    s.ambientLossMW = s.startupMode && s.startupStage !== 'power' ? Math.max(0, 0.01 * (s.coolantTemp - 25)) : 0;
+    const incomingEnergy = s.thermalPower + s.auxiliaryHeatMW + s.feedFlow * feedH;
+    const outgoingEnergy = s.steamFlow * vaporH + s.ambientLossMW;
     const steamEnergy = steamStoredEnergy(s.steamTemp, s.steamMass, p.steamMetalCapacityMJK)
-      + h * (s.heatToSteam + s.feedFlow * FEED_H - s.steamFlow * vaporH);
+      + h * (s.heatToSteam + s.feedFlow * feedH - s.steamFlow * vaporH);
     const newMass = s.steamMass + h * (s.feedFlow - s.steamFlow);
     // Exit before invalid property calls; retain last physical thermodynamic state.
     if (newMass <= 0 || steamEnergy <= 0) {
       this._domain('Steam inventory depleted; two-phase/dryout physics outside this model');
       return;
     }
+    let nextSteamTemperature;
+    try { nextSteamTemperature = steamTemperatureFromEnergy(steamEnergy, newMass, p.steamMetalCapacityMJK); }
+    catch { this._domain('Steam thermal energy outside water-property table range'); return; }
     s.fuelTemp += h * (s.thermalPower - s.heatToCoolant) / p.fuelCapacityMJK;
-    s.coolantTemp += h * (s.heatToCoolant - s.heatToSteam) / p.coolantCapacityMJK;
-    s.steamTemp = steamTemperatureFromEnergy(steamEnergy, newMass, p.steamMetalCapacityMJK);
+    s.coolantTemp += h * (s.heatToCoolant + s.auxiliaryHeatMW - s.heatToSteam - s.ambientLossMW) / p.coolantCapacityMJK;
+    s.steamTemp = nextSteamTemperature;
     s.steamMass = newMass;
-    s.primaryPressure += 0.09 * (s.coolantTemp - oldCoolant) - h * (s.primaryPressure - p.primaryPressureMPa) / 45;
+    if (startupActive) {
+      // Charging/pressurizer control surrogate. It represents external hydraulic
+      // pressure support, not a pressurizer two-phase mass/energy calculation.
+      const targetPressure = s.startupStage === 'cold' ? 0.3 : p.primaryPressureMPa;
+      s.primaryPressure += 0.02 * (s.coolantTemp - oldCoolant) + h * (targetPressure - s.primaryPressure) / 90;
+    } else s.primaryPressure += 0.09 * (s.coolantTemp - oldCoolant) - h * (s.primaryPressure - p.primaryPressureMPa) / 45;
+    s.heatupRateCPerHour = (s.coolantTemp - oldCoolant) / h * 3600;
 
     // An infinite electrical bus fixes speed while connected. Upon trip the rotor
     // coasts down with a generic 45 s time constant; no grid-frequency model.
-    const gridConnected = !s.tripped && !this.faults.turbineTrip && s.turbineSteamFlow > 1;
-    s.turbineSpeed = gridConnected ? 3000 : relax(s.turbineSpeed, 0, h, 45);
-    s.grossPower = gridConnected ? s.turbineSteamFlow * (vaporH - FEED_H) * efficiency : 0;
-    s.electricPower = s.grossPower - auxiliaries;
+    const gridConnected = s.gridConnected && !s.tripped && !this.faults.turbineTrip;
+    s.mechanicalPowerMW = s.turbineSteamFlow * (vaporH - feedH) * efficiency;
+    if (s.startupMode) {
+      const oldRotor = s.rotorEnergyMJ;
+      s.rotorLossMW = gridConnected ? 0 : rotorLoss;
+      // Grid coupling exchanges the small synchronization-energy difference
+      // continuously over 3 s rather than jumping the shaft speed to 3000 rpm.
+      const rotorRate = gridConnected ? (p.rotorRatedEnergyMJ - oldRotor) / 3 : s.mechanicalPowerMW - s.rotorLossMW;
+      s.rotorEnergyMJ = Math.max(0, oldRotor + h * rotorRate);
+      s.grossPower = gridConnected ? s.mechanicalPowerMW - rotorRate : 0;
+      s.turbineSpeed = 3000 * Math.sqrt(s.rotorEnergyMJ / p.rotorRatedEnergyMJ);
+      s.rotorEnergyResidualMW = (s.rotorEnergyMJ - oldRotor) / h - s.mechanicalPowerMW + s.grossPower + s.rotorLossMW;
+    } else {
+      s.turbineSpeed = gridConnected && s.turbineSteamFlow > 1 ? 3000 : relax(s.turbineSpeed, 0, h, 45);
+      s.rotorEnergyMJ = p.rotorRatedEnergyMJ * (s.turbineSpeed / 3000) ** 2;
+      s.grossPower = gridConnected && s.turbineSteamFlow > 1 ? s.mechanicalPowerMW : 0;
+      s.rotorLossMW = 0; s.rotorEnergyResidualMW = 0;
+    }
+    s.electricPower = s.grossPower - auxiliaries - s.auxiliaryHeatMW;
     // Regenerative feedwater train is an algebraic closure returning condensate
     // to fixed FEED_H. Condenser heat is cycle heat input minus shaft output.
-    s.condenserHeat = s.steamFlow * (vaporH - FEED_H) - s.grossPower;
+    s.condenserHeat = s.steamFlow * (vaporH - feedH) - (s.startupMode ? s.mechanicalPowerMW : s.grossPower);
     const coolingFraction = this.faults.lossOfHeatSink ? 0 : c.cooling;
     s.coolingHeat = p.condenserConductanceMWK * coolingFraction * (s.condenserTemp - p.coolingWaterTempC);
     s.condenserTemp += h * (s.condenserHeat - s.coolingHeat) / p.condenserCapacityMJK;
@@ -289,7 +461,7 @@ export class PWRPlant {
     else if (s.steamMass < 60000) this.scram('Low steam-generator inventory');
     else if (s.pumpSpeed < 0.5 && s.neutronPower > 0.15) this.scram('Low primary coolant flow');
     else if (s.condenserTemp > 65) this.scram('High condenser backpressure');
-    else if (s.steamTemp > saturationTemperature(7.5)) this.scram('High secondary pressure');
+    else if (s.steamTemp > HIGH_STEAM_T) this.scram('High secondary pressure');
   }
 
   _domain(reason) {
@@ -302,17 +474,21 @@ export class PWRPlant {
     const s = this.state;
     const badNumber = Object.entries(s).find(([, value]) => typeof value === 'number' && !Number.isFinite(value));
     if (badNumber) { this._domain(`Non-finite ${badNumber[0]}`); return; }
-    if (s.fuelTemp > 1400 || s.fuelTemp < 80) this._domain('Fuel temperature outside lumped solid-fuel model (80–1400 C)');
-    else if (s.coolantTemp < 100 || s.coolantTemp > 340) this._domain('Primary average temperature outside single-phase model (100–340 C)');
-    else if (s.steamTemp < 100 || s.steamTemp > 330) this._domain('Steam temperature outside declared enthalpy-closure range (100–330 C)');
+    const minimumFuel = s.startupMode ? 20 : 80;
+    const minimumFluid = s.startupMode ? 20 : 100;
+    if (s.fuelTemp > 1400 || s.fuelTemp < minimumFuel) this._domain(`Fuel temperature outside lumped solid-fuel model (${minimumFuel}–1400 C)`);
+    else if (s.coolantTemp < minimumFluid || s.coolantTemp > 340) this._domain(`Primary average temperature outside single-phase model (${minimumFluid}–340 C)`);
+    else if (s.steamTemp < minimumFluid || s.steamTemp > 330) this._domain(`Steam temperature outside declared enthalpy-closure range (${minimumFluid}–330 C)`);
     else if (s.steamMass < 9000 || s.steamMass > 291000) this._domain('Steam-generator inventory outside 3–97% model range');
     else if (s.condenserTemp < 20 || s.condenserTemp > 95) this._domain('Condenser temperature outside 20–95 C model range');
     else if (s.neutronPower > 2 || s.neutronPower < 0) this._domain('Neutron power outside 0–200% model range');
     else if (s.primaryPressure < 0.1 || s.primaryPressure > 22) this._domain('Primary pressure outside single-phase property range');
+    else if (s.startupMode && s.turbineSpeed > 3300) this._domain('Turbine speed outside 0–3300 rpm rotor model range');
     else {
       const flow = PARAMETERS.primaryFlowKgS * (0.08 + 0.92 * s.pumpSpeed);
       const hotLeg = s.coolantTemp + s.heatToCoolant / (2 * flow * PARAMETERS.primaryCpMJkgK);
-      if (hotLeg >= saturationTemperature(s.primaryPressure)) this._domain('Primary hot leg reaches saturation; two-phase primary-flow physics not represented');
+      if (hotLeg < 0.01) this._domain('Primary hot leg outside water-property temperature range');
+      else if (hotLeg >= 373.946 || saturationPressure(hotLeg) >= s.primaryPressure) this._domain('Primary hot leg reaches saturation; two-phase primary-flow physics not represented');
     }
   }
 
@@ -325,12 +501,12 @@ export class PWRPlant {
     if (s.steamMass < 105000) add('sg-low', 'warning', 'Steam generator level below 35%');
     if (s.steamMass > 225000) add('sg-high', 'warning', 'Steam generator level above 75%');
     if (s.coolantTemp > 320) add('primary-hot', 'warning', 'High average primary coolant temperature');
-    if (s.pumpSpeed < 0.7) add('low-flow', 'warning', 'Primary pump speed below 70%');
+    if (s.pumpSpeed < 0.7 && s.startupStage !== 'cold') add('low-flow', 'warning', 'Primary pump speed below 70%');
     if (s.condenserTemp > 52) add('condenser-hot', 'warning', 'Condenser heat sink degraded');
     if (s.primaryPressure > 16.2) add('primary-pressure', 'warning', 'High primary pressure');
     const availableThermalNet = 3000 * PARAMETERS.turbineEfficiency * (1 - 0.008 * (s.condenserTemp - PARAMETERS.condenserTempC))
       - (30 + 20 * s.pumpSpeed ** 3);
-    if (!s.tripped && this.controls.demand * 1000 > availableThermalNet + 10) add('load-limited', 'warning', 'Electrical demand exceeds output available at rated thermal power');
+    if (!s.tripped && s.gridConnected && this.controls.demand * 1000 > availableThermalNet + 10) add('load-limited', 'warning', 'Electrical demand exceeds output available at rated thermal power');
     if (s.xenon > 1.1) add('xenon', 'warning', 'Xenon inventory above full-power equilibrium');
     for (const fault of FAULT_NAMES) if (this.faults[fault]) add(`fault-${fault}`, 'warning', `Active fault: ${fault}`);
     return alarms;
@@ -347,7 +523,7 @@ export class PWRPlant {
       electricPower: s.electricPower, grossPower: s.grossPower, decayPower: s.decayPower,
       fuelTemp: s.fuelTemp, hotLegTemp: s.coolantTemp + coreDeltaT / 2,
       coldLegTemp: s.coolantTemp - coreDeltaT / 2, coolantTemp: s.coolantTemp,
-      primaryPressure: s.primaryPressure, steamPressure: pressureSafe(s.steamTemp),
+      primaryPressure: s.primaryPressure, steamPressure: s.startupMode ? Math.max(0.101325, pressureSafe(s.steamTemp)) : pressureSafe(s.steamTemp),
       steamTemp: s.steamTemp, steamLevel: 100 * s.steamMass / p.steamFullMassKg,
       steamFlow: s.steamFlow, feedFlow: s.feedFlow, primaryFlow: flow,
       condenserPressure: pressureSafe(s.condenserTemp) * 1000,
@@ -364,25 +540,53 @@ export class PWRPlant {
       efficiency: s.thermalPower > 1 ? 100 * s.electricPower / s.thermalPower : 0,
       tripped: s.tripped, tripReason: s.tripReason,
       domainExceeded: s.domainExceeded, domainReason: s.domainReason,
+      startupMode: s.startupMode, startupStage: s.startupStage, gridConnected: s.gridConnected,
+      startupStatus: s.domainExceeded ? s.domainReason : s.tripped ? `Reactor trip latched: ${s.tripReason}`
+        : ({ cold: 'Cold, subcritical; prepare circulation and pressurization', prepared: 'Circulation and external auxiliary heat; wait for heatup permissives',
+          heatup: 'Reactor-assisted heatup; thermal states integrate continuously', hotStandby: 'Hot thermal hold at low reactor power; turbine disconnected',
+          turbineRoll: 'Steam is accelerating the turbine rotor; generator disconnected', power: s.gridConnected ? 'Generator connected; net-load control active' : 'Generator disconnected' })[s.startupStage],
+      startupPermissives: this._startupPermissives(), heatupTarget: s.heatupTarget,
+      heatupRateCPerHour: s.heatupRateCPerHour, rotorEnergyMJ: s.rotorEnergyMJ,
+      auxiliaryHeatMW: s.auxiliaryHeatMW, ambientLossMW: s.ambientLossMW,
+      sourceStrength: s.sourceStrength, feedwaterTemp: s.feedwaterTemp,
+      mechanicalPowerMW: s.mechanicalPowerMW, rotorLossMW: s.rotorLossMW,
+      rotorEnergyResidualMW: s.rotorEnergyResidualMW,
       controls: { ...this.controls }, faults: { ...this.faults },
       alarms: this._alarms(), events: this.events.map(event => ({ ...event })),
     };
   }
 
   exportState() {
-    return { schema: SCHEMA, model: 'OpenPWR reduced-order PWR 1.0', controls: clone(this.controls), faults: clone(this.faults), state: clone(this.state), events: clone(this.events) };
+    return { schema: SCHEMA, model: MODEL, controls: clone(this.controls), faults: clone(this.faults), state: clone(this.state), events: clone(this.events) };
   }
 
   importState(input) {
     // Validate without mutating this instance. Reject extra/missing fields to avoid
     // prototype keys, schema drift, incomplete physics and arbitrary user content.
-    if (!input || typeof input !== 'object' || input.schema !== SCHEMA) throw new TypeError('Unsupported OpenPWR save format');
+    if (!input || typeof input !== 'object' || ![SCHEMA, 'openpwr-state-v1'].includes(input.schema)) throw new TypeError('Unsupported OpenPWR save format');
     const incoming = clone(input);
     const reference = new PWRPlant();
+    if (incoming.schema === 'openpwr-state-v1') {
+      if (incoming.model !== 'OpenPWR reduced-order PWR 1.0' || !incoming.controls || !incoming.state || !Array.isArray(incoming.events)) throw new TypeError('Invalid legacy OpenPWR save');
+      const addedKeys = ['startupMode', 'startupStage', 'gridConnected', 'rotorEnergyMJ', 'auxiliaryHeatMW', 'ambientLossMW', 'sourceStrength',
+        'heatupTarget', 'heatupRateCPerHour', 'mechanicalPowerMW', 'rotorLossMW', 'rotorEnergyResidualMW', 'feedwaterTemp'];
+      if (Object.hasOwn(incoming.controls, 'startupPower') || addedKeys.some(key => Object.hasOwn(incoming.state, key))) throw new TypeError('Legacy save contains unexpected version-2 fields');
+      incoming.controls.startupPower = 0.01;
+      for (const key of addedKeys) incoming.state[key] = reference.state[key];
+      incoming.state.gridConnected = !incoming.state.tripped && !incoming.faults?.turbineTrip;
+      incoming.state.rotorEnergyMJ = PARAMETERS.rotorRatedEnergyMJ * (incoming.state.turbineSpeed / 3000) ** 2;
+      incoming.state.mechanicalPowerMW = incoming.state.grossPower;
+      // Version-1 used approximate enthalpy. Preserve every thermodynamic state,
+      // precursor and time; restart accounting integrals under the IF97 closure.
+      for (const key of ['energyResidual', 'integratedEnergyResidualMJ', 'integratedBoundaryEnergyMJ', 'energyInMJ', 'energyOutMJ']) incoming.state[key] = 0;
+      incoming.events.push({ time: incoming.state.time, level: 'info', message: 'Migrated v1 hot state; temperatures and nuclear inventories preserved; energy counters restarted for IF97 properties' });
+      incoming.events = incoming.events.slice(-200);
+      incoming.schema = SCHEMA; incoming.model = MODEL;
+    }
     const exactKeys = (object, keys) => object && typeof object === 'object' && !Array.isArray(object)
       && Object.keys(object).length === keys.length && keys.every(key => Object.hasOwn(object, key));
     if (!exactKeys(incoming, ['schema', 'model', 'controls', 'faults', 'state', 'events'])
-        || incoming.model !== 'OpenPWR reduced-order PWR 1.0'
+        || incoming.model !== MODEL
         || !exactKeys(incoming.controls, Object.keys(reference.controls)) || !exactKeys(incoming.faults, FAULT_NAMES)
         || !exactKeys(incoming.state, Object.keys(reference.state))) throw new TypeError('Save has missing or unknown state fields');
     for (const key of BOOLEAN_CONTROLS) if (typeof incoming.controls[key] !== 'boolean') throw new TypeError('Invalid automatic control flag');
@@ -395,26 +599,51 @@ export class PWRPlant {
       const value = incoming.state[key];
       if (Array.isArray(original)) {
         if (!Array.isArray(value) || value.length !== original.length
-          || value.some((x, index) => !Number.isFinite(x) || x < 0 || x > (key === 'decay' ? 3 * DECAY_GROUPS[index].fraction : 3))) throw new TypeError(`Invalid ${key} array`);
+          || value.some((x, index) => !Number.isFinite(x) || x < 0 || x > (incoming.state.domainExceeded ? 1e6 : (key === 'decay' ? 3 * DECAY_GROUPS[index].fraction : 3)))) throw new TypeError(`Invalid ${key} array`);
       } else if (typeof original === 'number') {
         if (!Number.isFinite(value) || Math.abs(value) > 1e15) throw new TypeError(`Invalid numeric ${key}`);
       } else if (typeof value !== typeof original || (typeof value === 'string' && value.length > 300)) throw new TypeError(`Invalid ${key}`);
     }
     const s = incoming.state;
-    if (s.time < 0 || s.time > 1e8 || s.neutronPower < 0 || s.neutronPower > 2.1 || s.fuelTemp < 0 || s.fuelTemp > 1500
-      || s.coolantTemp < 50 || s.coolantTemp > 360 || s.steamTemp < 50 || s.steamTemp > 350
+    // A terminal numerical/domain overshoot remains inspectable and saveable,
+    // but cannot advance. Retain strict schemas and finite data; require only
+    // the material-state bounds needed to evaluate its diagnostic snapshot.
+    // Active states retain the narrower physical envelope below.
+    if (!STARTUP_STAGES.includes(s.startupStage) || (!s.startupMode && s.startupStage !== 'power')
+      || s.time < 0 || s.time > 1e8 || s.steamTemp < 0 || s.steamTemp > 350 || s.steamMass <= 0
+      || s.pumpSpeed < 0 || s.pumpSpeed > 1) {
+      throw new RangeError('Saved state cannot be represented by the model');
+    }
+    if (!s.domainExceeded && (s.time < 0 || s.time > 1e8 || s.neutronPower < 0 || s.neutronPower > 2.1 || s.fuelTemp < 0 || s.fuelTemp > 1500
+      || s.coolantTemp < 10 || s.coolantTemp > 360 || s.steamTemp < 10 || s.steamTemp > 350
       || s.steamMass <= 0 || s.steamMass > 310000 || s.condenserTemp < 10 || s.condenserTemp > 100
       || s.primaryPressure < 0.1 || s.primaryPressure > 22 || s.pumpSpeed < 0 || s.pumpSpeed > 1
       || s.turbineValve < 0 || s.turbineValve > 1 || s.feedFlow < 0 || s.feedFlow > 1.21 * PARAMETERS.nominalSteamFlowKgS
-      || s.iodine < 0 || s.iodine > 10 || s.xenon < 0 || s.xenon > 10 || Math.abs(s.autoRod) > 2500
-      || s.turbineSpeed < 0 || s.turbineSpeed > 3000 || Math.abs(s.reactivity) > 15000
+      || s.iodine < 0 || s.iodine > 10 || s.xenon < 0 || s.xenon > 10 || s.autoRod < (s.startupMode ? -10000 : -2500) || s.autoRod > 2500
+      || s.turbineSpeed < 0 || s.turbineSpeed > 3400 || Math.abs(s.reactivity) > 15000
       || s.thermalPower < 0 || s.thermalPower > 10000 || s.decayPower < 0 || s.decayPower > 1000
-      || s.grossPower < 0 || s.grossPower > 3000 || s.electricPower < -100 || s.electricPower > 3000
+      || s.grossPower < -50 || s.grossPower > 3000 || s.electricPower < -150 || s.electricPower > 3000
       || s.steamFlow < 0 || s.steamFlow > 10000 || s.turbineSteamFlow < 0 || s.turbineSteamFlow > 5000
       || s.bypassSteamFlow < 0 || s.bypassSteamFlow > 5000 || Math.abs(s.energyResidual) > 1
       || Math.abs(s.heatToSteam) > 1e5 || Math.abs(s.heatToCoolant) > 1e5
       || Math.abs(s.condenserHeat) > 1e5 || Math.abs(s.coolingHeat) > 1e5
-      || s.energyInMJ < 0 || s.energyOutMJ < 0) throw new RangeError('Save outside physical state domain');
+      || s.energyInMJ < 0 || s.energyOutMJ < 0
+      || !STARTUP_STAGES.includes(s.startupStage) || (!s.startupMode && s.startupStage !== 'power')
+      || (s.gridConnected && (s.startupStage !== 'power' || s.tripped))
+      || s.rotorEnergyMJ < 0 || s.rotorEnergyMJ > 2600 || s.auxiliaryHeatMW < 0 || s.auxiliaryHeatMW > 5
+      || s.ambientLossMW < 0 || s.ambientLossMW > 5 || s.sourceStrength < 0 || s.sourceStrength > PARAMETERS.startupSourcePerS
+      || s.heatupTarget < 0 || s.heatupTarget > 0.12 || Math.abs(s.heatupRateCPerHour) > 1e5
+      || s.mechanicalPowerMW < 0 || s.mechanicalPowerMW > 3000 || s.rotorLossMW < 0 || s.rotorLossMW > 10
+      || Math.abs(s.rotorEnergyResidualMW) > 1 || s.feedwaterTemp < 0 || s.feedwaterTemp > FEED_T)) throw new RangeError('Save outside physical state domain');
+    const energyFromSpeed = PARAMETERS.rotorRatedEnergyMJ * (s.turbineSpeed / 3000) ** 2;
+    if (s.turbineSpeed < 0 || s.rotorEnergyMJ < 0 || Math.abs(s.rotorEnergyMJ - energyFromSpeed) > Math.max(1e-6, 1e-10 * energyFromSpeed)) throw new RangeError('Saved rotor speed and kinetic energy are inconsistent');
+    if (!s.domainExceeded && s.startupMode && s.startupStage === 'power' && !s.gridConnected && !s.tripped) {
+      throw new RangeError('An untripped startup power stage requires a connected generator');
+    }
+    if (!s.domainExceeded && s.startupMode && s.gridConnected && (s.turbineSpeed < 2950 - 1e-6 || s.turbineSpeed > 3050 + 1e-6
+      || s.steamTemp < ATMOSPHERIC_BOILING_T || s.coolantTemp < 100)) {
+      throw new RangeError('Saved grid connection is incompatible with turbine speed or hot steam conditions');
+    }
     if (!Array.isArray(incoming.events) || incoming.events.length > 200
       || incoming.events.some(e => !exactKeys(e, ['time', 'level', 'message']) || !Number.isFinite(e.time) || e.time < 0 || e.time > s.time + 1e-8
         || !['info', 'warning', 'critical'].includes(e.level) || typeof e.message !== 'string' || e.message.length > 400)) throw new TypeError('Invalid event history');
@@ -426,7 +655,10 @@ export class PWRPlant {
       reference._checkDomain();
       if (reference.state.domainExceeded) throw new RangeError(`Imported state outside model domain: ${reference.state.domainReason}`);
     }
-    reference.snapshot(); // verifies thermodynamic derived quantities are evaluable
+    const diagnostics = reference.snapshot();
+    if (Object.values(diagnostics).some(value => typeof value === 'number' && !Number.isFinite(value))) {
+      throw new RangeError('Saved state produces non-finite diagnostic quantities');
+    }
     this.state = s;
     this.controls = incoming.controls;
     this.faults = incoming.faults;

@@ -10,7 +10,7 @@ const root = source ? project : resolve(project, 'dist');
 const requestedPort = process.argv.find(a => a.startsWith('--port='));
 const port = requestedPort ? Number(requestedPort.split('=')[1]) : 4173;
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Port must be an integer between 1024 and 65535');
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.md': 'text/plain; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png' };
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.md': 'text/plain; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg' };
 const server = createServer(async (req, res) => {
   if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); res.end(); return; }
   try {
@@ -19,8 +19,8 @@ const server = createServer(async (req, res) => {
     if (route.split(/[\\/]/).some(part => part === '..' || part === '.')) {
       res.writeHead(404); res.end('Not found'); return;
     }
-    if (source && route === 'verification.json') route = 'artifacts/verification.json';
-    if (!/^(index\.html|verification\.html|verification\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/verification\.json)$/.test(route)) {
+    if (source && ['verification.json', 'benchmarks.json'].includes(route)) route = 'artifacts/' + route;
+    if (!/^(index\.html|verification\.html|verification\.json|benchmarks\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks)\.json)$/.test(route)) {
       res.writeHead(404); res.end('Not found'); return;
     }
     const path = resolve(root, route);

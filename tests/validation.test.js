@@ -54,15 +54,14 @@ test('IAPWS saturation pressure agrees with external NIST table anchors', () => 
   }
 });
 
-test('simplified enthalpy closure stays within 3% at held-out NIST temperatures', () => {
-  // The liquid fit uses 100/280 C and the vaporization correlation is anchored
-  // at 100 C. These 200/300 C points are not the fit endpoints. This sparse
-  // check is NOT a claim of a 3% bound throughout the full operating domain.
+test('production IF97 enthalpies agree with NIST at 200 and 300 C', () => {
+  // These externally tabulated points supplement the broader published
+  // benchmark suite. Production now uses interpolated IF97 enthalpy values.
   const anchors = [[200, 0.85227, 2.7920], [300, 1.3450, 2.7496]];
   for (const [temperature, hLiquid, hVapor] of anchors) {
-    assert.ok(relativeError(liquidEnthalpy(temperature), hLiquid) < 0.03);
-    assert.ok(relativeError(vaporEnthalpy(temperature), hVapor) < 0.03);
-    assert.ok(relativeError(vaporEnthalpy(temperature) - liquidEnthalpy(temperature), hVapor - hLiquid) < 0.03);
+    assert.ok(relativeError(liquidEnthalpy(temperature), hLiquid) < 0.0005);
+    assert.ok(relativeError(vaporEnthalpy(temperature), hVapor) < 0.0005);
+    assert.ok(relativeError(vaporEnthalpy(temperature) - liquidEnthalpy(temperature), hVapor - hLiquid) < 0.0005);
   }
 });
 

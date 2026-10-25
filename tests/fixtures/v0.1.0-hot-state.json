@@ -1,0 +1,87 @@
+{
+  "schema": "openpwr-state-v1",
+  "model": "OpenPWR reduced-order PWR 1.0",
+  "controls": {
+    "demand": 0.75,
+    "autoReactor": true,
+    "rodReactivity": 0,
+    "primaryPump": 1,
+    "autoFeedwater": true,
+    "feedwater": 1,
+    "autoTurbine": true,
+    "turbineValve": 1,
+    "cooling": 1
+  },
+  "faults": {
+    "primaryPumpTrip": false,
+    "feedwaterTrip": false,
+    "turbineTrip": false,
+    "lossOfHeatSink": false
+  },
+  "state": {
+    "time": 59.99999999999873,
+    "neutronPower": 0.7059721312473052,
+    "precursors": [
+      0.8716388140124717,
+      0.7802730608538727,
+      0.7099079268989362,
+      0.7059414689962648,
+      0.7058992230144704,
+      0.7059410416583822
+    ],
+    "decay": [
+      0.009176610263054066,
+      0.011301560419186467,
+      0.009067127151564418,
+      0.009214582162445778,
+      0.00789214461270711,
+      0.006990351888057713
+    ],
+    "fuelTemp": 510.92938424684934,
+    "coolantTemp": 301.47808908477344,
+    "steamTemp": 277.7205562695328,
+    "steamMass": 150699.45543181695,
+    "primaryPressure": 15.16434029116731,
+    "condenserTemp": 38.842340831774585,
+    "pumpSpeed": 1,
+    "turbineValve": 0.7438305933200019,
+    "feedFlow": 1264.808421780459,
+    "turbineSpeed": 3000,
+    "iodine": 0.9995953693509614,
+    "xenon": 1.0002473640548584,
+    "autoRod": -271.0437339428179,
+    "reactivity": -20.72112573281595,
+    "tripped": false,
+    "tripReason": "",
+    "domainExceeded": false,
+    "domainReason": "",
+    "energyResidual": 4.440607881406322e-9,
+    "integratedEnergyResidualMJ": 2.0610514184227247e-9,
+    "integratedBoundaryEnergyMJ": -8731.61615129811,
+    "thermalPower": 2139.061041245996,
+    "decayPower": 160.92712949104668,
+    "electricPower": 750.0733663778306,
+    "grossPower": 800.0733663778306,
+    "steamFlow": 1267.5210378368806,
+    "turbineSteamFlow": 1267.5210378368806,
+    "bypassSteamFlow": 0,
+    "heatToSteam": 2233.4322465965247,
+    "heatToCoolant": 2148.25730385584,
+    "condenserHeat": 1464.9020948807843,
+    "coolingHeat": 1837.27950942268,
+    "energyInMJ": 220287.12349904905,
+    "energyOutMJ": 229018.7396503473
+  },
+  "events": [
+    {
+      "time": 0,
+      "level": "info",
+      "message": "Initialized at 100% reactor power; equilibrium precursor and decay inventory"
+    },
+    {
+      "time": 0,
+      "level": "info",
+      "message": "demand: 0.75"
+    }
+  ]
+}

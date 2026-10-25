@@ -23,7 +23,9 @@ Internally, time is seconds; power is MW = MJ/s; stored energy is MJ; mass is kg
 | Condenser thermal capacity | 12,000 MJ/K | Generic effective capacity |
 | Turbine conversion / auxiliary demand | 35% / 50 MW at nominal pumps | Calibrated to the nominal electrical output |
 
-`PARAMETERS` in [`src/engine.js`](../src/engine.js) is the authoritative parameter set. These values have not been inferred from a particular plant's design documents or validated transient measurements. Initial states assume equilibrium precursor, poison, and decay-heat inventories at the selected power. They do not reproduce a cold start or a short irradiation history. A half-thermal-power equilibrium produces 475 MWe because auxiliary loads remain present. The API accepts `initialPower` as a thermal fraction from `2/7` through `1`; the lower limit corresponds to 250 MWe net with nominal auxiliaries. Initial cooling-water command follows the initial thermal fraction to maintain a 40 °C condenser. Subsequent load increases may require increased cooling-water command; an output-limit alarm indicates insufficient conversion capacity at rated thermal power.
+`PARAMETERS` in [`src/engine.js`](../src/engine.js) is the authoritative parameter set. These values have not been inferred from a particular plant's design documents or validated transient measurements. Hot initial states assume equilibrium precursor, poison, and decay-heat inventories at the selected power. A half-thermal-power equilibrium produces 475 MWe because auxiliary loads remain present. The API accepts `initialPower` as a thermal fraction from `2/7` through `1`; the lower limit corresponds to 250 MWe net with nominal auxiliaries. Initial cooling-water command follows the initial thermal fraction to maintain a 40 °C condenser. Subsequent load increases may require increased cooling-water command; an output-limit alarm indicates insufficient conversion capacity at rated thermal power.
+
+`new PWRPlant({mode: 'cold'})` initializes a distinct 25 °C state with a source-supported subcritical neutron population, stationary rotor, disconnected generator, and zero prior poison/decay inventory. It represents a generic long-cooled initial condition, not the residual inventories of a recently shut-down plant. Startup actions preserve dynamic inventories; only an explicit initialization replaces them.
 
 ## Reactor dynamics
 
@@ -32,12 +34,12 @@ Internally, time is seconds; power is MW = MJ/s; stored energy is MJ; mass is kg
 The conventional point-kinetics equations are
 
 \[
-\dot n=\frac{\rho-\beta}{\Lambda}n+\sum_i\lambda_i C_i,
+\dot n=\frac{\rho-\beta}{\Lambda}n+\sum_i\lambda_i C_i+S,
 \qquad
 \dot C_i=\frac{\beta_i}{\Lambda}n-\lambda_i C_i.
 \]
 
-The implementation stores `zᵢ = λᵢ Λ Cᵢ / βᵢ`, so each normalized precursor equals `n` at equilibrium. A backward-Euler step solves all seven variables implicitly by eliminating the six precursor unknowns. The solver guards the positivity domain. This is a temporal, spatially uniform model: it cannot calculate flux shapes, local power peaking, rod shadowing, neutron spectra, or changing effective delayed-neutron data with burnup.
+The implementation stores `zᵢ = λᵢ Λ Cᵢ / βᵢ`, so each normalized precursor equals `n` at equilibrium. A backward-Euler step solves all seven variables implicitly by eliminating the six precursor unknowns. The solver guards the positivity domain. Hot initialization uses `S=0`; cold initialization uses a generic normalized source `S=10⁻⁶ s⁻¹` and `ρ=−1,500 pcm`, giving `n=−SΛ/ρ` and equilibrium precursors. The source is not a detector count rate. The same kernel accepts explicit benchmark group data and generation time; this does not change the plant's default parameters. This is a temporal, spatially uniform model: it cannot calculate flux shapes, local power peaking, rod shadowing, neutron spectra, or changing effective delayed-neutron data with burnup.
 
 | Group | βᵢ | λᵢ (s⁻¹) |
 | --- | ---: | ---: |
@@ -66,7 +68,7 @@ Normalized iodine follows fission production and radioactive decay. Xenon follow
 
 ### Primary loop
 
-The two thermal balances are
+The two thermal balances for the hot reference path are
 
 \[
 C_f\dot T_f=Q_{thermal}-Q_{f\to p},\qquad
@@ -74,6 +76,8 @@ C_p\dot T_p=Q_{f\to p}-Q_{p\to sg}.
 \]
 
 Heat transfers use conductance times temperature difference. Both conductances scale with circulation to the 0.8 power. Pump speed has a 7 s lag; circulation is `0.08 + 0.92 × pumpSpeed`. The 8% floor is an assumed residual-circulation surrogate, not a buoyancy-driven natural-circulation calculation. Hot- and cold-leg temperatures are derived from the average coolant and `ΔT = Q/(ṁ cₚ)`; they are not separately integrated volumes.
+
+The cold-start primary balance adds external auxiliary heat and subtracts ambient losses, as defined below. Neither source is hidden in the nuclear power indication.
 
 Primary pressure responds to average-coolant temperature change with a simple compliance term and relaxes to its reference pressure over 45 s. This stands in for pressure regulation. There is no separate two-phase pressurizer volume, surge-line model, primary inventory/boration balance, leak model, or pressure-wave calculation.
 
@@ -86,16 +90,11 @@ The steam generator updates liquid inventory and energy using
 \dot E=Q_{p\to sg}+\dot m_{feed}h_{feed}-\dot m_{steam}h_{vapor}.
 \]
 
-Stored energy is `E = Cmetal T + M h_liquid(T)`. Each step updates mass and energy, then solves the quadratic inverse for temperature. Steam pressure follows the saturation-temperature relation. This is a **lumped saturated-inventory approximation**: vapor holdup, void distribution, slip, moving boiling boundaries, shrink/swell, and steam-dryer behavior are omitted. Displayed level is the inventory fraction on the chosen full-mass scale.
+Stored energy is `E = Cmetal T + M h_liquid(T)`. Each step updates mass and energy, then solves the exact inverse of the piecewise-linear property table for temperature. Steam pressure follows the saturation-temperature relation. For cold-start states, secondary pressure has an atmospheric floor and steam outflow is inhibited below atmospheric boiling temperature. The atmospheric floor is a vented/subcooled surrogate, not a noncondensable-gas inventory model. This remains a **lumped inventory approximation**: vapor holdup, void distribution, slip, moving boiling boundaries, shrink/swell, and steam-dryer behavior are omitted. Displayed level is the inventory fraction on the chosen full-mass scale.
 
-Saturation pressure uses the published IAPWS Wagner correlation; its inverse is found by monotone bisection. The independent numerical checks use [NIST saturated-water tables](https://www.nist.gov/document/nistir5078-tab1pdf). Enthalpy is deliberately simpler:
+Saturation pressure uses the published IAPWS Wagner correlation; its inverse is found by monotone bisection. Version 0.2 replaces the fitted enthalpy curves with original implementations of the [IAPWS-IF97 region 1/2 Gibbs equations and region 4 saturation relation](https://iapws.org/technical-guidance/release/IF97-Rev.download). The production enthalpy functions interpolate a 0.25 °C saturated-water table from 0 to 350 °C. The storage inverse uses that same interpolation, maintaining consistent energy accounting across table cells. Reference comparisons use the official IF97 verification tables and [NIST saturated-water tables](https://www.nist.gov/document/nistir5078-tab1pdf); interpolation tests also check temperatures between cache nodes.
 
-\[
-h_l(T)=0.00406625556T+1.25444444\times10^{-6}T^2
-\quad\text{MJ/kg},
-\]
-
-with liquid coefficients fitted at 100 and 280 °C. Vaporization enthalpy uses a Watson exponent of 0.38, normalized to 2.2564 MJ/kg at 100 °C, and vapor enthalpy is their sum. Held-out checks at 200 and 300 °C bound errors at those points only. This is **not IAPWS-IF97** and does not establish a general accuracy envelope for compressed water, superheated steam, or near-critical states. The [IAPWS saturation release](https://iapws.org/technical-guidance/release/Supp-sat) supplies the pressure correlation, not the entire property model used here.
+This is **not a complete IF97 package**. Regions 3 and 5, transport properties, and a two-phase mixture equation of state are absent. The primary loop still uses a fixed effective heat capacity; feedwater uses saturated-liquid enthalpy as a compressed-water approximation. Improved property functions do not validate the inventory, heat-transfer, turbine, or pressure closures. The direct IF97 helper exposes `h`, `u`, `v`, `s`, and `cp`, while the coupled plant currently uses its saturated enthalpies. [BENCHMARKS.md](BENCHMARKS.md) gives the exact implemented scope and reference conditions.
 
 Automatic feedwater tracks steam outflow plus an inventory correction, with a 4 s actuator lag and a maximum flow. Turbine steam flow scales with valve opening and the square root of steam pressure. An idealized steam bypass opens on high secondary pressure and supplies a residual steam path after trip. It is not a plant-specific auxiliary-feedwater or emergency-cooling train.
 
@@ -103,7 +102,21 @@ Automatic feedwater tracks steam outflow plus an inventory correction, with a 4 
 
 Gross electrical power is turbine steam flow times the available cycle enthalpy difference times a calibrated conversion efficiency. Efficiency decreases with condenser temperature. Auxiliary load is `30 + 20 × pumpSpeed³` MW; the net meter therefore shows grid import after generator disconnection. A fixed infinite grid holds connected rotor speed at 3,000 rpm; a tripped rotor coasts down with a 45 s lag. Generator electromagnetic transients, shaft torsion, moisture separation/reheat, synchronizing procedures, and grid-frequency dynamics are absent.
 
-The feed-heating train is an algebraic closure returning condensate to a fixed feed enthalpy. The condenser integrates rejected heat minus a conductance-based cooling-water heat sink. There is no cooling-tower weather model or separate condensate inventory. This reduced cycle is useful for interaction studies around its reference operating regime; it is not a full Rankine-cycle performance or equipment-sizing model.
+For hot initialization the feed-heating train is an algebraic closure returning condensate to a fixed feed enthalpy. The cold-start path uses the temperature-dependent closure below. The condenser integrates rejected heat minus a conductance-based cooling-water heat sink. There is no cooling-tower weather model or separate condensate inventory. This reduced cycle is useful for interaction studies around its reference operating regime; it is not a full Rankine-cycle performance or equipment-sizing model.
+
+## Generic cold-start experiment
+
+This is a **reactor-assisted educational heatup**, not a plant-specific startup procedure or a qualified representation of actual PWR operating modes. The states `cold → prepared → heatup → hotStandby → turbineRoll → power` form a control sequence; state changes never assign temperatures, neutron power, precursors, decay heat, or rotor energy. The historical API name `hotStandby` means a **hot thermal hold at low reactor power** in this model, not a subcritical plant Mode 3.
+
+Cold initialization uses 25 °C thermal nodes, 0.3 MPa primary pressure, zero rotor energy, and no previous fission-product inventory. Preparing circulation commands the pumps and cooling system and enables a generic 5 MW external auxiliary heat input. The electrical meter includes that heat input as imported power. During pre-grid startup, ambient heat loss is `max(0, 0.01(Tprimary−25)) MW`; both terms appear in the fuel/primary/steam-generator energy accounting. Pressure support uses a 90 s relaxation toward 15.5 MPa plus a temperature-compliance term. This represents external charging/pressure control; it has no resolved pressurizer mass/energy or hydraulic-work model.
+
+Heatup becomes available only with adequate circulation, pressure, and inventory. Its automatic controller moves the rod surrogate toward a reactivity setpoint based on the logarithm of requested/measured neutron power. Default requested power is 1% of nominal thermal power. Below 265 °C average primary temperature, an aggregate thermal-capacity schedule limits the requested nuclear power to approximately a 50 °C/h heatup budget. This is a power cap, not an imposed temperature trajectory or a guaranteed local rate limit. Local thermal lags, losses, and stored heat remain in the integrated equations; the limit does not apply to subsequent load pickup.
+
+The hot-hold stage requires at least 275 °C primary coolant, 265 °C steam-generator temperature, and 14 MPa primary pressure, with 35–75% indicated SG inventory. It regulates low reactor power around a 280 °C primary target. Turbine roll additionally requires circulation and condenser cooling. These are chosen generic permissives, not plant technical specifications. Cold feedwater enthalpy follows an idealized regenerative temperature `min(220, max(Tcondenser, TSG−35)) °C`; its thermal contribution is deducted in the cycle/condenser closure. No separate feed-heater inventories or thermal delays are represented.
+
+For the cold-start path, the rotor has rated kinetic energy 2,000 MJ at 3,000 rpm. While disconnected, `dErotor/dt = Pshaft − Erotor/600`, and speed follows `3000 sqrt(Erotor/2000)`. A bounded steam-valve governor supplies acceleration power. Grid connection requires 2,950–3,050 rpm and the hot conditions above. A 3 s grid-coupling term exchanges the remaining rotor-energy difference continuously; gross electrical output is shaft power minus that exchange and may briefly be negative. Grid phase, voltage, frequency matching, and electromagnetic transients are not modeled. Explicit generator disconnection triggers a load-rejection trip and fast stop-valve closure.
+
+The reference headless sequence applies actions through the public API at one-second decision boundaries. After connection, demand rises from 250 to 1,000 MWe in 10 MWe/min steps. Its times and power traces are reproducible results of the assumed model, not external validation observations. The generated verification report includes the action times and a one-minute trace. Saved-state schema v2 includes startup and rotor states; importing an authentic v1 hot save preserves thermal/nuclear inventories but restarts cumulative energy diagnostics because the enthalpy closure changed.
 
 ## Protection, limits, and numerical behavior
 
@@ -111,12 +124,12 @@ Trips are latched. Initiating equipment faults and generic thresholds can insert
 
 The engine limits internal steps to 50 ms and integrates thermal/mass balances explicitly, with implicit kinetics and exact first-order relaxations. Reducing the caller step refines the coupled solution. Exiting a supported physical envelope creates a visible model-boundary event and halts advancement. The primary hot-leg diagnostic is checked against saturation temperature at the current primary pressure. In particular, primary boiling or exhausted steam-generator inventory is not followed into two-phase primary flow, dryout, or fuel-damage predictions.
 
-The recorded energy residual compares stored energy change in **fuel + primary coolant + steam-generator liquid/metal** with nuclear heat and feed/steam enthalpy crossing that boundary. It excludes the condenser, generator, auxiliary equipment, and mechanical stores. A small residual confirms discrete bookkeeping for those nodes, not physical validity of the plant model.
+The recorded energy residual compares stored energy change in **fuel + primary coolant + steam-generator liquid/metal** with nuclear heat, external auxiliary heat, feed/steam enthalpy, and ambient loss crossing that boundary. It excludes the condenser, generator, auxiliary equipment stores, and mechanical stores; rotor energy has a separate residual. A small residual confirms discrete bookkeeping for those nodes, not physical validity of the plant model.
 
 Numerical verification, reference-property checks, and the missing validation evidence are described in [VALIDATION.md](VALIDATION.md). Scenario results and plots should always be interpreted together with these model assumptions.
 
 ## Deliberate exclusions
 
-This release does not model cold startup/shutdown procedures, spatial neutronics, fuel depletion/refueling, boron chemistry, detailed instrumentation failure, LOCA, critical heat flux/DNBR, two-phase primary flow, ECCS, containment, radionuclide release, material damage, or severe accidents. It cannot predict whether a real plant is safe. Detailed reactor transport and CFD would require separate modeling tools and validation; this browser engine is not a substitute for them.
+The cold-start experiment does not reproduce plant-specific startup/shutdown procedures. This release also omits spatial neutronics, fuel depletion/refueling, boron chemistry, detailed instrumentation failure, LOCA, critical heat flux/DNBR, two-phase primary flow, ECCS, containment, radionuclide release, material damage, and severe accidents. It cannot predict whether a real plant is safe. Detailed reactor transport and CFD would require separate modeling tools and validation; this browser engine is not a substitute for them. See the [roadmap](ROADMAP.md) for the remaining systems and required evidence.
 
 For an accessible description of the physical PWR energy path and major equipment, see the [NRC PWR overview](https://www.nrc.gov/reactors/power/pwrs). Those physical concepts motivate the topology, but the NRC document does not validate OpenPWR's parameters or transient results.

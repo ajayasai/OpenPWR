@@ -15,4 +15,4 @@ No source code from ThermoSysPro, TRANSFORM, Reactor Dynamics, OpenMC, or Hartru
 
 No API keys, private plant data, analytics scripts, third-party CDN assets, or network-backed simulation services are used. After the static assets load, the simulator's numerical work is local; export and import remain on the device. Native browser download behavior saves files only when requested.
 
-The complete corresponding source is in this repository. Build outputs are straightforward copies of that source, plus generated numerical verification evidence.
+The complete corresponding source is in this repository. Build outputs are straightforward copies of that source, plus generated numerical verification and published benchmark comparison reports. The property implementation and benchmark runner are original code. Reference values and equations are attributed to their publications in [BENCHMARKS.md](BENCHMARKS.md); no publisher PDFs or third-party solver implementations are bundled.

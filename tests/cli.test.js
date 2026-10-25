@@ -29,7 +29,7 @@ async function run(args) {
 function parseCsv(text) {
   const [header, ...rows] = text.trim().split('\n');
   const keys = header.trim().split(',');
-  return rows.map(line => Object.fromEntries(line.trim().split(',').map((value, i) => [keys[i], value === 'true' ? true : value === 'false' ? false : Number(value)])));
+  return rows.map(line => Object.fromEntries(line.trim().split(',').map((value, i) => [keys[i], value === 'true' ? true : value === 'false' ? false : value !== '' && Number.isFinite(Number(value)) ? Number(value) : value])));
 }
 
 test('headless runner lands on exact 1 s sample boundaries with a nondividing step', async (t) => {
@@ -58,6 +58,10 @@ test('headless SCRAM occurs at 60 s and retains residual heat and negative auxil
   const rows = parseCsv(await readFile(output, 'utf8'));
   assert.equal(rows.length, 91, 'one row per integer second without duplicate final row');
   rows.forEach((row, index) => assert.ok(Math.abs(row.time - index) < 1e-8));
+  assert.equal(rows[59].tripped, false);
+  assert.equal(rows[60].tripped, true, 'the event-boundary sample includes the command applied at that time');
+  assert.equal(rows[60].gridConnected, false);
+  assert.equal(typeof rows[60].startupStage, 'string');
   const metadata = JSON.parse(await readFile(output + '.json', 'utf8'));
   const event = metadata.final.events.find(event => event.message.includes('Headless scenario'));
   assert.ok(event, 'scenario must produce a journal entry');
@@ -67,6 +71,36 @@ test('headless SCRAM occurs at 60 s and retains residual heat and negative auxil
   assert.ok(metadata.final.decayPower > 0);
   assert.ok(metadata.final.electricPower < 0, 'tripped plant continues importing auxiliary electricity');
   assert.equal(metadata.final.domainExceeded, false);
+});
+
+test('short cold-start CLI records measured stage changes, exact sampling, and action provenance', async (t) => {
+  const dir = await fixture(t);
+  const output = join(dir, 'cold-start.csv');
+  const result = await run(['--scenario=cold-start', '--duration=30.4', '--dt=0.03', `--output=${output}`]);
+  const summary = JSON.parse(result.stdout);
+  assert.equal(summary.scenario, 'cold-start');
+  assert.equal(summary.domainExceeded, false);
+  assert.ok(Math.abs(summary.simulationTime - 30.4) < 1e-8);
+  const rows = parseCsv(await readFile(output, 'utf8'));
+  assert.equal(rows.length, 32);
+  rows.slice(0, -1).forEach((row, index) => assert.ok(Math.abs(row.time - index) < 1e-8));
+  assert.ok(Math.abs(rows.at(-1).time - 30.4) < 1e-8);
+  assert.equal(rows[0].startupStage, 'prepared');
+  assert.equal(rows[0].hotLegTemp, 25, 'the prepare command must not teleport temperature');
+  assert.equal(rows.at(-1).startupStage, 'heatup');
+  assert.ok(rows.every(row => row.gridConnected === false && row.electricPower <= 0));
+  const report = JSON.parse(await readFile(output + '.json', 'utf8'));
+  assert.equal(report.final.startupMode, true);
+  assert.equal(report.final.startupStage, 'heatup');
+  assert.equal(report.final.tripped, false);
+  assert.deepEqual(report.actions.map(action => action.action), ['prepare', 'startHeatup']);
+  assert.equal(report.actions[0].time, 0);
+  const heatupTime = report.actions[1].time;
+  assert.ok(heatupTime > 0 && heatupTime < 30);
+  assert.ok(Math.abs(heatupTime - Math.round(heatupTime)) < 1e-8);
+  assert.equal(rows[Math.round(heatupTime)].startupStage, 'heatup');
+  assert.equal(report.units.auxiliaryHeatMW, 'MW');
+  assert.equal(report.units.rotorEnergyMJ, 'MJ');
 });
 
 test('invalid command-line parameters fail without creating output', async (t) => {
@@ -131,6 +165,7 @@ test('local preview serves only public files, blocks traversal, and implements H
   await writeFile(join(dir, 'docs/MODEL.md'), '# Public model');
   await writeFile(join(dir, 'package.json'), '{"private":"must not be exposed"}');
   await writeFile(join(dir, 'artifacts/verification.json'), '{"passed":10}');
+  await writeFile(join(dir, 'artifacts/benchmarks.json'), '{"passed":20}');
   const port = await unusedPort();
   const child = spawn(process.execPath, [join(dir, 'scripts/serve.mjs'), '--source', `--port=${port}`], { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   try {
@@ -148,6 +183,8 @@ test('local preview serves only public files, blocks traversal, and implements H
     assert.equal(await head.text(), '');
     const evidence = await fetch(origin + '/verification.json');
     assert.deepEqual(await evidence.json(), { passed: 10 });
+    const benchmarks = await fetch(origin + '/benchmarks.json');
+    assert.deepEqual(await benchmarks.json(), { passed: 20 });
     for (const route of ['/package.json', '/scripts/serve.mjs', '/src/a%2f..%2f..%2fpackage.json', '/src/%5c..%5cpackage.json', '/%FF']) {
       const response = await fetch(origin + route);
       assert.equal(response.status, 404, `excluded route ${route}`);
@@ -155,4 +192,28 @@ test('local preview serves only public files, blocks traversal, and implements H
     }
     assert.equal((await fetch(origin + '/', { method: 'POST' })).status, 405);
   } finally { await stop(child); }
+});
+
+test('release build rejects stale or failed evidence without replacing the last build', async (t) => {
+  const dir = await fixture(t);
+  for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
+  await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
+  for (const name of ['index.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  const marker = join(dir, 'dist', 'previous.txt');
+  await writeFile(marker, 'previous successful build');
+  const valid = { version: '0.2.0', gitRevision: null, passed: 1, checks: [{ name: 'Fixture evidence', pass: true }] };
+  const saveReport = (name, report) => writeFile(join(dir, 'artifacts', name + '.json'), JSON.stringify(report));
+  const build = () => exec(process.execPath, [join(dir, 'scripts/build.mjs')], { cwd: dir, timeout: 10000 });
+  await saveReport('verification', valid);
+  await saveReport('benchmarks', { ...valid, version: '0.1.0' });
+  await assert.rejects(build(), /different version/);
+  assert.equal(await readFile(marker, 'utf8'), 'previous successful build');
+  await saveReport('benchmarks', { ...valid, passed: 0, checks: [{ pass: false }] });
+  await assert.rejects(build(), /unsuccessful or incomplete/);
+  assert.equal(await readFile(marker, 'utf8'), 'previous successful build');
+  await saveReport('benchmarks', valid);
+  await build();
+  assert.deepEqual(JSON.parse(await readFile(join(dir, 'dist/benchmarks.json'), 'utf8')), valid);
+  await assert.rejects(access(marker), { code: 'ENOENT' });
 });

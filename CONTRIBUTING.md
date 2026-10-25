@@ -4,7 +4,7 @@ OpenPWR accepts improvements under Apache-2.0. Submit focused pull requests and 
 
 ## Development
 
-Use Node.js 22 or newer. No dependencies need installing. `npm run dev` serves the source at localhost:4173; `npm test`, `npm run verify`, and `npm run build` run the required checks. The browser and headless runner must continue to share one engine.
+Use Node.js 22 or newer. No dependencies need installing. `npm run dev` serves the source at localhost:4173; `npm test`, `npm run verify`, and `npm run build` run the required checks. `npm run benchmark` runs the published component cases alone. Builds require passing reports from the same version and commit. The browser and headless runner must continue to share one engine.
 
 For a model change, provide equations, dimensions, parameter origins, validity limits, and a reference solution or independent benchmark where possible. Keep numerical verification separate from empirical validation. A passing test that repeats the implementation is not sufficient evidence of physical accuracy.
 
