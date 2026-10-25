@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
+import { createPlantView } from './plant-view.js';
 // The engineering workbench renders only observations returned by the native FMU.
 // Display animation and charts never advance or calculate plant physics.
 const $ = id => document.getElementById(id);
+const plantView = createPlantView({ host: $('plant-3d'), schematic: $('plant-schematic'), mode: 'native' });
 const inputs = [...document.querySelectorAll('[data-engineering-control]')];
 const number = (value, digits = 1) => Number.isFinite(value)
   ? value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '—';
@@ -11,6 +13,8 @@ const digits = { reactorPowerMW: 0, pumpCommand: 0, steamTemperatureC: 1, heater
 const expectedOutputs = ['hotLegTemperatureC', 'coldLegTemperatureC', 'fuelTemperatureC', 'primaryPressureMPa', 'pressurizerLevelPercent', 'primaryFlowKgS', 'pumpSpeed', 'heatToSteamMW', 'thermalEnergyMJ', 'pressurizerMassKg', 'pressurizerEnergyMJ', 'energyResidualMW', 'massResidualKgS'];
 let connected = false, paused = true, busy = false, connecting = false;
 let state = null, pendingControls = {}, resetQueued = false, exportQueued = false;
+let pendingSessionAction = null, scenarios = [];
+const planActive = () => ['ready', 'running'].includes(state?.experiment?.status);
 let sessionHash = null;
 let history = [], lastSampleTime = -Infinity, nextStepWall = 0, noticeTimer;
 let lastFrame = performance.now(), flowPhase = 0, rotorPhase = 0, sprayPhase = 0;
@@ -47,7 +51,7 @@ async function request(path, body, { download = false } = {}) {
     if (!response.ok) {
       let message = `Engineering service returned HTTP ${response.status}.`;
       try { const detail = await response.json(); if (typeof detail.message === 'string') message = detail.message; } catch { /* Static hosts return HTML error pages. */ }
-      throw new Error(message);
+      const failure = new Error(message); failure.status = response.status; throw failure;
     }
     if (download) return await response.blob();
     if (!(response.headers.get('content-type') || '').includes('application/json')) throw new Error('This address is serving the static site, not the native engineering service.');
@@ -76,15 +80,20 @@ function restoreConfirmedControls() {
   }
 }
 function updateAvailability() {
-  const inactive = !connected || connecting || resetQueued;
+  const inactive = !connected || connecting || resetQueued || Boolean(pendingSessionAction);
   const halted = modelHalted();
-  for (const input of inputs) input.disabled = inactive || halted;
-  for (const button of document.querySelectorAll('[data-experiment]')) button.disabled = inactive || halted;
-  $('engineering-run').disabled = inactive || halted;
+  for (const input of inputs) input.disabled = inactive || halted || planActive();
+  for (const button of document.querySelectorAll('[data-experiment]')) button.disabled = inactive || halted || planActive();
+  $('engineering-run').disabled = inactive || halted || state?.experiment?.status === 'complete';
   $('engineering-reset').disabled = inactive;
   $('engineering-export').disabled = inactive || !state;
   $('engineering-reconnect').disabled = busy || connecting;
   $('engineering-speed').disabled = inactive || halted;
+  $('scenario-select').disabled = inactive || !scenarios.length;
+  $('scenario-prepare').disabled = inactive || !scenarios.length;
+  $('scenario-stop').disabled = inactive || !['ready', 'running', 'complete'].includes(state?.experiment?.status);
+  $('commands-export').disabled = inactive || !state;
+  $('commands-import').disabled = inactive;
   text('engineering-run', paused ? 'Run model' : 'Pause');
   $('engineering-run').setAttribute('aria-pressed', String(!paused));
   const status = !connected ? state ? 'Connection lost' : 'Awaiting model' : halted ? 'Domain boundary' : paused ? 'Model paused' : 'Model running';
@@ -102,6 +111,7 @@ function acceptState(next, { reset = false } = {}) {
   }
   if (reset || (state && next.time < state.time)) { history = []; lastSampleTime = -Infinity; }
   state = next;
+  if (next.experiment?.status === 'complete') paused = true;
   if (next.halted || !next.outputs.valid) paused = true;
   if (!history.length || next.time - lastSampleTime >= 1 - 1e-8 || next.halted) {
     if (history.at(-1)?.time === next.time) history[history.length - 1] = { time: next.time, ...next.outputs };
@@ -145,11 +155,20 @@ function render() {
   $('engineering-core-heat').style.opacity = String(.08 + .92 * clamp(controls.reactorPowerMW / 3000, 0, 1));
   $('engineering-halt').hidden = !state.halted && out.valid;
   if (state.halted || !out.valid) text('engineering-halt', `Model domain reached. ${state.haltReason || 'The solver state is outside this model’s supported range.'} Reset the hot initial condition to begin another experiment.`);
+  const plan = state.experiment;
+  const activePlan = plan && !['stopped', 'manual'].includes(plan.status);
+  $('experiment-progress-bar').hidden = !activePlan;
+  if (activePlan) {
+    const fraction = plan.duration > 0 ? clamp(state.time / plan.duration, 0, 1) : 0;
+    $('experiment-progress-bar').value = fraction;
+    const comparison = plan.comparison ? (plan.comparison.pass ? ' · Replay matches saved endpoint' : ' · Replay endpoint differs — inspect report') : '';
+    text('experiment-progress', `${plan.label} · ${plan.status} · ${clock(state.time)} / ${clock(plan.duration)} · ${plan.appliedEvents}/${plan.eventCount} events${comparison}`);
+  } else text('experiment-progress', 'Manual experiment · controls are available');
   updateAvailability();
 }
 async function connect() {
   if (busy || connecting) return;
-  connecting = true; busy = true; paused = true; pendingControls = {}; resetQueued = false; exportQueued = false;
+  connecting = true; busy = true; paused = true; pendingControls = {}; resetQueued = false; exportQueued = false; pendingSessionAction = null;
   updateAvailability();
   text('connection-title', 'Connecting to the engineering service');
   let health = null;
@@ -161,6 +180,8 @@ async function connect() {
     const current = await request('/api/state');
     acceptState(current, { reset: Boolean(sessionHash && sessionHash !== health.fmuSha256) });
     sessionHash = health.fmuSha256;
+    await restoreSessionHistory(health);
+    await loadScenarios();
     restoreConfirmedControls();
     clearTimeout(noticeTimer);
     $('engineering-notice').hidden = true;
@@ -178,6 +199,50 @@ async function connect() {
     await readNativeEvidence(health);
     connecting = false; busy = false; updateAvailability();
   }
+}
+async function restoreSessionHistory(health) {
+  try {
+    const saved = await request('/api/history?maxPoints=600');
+    if (saved.schema !== 'openpwr-fmi-history-v1' || saved.fmuSha256 !== health.fmuSha256
+        || !Array.isArray(saved.points) || saved.points.length > 2400) return;
+    let previous = -Infinity;
+    const valid = saved.points.every(point => {
+      const okay = Number.isFinite(point.time) && point.time >= 0 && point.time > previous
+        && point.outputs && expectedOutputs.every(key => Number.isFinite(point.outputs[key]));
+      previous = point.time; return okay;
+    });
+    if (!valid) return;
+    if (saved.current) acceptState(saved.current);
+    if (saved.points.some(point => point.time > state.time)) return;
+    history = saved.points.map(point => ({ time: point.time, ...point.outputs }));
+    lastSampleTime = history.at(-1)?.time ?? -Infinity;
+    render();
+  } catch { /* A compatible older service can still supply current observations. */ }
+}
+async function loadScenarios() {
+  try {
+    const catalogue = await request('/api/scenarios');
+    if (catalogue.schema !== 'openpwr-fmi-scenarios-v1' || !Array.isArray(catalogue.scenarios)
+        || catalogue.scenarios.length > 20 || catalogue.scenarios.some(item => typeof item.id !== 'string'
+          || typeof item.label !== 'string' || typeof item.description !== 'string' || !Number.isFinite(item.duration))) return;
+    const selected = $('scenario-select').value;
+    scenarios = catalogue.scenarios;
+    $('scenario-select').replaceChildren(...scenarios.map(item => {
+      const option = document.createElement('option'); option.value = item.id; option.textContent = `${item.label} · ${number(item.duration, 0)} s`; return option;
+    }));
+    if (scenarios.some(item => item.id === selected)) $('scenario-select').value = selected;
+    describeScenario();
+  } catch { scenarios = []; text('scenario-description', 'This service does not expose timed experiments. Restart with the current backend to enable them.'); }
+}
+function describeScenario() {
+  const selected = scenarios.find(item => item.id === $('scenario-select').value);
+  text('scenario-description', selected?.description || 'Choose an experiment.');
+}
+function queueSessionAction(route, body, message, reset = true) {
+  if (!connected || connecting || pendingSessionAction) return;
+  paused = true; pendingControls = {}; resetQueued = false;
+  pendingSessionAction = { route, body, message, reset };
+  updateAvailability();
 }
 async function readNativeEvidence(health) {
   $('native-evidence-link').hidden = true;
@@ -200,7 +265,7 @@ async function readNativeEvidence(health) {
   }
 }
 function queueControls(changes, message) {
-  if (!connected || modelHalted()) return;
+  if (!connected || modelHalted() || planActive()) return;
   Object.assign(pendingControls, changes);
   for (const [key, value] of Object.entries(changes)) {
     $(key).value = value;
@@ -212,6 +277,7 @@ async function tick() {
   if (busy || connecting || !connected) return;
   let action = null;
   if (resetQueued) action = 'reset';
+  else if (pendingSessionAction) action = 'session';
   else if (Object.keys(pendingControls).length) action = 'control';
   else if (exportQueued) action = 'export';
   else if (!paused && !document.hidden && !modelHalted() && performance.now() >= nextStepWall) action = 'step';
@@ -226,15 +292,24 @@ async function tick() {
       text('backend-performance', 'Model reset');
       notice('Native model reset to its documented hot initial condition.');
       charts();
+    } else if (action === 'session') {
+      const operation = pendingSessionAction;
+      pendingSessionAction = null;
+      acceptState(await request(operation.route, operation.body), { reset: operation.reset });
+      paused = true;
+      restoreConfirmedControls();
+      notice(operation.message);
+      charts();
     } else if (action === 'control') {
       const changes = pendingControls;
       pendingControls = {};
       acceptState(await request('/api/control', changes));
     } else if (action === 'export') {
+      const kind = exportQueued;
       exportQueued = false;
-      const file = await request('/api/export', undefined, { download: true });
+      const file = kind === 'commands' ? new Blob([JSON.stringify(await request('/api/commands'), null, 2)], { type: 'application/json' }) : await request('/api/export', undefined, { download: true });
       const url = URL.createObjectURL(file), link = document.createElement('a');
-      link.href = url; link.download = `openpwr-engineering-${Math.floor(state.time)}s.csv`; link.click();
+      link.href = url; link.download = `openpwr-engineering-${Math.floor(state.time)}s.${kind === 'commands' ? 'json' : 'csv'}`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } else {
       const simulatedSeconds = .25 * Number($('engineering-speed').value);
@@ -246,9 +321,23 @@ async function tick() {
   } catch (error) {
     // A timed-out request may have advanced the native model. Require an explicit
     // state refresh before issuing another command instead of replaying blindly.
-    pendingControls = {}; resetQueued = false; exportQueued = false;
-    setConnection(false, error.message);
-    notice(`Engineering session paused. ${error.message}`, true);
+    pendingControls = {}; resetQueued = false; exportQueued = false; pendingSessionAction = null;
+    paused = true;
+    if (action === 'session' && error.status >= 400 && error.status < 500) {
+      try {
+        // A time-zero native control can fail after initialization. Recover the
+        // authoritative state even though validation normally precedes reset.
+        acceptState(await request('/api/state'));
+        restoreConfirmedControls();
+        notice(`Experiment could not be loaded. ${error.message} Current solver state refreshed and paused.`, true);
+      } catch (recoveryError) {
+        setConnection(false, recoveryError.message);
+        notice(`Experiment request failed; reconnect to recover its current state. ${error.message}`, true);
+      }
+    } else {
+      setConnection(false, error.message);
+      notice(`Engineering session paused. ${error.message}`, true);
+    }
   } finally { busy = false; updateAvailability(); }
 }
 
@@ -294,6 +383,7 @@ function charts() {
 }
 const flowPaths = [...document.querySelectorAll('.flow')], droplets = [...$('spray-droplets').children];
 function animate(now) {
+  plantView.update(state, { paused: paused || !connected || modelHalted(), hidden: document.hidden });
   const dt = Math.min(.1, Math.max(0, (now - lastFrame) / 1000)); lastFrame = now;
   const active = connected && !paused && !modelHalted() && !document.hidden && !reducedMotion.matches;
   if (state) {
@@ -323,6 +413,24 @@ $('engineering-run').addEventListener('click', () => { if (!connected || modelHa
 $('engineering-reconnect').addEventListener('click', connect);
 $('engineering-reset').addEventListener('click', () => { if (!connected) return; paused = true; pendingControls = {}; resetQueued = true; updateAvailability(); });
 $('engineering-export').addEventListener('click', () => { exportQueued = true; });
+$('commands-export').addEventListener('click', () => { exportQueued = 'commands'; });
+$('commands-import').addEventListener('click', () => $('commands-file').click());
+$('commands-file').addEventListener('change', async event => {
+  const file = event.target.files?.[0]; event.target.value = '';
+  if (!file) return;
+  try {
+    if (file.size > 4 * 1024 * 1024) throw new Error('Command history exceeds the 4 MiB limit.');
+    const commands = JSON.parse(await file.text());
+    queueSessionAction('/api/replay', commands, 'Command history validated and prepared. Press Run model to replay.');
+  } catch (error) { notice(`Could not read command history. ${error.message}`, true); }
+});
+$('scenario-select').addEventListener('change', describeScenario);
+$('scenario-prepare').addEventListener('click', () => {
+  queueSessionAction('/api/experiment', { scenario: $('scenario-select').value }, 'Experiment prepared at its hot initial condition. Press Run model.');
+});
+$('scenario-stop').addEventListener('click', () => {
+  queueSessionAction('/api/experiment/stop', {}, 'Timed sequence stopped. Current model state retained; manual controls are available.', false);
+});
 const experiments = { power: [{ reactorPowerMW: 2700 }, 'Applying a 10% reactor heat-input reduction.'], pump: [{ pumpCommand: .8 }, 'Applying an 80% primary-pump command.'], spray: [{ sprayFlowKgS: 5 }, 'Applying 5 kg/s pressurizer spray.'], heater: [{ heaterPowerMW: 1 }, 'Applying 1 MW pressurizer heater power.'] };
 for (const button of document.querySelectorAll('[data-experiment]')) button.addEventListener('click', () => {
   const [changes, message] = experiments[button.dataset.experiment];

@@ -50,11 +50,13 @@ try {
       await run([runtime.venvPython, 'models/reference-checks.py', '--build']);
     }
     else if (action === 'start') await run([runtime.venvPython, 'backend/server.py', ...extra]);
+    else if (action === 'experiment') await run([runtime.venvPython, 'backend/experiments.py', ...extra]);
+    else if (action === 'profile') await run([runtime.venvPython, 'models/performance-checks.py', ...extra]);
     else if (action === 'test') await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'backend', '-p', 'test_*.py'], { OPENPWR_FMU: 'artifacts/modelica/PrimaryLoop.fmu' });
     else if (action === 'verify') {
       await run([runtime.venvPython, 'backend/verify.py', ...extra]);
       await run([runtime.venvPython, 'models/reference-checks.py']);
     }
-    else throw new Error('Choose setup, build, start, test, or verify.');
+    else throw new Error('Choose setup, build, start, test, verify, experiment, or profile.');
   }
 } catch (error) { console.error(error.message); process.exitCode = 1; }

@@ -4,6 +4,8 @@ package OpenPWR "OpenPWR native engineering workbench"
   // Original subsystem model. Modelica Standard Library water properties retain
   // their own BSD-3-Clause license. No ThermoSysPro or proprietary code is used.
   package Water = Modelica.Media.Water.StandardWater;
+  package PrimaryWater = Modelica.Media.Water.StandardWaterOnePhase
+    "Direct IF97 p,T properties for the subcooled primary volumes";
 
   function balanceRates "Solve the four coupled inventory balances with upstream surge enthalpy"
     input Real mh[4];
@@ -92,11 +94,11 @@ package OpenPWR "OpenPWR native engineering workbench"
     parameter Real elevationM = 10;
     parameter Real chargingTemperatureK = 323.15;
     parameter Real ambientHeatLossW = 0 "Adiabatic pressurizer reference case";
-    parameter Real hotEnthalpy0 = Water.specificEnthalpy_pT(initialPressurePa, initialHotTemperatureK);
-    parameter Real coldEnthalpy0 = Water.specificEnthalpy_pT(initialPressurePa, initialColdTemperatureK);
+    parameter Real hotEnthalpy0 = PrimaryWater.specificEnthalpy_pT(initialPressurePa, initialHotTemperatureK);
+    parameter Real coldEnthalpy0 = PrimaryWater.specificEnthalpy_pT(initialPressurePa, initialColdTemperatureK);
     parameter Real nominalFlowKgS = nominalThermalPowerW / (hotEnthalpy0 - coldEnthalpy0);
     parameter Real nominalBuoyancyPa = Modelica.Constants.g_n * elevationM *
-      (Water.density_pT(initialPressurePa, initialColdTemperatureK) - Water.density_pT(initialPressurePa, initialHotTemperatureK));
+      (PrimaryWater.density_pT(initialPressurePa, initialColdTemperatureK) - PrimaryWater.density_pT(initialPressurePa, initialHotTemperatureK));
     parameter Real hydraulicResistance = (pumpHeadPa + nominalBuoyancyPa) / nominalFlowKgS^2;
     parameter Real hydraulicInertia = 2 * hydraulicResistance * nominalFlowKgS * flowTimeConstantS;
     parameter Real fuelConductanceWK = nominalThermalPowerW / (initialFuelTemperatureK - initialHotTemperatureK);
@@ -144,8 +146,8 @@ package OpenPWR "OpenPWR native engineering workbench"
     Real hotTemperatureK(start=initialHotTemperatureK, fixed=true, nominal=500, stateSelect=StateSelect.always);
     Real coldTemperatureK(start=initialColdTemperatureK, fixed=true, nominal=500, stateSelect=StateSelect.always);
     Real fuelTemperatureK(start=initialFuelTemperatureK, fixed=true, nominal=873, stateSelect=StateSelect.always);
-    Water.ThermodynamicState hotState;
-    Water.ThermodynamicState coldState;
+    PrimaryWater.ThermodynamicState hotState;
+    PrimaryWater.ThermodynamicState coldState;
     Water.SaturationProperties saturation;
     Real rhoHot;
     Real rhoCold;
@@ -200,21 +202,21 @@ package OpenPWR "OpenPWR native engineering workbench"
     Real coldEnergyCoefficients[4];
 
   equation
-    hotState = Water.setState_pT(pressurePa, hotTemperatureK);
-    coldState = Water.setState_pT(pressurePa, coldTemperatureK);
+    hotState = PrimaryWater.setState_pT(pressurePa, hotTemperatureK);
+    coldState = PrimaryWater.setState_pT(pressurePa, coldTemperatureK);
     saturation = Water.setSat_p(pressurePa);
-    rhoHot = Water.density(hotState);
-    rhoCold = Water.density(coldState);
-    hHot = Water.specificEnthalpy(hotState);
-    hCold = Water.specificEnthalpy(coldState);
-    uHot = Water.specificInternalEnergy(hotState);
-    uCold = Water.specificInternalEnergy(coldState);
-    cpHot = Water.specificHeatCapacityCp(hotState);
-    cpCold = Water.specificHeatCapacityCp(coldState);
-    alphaHot = Water.isobaricExpansionCoefficient(hotState);
-    alphaCold = Water.isobaricExpansionCoefficient(coldState);
-    kappaHot = Water.isothermalCompressibility(hotState);
-    kappaCold = Water.isothermalCompressibility(coldState);
+    rhoHot = PrimaryWater.density(hotState);
+    rhoCold = PrimaryWater.density(coldState);
+    hHot = PrimaryWater.specificEnthalpy(hotState);
+    hCold = PrimaryWater.specificEnthalpy(coldState);
+    uHot = PrimaryWater.specificInternalEnergy(hotState);
+    uCold = PrimaryWater.specificInternalEnergy(coldState);
+    cpHot = PrimaryWater.specificHeatCapacityCp(hotState);
+    cpCold = PrimaryWater.specificHeatCapacityCp(coldState);
+    alphaHot = PrimaryWater.isobaricExpansionCoefficient(hotState);
+    alphaCold = PrimaryWater.isobaricExpansionCoefficient(coldState);
+    kappaHot = PrimaryWater.isothermalCompressibility(hotState);
+    kappaCold = PrimaryWater.isothermalCompressibility(coldState);
     rhoLiquid = Water.bubbleDensity(saturation);
     rhoVapor = Water.dewDensity(saturation);
     hLiquid = Water.bubbleEnthalpy(saturation);
@@ -258,7 +260,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     coldToHotPowerW = noEvent(if primaryFlowKgS >= 0 then primaryFlowKgS * hCold else primaryFlowKgS * hHot);
     hotToColdPowerW = noEvent(if flowToColdKgS >= 0 then flowToColdKgS * hHot else flowToColdKgS * hCold);
     surgePowerW = noEvent(if surgeFlowKgS >= 0 then surgeFlowKgS * hHot else surgeFlowKgS * hLiquid);
-    chargingEnthalpy = Water.specificEnthalpy_pT(pressurePa, chargingTemperatureK);
+    chargingEnthalpy = PrimaryWater.specificEnthalpy_pT(pressurePa, chargingTemperatureK);
 
     heatToCoolantW = fuelConductanceWK * (fuelTemperatureK - hotTemperatureK);
     heatToSteamW = steamGeneratorConductanceWK * (coldTemperatureK - steamTemperatureC - 273.15);
@@ -323,7 +325,17 @@ package OpenPWR "OpenPWR native engineering workbench"
       Documentation(info="<html><p>Generic hot-primary-system experiment. Prescribed reactor heat and secondary temperature; no neutron kinetics, turbine, secondary inventory, or real plant protection. IF97 primary properties and saturated liquid/vapor pressurizer balances are coupled through mass and energy conservation. See docs/MODELICA_MODEL.md.</p></html>"));
   end PrimaryLoop;
 
-  model PropertyReferenceChecks "Static IF97 observations for external table comparisons"
+  model PropertyReferenceChecks "Native IF97 observations for published tables and differential checks"
+    input Real probePressurePa(start=15.5e6) "Property probe independent of PrimaryLoop validity envelope";
+    input Real probeTemperatureK(start=598.15);
+    PrimaryWater.ThermodynamicState probeState = PrimaryWater.setState_pT(probePressurePa, probeTemperatureK);
+    output Real probeDensityKgM3 = PrimaryWater.density(probeState);
+    output Real probeSpecificVolumeM3Kg = 1 / probeDensityKgM3;
+    output Real probeEnthalpyKJkg = PrimaryWater.specificEnthalpy(probeState) / 1000;
+    output Real probeInternalEnergyKJkg = PrimaryWater.specificInternalEnergy(probeState) / 1000;
+    output Real probeCpKJkgK = PrimaryWater.specificHeatCapacityCp(probeState) / 1000;
+    output Real probeExpansionPerK = PrimaryWater.isobaricExpansionCoefficient(probeState);
+    output Real probeCompressibilityPerPa = PrimaryWater.isothermalCompressibility(probeState);
     output Real pressure20MPa = Water.saturationPressure(293.15) / 1e6;
     output Real liquidEnthalpy20KJkg = Water.bubbleEnthalpy(Water.setSat_T(293.15)) / 1000;
     output Real vaporEnthalpy20KJkg = Water.dewEnthalpy(Water.setSat_T(293.15)) / 1000;
@@ -339,6 +351,6 @@ package OpenPWR "OpenPWR native engineering workbench"
     annotation(experiment(StartTime=0, StopTime=1, Interval=1));
   end PropertyReferenceChecks;
 
-  annotation(uses(Modelica(version="4.0.0")), version="0.3.0",
+  annotation(uses(Modelica(version="4.0.0")), version="0.4.0",
     Documentation(info="<html><p>Original OpenPWR engineering workbench models, Apache-2.0. Requires Modelica Standard Library 4.0.0 under its own BSD-3-Clause license.</p></html>"));
 end OpenPWR;

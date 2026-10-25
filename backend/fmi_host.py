@@ -8,6 +8,7 @@ of Python dependencies.
 from __future__ import annotations
 
 import csv
+import copy
 import hashlib
 import io
 import math
@@ -50,6 +51,15 @@ class ServiceError(Exception):
         self.status, self.error, self.message = status, error, message
 
 
+def finite_number(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
 def validate_controls(values):
     if not isinstance(values, dict) or not values:
         raise ServiceError(400, "invalid_controls", "Supply a nonempty JSON object of control values.")
@@ -59,7 +69,7 @@ def validate_controls(values):
     result = {}
     for name, value in values.items():
         low, high = CONTROL_LIMITS[name]
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not low <= value <= high:
+        if not finite_number(value) or not low <= value <= high:
             raise ServiceError(400, "invalid_control", f"{name} must be a finite number between {low:g} and {high:g}.")
         result[name] = float(value)
     return result
@@ -207,6 +217,7 @@ class FMIPlant:
                 self._read()
                 self.commands.append({"time": self.steps * self.step_size, "controls": updates})
                 self.command_count += 1
+                self._record()
             except ServiceError:
                 raise
             except Exception as error:
@@ -215,11 +226,17 @@ class FMIPlant:
             return self._snapshot()
 
     def step(self, seconds):
-        if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or not 0.1 <= seconds <= 10:
+        if not finite_number(seconds) or not 0.1 <= seconds <= 10:
             raise ServiceError(400, "invalid_step", "seconds must be between 0.1 and 10.")
         count = round(seconds / self.step_size)
         if abs(count * self.step_size - seconds) > 1e-8:
             raise ServiceError(400, "invalid_step", f"seconds must be a multiple of {self.step_size}.")
+        return self._advance_steps(count)
+
+    def _advance_steps(self, count):
+        """Bounded internal primitive used to land exactly on scripted events."""
+        if isinstance(count, bool) or not isinstance(count, int) or not 1 <= count <= round(10 / self.step_size):
+            raise ServiceError(400, "invalid_step", "Invalid native step count.")
         with self.lock:
             if self.halted:
                 raise ServiceError(409, "solver_halted", self.halt_reason)
@@ -270,7 +287,30 @@ class FMIPlant:
 
     def export_commands(self):
         with self.lock:
-            return {"schema": "openpwr-fmi-command-log-v1", "fmuSha256": self.sha256,
+            return {"schema": "openpwr-fmi-command-log-v2", "fmuSha256": self.sha256,
                 "stepSize": self.step_size, "initialControls": dict(self.defaults),
-                "time": self.steps * self.step_size, "commands": list(self.commands),
-                "truncated": self.command_count > self.commands.maxlen}
+                "time": self.steps * self.step_size, "commands": copy.deepcopy(list(self.commands)),
+                "truncated": self.command_count > self.commands.maxlen,
+                "finalState": {"time": self.steps * self.step_size, "outputs": dict(self.outputs), "halted": self.halted}}
+
+    def history_points(self, max_points=600):
+        if isinstance(max_points, bool) or not isinstance(max_points, int) or not 2 <= max_points <= 2000:
+            raise ServiceError(400, "invalid_history_limit", "maxPoints must be an integer between 2 and 2000.")
+        with self.lock:
+            rows = list(self.history)
+            current = self._row()
+            if rows and rows[-1]["time"] == current["time"]:
+                rows[-1] = current
+            elif self.outputs:
+                rows.append(current)
+            retained = len(rows)
+            if retained > max_points:
+                indices = sorted({round(i * (retained - 1) / (max_points - 1)) for i in range(max_points)})
+                rows = [rows[i] for i in indices]
+            points = [{"time": row["time"], "controls": {name: row[name] for name in CONTROL_LIMITS},
+                "outputs": {name: row[name] for name in (*REAL_OUTPUTS, "valid")}, "halted": row["halted"]} for row in rows]
+            return {"schema": "openpwr-fmi-history-v1", "fmuSha256": self.sha256, "samplePeriod": 1,
+                "storageIncludesCommandBoundaries": True,
+                "includesCommandBoundaries": retained <= len(points),
+                "retainedSamples": retained, "returnedSamples": len(points), "downsampled": retained > len(points),
+                "truncated": bool(points and points[0]["time"] > 0), "points": points, "current": self._snapshot()}

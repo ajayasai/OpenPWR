@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve, dirname, basename, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
+import { createHash } from 'node:crypto';
 import { PWRPlant } from '../src/engine.js';
 
 const exec = promisify(execFile);
@@ -199,7 +200,7 @@ test('release build rejects stale or failed evidence without replacing the last 
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
-  for (const name of ['index.html', 'engineering.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   const marker = join(dir, 'dist', 'previous.txt');
   await writeFile(marker, 'previous successful build');
   const valid = { version: '0.2.0', gitRevision: null, passed: 1, checks: [{ name: 'Fixture evidence', pass: true }] };
@@ -213,7 +214,67 @@ test('release build rejects stale or failed evidence without replacing the last 
   await assert.rejects(build(), /unsuccessful or incomplete/);
   assert.equal(await readFile(marker, 'utf8'), 'previous successful build');
   await saveReport('benchmarks', valid);
+  await assert.rejects(exec(process.execPath, [join(dir, 'scripts/build.mjs'), '--require-native'], { cwd: dir, timeout: 10000 }), /Native evidence required/);
+  assert.equal(await readFile(marker, 'utf8'), 'previous successful build');
   await build();
   assert.deepEqual(JSON.parse(await readFile(join(dir, 'dist/benchmarks.json'), 'utf8')), valid);
   await assert.rejects(access(marker), { code: 'ENOENT' });
+});
+
+test('native release evidence binds both reports to the exact compiled bytes before replacing dist', async (t) => {
+  const dir = await fixture(t);
+  for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
+  await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  const version = '0.4.0';
+  const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
+  const sha = value => createHash('sha256').update(value).digest('hex');
+  await json('package.json', { name: 'openpwr-native-fixture', version, type: 'module' });
+  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  // An isolated empty commit exercises the real revision guard without touching
+  // the working repository or depending on the developer's identity/signing setup.
+  await exec('git', ['init', '--quiet'], { cwd: dir });
+  await exec('git', ['-c', 'user.name=Packaging fixture', '-c', 'user.email=fixture@example.invalid',
+    '-c', 'commit.gpgsign=false', '-c', `core.hooksPath=${join(dir, '.git', 'empty-hooks')}`,
+    'commit', '--quiet', '--allow-empty', '--no-verify', '-m', 'Native packaging fixture'], { cwd: dir });
+  const gitRevision = (await exec('git', ['rev-parse', 'HEAD'], { cwd: dir })).stdout.trim();
+  const source = 'within; package OpenPWR "Packaging fixture only" end OpenPWR;\n';
+  await writeFile(join(dir, 'models/OpenPWR/package.mo'), source);
+  const sourceSha256 = sha(source);
+  const passed = { version, gitRevision, passed: 1, total: 1, checks: [{ name: 'Packaging fixture check', pass: true }] };
+  await json('artifacts/verification.json', passed); await json('artifacts/benchmarks.json', passed);
+  const fixtures = [
+    { model: 'OpenPWR.PrimaryLoop', fmu: 'PrimaryLoop.fmu', manifest: 'manifest.json', report: 'modelica-verification.json', published: 'engineering-verification.json', primary: true },
+    { model: 'OpenPWR.PropertyReferenceChecks', fmu: 'PropertyReferenceChecks.fmu', manifest: 'property-manifest.json', report: 'modelica/property-verification.json', published: 'modelica-property-verification.json', primary: false },
+  ];
+  for (const item of fixtures) {
+    // The packaging guard hashes bytes; it does not execute or unzip an FMU.
+    item.bytes = Buffer.from(`Fake ${item.model} FMU bytes for packaging-only tests\n`);
+    const manifest = { version, gitRevision, model: item.model, fmiVersion: '2.0', sourceSha256, fmuSha256: sha(item.bytes) };
+    item.evidence = item.primary
+      ? { ...passed, schemaVersion: 1, buildManifest: manifest, runtime: { backend: 'fmi2', model: item.model, fmiVersion: '2.0', fmuSha256: manifest.fmuSha256 } }
+      : { ...passed, model: item.model, sourceSha256, fmuSha256: manifest.fmuSha256 };
+    await writeFile(join(dir, 'artifacts/modelica', item.fmu), item.bytes);
+    await json(`artifacts/modelica/${item.manifest}`, manifest);
+    await json(`artifacts/${item.report}`, item.evidence);
+  }
+  const build = () => exec(process.execPath, [join(dir, 'scripts/build.mjs'), '--require-native'], { cwd: dir, timeout: 10000 });
+  await build();
+  for (const item of fixtures) assert.deepEqual(JSON.parse(await readFile(join(dir, 'dist', item.published), 'utf8')), item.evidence);
+  const marker = join(dir, 'dist/last-good.txt'); await writeFile(marker, 'last successful native build');
+  for (const item of fixtures) {
+    for (const corruption of ['compiled bytes', 'report hash']) {
+      if (corruption === 'compiled bytes') await writeFile(join(dir, 'artifacts/modelica', item.fmu), Buffer.concat([item.bytes, Buffer.from('changed without changing source')]));
+      else {
+        const mismatched = structuredClone(item.evidence);
+        if (item.primary) mismatched.runtime.fmuSha256 = '0'.repeat(64);
+        else mismatched.fmuSha256 = '0'.repeat(64);
+        await json(`artifacts/${item.report}`, mismatched);
+      }
+      await assert.rejects(build(), /Native evidence required:.*does not identify the current compiled model/, `${item.model}: ${corruption}`);
+      assert.equal(await readFile(marker, 'utf8'), 'last successful native build');
+      assert.deepEqual(JSON.parse(await readFile(join(dir, 'dist', item.published), 'utf8')), item.evidence, 'the previously published report must remain intact');
+      await writeFile(join(dir, 'artifacts/modelica', item.fmu), item.bytes);
+      await json(`artifacts/${item.report}`, item.evidence);
+    }
+  }
 });

@@ -19,8 +19,9 @@ const server = createServer(async (req, res) => {
     if (route.split(/[\\/]/).some(part => part === '..' || part === '.')) {
       res.writeHead(404); res.end('Not found'); return;
     }
-    if (source && ['verification.json', 'benchmarks.json'].includes(route)) route = 'artifacts/' + route;
-    if (!/^(index\.html|engineering\.html|verification\.html|verification\.json|benchmarks\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks)\.json)$/.test(route)) {
+    const reports = { 'verification.json': 'artifacts/verification.json', 'benchmarks.json': 'artifacts/benchmarks.json', 'engineering-verification.json': 'artifacts/modelica-verification.json', 'modelica-property-verification.json': 'artifacts/modelica/property-verification.json' };
+    if (source && reports[route]) route = reports[route];
+    if (!/^(index\.html|engineering\.html|engineering-evidence\.html|verification\.html|verification\.json|benchmarks\.json|engineering-verification\.json|modelica-property-verification\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks|modelica-verification|modelica\/property-verification)\.json)$/.test(route)) {
       res.writeHead(404); res.end('Not found'); return;
     }
     const path = resolve(root, route);

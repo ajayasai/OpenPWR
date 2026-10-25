@@ -7,12 +7,14 @@
   <meta name="description" content="OpenPWR engineering workbench: a local OpenModelica primary-loop and pressurizer model connected to interactive controls.">
   <title>OpenPWR · OpenModelica engineering workbench</title>
   <link rel="stylesheet" href="./src/engineering.css">
+  <link rel="stylesheet" href="./src/plant3d.css">
+  <link rel="stylesheet" href="./src/plant-view.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to engineering workbench</a>
   <header class="masthead">
     <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">◈</span><span>Open<span class="brand-light">PWR</span><small>OPEN ENGINEERING / OPEN ENERGY</small></span></a>
-    <nav aria-label="Main navigation"><a href="./">Control room</a><span aria-current="page">Engineering</span><a href="./docs/ENGINEERING.md#evidence">Model &amp; evidence ↗</a></nav>
+    <nav aria-label="Main navigation"><a href="./">Control room</a><span aria-current="page">Engineering</span><a href="./engineering-evidence.html">Native evidence ↗</a></nav>
   </header>
   <main id="main" class="workspace">
     <section class="page-heading">
@@ -40,6 +42,9 @@ npm run engineering:start</code></pre><p>Then open <a href="http://127.0.0.1:800
       <div class="plant-column">
         <section class="panel" aria-labelledby="primary-diagram-title">
           <div class="panel-heading"><div><span class="section-index">01</span><h2 id="primary-diagram-title">Primary circuit &amp; pressure control</h2></div><span id="engine-status" class="status-pill">Awaiting model</span></div>
+          <div class="plant-view-switch" role="group" aria-label="Plant view"><button data-plant-view="3d" aria-pressed="true" aria-controls="plant-3d">3D cutaway</button><button data-plant-view="schematic" aria-pressed="false" aria-controls="plant-schematic">Process schematic</button><small>Native observations · illustrative geometry</small></div>
+          <div id="plant-3d" class="plant-3d-host"></div>
+          <div id="plant-schematic" data-schematic hidden>
           <div class="diagram-legend"><span><i class="legend-line hot"></i>Hot primary</span><span><i class="legend-line cold"></i>Cold primary</span><span><i class="legend-line boundary"></i>Thermal boundary</span><span id="motion-status">Motion paused</span></div>
           <div class="diagram-scroll" tabindex="0" role="region" aria-label="Primary circuit schematic; scroll horizontally on small screens">
             <svg id="engineering-diagram" viewBox="0 0 920 420" role="img" aria-labelledby="schematic-title schematic-description">
@@ -67,10 +72,24 @@ npm run engineering:start</code></pre><p>Then open <a href="http://127.0.0.1:800
             </svg>
           </div>
           <p class="diagram-caption">Flow and pump motion follow solver outputs, slowed for clarity. <span class="mobile-hint">Swipe to explore the circuit.</span></p>
+          </div>
           <div class="balance-strip"><span id="communication-step">Native FMI co-simulation</span><span id="backend-performance">Awaiting solver</span></div>
         </section>
 
-        <section class="panel" aria-labelledby="experiment-title"><div class="panel-heading"><div><span class="section-index">02</span><h2 id="experiment-title">Transient experiments</h2></div></div><p class="section-description">Apply a boundary change and observe the coupled response. These are generic model experiments.</p><div class="experiment-grid"><button data-experiment="power" class="experiment" disabled><span>↘</span><strong>Power reduction</strong><small>Heat input → 2,700 MW</small></button><button data-experiment="pump" class="experiment" disabled><span>◉</span><strong>Pump reduction</strong><small>Command → 80%</small></button><button data-experiment="spray" class="experiment" disabled><span>⋮</span><strong>Spray response</strong><small>Spray → 5 kg/s</small></button><button data-experiment="heater" class="experiment" disabled><span>♨</span><strong>Heater response</strong><small>Heater → 1 MW</small></button></div></section>
+        <section class="panel" aria-labelledby="experiment-title">
+          <div class="panel-heading"><div><span class="section-index">02</span><h2 id="experiment-title">Reproducible experiments</h2></div></div>
+          <div class="experiment-plan">
+            <p>Prepare a timed input sequence, run it, and replay the recorded commands against the same model.</p>
+            <label for="scenario-select">Experiment<select id="scenario-select" disabled><option value="">Connect to load experiments</option></select></label>
+            <p id="scenario-description">Schedules are supplied by the native service.</p>
+            <div class="experiment-actions"><button id="scenario-prepare" class="button" disabled>Reset &amp; prepare</button><button id="scenario-stop" class="button" disabled>Return to manual</button></div>
+            <div id="experiment-progress" class="experiment-progress" role="status">Manual experiment</div>
+            <progress id="experiment-progress-bar" max="1" value="0" aria-label="Experiment progress" hidden></progress>
+            <div class="experiment-actions"><button id="commands-export" class="text-button" disabled>Save command history ↓</button><button id="commands-import" class="text-button" disabled>Replay saved commands ↑</button><input id="commands-file" type="file" accept=".json,application/json" hidden></div>
+            <p class="control-help">Preparing or importing resets the native model. Press Run model to advance. Scheduled controls are locked until completion or Return to manual.</p>
+          </div>
+          <details class="manual-experiments"><summary>Quick manual changes</summary><div class="experiment-grid"><button data-experiment="power" class="experiment" disabled><span>↘</span><strong>Power reduction</strong><small>Heat input → 2,700 MW</small></button><button data-experiment="pump" class="experiment" disabled><span>◉</span><strong>Pump reduction</strong><small>Command → 80%</small></button><button data-experiment="spray" class="experiment" disabled><span>⋮</span><strong>Spray response</strong><small>Spray → 5 kg/s</small></button><button data-experiment="heater" class="experiment" disabled><span>♨</span><strong>Heater response</strong><small>Heater → 1 MW</small></button></div></details>
+        </section>
 
         <section class="panel" aria-labelledby="engineering-trends-title"><div class="panel-heading"><div><span class="section-index">03</span><h2 id="engineering-trends-title">Solver history</h2></div><button id="engineering-export" class="text-button" disabled>Export CSV ↓</button></div><div class="charts"><article><h3>Pressure <small>MPa</small></h3><svg id="pressure-chart" class="chart" role="img" aria-label="Primary pressure against simulation time"></svg></article><article><h3>Loop temperatures <small>°C</small></h3><div class="chart-legend"><span class="hot-key">Hot leg</span><span class="cold-key">Cold leg</span></div><svg id="temperature-chart" class="chart" role="img" aria-label="Hot and cold leg temperatures against simulation time"></svg></article></div><p id="sample-count" class="sample-count">Awaiting solver observations</p></section>
       </div>

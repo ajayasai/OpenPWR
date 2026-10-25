@@ -2,7 +2,7 @@
 
 The optional engineering workbench executes a compiled **OpenModelica FMI 2.0 co-simulation model**, hosted locally by FMPy. It models primary-loop and pressurizer dynamics. The existing JavaScript whole-plant laboratory remains a separate browser-only edition; readings are never silently blended between engines.
 
-This is the first native engineering integration, not a complete replacement plant model. Reactor heat is a prescribed input; steam-generator secondary temperature is a boundary condition. Neutron kinetics, the secondary cycle, turbine, electrical system, cold startup, and a 3D environment are not part of this native model. See [model equations and scope](MODELICA_MODEL.md).
+This is a native subsystem integration, not a complete replacement plant model. Reactor heat is a prescribed input; steam-generator secondary temperature is a boundary condition. Neutron kinetics, the secondary cycle, turbine, electrical system and cold startup are not part of this native model. Its 3D cutaway displays the same observations as the gauges and schematic; geometry does not add modeled systems. See [model equations and scope](MODELICA_MODEL.md).
 
 ![Native OpenModelica workbench with solver readings and primary circuit controls](engineering-workbench.jpg)
 
@@ -52,9 +52,26 @@ The service binds only to `127.0.0.1`. It serves the UI and API from one origin,
 
 FMI state serialization is not promised. Use reset plus the recorded commands for reproducible experiments; existing JavaScript save files cannot be loaded into this different model.
 
+## Timed experiments and replay
+
+Choose a heater, spray, pump or inventory experiment and select **Reset & prepare**. The service validates its schedule and initializes the model; **Run model** advances it. The host applies every control event at its exact 50 ms boundary, including when a browser request spans several events. Completion pauses the UI. Select **Return to manual** to continue from the final state.
+
+**Save command history** records applied controls, times, FMU identity and final observations. **Replay saved commands** validates the entire file before resetting, rejects truncated or different-FMU logs, then replays it using ordinary solver steps. Completion compares the saved and replayed endpoint observations. Histories are bounded; reconnecting restores a sampled view of the native session. All browser tabs share one local session.
+
+The same scheduler runs without the browser:
+
+```sh
+npm run engineering:experiment -- --scenario heater --output artifacts/heater
+npm run engineering:experiment -- --replay artifacts/heater.commands.json --output artifacts/heater-replay
+```
+
+Each run writes a CSV, command history and report; a domain halt or failed comparison returns a nonzero exit status. Inputs remain generic model experiments, not plant operating procedures.
+
 ## Evidence
 
-`npm run engineering:verify` runs the actual compiled FMUs. The primary subsystem has eight checks: nominal equilibrium, analytical pump lag, heater and spray response directions, external mass accounting, independently integrated boundary energy, communication-step refinement, and deterministic reset/replay. A separate property probe compares twelve native Modelica water-property values with NISTIR 5078 at 20, 100, 200 and 300 °C. Its 0.05% relative tolerance accounts for the printed table precision and IF97/IAPWS-95 differences.
+The [native evidence page](https://ajayasai.github.io/OpenPWR/engineering-evidence.html) presents source/binary identity, actual transient traces and per-check tolerances. GitHub's deployment build requires successful native reports from the current source. `npm run build -- --require-native` enforces the same requirement locally; ordinary browser-only builds omit missing or stale native reports.
+
+`npm run engineering:verify` runs the actual compiled FMUs. The primary checks cover nominal equilibrium, analytical pump lag, heater and spray response directions, closed-system mass conservation, external mass accounting, independently integrated boundary energy, communication-step refinement, and deterministic reset/replay. A separate probe makes 24 published comparisons: twelve NISTIR 5078 saturation values and twelve official IAPWS-IF97 compressed-liquid verification values. It also reports 25 numerical derivative-consistency checks separately. The NIST 0.05% tolerance accounts for table precision and IF97/IAPWS-95 differences; exact inputs and tolerances are in the report and model guide.
 
 These are separate from the browser engine's 71 published component comparisons. They do not establish agreement with measured plant transients. Parameters and component geometry remain generic. The generated reports are `artifacts/modelica-verification.json` and `artifacts/modelica/property-verification.json`. The local workbench links the native report and checks its FMU hash against the running model. The verifier rejects a stale source or modified FMU; manifests identify the source hash, compiler, platform and revision.
 
@@ -66,4 +83,4 @@ The original model, UI, host and build scripts are Apache-2.0. OpenModelica, the
 
 ## Next model increments
 
-After independent review and measured/published transient comparisons, add loop geometry and pump curves, a resolved steam generator, then integrate reactor feedback and the secondary/electrical systems. Add 3D geometry as a view of the same observations. Each increment needs its own operating envelope and evidence before extending the model's claims.
+After independent review and measured/published transient comparisons, add loop geometry and pump curves, a resolved steam generator, then integrate reactor feedback and the secondary/electrical systems. The existing 3D view must continue to distinguish modeled states from illustrative geometry. Each increment needs its own operating envelope and evidence before extending the model's claims.

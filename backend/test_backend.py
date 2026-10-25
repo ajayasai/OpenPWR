@@ -146,7 +146,7 @@ class HostTest(HostFixture, unittest.TestCase):
         self.assertEqual(caught.exception.status, 503)
 
 
-class HttpTest(HostFixture, unittest.TestCase):
+class HttpFixture(HostFixture):
     def setUp(self):
         super().setUp()
         self.root = Path(self.temp.name)
@@ -172,6 +172,8 @@ class HttpTest(HostFixture, unittest.TestCase):
         client.close()
         return status, data, response_headers
 
+
+class HttpTest(HttpFixture, unittest.TestCase):
     def test_http_control_and_export(self):
         status, body, _ = self.request("POST", "/api/control", {"pumpCommand": 0.5})
         self.assertEqual(status, 200)
@@ -196,6 +198,21 @@ class HttpTest(HostFixture, unittest.TestCase):
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
         for path in ["/secret.txt", "/backend/server.py", "/docs/../secret.txt", "/docs/%2e%2e/secret.txt"]:
             self.assertEqual(self.request("GET", path)[0], 404, path)
+
+    def test_native_evidence_serves_saved_bytes_and_missing_reports_are_404(self):
+        (self.root / "engineering-evidence.html").write_text("<h1>Native evidence</h1>", encoding="utf-8")
+        self.assertEqual(self.request("GET", "/engineering-evidence.html")[0], 200)
+        reports = {"/engineering-verification.json": "artifacts/modelica-verification.json",
+            "/modelica-property-verification.json": "artifacts/modelica/property-verification.json"}
+        for route, relative in reports.items():
+            self.assertEqual(self.request("GET", route)[0], 404)
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            evidence = b'{"fmuSha256":"recorded-build","generatedAt":"saved-time","passed":7}'
+            path.write_bytes(evidence)
+            status, body, _ = self.request("GET", route)
+            self.assertEqual(status, 200)
+            self.assertEqual(body, evidence)
 
     def test_unavailable_native_engine_is_503(self):
         self.server.plant = None

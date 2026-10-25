@@ -7,12 +7,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import mimetypes
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 try:
     from .fmi_host import FMIPlant, ServiceError
+    from .experiments import ExperimentSession, MAX_REPLAY_BYTES, scenarios
 except ImportError:  # python backend/server.py
     from fmi_host import FMIPlant, ServiceError
+    from experiments import ExperimentSession, MAX_REPLAY_BYTES, scenarios
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -33,7 +35,7 @@ class LocalServer(ThreadingHTTPServer):
     allow_reuse_address = True
 
     def __init__(self, address, *, plant=None, unavailable=None, root=ROOT):
-        self.plant = plant
+        self.plant = ExperimentSession(plant) if plant is not None and not isinstance(plant, ExperimentSession) else plant
         self.unavailable = unavailable or "Native FMU is unavailable. Build the engineering model and restart this service."
         self.root = Path(root).resolve()
         super().__init__(address, Handler)
@@ -61,9 +63,9 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header(key, value)
         self.end_headers()
 
-    def _json(self, status, value):
+    def _json(self, status, value, extra=None):
         body = json.dumps(value, allow_nan=False, separators=(",", ":")).encode("utf-8")
-        self._headers(status, length=len(body))
+        self._headers(status, length=len(body), extra=extra)
         if self.command != "HEAD":
             self.wfile.write(body)
 
@@ -78,7 +80,7 @@ class Handler(BaseHTTPRequestHandler):
             raise ServiceError(403, "invalid_host", "This service accepts its loopback address only.")
         return host
 
-    def _body(self):
+    def _body(self, max_bytes=MAX_REQUEST_BYTES):
         host = self._host()
         if self.headers.get("Origin") != f"http://{host}":
             raise ServiceError(403, "invalid_origin", "Control requests must originate from this local control room.")
@@ -92,8 +94,8 @@ class Handler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", "0"))
         except ValueError as error:
             raise ServiceError(400, "invalid_body", "Invalid Content-Length.") from error
-        if not 0 < length <= MAX_REQUEST_BYTES:
-            raise ServiceError(413, "invalid_body", "A JSON body of 1 to 8192 bytes is required.")
+        if not 0 < length <= max_bytes:
+            raise ServiceError(413, "invalid_body", f"A JSON body of 1 to {max_bytes} bytes is required.")
         try:
             data = json.loads(self.rfile.read(length).decode("utf-8"), object_pairs_hook=unique_object,
                 parse_constant=lambda _: (_ for _ in ()).throw(ValueError("Nonfinite JSON")))
@@ -110,8 +112,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            data = self._body()
             route = urlsplit(self.path).path
+            data = self._body(MAX_REPLAY_BYTES if route == "/api/replay" else MAX_REQUEST_BYTES)
             plant = self._plant()
             if route == "/api/control":
                 result = plant.control(data)
@@ -123,6 +125,16 @@ class Handler(BaseHTTPRequestHandler):
                 if data:
                     raise ServiceError(400, "invalid_reset", "Reset accepts an empty object.")
                 result = plant.reset()
+            elif route == "/api/experiment":
+                if set(data) != {"scenario"} or not isinstance(data["scenario"], str):
+                    raise ServiceError(400, "invalid_experiment", "Supply only a scenario identifier.")
+                result = plant.start(data["scenario"])
+            elif route == "/api/replay":
+                result = plant.replay(data)
+            elif route == "/api/experiment/stop":
+                if data:
+                    raise ServiceError(400, "invalid_experiment", "Stopping an experiment accepts an empty object.")
+                result = plant.stop()
             else:
                 raise ServiceError(404, "not_found", "Unknown API route.")
             self._json(200, result)
@@ -142,7 +154,20 @@ class Handler(BaseHTTPRequestHandler):
             elif route == "/api/state":
                 self._json(200, self._plant().state())
             elif route == "/api/commands":
-                self._json(200, self._plant().export_commands())
+                self._json(200, self._plant().export_commands(), {"Content-Disposition": 'attachment; filename="openpwr-engineering.commands.json"'})
+            elif route == "/api/scenarios":
+                self._json(200, scenarios())
+            elif route == "/api/history":
+                parameters = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
+                try:
+                    if set(parameters) - {"maxPoints"} or len(parameters.get("maxPoints", ["600"])) != 1:
+                        raise ValueError("Invalid query")
+                    max_points = int(parameters.get("maxPoints", ["600"])[0])
+                except ValueError as error:
+                    raise ServiceError(400, "invalid_history_limit", "Supply at most one integer maxPoints value.") from error
+                self._json(200, self._plant().history_points(max_points))
+            elif route == "/api/report":
+                self._json(200, self._plant().report(), {"Content-Disposition": 'attachment; filename="openpwr-engineering.report.json"'})
             elif route == "/api/export":
                 body = self._plant().export_csv().encode("utf-8")
                 self._headers(200, "text/csv; charset=utf-8", len(body), {"Content-Disposition": 'attachment; filename="openpwr-engineering.csv"'})
@@ -182,7 +207,7 @@ class Handler(BaseHTTPRequestHandler):
         }
         if name in report_paths:
             path = self.server.root / report_paths[name]
-        elif name in {"index.html", "engineering.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
+        elif name in {"index.html", "engineering.html", "engineering-evidence.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
             path = self.server.root / name
         else:
             raise ServiceError(404, "not_found", "Not found.")

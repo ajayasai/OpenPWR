@@ -11,7 +11,7 @@ OpenPWR is an open, reduced-order simulation laboratory. A complete operating en
 
 ## Next engineering increments
 
-Version 0.3 implements the first primary-pressure/inventory increment as a separate OpenModelica hot-system workbench. Its eight subsystem checks and twelve published water-property comparisons establish initial numerical evidence. Measured coupled transients, plant-specific geometry, broader operating conditions and integration with the browser model remain future work.
+Version 0.4 extends the separate OpenModelica hot-system workbench with direct pressure/temperature property evaluation, nine subsystem checks, 24 published water-property comparisons, and 25 separately identified derivative-consistency checks. Timed experiments, command replay, and the native evidence viewer make these results reproducible and inspectable. The interactive 3D view depicts simulated observations using illustrative geometry. Measured coupled transients, plant-specific geometry, broader operating conditions and integration with the browser physics model remain future work.
 
 | Increment | Required modeling work | Evidence needed before claiming fidelity |
 | --- | --- | --- |

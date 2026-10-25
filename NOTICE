@@ -2,7 +2,9 @@ OpenPWR
 Copyright 2026 OpenPWR contributors
 
 Original source code and project documentation are licensed under Apache-2.0.
-The browser edition bundles no third-party runtime packages.
+The browser edition includes locally vendored Three.js under its upstream MIT
+license for the optional 3D view. Its license and provenance are in src/vendor/three.
+The original browser physics engine has no third-party runtime dependency.
 Optional native FMUs include generated Modelica code, OpenModelica runtime code,
 SUNDIALS solver libraries, and supporting components under their own licenses.
 Their notices are retained in models/licenses and inside the generated FMUs.

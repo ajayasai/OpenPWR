@@ -119,6 +119,23 @@ def verify(fmu_path, output_path):
              "reference": "Qualitative equilibrium-pressurizer response; no plant-specific spray transient."}, "generic subsystem response")
         traces["spray"] = spray[::10]
 
+        # A closed primary inventory must conserve actual IF97-derived mass
+        # through all three mechanisms. This checks state-property consistency,
+        # independently of the model's algebraically constructed residual.
+        closed_cases = {"pump": pump, "heater": heater, "spray": spray}
+        closed_mass_errors = {name: max(abs(point["outputs"]["totalMassKg"] - trace[0]["outputs"]["totalMassKg"])
+            for point in trace if point["time"] <= 5.0) for name, trace in closed_cases.items()}
+        closed_valid = all(len([point for point in trace if point["time"] <= 5.0]) == 51
+            and not any(point["halted"] for point in trace if point["time"] <= 5.0)
+            for trace in closed_cases.values())
+        add("Closed primary mass is conserved during pump, heater, and spray changes",
+            closed_valid and all(error < 1e-4 for error in closed_mass_errors.values()),
+            {"maximumMassDriftKg": closed_mass_errors, "durationSeconds": 5,
+             "toleranceKg": 1e-4, "sampleIntervalSeconds": 0.1,
+             "reference": "Zero external charging and letdown: total physical water inventory must remain constant. Spray transfers mass internally.",
+             "scope": "IF97 state/property consistency across pump, heater, and spray transients; independent of reported algebraic residuals."},
+            "analytical conservation reference")
+
         initial = reset()
         plant.control({"chargingFlowKgS": 2, "letdownFlowKgS": 0.5, "heaterPowerMW": 0.5})
         inventory = run_for(plant, 30)

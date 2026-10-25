@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 import { PWRPlant } from './engine.js';
 import { createDiagramAnimation } from './diagram.js';
+import { createPlantView } from './plant-view.js';
 
 // All readings originate in the same engine used by the command-line test suite.
 // No network requests, telemetry, external chart library, or UI-derived physics.
 const plant = new PWRPlant();
 const $ = (id) => document.getElementById(id);
 const diagram = createDiagramAnimation();
+const plantView = createPlantView({ host: $('plant-3d'), schematic: $('plant-schematic'), mode: 'browser' });
 const DT = 0.05;
 const MAX_HISTORY = 86400; // 24 h at 1 Hz; pruned in chunks to keep accelerated runs responsive.
 const FRAME_WORK_BUDGET_MS = 12;
@@ -502,6 +504,7 @@ function frame(now) {
   }
   if (now - lastChartPaint > 500) { renderCharts(); lastChartPaint = now; }
   diagram.update(lastSnapshot, { elapsed, paused, hidden: document.hidden });
+  plantView.update(lastSnapshot, { paused, hidden: document.hidden });
   if (now - lastRateWall >= 1000) {
     const actual = Math.max(0, (lastSnapshot.time - lastRateSim) * 1000 / (now - lastRateWall));
     $('speed-achieved').hidden = speed <= 20;

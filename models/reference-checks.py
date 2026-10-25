@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Build and compare the native MSL property probe against published NIST data."""
+"""Compare native MSL IF97 with published NIST/IAPWS tables and differential identities."""
 import argparse
 import hashlib
 import json
@@ -30,6 +30,21 @@ REFERENCES = [
     (200, 1.5549, 852.27, 2792.0),
     (300, 8.5879, 1345.0, 2749.6),
 ]
+IAPWS_SOURCE = {
+    'title': 'IAPWS R7-97(2012), Revised Release on IAPWS-IF97',
+    'url': 'https://iapws.org/technical-guidance/release/IF97-Rev.download',
+    'table': 'Table 5, page 9: Region 1 computer-program verification',
+}
+# Literal Table 5 values, independently transcribed from the IAPWS release.
+# p/MPa, T/K, v/(m3/kg), h/(kJ/kg), u/(kJ/kg), cp/(kJ/(kg K)).
+REGION1_REFERENCES = [
+    (3, 300, .00100215168, 115.331273, 112.324818, 4.17301218),
+    (80, 300, .000971180894, 184.142828, 106.448356, 4.01008987),
+    (3, 500, .00120241800, 975.542239, 971.934985, 4.65580682),
+]
+PROBE_OUTPUTS = ('probeDensityKgM3', 'probeSpecificVolumeM3Kg', 'probeEnthalpyKJkg',
+                 'probeInternalEnergyKJkg', 'probeCpKJkgK', 'probeExpansionPerK',
+                 'probeCompressibilityPerPa')
 
 
 def sha(path):
@@ -86,6 +101,7 @@ def verify():
     description = read_model_description(str(FMU), validate=True)
     refs = {item.name: item.valueReference for item in description.modelVariables}
     values = {}
+    checks = []
     with tempfile.TemporaryDirectory(prefix='openpwr-property-run-') as work:
         extract(str(FMU), unzipdir=work)
         unit = FMU2Slave(guid=description.guid, unzipDirectory=work,
@@ -99,10 +115,60 @@ def verify():
             for temperature, _, _, _ in REFERENCES:
                 names = [f'pressure{temperature}MPa', f'liquidEnthalpy{temperature}KJkg', f'vaporEnthalpy{temperature}KJkg']
                 values[temperature] = unit.getReal([refs[name] for name in names])
+
+            def probe(pressure, temperature):
+                unit.setReal([refs['probePressurePa'], refs['probeTemperatureK']], [pressure, temperature])
+                return dict(zip(PROBE_OUTPUTS, unit.getReal([refs[name] for name in PROBE_OUTPUTS])))
+
+            for pressure, temperature, volume, enthalpy, internal, cp in REGION1_REFERENCES:
+                actual = probe(pressure * 1e6, temperature)
+                for output, label, reference, units in [
+                        ('probeSpecificVolumeM3Kg', 'specific volume', volume, 'm3/kg'),
+                        ('probeEnthalpyKJkg', 'enthalpy', enthalpy, 'kJ/kg'),
+                        ('probeInternalEnergyKJkg', 'internal energy', internal, 'kJ/kg'),
+                        ('probeCpKJkgK', 'isobaric heat capacity', cp, 'kJ/(kg K)')]:
+                    measured = actual[output]
+                    error = abs(measured - reference)
+                    # 1e-8 relative allows the last printed digit of the nine-digit table.
+                    tolerance = abs(reference) * 1e-8
+                    checks.append({'name': f'Native IF97 region 1 {label}, {pressure} MPa / {temperature} K',
+                                   'category': 'published-water-property', 'measured': measured,
+                                   'reference': reference, 'absoluteError': error,
+                                   'relativeError': error / abs(reference), 'tolerance': tolerance,
+                                   'units': units, 'pass': error <= tolerance, 'source': IAPWS_SOURCE})
+
+            # These are consistency checks, explicitly separate from published comparisons.
+            # Central differences observe independent nearby property calls through FMI.
+            # The analytical expressions are the exact thermodynamic identities used by
+            # PrimaryLoop's fixed-volume mass and internal-energy inventory derivatives.
+            states = [(p * 1e6, t) for p, t, *_ in REGION1_REFERENCES] + [(15.5e6, 563.15), (15.5e6, 598.15)]
+            for pressure, temperature in states:
+                center = probe(pressure, temperature)
+                dp, dt = 100.0, .002
+                pplus, pminus = probe(pressure + dp, temperature), probe(pressure - dp, temperature)
+                tplus, tminus = probe(pressure, temperature + dt), probe(pressure, temperature - dt)
+                rho, alpha, kappa = center['probeDensityKgM3'], center['probeExpansionPerK'], center['probeCompressibilityPerPa']
+                cp = 1000 * center['probeCpKJkgK']
+                comparisons = [
+                    ('density pressure derivative', (pplus['probeDensityKgM3'] - pminus['probeDensityKgM3']) / (2 * dp), rho * kappa, 'kg/(m3 Pa)'),
+                    ('density temperature derivative', (tplus['probeDensityKgM3'] - tminus['probeDensityKgM3']) / (2 * dt), -rho * alpha, 'kg/(m3 K)'),
+                    ('enthalpy temperature derivative', 1000 * (tplus['probeEnthalpyKJkg'] - tminus['probeEnthalpyKJkg']) / (2 * dt), cp, 'J/(kg K)'),
+                    ('internal-energy pressure derivative', 1000 * (pplus['probeInternalEnergyKJkg'] - pminus['probeInternalEnergyKJkg']) / (2 * dp), (pressure * kappa - temperature * alpha) / rho, 'J/(kg Pa)'),
+                    ('internal-energy temperature derivative', 1000 * (tplus['probeInternalEnergyKJkg'] - tminus['probeInternalEnergyKJkg']) / (2 * dt), cp - pressure * alpha / rho, 'J/(kg K)'),
+                ]
+                for label, measured, reference, units in comparisons:
+                    error = abs(measured - reference)
+                    tolerance = abs(reference) * 2e-6
+                    checks.append({'name': f'Native {label}, {pressure / 1e6:g} MPa / {temperature:g} K',
+                                   'category': 'thermodynamic-derivative-consistency', 'measured': measured,
+                                   'reference': reference, 'absoluteError': error,
+                                   'relativeError': error / abs(reference), 'tolerance': tolerance,
+                                   'units': units, 'pass': error <= tolerance,
+                                   'method': {'pressureDifferencePa': dp, 'temperatureDifferenceK': dt,
+                                              'scheme': 'Central difference vs thermodynamic identity; not published validation'}})
             unit.terminate()
         finally:
             unit.freeInstance()
-    checks = []
     for temperature, pressure, liquid, vapor in REFERENCES:
         for index, (name, expected, units) in enumerate([
                 ('pressure', pressure, 'MPa'), ('liquid enthalpy', liquid, 'kJ/kg'), ('vapor enthalpy', vapor, 'kJ/kg')]):
@@ -117,12 +183,15 @@ def verify():
     passed = sum(item['pass'] for item in checks)
     report = {**metadata(), 'model': manifest['model'], 'compiler': manifest['compiler'],
               'modelicaLibrary': manifest['modelicaLibrary'], 'fmuSha256': sha(FMU),
-              'scope': 'Published pure-water property comparisons through a compiled native Modelica Standard Library IF97 FMU. These do not validate the primary-loop/pressurizer transients or the whole plant.',
+              'scope': 'Published pure-water property comparisons and separately labeled thermodynamic-derivative consistency checks through a compiled native Modelica Standard Library IF97 FMU. These do not validate the primary-loop/pressurizer transients or the whole plant.',
+              'publishedComparisons': sum(c['category'] == 'published-water-property' for c in checks),
+              'derivativeConsistencyChecks': sum(c['category'] == 'thermodynamic-derivative-consistency' for c in checks),
               'passed': passed, 'total': len(checks), 'checks': checks}
     (OUTPUT / 'property-verification.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     for item in checks:
         print(('PASS' if item['pass'] else 'FAIL') + ' ' + item['name'] + f": {item['measured']:.9g} {item['units']}; reference {item['reference']}")
-    print(f'{passed}/{len(checks)} published native property checks passed.')
+    print(f'{passed}/{len(checks)} native property/derivative checks passed; '
+          f"{report['publishedComparisons']} published comparisons and {report['derivativeConsistencyChecks']} consistency checks.")
     if passed != len(checks):
         raise SystemExit(1)
 

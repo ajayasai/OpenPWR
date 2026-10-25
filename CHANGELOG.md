@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-10-25
+
+Adds an interactive Three.js cutaway to both simulation editions: camera presets, orbit/zoom, equipment selection, live observation inspector, flow markers, shaft/pump animation, cutaway and label controls, keyboard/touch support, reduced-motion handling, and an explicit WebGL fallback. Three.js is pinned, locally vendored with its MIT license, and requires no runtime CDN. The original process schematic remains selectable.
+
+Adds timed native experiments and validated command-history replay, exact event boundaries, endpoint comparison, bounded history recovery on reconnection, JSON/CSV export, and a headless experiment runner. The public native evidence viewer shows source identity, saved transient plots, check tolerances, 24 published NIST/IAPWS property comparisons and 25 separate numerical derivative checks. Deployment requires current successful native evidence.
+
+Uses direct pressure/temperature properties in native primary volumes, retaining the same physical balances and saturated pressurizer model. Same-workload comparisons show substantially smaller inventory accounting errors with closely matching trajectories. Timing improvements are modest and host-dependent; no large speedup or real-plant validation is claimed. Native scope remains the hot primary subsystem, separate from the browser whole-plant model.
+
 ## 0.3.0 — 2026-10-25
 
 Adds an optional native OpenModelica engineering workbench. A coupled hot primary-loop/pressurizer Modelica model uses the Modelica Standard Library's IF97 properties, separate coolant volumes, saturated pressurizer phase inventories, hydraulic flow and pump lag, heaters/spray, and charging/letdown boundaries. It exports as an FMI 2.0 co-simulation FMU with CVODE and is operated through a local FMPy service and browser controls.
