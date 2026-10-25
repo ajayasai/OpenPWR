@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-25
+
+Makes the process diagram visibly animated: brighter flow tracers, rotating primary/feed pumps, turbine and generator rotors, steam-generator bubbles, and power-dependent core heat intensity. Motion follows engine observations on a bounded display clock; it freezes with pause, respects reduced-motion preferences, and can be disabled independently of the simulation. Rotor motion is illustrative, not literal RPM; feed-pump rotation is inferred from mass flow because no feed-pump rotor state is modeled.
+
+Corrects the shared steam header to follow total steam flow even when the turbine is isolated and only the bypass carries steam. Generator-lead motion follows signed gross power and breaker state; pump coastdown and the model's natural-circulation floor remain distinct. Keeps the diagram available on mobile with horizontal scrolling. Adds eight mapping and animation-clock regression tests. Engineering model equations and benchmark tolerances are unchanged.
+
 ## 0.2.0 — 2026-10-25
 
 Adds a continuous generic cold-start experiment: 25 °C subcritical initialization, source-driven kinetics, circulation and pressure support, reactor-assisted heatup, hot thermal hold, steam-driven turbine acceleration, conditional grid connection, and load pickup. Startup actions change controls without replacing thermal or nuclear inventories. Generator load rejection trips the reactor and closes the turbine stop valve.

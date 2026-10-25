@@ -15,7 +15,8 @@ OpenPWR models a generic pressurized-water plant at system level. Reactor power 
 - Automatic load, feedwater, and turbine controls, with manual overrides and a latched reactor trip.
 - Cold initialization, source-driven subcritical kinetics, heatup, hot thermal hold, turbine acceleration, and conditional grid connection. Temperatures and stored inventories evolve through the same engine.
 - Pump-trip, feedwater-loss, turbine-trip, and heat-sink-loss experiments.
-- Live process diagram, unit-labeled trends, alarms/events, adjustable simulation speed, JSON snapshots, and CSV export.
+- Animated process diagram with visible flow, pump/rotor motion, steam generation, and generator power direction, including a scrollable mobile view. Motion follows model observations, freezes with pause, and respects reduced-motion preferences.
+- Unit-labeled trends, alarms/events, adjustable simulation speed, JSON snapshots, and CSV export.
 - A headless runner, published point-kinetics and water-property benchmark comparisons, machine-readable evidence, and CI on Linux and Windows.
 
 ## Scope and accuracy

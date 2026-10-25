@@ -515,17 +515,16 @@ small {
 }
 .pipe-flow {
   fill:none;
-  stroke-width:1.4;
+  stroke-width:3.2;
   stroke-linecap:round;
-  stroke-dasharray:4 23;
-  animation:flow 4s linear infinite
+  stroke-dasharray:7 23;
+  pointer-events:none
 }
 .primary-flow {
   stroke:#9cf6ec
 }
-.steam-flow {
+.steam-flow,.steam-header-flow {
   stroke:#ffe0a4;
-  animation-duration:3s
 }
 .feed-flow {
   stroke:#a5dcd6
@@ -1834,7 +1833,14 @@ dialog::backdrop {
     font-size:8px
   }
   .diagram-wrapper {
-    display:none
+    display:block;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scrollbar-width:thin;
+    scrollbar-color:#426b7a #0f1925
+  }
+  .diagram-wrapper .plant-diagram {
+    min-width:720px
   }
   .loop-legend {
     flex-wrap:wrap;
@@ -2166,4 +2172,20 @@ dialog::backdrop {
 @media(max-width:1250px){.startup-readings{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.startup-actions{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.startup-panel .panel-heading{align-items:flex-start}.startup-panel .text-button{font-size:9px;max-width:122px;text-align:right;line-height:1.5}.startup-panel .section-index{display:none}.startup-stages{grid-template-columns:repeat(3,minmax(0,1fr));padding:0 14px;gap:7px}.startup-stages li{font-size:10px;padding:8px 5px}.startup-stages li>span{font-size:9px}.startup-status{font-size:12px;margin:16px 14px}.startup-readings{padding:0 14px 17px}.startup-readings span{font-size:10px;line-height:1.5}.startup-readings strong{font-size:16px}.startup-control-row{grid-template-columns:1fr;gap:15px;padding:16px 14px}.startup-power-field label{font-size:11px}.startup-actions{grid-template-columns:1fr 1fr;gap:15px;padding:17px 14px}.startup-action .button{font-size:11px;min-height:44px}.startup-action p{font-size:10px}.startup-footer{display:block;padding:0 14px 15px}.startup-footer p{font-size:10px}.startup-footer .text-button{max-width:none;text-align:left;margin-top:8px}}
 .bypass-pipe{stroke:#665b42;stroke-width:3;stroke-dasharray:5 4}
-.bypass-flow{stroke:#ddba7e;stroke-width:1.2}
+.bypass-flow{stroke:#ffe0a4;stroke-width:2.8}
+.animation-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px 10px;font-size:10px;color:#8ca8b8}
+.animation-toolbar .text-button{font-size:10px;color:#8ddbd1;white-space:nowrap}
+.animation-toolbar .text-button:disabled{color:#8395a1;cursor:default}
+.animation-caption{font-size:10px;color:#839eaf;margin:5px 18px 14px;line-height:1.5}
+.diagram-scroll-hint{display:none}
+.diagram-wrapper:focus-visible{outline:2px solid #60d4ce;outline-offset:-3px}
+.rotor-wheel{fill:none;stroke:#9e8863;stroke-width:2}
+.rotor-wheel.rotor-active{stroke:#f0c37c}
+.rotor-wheel circle:last-child{fill:#d8b070;stroke:#f5d59b}
+.pump-blade.rotor-active{fill:#3b7b80;stroke:#a8f6ea}
+.generator-rotor{fill:none;stroke:#53938b;stroke-width:2.5;stroke-dasharray:16 9}
+.generator-rotor.rotor-active{stroke:#a2f3dc}
+.shaft-motion{fill:none;stroke:#fff1c8;stroke-width:3;stroke-dasharray:3 7}
+.grid-flow{stroke:#c0ffe6;stroke-width:3}
+.steam-bubbles{fill:#ffe1a6;stroke:#fff1d4;stroke-width:.5;pointer-events:none}
+@media(max-width:700px){.diagram-scroll-hint{display:inline}.animation-toolbar{padding:12px 14px 0;font-size:9px}.animation-caption{margin:4px 14px 12px;font-size:9px}}

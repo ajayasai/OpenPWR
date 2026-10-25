@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 import { PWRPlant } from './engine.js';
+import { createDiagramAnimation } from './diagram.js';
 
 // All readings originate in the same engine used by the command-line test suite.
 // No network requests, telemetry, external chart library, or UI-derived physics.
 const plant = new PWRPlant();
 const $ = (id) => document.getElementById(id);
+const diagram = createDiagramAnimation();
 const DT = 0.05;
 const MAX_HISTORY = 86400; // 24 h at 1 Hz; pruned in chunks to keep accelerated runs responsive.
 const FRAME_WORK_BUDGET_MS = 12;
@@ -83,6 +85,7 @@ function setPaused(value) {
   setText('play-icon', paused ? '▶' : 'Ⅱ');
   $('live-dot').classList.toggle('paused', paused);
   document.body.classList.toggle('paused', paused);
+  diagram.update(lastSnapshot, { paused, hidden: document.hidden });
 }
 function mutate(action, message) {
   try {
@@ -184,19 +187,7 @@ function render(s) {
   $('level-fill').setAttribute('height', String(level * 29));
   $('level-fill').setAttribute('y', String(186 - level * 29));
   $('grid-breaker').setAttribute('d', s.gridConnected === false ? 'M807 88 L831 68' : 'M807 88 L839 88');
-  // Diagram motion is driven by current flow, rather than an always-on decoration.
-  const flowRates = [
-    ['.primary-flow', s.primaryFlow / 15584.415584415585],
-    ['.steam-flow', s.turbineSteamFlow / 1676.4752239102595],
-    ['.bypass-flow', s.bypassSteamFlow / 1676.4752239102595],
-    ['.feed-flow', s.feedFlow / 1676.4752239102595],
-    ['.cooling-flow', s.faults.lossOfHeatSink ? 0 : s.controls.cooling],
-  ];
-  for (const [selector, rate] of flowRates) for (const path of document.querySelectorAll(selector)) {
-    path.style.animationDuration = `${4 / Math.max(.05, Math.abs(rate))}s`;
-    path.style.animationPlayState = paused || Math.abs(rate) < .001 ? 'paused' : 'running';
-    path.style.opacity = Math.abs(rate) < .001 ? '0' : '1';
-  }
+  diagram.update(s, { paused, hidden: document.hidden });
   setText('balance-reading', `Thermal balance residual ${fmt(s.energyResidual, 3)} MW`);
   const status = $('plant-status');
   const abnormal = s.alarms?.length > 0;
@@ -510,6 +501,7 @@ function frame(now) {
     lastSnapshot = plant.snapshot(); render(lastSnapshot); lastPaint = now;
   }
   if (now - lastChartPaint > 500) { renderCharts(); lastChartPaint = now; }
+  diagram.update(lastSnapshot, { elapsed, paused, hidden: document.hidden });
   if (now - lastRateWall >= 1000) {
     const actual = Math.max(0, (lastSnapshot.time - lastRateSim) * 1000 / (now - lastRateWall));
     $('speed-achieved').hidden = speed <= 20;
