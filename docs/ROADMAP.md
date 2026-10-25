@@ -11,6 +11,8 @@ OpenPWR is an open, reduced-order simulation laboratory. A complete operating en
 
 ## Next engineering increments
 
+Version 0.3 implements the first primary-pressure/inventory increment as a separate OpenModelica hot-system workbench. Its eight subsystem checks and twelve published water-property comparisons establish initial numerical evidence. Measured coupled transients, plant-specific geometry, broader operating conditions and integration with the browser model remain future work.
+
 | Increment | Required modeling work | Evidence needed before claiming fidelity |
 | --- | --- | --- |
 | Primary pressure and inventory | Separate pressurizer liquid/vapor volumes, surge flow, heater/spray energy, charging and letdown mass balances | Published pressure/inventory transients and conservation/refinement studies |

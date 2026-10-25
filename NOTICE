@@ -2,7 +2,11 @@ OpenPWR
 Copyright 2026 OpenPWR contributors
 
 Original source code and project documentation are licensed under Apache-2.0.
-No third-party source code or runtime packages are bundled in the application.
+The browser edition bundles no third-party runtime packages.
+Optional native FMUs include generated Modelica code, OpenModelica runtime code,
+SUNDIALS solver libraries, and supporting components under their own licenses.
+Their notices are retained in models/licenses and inside the generated FMUs.
+OpenPWR's Apache license does not replace upstream licenses.
 Scientific references describe equations and data; their inclusion is not an endorsement.
 Node.js is optional development tooling, available under its own open-source license.
 GitHub Pages is optional hosting; the built files work on any static HTTP server.

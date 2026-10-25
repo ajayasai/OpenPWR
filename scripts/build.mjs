@@ -28,7 +28,7 @@ try {
   await rm(output, { recursive: true });
 } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await mkdir(output, { recursive: true });
-for (const name of ['index.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
+for (const name of ['index.html', 'engineering.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
 for (const name of ['verification.json', 'benchmarks.json']) {

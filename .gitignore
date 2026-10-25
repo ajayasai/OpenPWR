@@ -7,3 +7,5 @@ artifacts/
 !.env.example
 .openai/
 CONTRACT.md
+__pycache__/
+*.pyc

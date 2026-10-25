@@ -20,7 +20,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(404); res.end('Not found'); return;
     }
     if (source && ['verification.json', 'benchmarks.json'].includes(route)) route = 'artifacts/' + route;
-    if (!/^(index\.html|verification\.html|verification\.json|benchmarks\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks)\.json)$/.test(route)) {
+    if (!/^(index\.html|engineering\.html|verification\.html|verification\.json|benchmarks\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks)\.json)$/.test(route)) {
       res.writeHead(404); res.end('Not found'); return;
     }
     const path = resolve(root, route);

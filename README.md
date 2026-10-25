@@ -4,7 +4,9 @@
 
 [Launch control room](https://ajayasai.github.io/OpenPWR/) · [Benchmark & verification evidence](https://ajayasai.github.io/OpenPWR/verification.html) · [Model equations](docs/MODEL.md) · [Validation scope](docs/VALIDATION.md)
 
-OpenPWR models a generic pressurized-water plant at system level. Reactor power emerges from neutron kinetics and feedback, while the coolant, steam system, turbine, condenser, and controllers respond together. The UI and command-line runner use the **same engine**.
+**New in v0.3:** an optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs a native primary-loop/pressurizer model through FMI and FMPy. It has separate hot/cold volumes, pressure-dependent water properties, liquid/vapor pressurizer inventories, heaters, spray, charging and letdown. This is a distinct hot-system experiment; the browser-only whole-plant model below remains available.
+
+OpenPWR's browser edition models a generic pressurized-water plant at system level. Reactor power emerges from neutron kinetics and feedback, while the coolant, steam system, turbine, condenser, and controllers respond together. Its UI and command-line runner use the **same JavaScript engine**.
 
 ![OpenPWR control room with measured plant state, process diagram, operator controls, and live trends](docs/control-room.jpg)
 
@@ -23,7 +25,7 @@ OpenPWR models a generic pressurized-water plant at system level. Reactor power 
 
 This is a **reduced-order engineering model**, not a validated replica of an operating facility. Version 0.2 extends the operating envelope from cold initialization through generic startup to hot power operation and selected transients. The nominal point is 3,000 MW thermal and 1,000 MW net electrical; nominal calibration is an assumption, not validation data.
 
-The startup sequence is an educational, reactor-assisted heatup experiment with generic controls and permissives. It is not a named plant's startup procedure. A resolved pressurizer, multi-loop hydraulics, spatial core physics, complete water/steam property regions, emergency core cooling, containment, fuel damage, severe-accident chemistry, and plant-specific instrumentation remain outside the model. The engine stops at declared model-domain boundaries. Read [MODEL.md](docs/MODEL.md) before interpreting results.
+The browser startup sequence is an educational, reactor-assisted heatup experiment with generic controls and permissives. It is not a named plant's startup procedure. A resolved pressurizer, multi-loop hydraulics, spatial core physics, complete water/steam property regions, emergency core cooling, containment, fuel damage, severe-accident chemistry, and plant-specific instrumentation remain outside the browser model. The optional native workbench adds a coupled equilibrium pressurizer within its own narrower hot-system envelope. Each engine stops at its declared model-domain boundaries. Read [MODEL.md](docs/MODEL.md) and [MODELICA_MODEL.md](docs/MODELICA_MODEL.md) before interpreting results.
 
 Tests establish numerical consistency, agreement with cited published component benchmarks, and expected generic responses. They do not establish real-plant predictive accuracy or qualify the program for plant operation, safety analysis, or operator licensing. [Benchmark provenance](docs/BENCHMARKS.md) records inputs, references, and tolerances. [The development roadmap](docs/ROADMAP.md) distinguishes remaining model work from the evidence needed for full-scope claims.
 
@@ -68,7 +70,7 @@ Browser controls → model API → deterministic engine → observations / plots
 
 ## Fully open stack
 
-Original source and documentation: **Apache-2.0**. No proprietary solver, licensed plant dataset, telemetry, API key, cloud computation, remote font, or runtime package is required. All computation runs on your device. GitHub Pages is optional hosting, and GitHub Actions is optional CI. Source availability does not imply physical-model completeness.
+Original source and documentation: **Apache-2.0**. The browser edition has no runtime package dependencies. Optional engineering mode uses OpenModelica, the Modelica Standard Library, FMPy and their open-source dependencies, under their respective licenses. It requires a local native solver service. Neither edition requires a proprietary solver, private plant dataset, telemetry, API key, cloud computation, or remote font. GitHub Pages is optional static hosting and cannot execute the native FMU; GitHub Actions is optional CI. Source availability does not imply physical-model completeness.
 
 See [LICENSE](LICENSE), [NOTICE](NOTICE), and [dependency inventory](docs/OPEN_SOURCE.md).
 

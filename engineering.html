@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b111b">
+  <meta name="description" content="OpenPWR engineering workbench: a local OpenModelica primary-loop and pressurizer model connected to interactive controls.">
+  <title>OpenPWR · OpenModelica engineering workbench</title>
+  <link rel="stylesheet" href="./src/engineering.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to engineering workbench</a>
+  <header class="masthead">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">◈</span><span>Open<span class="brand-light">PWR</span><small>OPEN ENGINEERING / OPEN ENERGY</small></span></a>
+    <nav aria-label="Main navigation"><a href="./">Control room</a><span aria-current="page">Engineering</span><a href="./docs/ENGINEERING.md#evidence">Model &amp; evidence ↗</a></nav>
+  </header>
+  <main id="main" class="workspace">
+    <section class="page-heading">
+      <div><p class="eyebrow">OPENMODELICA / FMI 2.0</p><h1>Primary-loop workbench.</h1><p class="intro">Explore coolant circulation, stored heat, and pressurizer response in a compiled engineering model.</p></div>
+      <div class="session-controls"><div class="clock-label">SIMULATION TIME<strong id="engineering-time">—</strong></div><button id="engineering-run" class="button button-primary" disabled>Run model</button><label><span class="sr-only">Simulation speed</span><select id="engineering-speed" aria-label="Simulation speed"><option value="1">1× speed</option><option value="5">5× speed</option><option value="20">20× speed</option></select></label></div>
+    </section>
+
+    <section id="connection-panel" class="connection-panel" aria-labelledby="connection-title">
+      <div><span class="connection-dot" id="connection-dot"></span><h2 id="connection-title">Connecting to the engineering service</h2><p id="connection-message">Checking for a local OpenModelica model. No simulated readings are shown until it responds.</p></div><button id="engineering-reconnect" class="button" disabled>Retry connection</button>
+      <div id="local-instructions" hidden><p>The GitHub Pages edition serves this interface. The compiled model runs in the local engineering service.</p><pre><code>npm run engineering:setup
+npm run engineering:build
+npm run engineering:start</code></pre><p>Then open <a href="http://127.0.0.1:8001/engineering.html">http://127.0.0.1:8001/engineering.html ↗</a>. Setup and model details are in the <a href="./docs/ENGINEERING.md">engineering guide ↗</a>.</p></div>
+    </section>
+    <div id="engineering-notice" class="notice" role="status" hidden></div>
+    <div id="engineering-halt" class="halt-notice" role="alert" hidden></div>
+
+    <section class="metrics" aria-label="Engineering measurements">
+      <article class="metric"><span class="metric-label">PRIMARY PRESSURE</span><strong><span id="pressure-value">—</span><small>MPa</small></strong><span class="metric-note">Pressurizer response</span></article>
+      <article class="metric"><span class="metric-label">PRESSURIZER LEVEL</span><strong><span id="level-value">—</span><small>%</small></strong><span class="metric-note">Liquid inventory</span></article>
+      <article class="metric"><span class="metric-label">HOT LEG</span><strong><span id="hot-value">—</span><small>°C</small></strong><span class="metric-note" id="cold-note">Cold leg — °C</span></article>
+      <article class="metric"><span class="metric-label">PRIMARY MASS FLOW</span><strong><span id="flow-value">—</span><small>kg/s</small></strong><span class="metric-note" id="pump-note">Pump speed —%</span></article>
+    </section>
+
+    <div class="engineering-layout">
+      <div class="plant-column">
+        <section class="panel" aria-labelledby="primary-diagram-title">
+          <div class="panel-heading"><div><span class="section-index">01</span><h2 id="primary-diagram-title">Primary circuit &amp; pressure control</h2></div><span id="engine-status" class="status-pill">Awaiting model</span></div>
+          <div class="diagram-legend"><span><i class="legend-line hot"></i>Hot primary</span><span><i class="legend-line cold"></i>Cold primary</span><span><i class="legend-line boundary"></i>Thermal boundary</span><span id="motion-status">Motion paused</span></div>
+          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Primary circuit schematic; scroll horizontally on small screens">
+            <svg id="engineering-diagram" viewBox="0 0 920 420" role="img" aria-labelledby="schematic-title schematic-description">
+              <title id="schematic-title">Primary coolant loop and pressurizer</title><desc id="schematic-description">The imposed reactor heat input warms primary coolant. Coolant flows through hot and cold legs and transfers heat to an imposed steam-generator boundary. A surge connection couples the loop to a pressurizer with heater, spray, charging, and letdown controls. Motion is illustrative.</desc>
+              <defs><pattern id="engineering-dot-grid" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="#304352" opacity=".5"/></pattern><linearGradient id="engineering-core-gradient" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#b97823" stop-opacity=".15"/><stop offset="1" stop-color="#efbe6a" stop-opacity=".5"/></linearGradient></defs>
+              <rect width="920" height="420" fill="url(#engineering-dot-grid)"/>
+              <path d="M175 232 H257 V190 H569" class="pipe hot-pipe"/><path d="M620 304 V350 H175 V301" class="pipe cold-pipe"/>
+              <path d="M175 232 H257 V190 H569" class="flow hot-flow"/><path d="M620 304 V350 H175 V301" class="flow cold-flow"/>
+              <path d="M352 190 V143" class="pipe surge-pipe"/>
+              <text x="367" y="158" class="diagram-note">Surge connection</text>
+              <rect x="309" y="37" width="86" height="110" rx="26" class="vessel"/><rect id="pressurizer-liquid" x="317" y="96" width="70" height="43" rx="8" class="liquid-fill"/>
+              <path d="M329 121 L335 113 L341 121 L347 113 L353 121 L359 113 L365 121 L371 113" id="heater-coil" class="heater-coil"/>
+              <path d="M352 18 V54 M340 61 L352 54 L364 61" class="spray-nozzle"/><g id="spray-droplets" class="spray-droplets"><circle cx="339" cy="72" r="2"/><circle cx="352" cy="81" r="2"/><circle cx="366" cy="70" r="2"/></g>
+              <text x="408" y="57" class="diagram-label">Pressurizer</text><text x="408" y="80" class="diagram-reading" id="diagram-pressure">— MPa</text><text x="408" y="102" class="diagram-note" id="diagram-level">—% liquid</text><text x="408" y="126" class="diagram-note" id="diagram-heater">Heater — MW</text>
+              <text x="246" y="27" text-anchor="end" class="diagram-note" id="diagram-spray">Spray — kg/s</text><path d="M253 22 H352" class="fine-pipe"/>
+              <rect x="118" y="211" width="112" height="105" rx="31" class="vessel"/><rect id="engineering-core-heat" x="137" y="239" width="74" height="56" rx="4" fill="url(#engineering-core-gradient)"/><path d="M146 244 V289 M160 244 V289 M174 244 V289 M188 244 V289 M202 244 V289" class="fuel-rods"/>
+              <text x="173" y="181" text-anchor="middle" class="diagram-label">Reactor thermal node</text><text x="173" y="202" text-anchor="middle" class="diagram-note" id="diagram-power">Input — MW</text><text x="173" y="389" text-anchor="middle" class="diagram-note" id="diagram-fuel">Fuel — °C</text>
+              <text x="459" y="172" text-anchor="middle" class="diagram-reading" id="diagram-hot">— °C</text><text x="457" y="331" text-anchor="middle" class="diagram-reading cold-text" id="diagram-cold">— °C</text>
+              <circle cx="360" cy="350" r="22" class="pump-body"/><g id="engineering-pump-rotor" class="pump-rotor"><path d="M360 350 Q340 335 360 332 Q363 342 360 350 M360 350 Q379 338 375 357 Q366 359 360 350 M360 350 Q359 371 344 361 Q348 353 360 350"/><circle cx="360" cy="350" r="4"/></g><text x="360" y="389" text-anchor="middle" class="diagram-note" id="diagram-pump">Pump —%</text>
+              <rect x="566" y="170" width="108" height="137" rx="27" class="vessel"/><path d="M583 286 V196 Q583 184 592 184 Q601 184 601 196 V286 M615 286 V196 Q615 184 624 184 Q633 184 633 196 V286 M647 286 V196" class="sg-tubes"/>
+              <path d="M676 215 H785 M676 261 H785" class="boundary-pipe"/><path d="M772 207 L785 215 L772 223 M772 253 L785 261 L772 269" class="boundary-arrow"/>
+              <text x="620" y="135" text-anchor="middle" class="diagram-label">Heat exchanger</text><text x="620" y="155" text-anchor="middle" class="diagram-note" id="diagram-transfer">— MW to boundary</text>
+              <rect x="789" y="197" width="106" height="84" rx="7" class="boundary-box"/><text x="842" y="220" text-anchor="middle" class="diagram-overline">IMPOSED</text><text x="842" y="239" text-anchor="middle" class="diagram-note">Steam boundary</text><text x="842" y="262" text-anchor="middle" class="diagram-reading" id="diagram-boundary">— °C</text>
+              <text x="620" y="389" text-anchor="middle" class="diagram-note">Primary coolant returns to reactor</text>
+            </svg>
+          </div>
+          <p class="diagram-caption">Flow and pump motion follow solver outputs, slowed for clarity. <span class="mobile-hint">Swipe to explore the circuit.</span></p>
+          <div class="balance-strip"><span id="communication-step">Native FMI co-simulation</span><span id="backend-performance">Awaiting solver</span></div>
+        </section>
+
+        <section class="panel" aria-labelledby="experiment-title"><div class="panel-heading"><div><span class="section-index">02</span><h2 id="experiment-title">Transient experiments</h2></div></div><p class="section-description">Apply a boundary change and observe the coupled response. These are generic model experiments.</p><div class="experiment-grid"><button data-experiment="power" class="experiment" disabled><span>↘</span><strong>Power reduction</strong><small>Heat input → 2,700 MW</small></button><button data-experiment="pump" class="experiment" disabled><span>◉</span><strong>Pump reduction</strong><small>Command → 80%</small></button><button data-experiment="spray" class="experiment" disabled><span>⋮</span><strong>Spray response</strong><small>Spray → 5 kg/s</small></button><button data-experiment="heater" class="experiment" disabled><span>♨</span><strong>Heater response</strong><small>Heater → 1 MW</small></button></div></section>
+
+        <section class="panel" aria-labelledby="engineering-trends-title"><div class="panel-heading"><div><span class="section-index">03</span><h2 id="engineering-trends-title">Solver history</h2></div><button id="engineering-export" class="text-button" disabled>Export CSV ↓</button></div><div class="charts"><article><h3>Pressure <small>MPa</small></h3><svg id="pressure-chart" class="chart" role="img" aria-label="Primary pressure against simulation time"></svg></article><article><h3>Loop temperatures <small>°C</small></h3><div class="chart-legend"><span class="hot-key">Hot leg</span><span class="cold-key">Cold leg</span></div><svg id="temperature-chart" class="chart" role="img" aria-label="Hot and cold leg temperatures against simulation time"></svg></article></div><p id="sample-count" class="sample-count">Awaiting solver observations</p></section>
+      </div>
+
+      <aside class="control-column" aria-label="Engineering model controls">
+        <section class="panel"><div class="panel-heading"><h2>Boundary conditions</h2><span class="subtle-label">MODEL INPUTS</span></div><div class="control-fields">
+          <label class="range-field" for="reactorPowerMW"><span>Reactor thermal input<output id="reactorPowerMW-output">— MW</output></span><input id="reactorPowerMW" data-engineering-control="reactorPowerMW" type="range" min="0" max="3300" step="10" disabled><small>Imposed heat source; no neutron kinetics in this workbench.</small></label>
+          <label class="range-field" for="pumpCommand"><span>Primary pump command<output id="pumpCommand-output">—%</output></span><input id="pumpCommand" data-engineering-control="pumpCommand" type="range" min="0" max="1" step="0.01" disabled><small>Pump inertia and circulation evolve in the model.</small></label>
+          <label class="range-field" for="steamTemperatureC"><span>Steam boundary temperature<output id="steamTemperatureC-output">— °C</output></span><input id="steamTemperatureC" data-engineering-control="steamTemperatureC" type="range" min="240" max="300" step="0.5" disabled></label>
+        </div></section>
+        <section class="panel"><div class="panel-heading"><h2>Pressurizer &amp; inventory</h2></div><div class="control-fields">
+          <label class="range-field" for="heaterPowerMW"><span>Heater power<output id="heaterPowerMW-output">— MW</output></span><input id="heaterPowerMW" data-engineering-control="heaterPowerMW" type="range" min="0" max="3" step="0.05" disabled></label>
+          <label class="range-field" for="sprayFlowKgS"><span>Spray flow<output id="sprayFlowKgS-output">— kg/s</output></span><input id="sprayFlowKgS" data-engineering-control="sprayFlowKgS" type="range" min="0" max="30" step="0.5" disabled></label>
+          <label class="range-field" for="chargingFlowKgS"><span>Charging flow<output id="chargingFlowKgS-output">— kg/s</output></span><input id="chargingFlowKgS" data-engineering-control="chargingFlowKgS" type="range" min="0" max="10" step="0.25" disabled></label>
+          <label class="range-field" for="letdownFlowKgS"><span>Letdown flow<output id="letdownFlowKgS-output">— kg/s</output></span><input id="letdownFlowKgS" data-engineering-control="letdownFlowKgS" type="range" min="0" max="10" step="0.25" disabled></label>
+          <p class="control-help">Changes are sent when you release a slider. The last confirmed solver state supplies all measurements.</p>
+        </div></section>
+        <section class="panel"><div class="panel-heading"><h2>Model diagnostics</h2></div><dl class="diagnostics"><div><dt>Thermal balance residual</dt><dd id="energy-residual">— MW</dd></div><div><dt>Mass balance residual</dt><dd id="mass-residual">— kg/s</dd></div><div><dt>Thermal stored energy</dt><dd id="thermal-energy">— MJ</dd></div><div><dt>Pressurizer mass</dt><dd id="pressurizer-mass">— kg</dd></div><div><dt>Pressurizer energy</dt><dd id="pressurizer-energy">— MJ</dd></div></dl><p class="diagnostic-note">Conservation diagnostics check the implemented balances. They do not measure agreement with a real plant.</p><div class="native-evidence"><p id="native-evidence-status">Checking for native subsystem evidence.</p><a id="native-evidence-link" href="./engineering-verification.json" hidden>Native verification report (JSON) ↗</a></div></section>
+        <section class="panel session-panel"><div class="panel-heading"><h2>Engineering session</h2></div><p>Reset the native model to its documented hot initial condition. The browser control-room experiment remains separate.</p><button id="engineering-reset" class="button" disabled>Reset hot initial condition ↶</button><details><summary>Model provenance</summary><dl class="provenance"><dt>Model</dt><dd id="provenance-model">—</dd><dt>Compiler</dt><dd id="provenance-compiler">—</dd><dt>FMU SHA-256</dt><dd id="provenance-hash">—</dd></dl></details></section>
+      </aside>
+    </div>
+    <footer><strong>OpenPWR / ENGINEERING</strong><p>Generic primary-loop and pressurizer model with imposed reactor and steam boundaries. No turbine, electrical plant, neutron kinetics, or full-plant startup in this workbench. <a href="./docs/MODELICA_MODEL.md">Read the equations &amp; limits ↗</a></p></footer>
+  </main>
+  <script type="module" src="./src/engineering.js"></script>
+</body>
+</html>

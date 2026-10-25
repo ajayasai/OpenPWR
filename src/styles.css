@@ -2178,6 +2178,8 @@ dialog::backdrop {
 .animation-toolbar .text-button:disabled{color:#8395a1;cursor:default}
 .animation-caption{font-size:10px;color:#839eaf;margin:5px 18px 14px;line-height:1.5}
 .diagram-scroll-hint{display:none}
+.engineering-link{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11px;line-height:1.6;margin:0 0 18px;color:#8da5b5}
+.engineering-link a{color:#8cddd2;text-underline-offset:4px}
 .diagram-wrapper:focus-visible{outline:2px solid #60d4ce;outline-offset:-3px}
 .rotor-wheel{fill:none;stroke:#9e8863;stroke-width:2}
 .rotor-wheel.rotor-active{stroke:#f0c37c}

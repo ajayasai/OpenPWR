@@ -199,7 +199,7 @@ test('release build rejects stale or failed evidence without replacing the last 
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
-  for (const name of ['index.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'engineering.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   const marker = join(dir, 'dist', 'previous.txt');
   await writeFile(marker, 'previous successful build');
   const valid = { version: '0.2.0', gitRevision: null, passed: 1, checks: [{ name: 'Fixture evidence', pass: true }] };

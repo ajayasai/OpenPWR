@@ -31,9 +31,40 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
           path: dist
+  engineering:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+      - name: Install open-source native compiler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ca-certificates curl gnupg python3-venv cmake
+          curl -fsSL https://build.openmodelica.org/apt/openmodelica.asc | sudo gpg --dearmor --yes -o /usr/share/keyrings/openmodelica-keyring.gpg
+          echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/openmodelica-keyring.gpg] https://build.openmodelica.org/apt noble stable' | sudo tee /etc/apt/sources.list.d/openmodelica.list
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends omc omlibrary
+      - run: npm run engineering:setup
+      - run: npm run engineering:build
+      - run: npm run engineering:test
+        env:
+          OPENPWR_FMU: artifacts/modelica/PrimaryLoop.fmu
+      - run: npm run engineering:verify
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: native-engineering-evidence-linux64
+          path: |
+            artifacts/modelica/*.fmu
+            artifacts/modelica/*.json
+            artifacts/modelica/*.log
+            artifacts/modelica-verification.json
+          if-no-files-found: warn
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: verify
+    needs: [verify, engineering]
     runs-on: ubuntu-latest
     permissions:
       pages: write

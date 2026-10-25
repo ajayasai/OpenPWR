@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — 2026-10-25
+
+Adds an optional native OpenModelica engineering workbench. A coupled hot primary-loop/pressurizer Modelica model uses the Modelica Standard Library's IF97 properties, separate coolant volumes, saturated pressurizer phase inventories, hydraulic flow and pump lag, heaters/spray, and charging/letdown boundaries. It exports as an FMI 2.0 co-simulation FMU with CVODE and is operated through a local FMPy service and browser controls.
+
+Adds reproducible setup/build commands, compiler/source/artifact provenance, eight native subsystem checks, twelve native water-property comparisons against published NIST values, service tests, an engineering CI job, model-driven diagrams and trends, and unavailable-backend instructions on static hosting. Native artifacts preserve original model source and upstream license notices. The original browser-only whole-plant model remains separate. This native slice does not yet include neutron kinetics, the secondary/electrical plant, cold startup, or 3D geometry, and is not validated against measured whole-plant transients.
+
 ## 0.2.1 — 2026-10-25
 
 Makes the process diagram visibly animated: brighter flow tracers, rotating primary/feed pumps, turbine and generator rotors, steam-generator bubbles, and power-dependent core heat intensity. Motion follows engine observations on a bounded display clock; it freezes with pause, respects reduced-motion preferences, and can be disabled independently of the simulation. Rotor motion is illustrative, not literal RPM; feed-pump rotation is inferred from mass flow because no feed-pump rotor state is modeled.
