@@ -48,7 +48,7 @@ function commandLabel(key, value) {
   if (['tripCommand', 'turbineTripCommand'].includes(key)) return value === 1 ? 'Trip requested' : 'No manual request';
   if (key === 'gridBreakerCommand') return value === 1 ? 'Close requested' : 'Open requested';
   if (key === 'auxAutoEnable') return value === 1 ? 'Enabled' : 'Disabled';
-  if (['auxPumpAAvailable', 'auxPumpBAvailable'].includes(key)) return value === 1 ? 'Available' : 'Failed';
+  if (['auxPumpAAvailable', 'auxPumpBAvailable'].includes(key)) return value === 1 ? 'Available' : 'Unavailable';
   if (['auxValveAOpen', 'auxValveBOpen'].includes(key)) return value === 1 ? 'Open' : 'Isolated';
   return `${number(['pumpCommand', 'turbineValveFraction', 'feedwaterFraction', 'coolingFraction', 'auxPumpACommand', 'auxPumpBCommand'].includes(key) ? value * 100 : value, digits[key])}${units[key]}`;
 }

@@ -44,3 +44,7 @@ npm run engineering:pressurizer -- --build
 `run_holdout(build_manifest, fmu_path=...)` is also callable from Python. It compares 0.1 s and 0.05 s communication steps with the declared 1e-9 compiled solver tolerance, preserves exact boundary knots and checks independent mass/energy integrals against physical inventories. It reports raw pressure errors without offset correction or time alignment. Numerical acceptance and descriptive agreement with measurements are separate results; neither establishes full-plant validation.
 
 Later model development may use the now-published response, but it must preserve the original freeze/result and identify subsequent ATWS-11 evaluations as post-unblinding. The original held-out status cannot be reset by rewriting the record.
+
+### Pre-scoring initialization correction in v0.7
+
+The first source freeze was withdrawn before any ATWS-11 candidate calculation. An independent audit found that the unrelated native auxiliary-feedwater latch missed an already-low steam-generator level at initialization. The original source is preserved in commit `1acbeb5`, and the original freeze bytes remain in `holdout-freeze-superseded-1.json`. The replacement freeze records its predecessor hash, source revision, withdrawal time and reason, and explicitly states that the prior candidate was never scored. The pressure equations, mesh choice, measured reference, protocol and scoring code were unchanged. This is a documented pre-scoring correction, not a reset after observing an unfavorable response.

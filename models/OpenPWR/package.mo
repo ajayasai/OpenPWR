@@ -799,13 +799,16 @@ package OpenPWR "OpenPWR native engineering workbench"
     parameter Real tankDensityKgM3 = PrimaryWater.density(tankState);
     parameter Real tankEnthalpyJkg = PrimaryWater.specificEnthalpy(tankState);
     parameter Real tankInternalEnergyJkg = PrimaryWater.specificInternalEnergy(tankState);
-    discrete Boolean automaticDemand(start=false,fixed=true);
+    discrete Boolean automaticDemand(start=false,fixed=false);
     discrete Boolean suctionLost(start=false,fixed=true);
     Real pressureRisePa;
     Real pumpWorkJkg;
     Real pumpATarget;
     Real pumpBTarget;
     Boolean deliveryPermitted;
+  initial equation
+    pre(automaticDemand) = automaticEnable > .5 and (secondaryLevelPercent < autoLowLevelPercent
+      or (mainFeedwaterFlowKgS < .1*nominalMainFeedwaterKgS and steamFlowKgS > .1*nominalMainFeedwaterKgS));
   equation
     when automaticEnable > .5 and (secondaryLevelPercent < autoLowLevelPercent
       or (mainFeedwaterFlowKgS < .1*nominalMainFeedwaterKgS and steamFlowKgS > .1*nominalMainFeedwaterKgS)) then

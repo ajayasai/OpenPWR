@@ -43,7 +43,7 @@ SCENARIOS = (
 
 PLANT_SCENARIOS = (
     {"id": "auxiliary-isolation", "label": "Auxiliary train A isolation and delivery", "duration": 7.0,
-     "description": "Disable auto, fail train B and start train A against its closed discharge valve. Open A at 5 s; compare rotor speed, delivered water, tank inventory and electrical draw.",
+     "description": "Disable auto, make train B unavailable and start train A against its closed discharge valve. Open A at 5 s; compare rotor speed, delivered water, tank inventory and electrical draw.",
      "commands": [{"time": 0.0, "controls": {"auxAutoEnable": 0, "auxPumpACommand": 1, "auxPumpBAvailable": 0, "auxValveAOpen": 0}},
                   {"time": 5.0, "controls": {"auxValveAOpen": 1}}]},
     {"id": "auxiliary-auto", "label": "Main feed loss with one auxiliary train", "duration": 10.0,

@@ -105,43 +105,42 @@ def component_boundary_power(values):
         - values["shaftFrictionMW"] - values["condenserDisplacementPowerMW"])
 
 
-def low_aux_inventory_reference(fmu_path, seconds=12, step=.025):
-    """Exercise a physically finite source using a documented test-only parameter.
+def coupled_initialization_reference(fmu_path, *, parameters, controls, seconds, step=.025):
+    """Run a separate native initialization with explicit test-only parameters.
 
-    The public session has no hidden parameter mutation. This independent FMI
-    initialization uses 1500 kg instead of 100000 kg solely to reach the suction
-    heel within a short verification run, without changing flow or timing.
+    Public sessions retain the nominal initial condition. These probes vary
+    inventory parameters through FMI initialization without changing equations.
     """
     from fmpy import extract, read_model_description
     from fmpy.fmi2 import FMU2Slave
     description = read_model_description(str(fmu_path), validate=True)
     if description.modelName != "OpenPWR.CoupledPlant":
-        raise RuntimeError("Auxiliary-inventory probe needs the coupled plant FMU")
+        raise RuntimeError("Initialization probe needs the coupled plant FMU")
     variables = {variable.name: variable for variable in description.modelVariables}
     names = [name for name, variable in variables.items() if variable.causality == "output" and variable.type == "Real"]
     inputs = {name: float(variable.start) for name, variable in variables.items() if variable.causality == "input" and variable.type == "Real"}
-    inputs.update(auxAutoEnable=0, auxPumpACommand=1, auxPumpBCommand=1)
+    inputs.update(controls)
     directory = extract(str(fmu_path))
     slave = None
     try:
         slave = FMU2Slave(guid=description.guid, unzipDirectory=directory,
-            modelIdentifier=description.coSimulation.modelIdentifier, instanceName="auxiliary_inventory_reference")
+            modelIdentifier=description.coSimulation.modelIdentifier, instanceName="auxiliary_initialization_reference")
         slave.instantiate(); slave.setupExperiment(startTime=0)
         slave.enterInitializationMode()
-        slave.setReal([variables["auxInitialTankMassKg"].valueReference], [1500.0])
+        slave.setReal([variables[name].valueReference for name in parameters], list(parameters.values()))
         slave.setReal([variables[name].valueReference for name in inputs], list(inputs.values()))
         slave.exitInitializationMode()
         def point(time):
             values = slave.getReal([variables[name].valueReference for name in names])
             if not all(math.isfinite(value) for value in values):
-                raise RuntimeError("Nonfinite low-inventory observation")
+                raise RuntimeError("Nonfinite native initialization-probe observation")
             valid = bool(slave.getBoolean([variables["valid"].valueReference])[0])
             return {"time": time, "outputs": dict(zip(names, values)), "halted": not valid}
         trace = [point(0)]
         for tick in range(1, round(seconds / step) + 1):
             status = slave.doStep(currentCommunicationPoint=(tick - 1) * step, communicationStepSize=step)
             if status not in (None, 0, 1):
-                raise RuntimeError(f"Low-inventory FMI step status {status}")
+                raise RuntimeError(f"Initialization-probe FMI step status {status}")
             trace.append(point(tick * step))
             if trace[-1]["halted"]:
                 break
@@ -151,6 +150,14 @@ def low_aux_inventory_reference(fmu_path, seconds=12, step=.025):
             try: slave.terminate()
             finally: slave.freeInstance()
         shutil.rmtree(directory, ignore_errors=True)
+
+
+def low_aux_inventory_reference(fmu_path, seconds=12, step=.025):
+    """Reach the suction heel with 1500 kg instead of the nominal 100000 kg."""
+    return coupled_initialization_reference(fmu_path,
+        parameters={"auxInitialTankMassKg": 1500.0},
+        controls={"auxAutoEnable": 0, "auxPumpACommand": 1, "auxPumpBCommand": 1},
+        seconds=seconds, step=step)
 
 
 def verify(fmu_path, kinetics_path, output_path):
@@ -405,6 +412,27 @@ def verify(fmu_path, kinetics_path, output_path):
              "trainAFlowKgS": end["auxTrainAFlowKgS"], "trainBFlowKgS": end["auxTrainBFlowKgS"],
              "scope": "Generic automatic initiation and hydraulic response, not proof of adequate emergency heat removal."}, "generic automatic response")
         traces["auxiliaryAutomatic"] = automatic
+
+        low_level = coupled_initialization_reference(fmu_path,
+            parameters={"secondary.initialLiquidVolumeM3": 156.0}, controls={}, seconds=5)
+        low_level_disabled = coupled_initialization_reference(fmu_path,
+            parameters={"secondary.initialLiquidVolumeM3": 156.0}, controls={"auxAutoEnable": 0}, seconds=.25)
+        low_first, low_last = low_level[0]["outputs"], low_level[-1]["outputs"]
+        disabled_first, disabled_last = low_level_disabled[0]["outputs"], low_level_disabled[-1]["outputs"]
+        add("Automatic low-level initiation is evaluated at native initialization", not any(point["halted"] for point in low_level + low_level_disabled)
+            and abs(low_first["secondaryLevelPercent"] - 39) < 1e-8 and low_first["auxAutoActuated"] == 1
+            and abs(low_first["mainFeedwaterFlowKgS"] - nominal[0]["outputs"]["mainFeedwaterFlowKgS"]) < 1e-6
+            and low_last["auxAutoActuated"] == 1 and low_last["auxTrainAFlowKgS"] > 10 and low_last["auxTrainBFlowKgS"] > 10
+            and disabled_first["auxAutoActuated"] == 0 and disabled_last["auxAutoActuated"] == 0
+            and abs(disabled_last["auxFeedwaterFlowKgS"]) < 1e-8,
+            {"testOnlyParameter": "secondary.initialLiquidVolumeM3=156 (39% of the aggregate steam-generator volume)",
+             "initialAutoEnabled": {name: low_first[name] for name in ("secondaryLevelPercent", "mainFeedwaterFlowKgS", "auxAutoActuated")},
+             "fiveSecondAutoEnabled": {name: low_last[name] for name in ("auxTrainAFlowKgS", "auxTrainBFlowKgS", "auxAutoActuated")},
+             "initialAutoDisabledLatch": disabled_first["auxAutoActuated"],
+             "autoDisabledFinalFlowKgS": disabled_last["auxFeedwaterFlowKgS"],
+             "acceptance": "An already-low initial level latches demand before the first step when enabled, despite normal main feedwater. Disabled automation stays inactive; manual commands remain at their declared zero starts."},
+            "native initialization regression")
+        traces["auxiliaryInitiallyLowLevel"] = low_level[::20]
 
         depletion = low_aux_inventory_reference(fmu_path)
         first, last = depletion[0]["outputs"], depletion[-1]["outputs"]
