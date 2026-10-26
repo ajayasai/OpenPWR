@@ -1,0 +1,76 @@
+{
+  "schema": "openpwr-measured-reference-v1",
+  "caseId": "krsko-2005-governor-closure-early",
+  "title": "Krško 5 April 2005 governor-closure transient: early thermal response",
+  "source": {
+    "title": "NUREG/IA-0221: Reactor Trip Analysis at Krško Nuclear Power Plant",
+    "authors": ["Andrej Prošek", "Borut Mavko"],
+    "publisher": "U.S. Nuclear Regulatory Commission / Jožef Stefan Institute",
+    "publicationDate": "2010-02",
+    "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+    "adamsAccession": "ML100680300",
+    "sha256": "0d9355cb4a04d3cfac6db671e54d1000df745606ed9af7f324ac650ece6c9665",
+    "accessed": "2026-10-26",
+    "sourceKind": "Measured operating-plant instrument curves published in a primary technical report",
+    "redistribution": "Only numerical facts extracted from the measured curves and original extraction code are distributed. The publisher PDF, artwork, and report prose are not bundled or relicensed."
+  },
+  "experiment": {
+    "plant": "Krško, Westinghouse two-loop PWR, post-2000 uprate, core cycle 21",
+    "eventDate": "2005-04-05",
+    "ratedCoreThermalPowerMW": 1994,
+    "reportedPumpHeatMW": 6,
+    "samplePeriodS": 2,
+    "eventTimeConvention": "Report section 4: t=0 is the inferred start of governor-valve closure, 53 seconds after the source acquisition began.",
+    "referenceWindowS": [-49, 49],
+    "comparisonWindowS": [0, 15],
+    "windowRationale": "End before operator reopening at approximately 16 s and inferred SI/reactor trip at approximately 17 s. The report warns that post-trip neutron-power and flow indications do not directly represent total decay heat and actual flows; those intervals are excluded.",
+    "measurementTimingAllowanceS": 1,
+    "measurementTimingAllowanceBasis": "Half of the reported 2 s acquisition interval; a comparison allowance, not a quantified instrument-delay distribution."
+  },
+  "extraction": {
+    "method": "Read PDF vector vertices of the magenta measured instrument curve in panel (a); exclude blue curves labeled cal and all legend symbols.",
+    "software": "pdfplumber 0.11.9",
+    "script": "validation/krsko2005/extract.py",
+    "csv": "validation/krsko2005/measured.csv",
+    "figures": [22, 23, 24, 25, 26, 29, 33, 34, 37, 38, 39, 40],
+    "pdfPagesOneBased": [42, 43, 44, 45, 46, 49, 53, 54, 57, 58, 59, 60],
+    "printedPages": [30, 31, 32, 33, 34, 37, 41, 42, 45, 46, 47, 48],
+    "samplesPerInstrument": 50,
+    "timeRounding": "Vector x-coordinates match -49,-47,...,49 s within 0.06 s. They are snapped to that stated acquisition grid; values are rounded to six decimals for reproducibility, not six-digit measurement accuracy.",
+    "readingAllowance": "A conservative half-PDF-point vertical reading allowance is recorded per channel by the extractor. It is roughly 0.006 MPa for primary pressure, 0.005 MPa for SG pressure, 0.04 K for cold legs and 0.13 K for hot legs. It covers figure extraction only, not instrument uncertainty.",
+    "pressureAxisCorrection": "Figures 29,33,34 label pressure in MPa but print bar-valued ticks (primary 144–162; SG 64–80). Multiply these tick values by 0.1 to recover MPa. This is corroborated independently by measured Table 2 initial pressure 15.48 MPa and SG pressures 6.42/6.40 MPa; raw printed values must not be treated as 154.8 MPa or 64.2 MPa.",
+    "temperatureConversion": "Printed kelvin values minus 273.15.",
+    "aggregation": "Hot/cold temperatures and SG pressures are unweighted means of the two reported loop instruments. Steam and feedwater flows are sums. These means do not resolve loop asymmetry.",
+    "powerConversion": "Before trip, reported neutron power percent multiplied by 1994 MW / 100. It is a thermal-input proxy, not direct calorimetry and not a valid post-trip decay-heat measurement."
+  },
+  "initialConditions": {
+    "basis": "Measured t=0 column of Table 2 (printed page 13, PDF page 25), with arithmetic means for two-loop temperatures and pressure.",
+    "primaryPressureMPa": 15.48,
+    "hotTemperatureK": 594.175,
+    "coldTemperatureK": 559.445,
+    "steamPressureMPa": 6.41,
+    "pressurizerLevelPercent": 52.95,
+    "nuclearPowerPercent": 91.94,
+    "coreThermalPowerMW": 1833.2836,
+    "steamFlowKgS": 994.1,
+    "feedwaterFlowKgS": 1004.6
+  },
+  "calibrationAndHoldout": {
+    "initializationData": "Only Table 2 initial values calibrate the nominal heat-transfer conductances and feedwater enthalpy needed for constructed equilibrium.",
+    "forcingChannels": ["reactorPowerMW", "steamFlowKgS", "feedwaterFlowKgS"],
+    "heldOutResponseChannels": ["primaryPressureMPa", "hotLegTemperatureC", "coldLegTemperatureC", "steamPressureMPa"],
+    "parameterFitting": "No transient response channel is used to fit volumes, heat capacities, conductances, control gains or time constants. No optimization is performed.",
+    "acceptance": "No plant-validation acceptance band is asserted: the source does not supply instrument uncertainties or the complete plant geometry/input deck needed for this reduced model. Errors are reported even when large. Numerical success does not turn the applicability assessment into a validation pass."
+  },
+  "limitations": [
+    "This is a short, boundary-driven thermal/inventory comparison. Measured core power and secondary flows are inputs, so the test does not validate neutron kinetics, turbine controls, generator, feedwater controls or trip logic.",
+    "The primary hot/cold volumes, fuel heat capacity, pressurizer volume, and secondary volume remain generic assumptions scaled from OpenPWR by initial core thermal power/3000 MW. They are not identified Krško geometry.",
+    "A homogeneous equilibrium secondary model omits distributed boiling, subcooled feedwater mixing, SG walls and instrument shrink/swell. The primary model omits wall heat storage and transport delays.",
+    "Initial feedwater enthalpy is inferred from a zero initial secondary energy-rate balance because inlet enthalpy is not given in the selected report. The measured feedwater/steam mismatch is retained, so initial secondary mass inventory need not be exactly stationary.",
+    "The reported 6 MW pump heat is omitted by the reused primary model. This is a known discrepancy, not an adjusted fit parameter.",
+    "Pressurizer heater, spray, charging and letdown are fixed to zero in this scoped replay. Figures 31–32 contain charging/letdown volumetric-flow curves, but their reference conditions and incoming-water enthalpy have not been established here. Their omission limits interpretation of the primary-pressure discrepancy.",
+    "The pre-event figure curves indicate aggregate steam flow around 1003 kg/s and feedwater around 996 kg/s, while Table 2 lists roughly the reverse. Instrument identifiers in Table 3 and captions are followed without swapping, offsetting or fitting the curves. The inconsistency remains a source-input limitation.",
+    "Instrument calibration accuracy and delay distributions are unavailable; graphical reading allowances cannot replace them.",
+    "The published curves are a rendered representation of measurements, not the original raw acquisition dataset."
+  ]
+}

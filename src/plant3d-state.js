@@ -6,11 +6,11 @@ const bounded = (value, low, high) => value === null ? 0 : Math.max(low, Math.mi
 const relative = (value, scale = 1) => bounded(value === null ? null : value / scale, -2, 2);
 
 export function plant3DState(snapshot, mode = 'browser') {
-  if (!['browser', 'native'].includes(mode)) throw new TypeError('Unknown 3D observation source');
+  if (!['browser', 'native', 'plant'].includes(mode)) throw new TypeError('Unknown 3D observation source');
   const s = snapshot && typeof snapshot === 'object' ? snapshot : {};
-  const o = mode === 'native' ? (s.outputs || {}) : s;
+  const o = mode !== 'browser' ? (s.outputs || {}) : s;
   const c = s.controls || {};
-  const native = mode === 'native';
+  const native = mode !== 'browser', coupled = mode === 'plant';
   const values = native ? {
     thermalPower: number(c.reactorPowerMW), hotTemperature: number(o.hotLegTemperatureC),
     coldTemperature: number(o.coldLegTemperatureC), fuelTemperature: number(o.fuelTemperatureC),
@@ -35,8 +35,18 @@ export function plant3DState(snapshot, mode = 'browser') {
     condenserTemperature: number(o.condenserTemp), steamPressure: number(o.steamPressure),
     turbineSteamFlow: number(o.turbineSteamFlow), bypassSteamFlow: number(o.bypassSteamFlow),
   };
+  if (coupled) Object.assign(values, {
+    thermalPower: number(o.reactorPowerMW), steamTemperature: number(o.secondaryTemperatureC),
+    steamLevel: number(o.secondaryLevelPercent), steamPressure: number(o.secondaryPressureMPa),
+    steamFlow: Number.isFinite(o.turbineFlowKgS) && Number.isFinite(o.bypassFlowKgS) ? o.turbineFlowKgS + o.bypassFlowKgS : null,
+    turbineSteamFlow: number(o.turbineFlowKgS), bypassSteamFlow: number(o.bypassFlowKgS),
+    feedFlow: number(o.feedwaterFlowKgS), turbineSpeed: number(o.turbineRpm),
+    electricPower: number(o.netPowerMW), grossPower: number(o.grossPowerMW),
+    condenserPressure: number(o.condenserPressureKPa), condenserTemperature: number(o.condenserTemperatureC),
+    energyResidual: number(o.plantEnergyResidualMW),
+  });
   const time = number(s.time);
-  const identity = !native || (s.backend === 'fmi2' && s.model === 'OpenPWR.PrimaryLoop' && typeof o.valid === 'boolean');
+  const identity = !native || (s.backend === 'fmi2' && s.model === (coupled ? 'OpenPWR.CoupledPlant' : 'OpenPWR.PrimaryLoop') && typeof o.valid === 'boolean');
   const available = identity && time !== null && time >= 0
     && ['hotTemperature', 'coldTemperature', 'pressure', 'primaryFlow', 'pumpSpeed'].every(key => values[key] !== null);
   const halted = native ? s.halted === true || o.valid === false : s.domainExceeded === true;
@@ -48,17 +58,17 @@ export function plant3DState(snapshot, mode = 'browser') {
     steamHeader: relative(values.steamFlow, 1500),
     bypass: relative(values.bypassSteamFlow, 1500),
     feed: relative(values.feedFlow, 1500),
-    cooling: native || s.faults?.lossOfHeatSink ? 0 : relative(number(c.cooling)),
+    cooling: coupled ? relative(number(o.coolingPowerMW), 2000) : native || s.faults?.lossOfHeatSink ? 0 : relative(number(c.cooling)),
     turbine: relative(values.turbineSpeed, 3000),
     generator: relative(values.turbineSpeed, 3000),
-    electricity: !native && s.gridConnected === true ? relative(values.grossPower, 1050) : 0,
+    electricity: (coupled ? o.gridConnected === 1 : !native && s.gridConnected === true) ? relative(values.grossPower, 1050) : 0,
     heat: bounded(values.thermalPower === null ? null : values.thermalPower / 3000, 0, 1),
     heater: bounded(values.heaterPower === null ? null : values.heaterPower / 3, 0, 1),
     spray: bounded(values.sprayFlow === null ? null : values.sprayFlow / 30, 0, 1),
   };
   if (!available) for (const key of Object.keys(activity)) activity[key] = 0;
-  return { mode, available, time, halted, tripped: !native && s.tripped === true,
-    gridConnected: !native && s.gridConnected === true, values, activity,
+  return { mode, available, time, halted, tripped: coupled ? o.reactorTripped === 1 : !native && s.tripped === true,
+    gridConnected: coupled ? o.gridConnected === 1 : !native && s.gridConnected === true, values, activity,
     levels: {
       pressurizer: available && values.pressurizerLevel !== null ? bounded(values.pressurizerLevel / 100, 0, 1) : null,
       steam: available && values.steamLevel !== null ? bounded(values.steamLevel / 100, 0, 1) : null,

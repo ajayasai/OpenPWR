@@ -1,4 +1,4 @@
-"""Local FMI 2 co-simulation host for the independently compiled primary model.
+"""Local FMI 2 co-simulation host with explicit primary and coupled-plant profiles.
 
 The host never computes substitute plant readings. FMPy and the FMU are loaded
 only when engineering mode is requested; the static browser edition stays free
@@ -20,29 +20,10 @@ import uuid
 
 
 STEP_SIZE = 0.05
-CONTROL_LIMITS = {
-    "reactorPowerMW": (0.0, 3300.0),
-    "pumpCommand": (0.0, 1.0),
-    "steamTemperatureC": (240.0, 300.0),
-    "heaterPowerMW": (0.0, 3.0),
-    "sprayFlowKgS": (0.0, 30.0),
-    "chargingFlowKgS": (0.0, 10.0),
-    "letdownFlowKgS": (0.0, 10.0),
-}
-DEFAULT_CONTROLS = {
-    "reactorPowerMW": 3000.0, "pumpCommand": 1.0,
-    "steamTemperatureC": 276.0, "heaterPowerMW": 0.0,
-    "sprayFlowKgS": 0.0, "chargingFlowKgS": 0.0, "letdownFlowKgS": 0.0,
-}
-REAL_OUTPUTS = (
-    "hotLegTemperatureC", "coldLegTemperatureC", "fuelTemperatureC",
-    "primaryPressureMPa", "pressurizerLevelPercent", "primaryFlowKgS",
-    "pumpSpeed", "heatToSteamMW", "thermalEnergyMJ", "pressurizerMassKg",
-    "pressurizerEnergyMJ", "energyResidualMW", "massResidualKgS",
-    "totalMassKg", "boundaryMassFlowKgS", "boundaryPowerMW",
-    "integratedBoundaryMassKg", "integratedBoundaryEnergyMJ", "surgeFlowKgS",
-    "primarySubcoolingK", "liquidMassKg", "vaporMassKg",
-)
+try:
+    from .profiles import CONTROL_LIMITS, DEFAULT_CONTROLS, REAL_OUTPUTS, PROFILES
+except ImportError:
+    from profiles import CONTROL_LIMITS, DEFAULT_CONTROLS, REAL_OUTPUTS, PROFILES
 
 
 class ServiceError(Exception):
@@ -60,17 +41,19 @@ def finite_number(value):
         return False
 
 
-def validate_controls(values):
+def validate_controls(values, limits=CONTROL_LIMITS, discrete_controls=()):
     if not isinstance(values, dict) or not values:
         raise ServiceError(400, "invalid_controls", "Supply a nonempty JSON object of control values.")
-    unknown = set(values) - set(CONTROL_LIMITS)
+    unknown = set(values) - set(limits)
     if unknown:
         raise ServiceError(400, "unknown_control", f"Unknown controls: {', '.join(sorted(unknown))}.")
     result = {}
     for name, value in values.items():
-        low, high = CONTROL_LIMITS[name]
+        low, high = limits[name]
         if not finite_number(value) or not low <= value <= high:
             raise ServiceError(400, "invalid_control", f"{name} must be a finite number between {low:g} and {high:g}.")
+        if name in discrete_controls and value not in (0, 1):
+            raise ServiceError(400, "invalid_control", f"{name} must be exactly 0 or 1.")
         result[name] = float(value)
     return result
 
@@ -78,7 +61,15 @@ def validate_controls(values):
 class FMIPlant:
     """One serialized session; all public operations are protected by a lock."""
 
-    def __init__(self, fmu_path: str | Path, *, description=None, slave_factory=None, extractor=None, step_size=STEP_SIZE):
+    def __init__(self, fmu_path: str | Path, *, description=None, slave_factory=None, extractor=None, step_size=STEP_SIZE, profile="primary"):
+        if profile not in PROFILES:
+            raise ValueError("Choose primary or plant model profile.")
+        self.profile = profile
+        self.contract = PROFILES[profile]
+        self.control_limits = self.contract["limits"]
+        self.real_outputs = self.contract["real_outputs"]
+        self.boolean_outputs = self.contract["boolean_outputs"]
+        self.discrete_controls = self.contract["discrete_controls"]
         self.path = Path(fmu_path).resolve()
         if step_size not in (0.025, 0.05):
             raise ValueError("Supported communication steps are 0.025 and 0.05 seconds.")
@@ -100,20 +91,23 @@ class FMIPlant:
             self.description = description
             if str(description.fmiVersion) != "2.0" or description.coSimulation is None:
                 raise ValueError("The model must be an FMI 2.0 co-simulation FMU.")
+            if description.modelName != self.contract["model"]:
+                raise ValueError(f"Selected {self.profile} profile requires {self.contract['model']}, not {description.modelName}.")
             self.variables = {v.name: v for v in description.modelVariables}
-            for name in CONTROL_LIMITS:
+            for name in self.control_limits:
                 variable = self.variables.get(name)
                 if variable is None or variable.causality != "input" or variable.type != "Real":
                     raise ValueError(f"FMU input {name} must be a Real input.")
-            for name in REAL_OUTPUTS:
+            for name in self.real_outputs:
                 variable = self.variables.get(name)
                 if variable is None or variable.type != "Real" or variable.causality != "output":
                     raise ValueError(f"FMU output {name} must be a Real output.")
-            valid = self.variables.get("valid")
-            if valid is None or valid.type != "Boolean" or valid.causality != "output":
-                raise ValueError("FMU output valid must be a Boolean output.")
-            self.defaults = validate_controls({name: float(self.variables[name].start)
-                if self.variables[name].start is not None else DEFAULT_CONTROLS[name] for name in CONTROL_LIMITS})
+            for name in self.boolean_outputs:
+                variable = self.variables.get(name)
+                if variable is None or variable.type != "Boolean" or variable.causality != "output":
+                    raise ValueError(f"FMU output {name} must be a Boolean output.")
+            self.defaults = self.validate_controls({name: float(self.variables[name].start)
+                if self.variables[name].start is not None else self.contract["defaults"][name] for name in self.control_limits})
             self.sha256 = hashlib.sha256(self.path.read_bytes()).hexdigest()
             self.directory = extractor(str(self.path))
             self.slave_factory = slave_factory
@@ -124,6 +118,9 @@ class FMIPlant:
         except Exception as error:
             self.close()
             raise ServiceError(503, "backend_unavailable", f"Could not load the native FMU: {error}") from error
+
+    def validate_controls(self, values):
+        return validate_controls(values, self.control_limits, self.discrete_controls)
 
     def _references(self, names):
         return [self.variables[name].valueReference for name in names]
@@ -151,18 +148,18 @@ class FMIPlant:
                     self.directory = None
 
     def _read(self):
-        values = self.slave.getReal(self._references(REAL_OUTPUTS))
-        if len(values) != len(REAL_OUTPUTS) or any(not math.isfinite(value) for value in values):
+        values = self.slave.getReal(self._references(self.real_outputs))
+        if len(values) != len(self.real_outputs) or any(not math.isfinite(value) for value in values):
             self.halted, self.halt_reason = True, "The native solver produced a non-finite observation. Reset the experiment."
             raise ServiceError(409, "solver_halted", self.halt_reason)
-        outputs = dict(zip(REAL_OUTPUTS, map(float, values)))
-        outputs["valid"] = bool(self.slave.getBoolean(self._references(["valid"]))[0])
+        outputs = dict(zip(self.real_outputs, map(float, values)))
+        outputs.update(zip(self.boolean_outputs, map(bool, self.slave.getBoolean(self._references(self.boolean_outputs)))))
         self.outputs = outputs
         if not outputs["valid"]:
-            self.halted, self.halt_reason = True, "The primary-loop model reached its declared validity boundary. Reset the experiment."
+            self.halted, self.halt_reason = True, "The native model reached its declared validity boundary. Reset the experiment."
 
     def _snapshot(self):
-        return {"backend": "fmi2", "model": self.description.modelName,
+        return {"backend": "fmi2", "model": self.description.modelName, "profile": self.profile,
             "time": self.steps * self.step_size, "controls": dict(self.controls), "outputs": dict(self.outputs),
             "halted": self.halted, "haltReason": self.halt_reason}
 
@@ -177,7 +174,10 @@ class FMIPlant:
             return {"ok": True, "available": True, "backend": "fmi2", "model": self.description.modelName,
                 "fmiVersion": "2.0", "fmuSha256": self.sha256,
                 "compiler": getattr(self.description, "generationTool", None), "stepSize": self.step_size,
-                "stateSerialization": False, "commandReplay": True}
+                "stateSerialization": False, "commandReplay": True, "profile": self.profile,
+                "controlLimits": dict(self.control_limits), "defaultControls": dict(self.defaults),
+                "realOutputs": list(self.real_outputs), "booleanOutputs": list(self.boolean_outputs),
+                "discreteControls": list(self.discrete_controls)}
 
     def reset(self):
         with self.lock:
@@ -207,7 +207,7 @@ class FMIPlant:
             return self._snapshot()
 
     def control(self, values):
-        updates = validate_controls(values)
+        updates = self.validate_controls(values)
         with self.lock:
             if self.halted:
                 raise ServiceError(409, "solver_halted", self.halt_reason)
@@ -280,7 +280,7 @@ class FMIPlant:
             else:
                 rows.append(current)
             stream = io.StringIO(newline="")
-            writer = csv.DictWriter(stream, fieldnames=["time", *CONTROL_LIMITS, *REAL_OUTPUTS, "valid", "halted"])
+            writer = csv.DictWriter(stream, fieldnames=["time", *self.control_limits, *self.real_outputs, *self.boolean_outputs, "halted"])
             writer.writeheader()
             writer.writerows(rows)
             return stream.getvalue()
@@ -307,8 +307,8 @@ class FMIPlant:
             if retained > max_points:
                 indices = sorted({round(i * (retained - 1) / (max_points - 1)) for i in range(max_points)})
                 rows = [rows[i] for i in indices]
-            points = [{"time": row["time"], "controls": {name: row[name] for name in CONTROL_LIMITS},
-                "outputs": {name: row[name] for name in (*REAL_OUTPUTS, "valid")}, "halted": row["halted"]} for row in rows]
+            points = [{"time": row["time"], "controls": {name: row[name] for name in self.control_limits},
+                "outputs": {name: row[name] for name in (*self.real_outputs, *self.boolean_outputs)}, "halted": row["halted"]} for row in rows]
             return {"schema": "openpwr-fmi-history-v1", "fmuSha256": self.sha256, "samplePeriod": 1,
                 "storageIncludesCommandBoundaries": True,
                 "includesCommandBoundaries": retained <= len(points),

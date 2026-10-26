@@ -11,7 +11,7 @@ OpenPWR is an open, reduced-order simulation laboratory. A complete operating en
 
 ## Next engineering increments
 
-Version 0.4 extends the separate OpenModelica hot-system workbench with direct pressure/temperature property evaluation, nine subsystem checks, 24 published water-property comparisons, and 25 separately identified derivative-consistency checks. Timed experiments, command replay, and the native evidence viewer make these results reproducible and inspectable. The interactive 3D view depicts simulated observations using illustrative geometry. Measured coupled transients, plant-specific geometry, broader operating conditions and integration with the browser physics model remain future work.
+Version 0.5 couples native reactor kinetics/feedback, the primary loop/pressurizer, a dynamic steam generator, turbine/rotor/generator, condenser and feedwater. Independent kinetics, conservation, refinement, trip, control-response and replay checks accompany the interactive workbench. A separate boundary-driven Krško 2005 comparison now uses actual measured traces and publishes pressure/temperature discrepancies and geometry sensitivity. This is an inconclusive validation assessment because the complete plant configuration and instrument uncertainties are unavailable. Native cold operation, plant-specific geometry, detailed secondary equipment, multi-loop/spatial response, containment and emergency systems remain future work. The browser and native engines remain separate.
 
 | Increment | Required modeling work | Evidence needed before claiming fidelity |
 | --- | --- | --- |
@@ -24,6 +24,8 @@ Version 0.4 extends the separate OpenModelica hot-system workbench with direct p
 | Extended transient envelope | Additional physical models for each new regime, with deliberate domain stops until implemented | Appropriate experimental or published coupled benchmarks; no extrapolation from normal-operation checks |
 
 ## Candidate whole-plant evidence
+
+[Krško NUREG/IA-0221](MEASURED_VALIDATION.md) is the first implemented measured comparison. It covers only the early governor-closure thermal response with measured power and flows as imposed inputs. It does not validate the coupled model's reactor, turbine, protection or condenser predictions. Further work needs independent configuration data and additional events; tuning against this trace would require a separate held-out validation event.
 
 The [OECD/NEA VVER-1000 coolant-transient benchmark](https://www.oecd-nea.org/jcms/pl_32219/vver-1000-coolant-transient-v1000ct-benchmarks) is a potential later source of coupled-code and plant-data comparisons. It concerns a specified VVER configuration. OpenPWR has neither implemented that benchmark configuration nor reproduced its transients; similar electrical rating alone does not justify a comparison.
 

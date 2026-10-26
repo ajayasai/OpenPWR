@@ -4,9 +4,9 @@
 
 [Launch control room](https://ajayasai.github.io/OpenPWR/) · [Benchmark & verification evidence](https://ajayasai.github.io/OpenPWR/verification.html) · [Model equations](docs/MODEL.md) · [Validation scope](docs/VALIDATION.md)
 
-**New in v0.4:** an interactive Three.js cutaway with equipment inspection and live flow/rotor animation, reproducible native experiments with command replay, and a [public native evidence viewer](https://ajayasai.github.io/OpenPWR/engineering-evidence.html). Direct pressure/temperature property evaluation improves native mass and energy consistency. The expanded probe distinguishes 24 published property comparisons from 25 numerical derivative checks.
+**New in v0.5:** a [native coupled plant](https://ajayasai.github.io/OpenPWR/plant.html) with reactor kinetics, a dynamic steam generator, turbine/generator, condenser and feedwater, connected to the existing primary loop and pressurizer. Interactive 3D equipment and controls now use those native outputs. A separate [measured-transient comparison](https://ajayasai.github.io/OpenPWR/plant-evidence.html) publishes discrepancies against the 2005 Krško governor-closure event, with reproducible data extraction and explicit limits. This is progress toward full scope; it is not a validated full-scope simulator.
 
-The optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs a native primary-loop/pressurizer model through FMI and FMPy. It has separate hot/cold volumes, pressure-dependent water properties, liquid/vapor pressurizer inventories, heaters, spray, charging and letdown. This is a distinct hot-system experiment; the browser whole-plant model below remains available.
+The optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs compiled models through FMI and FMPy. Its [coupled hot plant](docs/NATIVE_PLANT.md) and isolated [primary-loop workbench](docs/MODELICA_MODEL.md) are distinct experiments. The browser whole-plant model below remains available, including its generic cold-start experiment. Native cold startup is not yet implemented.
 
 OpenPWR's browser edition models a generic pressurized-water plant at system level. Reactor power emerges from neutron kinetics and feedback, while the coolant, steam system, turbine, condenser, and controllers respond together. Its UI and command-line runner use the **same JavaScript engine**.
 
@@ -28,9 +28,9 @@ OpenPWR's browser edition models a generic pressurized-water plant at system lev
 
 This is a **reduced-order engineering model**, not a validated replica of an operating facility. The browser edition covers cold initialization through generic startup to hot power operation and selected transients. The nominal point is 3,000 MW thermal and 1,000 MW net electrical; nominal calibration is an assumption, not validation data.
 
-The browser startup sequence is an educational, reactor-assisted heatup experiment with generic controls and permissives. It is not a named plant's startup procedure. A resolved pressurizer, multi-loop hydraulics, spatial core physics, complete water/steam property regions, emergency core cooling, containment, fuel damage, severe-accident chemistry, and plant-specific instrumentation remain outside the browser model. The optional native workbench adds a coupled equilibrium pressurizer within its own narrower hot-system envelope. Each engine stops at its declared model-domain boundaries. Read [MODEL.md](docs/MODEL.md) and [MODELICA_MODEL.md](docs/MODELICA_MODEL.md) before interpreting results.
+The browser startup sequence is an educational, reactor-assisted heatup experiment with generic controls and permissives. It is not a named plant's startup procedure. A resolved pressurizer, multi-loop hydraulics, spatial core physics, complete water/steam property regions, emergency core cooling, containment, fuel damage, severe-accident chemistry, and plant-specific instrumentation remain outside the browser model. The native coupled plant adds an equilibrium pressurizer and native secondary/electrical balances within a hot-system envelope. It still omits native cold startup, multiple loops, spatial core physics, detailed turbine/feed heaters, containment, and emergency cooling. Each engine stops at its declared boundaries. Read [MODEL.md](docs/MODEL.md) and [NATIVE_PLANT.md](docs/NATIVE_PLANT.md) before interpreting results.
 
-Tests establish numerical consistency, agreement with cited published component benchmarks, and expected generic responses. They do not establish real-plant predictive accuracy or qualify the program for plant operation, safety analysis, or operator licensing. [Benchmark provenance](docs/BENCHMARKS.md) records inputs, references, and tolerances. [The development roadmap](docs/ROADMAP.md) distinguishes remaining model work from the evidence needed for full-scope claims.
+Tests establish numerical consistency, agreement with cited published component benchmarks, and expected generic responses. The [Krško comparison](docs/MEASURED_VALIDATION.md) uses measured boundary inputs and holds out pressure and temperature channels; missing plant configuration and instrument uncertainty prevent a validation pass. These results do not qualify the program for plant operation, safety analysis, or operator licensing. [Benchmark provenance](docs/BENCHMARKS.md) and [the development roadmap](docs/ROADMAP.md) distinguish implemented models from demonstrated fidelity.
 
 ## Run locally
 
@@ -48,6 +48,21 @@ npm start
 Open `http://127.0.0.1:4173`. There are **no npm dependencies to install**. For development, `npm run dev` serves the source directly. The `dist/` directory is a portable static site; any HTTP server can host it. Native ES modules require HTTP, so opening `index.html` directly as a file is not supported.
 
 ## Reproducible experiments
+
+For the native coupled plant, install the open-source tools in [ENGINEERING.md](docs/ENGINEERING.md), then run:
+
+```sh
+npm run engineering:setup
+npm run engineering:build
+npm run engineering:test
+npm run engineering:plant:verify
+npm run engineering:measured -- --build
+npm run engineering:plant:start
+```
+
+Open `http://127.0.0.1:8002/plant.html`. Native experiments include load reduction, reactor/turbine trips, feedwater, cooling and pump changes, with reproducible command replay. GitHub Pages shows the interface and saved evidence; the native solver runs locally.
+
+The browser-only model has its own independent experiments:
 
 ```sh
 npm run simulate -- --scenario=load-step --duration=600 --output=artifacts/load-step.csv

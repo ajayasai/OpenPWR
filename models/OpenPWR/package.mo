@@ -325,6 +325,335 @@ package OpenPWR "OpenPWR native engineering workbench"
       Documentation(info="<html><p>Generic hot-primary-system experiment. Prescribed reactor heat and secondary temperature; no neutron kinetics, turbine, secondary inventory, or real plant protection. IF97 primary properties and saturated liquid/vapor pressurizer balances are coupled through mass and energy conservation. See docs/MODELICA_MODEL.md.</p></html>"));
   end PrimaryLoop;
 
+  model SteamGenerator "Fixed-volume saturated secondary inventory with explicit mass and energy balances"
+    parameter Real initialPressurePa = Water.saturationPressure(549.15);
+    parameter Real volumeM3 = 400;
+    parameter Real initialLiquidVolumeM3 = 200;
+    input Real heatInputMW(start=3000);
+    input Real feedwaterFlowKgS(start=1150);
+    input Real feedwaterEnthalpyJkg(start=112000);
+    input Real steamFlowKgS(start=1150);
+    output Real pressurePa(start=initialPressurePa, fixed=true, nominal=1e6, stateSelect=StateSelect.always);
+    output Real liquidVolumeM3(start=initialLiquidVolumeM3, fixed=true, nominal=200, stateSelect=StateSelect.always);
+    output Real pressureMPa = pressurePa / 1e6;
+    output Real temperatureC = Water.saturationTemperature(pressurePa) - 273.15;
+    output Real levelPercent = 100 * liquidVolumeM3 / volumeM3;
+    output Real massKg;
+    output Real energyMJ;
+    output Real steamEnthalpyJkg;
+    output Real energyResidualMW;
+    output Real massResidualKgS;
+    output Boolean valid;
+  protected
+    Water.SaturationProperties sat;
+    Real rl;
+    Real rv;
+    Real hl;
+    Real hv;
+    Real mp;
+    Real mv;
+    Real up;
+    Real uv;
+    Real massRate;
+    Real energyRate;
+    Real determinant;
+  equation
+    sat = Water.setSat_p(pressurePa);
+    rl = Water.bubbleDensity(sat);
+    rv = Water.dewDensity(sat);
+    hl = Water.bubbleEnthalpy(sat);
+    hv = Water.dewEnthalpy(sat);
+    massKg = liquidVolumeM3 * rl + (volumeM3 - liquidVolumeM3) * rv;
+    energyMJ = (liquidVolumeM3 * rl * hl + (volumeM3 - liquidVolumeM3) * rv * hv - pressurePa * volumeM3) / 1e6;
+    steamEnthalpyJkg = hv;
+    mp = liquidVolumeM3 * Water.dBubbleDensity_dPressure(sat) + (volumeM3 - liquidVolumeM3) * Water.dDewDensity_dPressure(sat);
+    mv = rl - rv;
+    up = liquidVolumeM3 * (Water.dBubbleDensity_dPressure(sat) * hl + rl * Water.dBubbleEnthalpy_dPressure(sat))
+      + (volumeM3 - liquidVolumeM3) * (Water.dDewDensity_dPressure(sat) * hv + rv * Water.dDewEnthalpy_dPressure(sat)) - volumeM3;
+    uv = rl * hl - rv * hv;
+    massRate = feedwaterFlowKgS - steamFlowKgS;
+    energyRate = heatInputMW * 1e6 + feedwaterFlowKgS * feedwaterEnthalpyJkg - steamFlowKgS * hv;
+    determinant = mp * uv - mv * up;
+    der(pressurePa) = (massRate * uv - energyRate * mv) / determinant;
+    der(liquidVolumeM3) = (mp * energyRate - up * massRate) / determinant;
+    massResidualKgS = mp * der(pressurePa) + mv * der(liquidVolumeM3) - massRate;
+    energyResidualMW = (up * der(pressurePa) + uv * der(liquidVolumeM3) - energyRate) / 1e6;
+    valid = pressurePa > 1e6 and pressurePa < 12e6 and liquidVolumeM3 > 0.05 * volumeM3
+      and liquidVolumeM3 < 0.95 * volumeM3 and feedwaterFlowKgS >= 0 and steamFlowKgS >= 0;
+  end SteamGenerator;
+
+  model ReactorKinetics "Six-group point kinetics with separately labeled illustrative decay-heat inventories"
+    parameter Real beta[6] = {0.000215,0.001424,0.001274,0.002568,0.000748,0.000273};
+    parameter Real lambda[6] = {0.0124,0.0305,0.111,0.301,1.14,3.01};
+    parameter Real generationTimeS = 1e-4;
+    parameter Real nominalThermalPowerMW = 3000;
+    parameter Real decayFraction[6] = {0.012,0.014,0.016,0.012,0.008,0.004};
+    parameter Real decayTimeS[6] = {1,5,25,150,1000,10000};
+    input Real reactivityPcm(start=0);
+    output Real neutronPowerFraction(start=1, fixed=true, nominal=1, stateSelect=StateSelect.always);
+    output Real precursors[6](each start=1, each fixed=true, each nominal=1);
+    output Real decayInventory[6](start=decayFraction, each fixed=true);
+    output Real fissionPowerMW = nominalThermalPowerMW * (1 - sum(decayFraction)) * neutronPowerFraction;
+    output Real decayHeatMW = nominalThermalPowerMW * sum(decayInventory);
+    output Real reactorPowerMW = fissionPowerMW + decayHeatMW;
+  equation
+    der(neutronPowerFraction) = ((reactivityPcm * 1e-5 - sum(beta)) * neutronPowerFraction + sum(beta .* precursors)) / generationTimeS;
+    for i in 1:6 loop
+      der(precursors[i]) = lambda[i] * (neutronPowerFraction - precursors[i]);
+      der(decayInventory[i]) = (decayFraction[i] * neutronPowerFraction - decayInventory[i]) / decayTimeS[i];
+    end for;
+  end ReactorKinetics;
+
+  model KineticsReference "Isolated native kinetics kernel for independent exponential benchmarks"
+    extends ReactorKinetics;
+    output Real precursor1 = precursors[1];
+    output Real precursor2 = precursors[2];
+    output Real precursor3 = precursors[3];
+    output Real precursor4 = precursors[4];
+    output Real precursor5 = precursors[5];
+    output Real precursor6 = precursors[6];
+    output Boolean valid = neutronPowerFraction >= 0 and neutronPowerFraction < 100
+      and reactivityPcm > -10000 and reactivityPcm < 500;
+    annotation(experiment(StartTime=0, StopTime=20, Tolerance=1e-9, Interval=0.05));
+  end KineticsReference;
+
+  model CoupledPlant "Hot coupled kinetics, primary, steam generator and Rankine-cycle laboratory"
+    parameter Real nominalThermalPowerMW = 3000;
+    parameter Real nominalNetPowerMW = 1000;
+    parameter Real nominalSteamTemperatureK = 549.15;
+    parameter Real initialCondenserTemperatureK = 298.15;
+    parameter Real coolingWaterTemperatureK = 288.15;
+    parameter Real initialCondenserMassKg = 500000;
+    parameter Real nominalAuxiliaryPowerMW = 50;
+    parameter Real generatorEfficiency = 0.985;
+    parameter Real feedPumpEfficiency = 0.8;
+    parameter Real nominalShaftFrictionMW = 2;
+    parameter Real nominalRotorEnergyMJ = 4200;
+    parameter Real nominalSecondaryPressurePa = Water.saturationPressure(nominalSteamTemperatureK);
+    parameter Real nominalCondenserPressurePa = Water.saturationPressure(initialCondenserTemperatureK);
+    parameter Real nominalSteamEnthalpyJkg = Water.dewEnthalpy(Water.setSat_p(nominalSecondaryPressurePa));
+    parameter Real nominalCondensateEnthalpyJkg = Water.bubbleEnthalpy(Water.setSat_p(nominalCondenserPressurePa));
+    parameter Real nominalCondensateDensity = Water.bubbleDensity(Water.setSat_p(nominalCondenserPressurePa));
+    parameter Real nominalPumpWorkJkg = (nominalSecondaryPressurePa - nominalCondenserPressurePa) / (nominalCondensateDensity * feedPumpEfficiency);
+    parameter Real nominalSteamFlowKgS = nominalThermalPowerMW * 1e6 / (nominalSteamEnthalpyJkg - nominalCondensateEnthalpyJkg - nominalPumpWorkJkg);
+    parameter Real nominalFeedPumpPowerMW = nominalSteamFlowKgS * nominalPumpWorkJkg / 1e6;
+    parameter Real nominalIsentropicDropJkg = nominalSteamEnthalpyJkg - Water.isentropicEnthalpy(nominalCondenserPressurePa,
+      Water.setState_ph(nominalSecondaryPressurePa, nominalSteamEnthalpyJkg, 2));
+    parameter Real turbineEfficiency = ((nominalNetPowerMW + nominalAuxiliaryPowerMW) / generatorEfficiency + nominalShaftFrictionMW)
+      * 1e6 / (nominalSteamFlowKgS * nominalIsentropicDropJkg)
+      "Effective efficiency calibrated to the assumed nominal point, not a turbine map";
+    parameter Real nominalCoolingPowerMW = nominalThermalPowerMW + nominalFeedPumpPowerMW
+      - (nominalNetPowerMW + nominalAuxiliaryPowerMW) / generatorEfficiency - nominalShaftFrictionMW;
+    parameter Real condenserConductanceWK = nominalCoolingPowerMW * 1e6 / (initialCondenserTemperatureK - coolingWaterTemperatureK);
+
+    input Real reactorDemandPercent(min=50,max=105,start=100);
+    input Real loadDemandMW(min=0,max=1000,start=1000);
+    input Real reactivityCommandPcm(min=-300,max=300,start=0);
+    input Real turbineValveFraction(min=0,max=1.2,start=1);
+    input Real feedwaterFraction(min=0,max=1.2,start=1);
+    input Real coolingFraction(min=0,max=1.2,start=1);
+    input Real pumpCommand(min=0,max=1,start=1);
+    input Real tripCommand(min=0,max=1,start=0);
+    input Real turbineTripCommand(min=0,max=1,start=0);
+    input Real gridBreakerCommand(min=0,max=1,start=1);
+    input Real heaterPowerMW(min=0,max=3,start=0);
+    input Real sprayFlowKgS(min=0,max=30,start=0);
+    input Real chargingFlowKgS(min=0,max=10,start=0);
+    input Real letdownFlowKgS(min=0,max=10,start=0);
+
+    PrimaryLoop primary(nominalThermalPowerW=nominalThermalPowerMW*1e6, nominalSteamTemperatureK=nominalSteamTemperatureK);
+    SteamGenerator secondary(initialPressurePa=nominalSecondaryPressurePa);
+    ReactorKinetics core(nominalThermalPowerMW=nominalThermalPowerMW);
+    output Real hotLegTemperatureC = primary.hotLegTemperatureC;
+    output Real coldLegTemperatureC = primary.coldLegTemperatureC;
+    output Real fuelTemperatureC = primary.fuelTemperatureC;
+    output Real primaryPressureMPa = primary.primaryPressureMPa;
+    output Real pressurizerLevelPercent = primary.pressurizerLevelPercent;
+    output Real primaryFlowKgS = primary.primaryFlowKgS;
+    output Real pumpSpeed = primary.pumpSpeed;
+    output Real heatToSteamMW = primary.heatToSteamMW;
+    output Real thermalEnergyMJ = primary.thermalEnergyMJ;
+    output Real pressurizerMassKg = primary.pressurizerMassKg;
+    output Real pressurizerEnergyMJ = primary.pressurizerEnergyMJ;
+    output Real energyResidualMW = primary.energyResidualMW;
+    output Real massResidualKgS = primary.massResidualKgS;
+    output Real totalMassKg = primary.totalMassKg;
+    output Real boundaryMassFlowKgS = primary.boundaryMassFlowKgS;
+    output Real boundaryPowerMW = primary.boundaryPowerMW;
+    output Real integratedBoundaryMassKg = primary.integratedBoundaryMassKg;
+    output Real integratedBoundaryEnergyMJ = primary.integratedBoundaryEnergyMJ;
+    output Real surgeFlowKgS = primary.surgeFlowKgS;
+    output Real primarySubcoolingK = primary.primarySubcoolingK;
+    output Real liquidMassKg = primary.liquidMassKg;
+    output Real vaporMassKg = primary.vaporMassKg;
+    output Real reactorPowerMW = core.reactorPowerMW;
+    output Real fissionPowerMW = core.fissionPowerMW;
+    output Real decayHeatMW = core.decayHeatMW;
+    output Real reactivityPcm;
+    output Real secondaryPressureMPa = secondary.pressureMPa;
+    output Real secondaryTemperatureC = secondary.temperatureC;
+    output Real secondaryLevelPercent = secondary.levelPercent;
+    output Real secondaryMassKg = secondary.massKg;
+    output Real turbineFlowKgS;
+    output Real bypassFlowKgS;
+    output Real feedwaterFlowKgS(start=nominalSteamFlowKgS,fixed=true);
+    output Real turbineRpm;
+    output Real grossPowerMW;
+    output Real netPowerMW;
+    output Real condenserPressureKPa;
+    output Real condenserTemperatureC;
+    output Real coolingPowerMW;
+    output Real feedwaterTemperatureC;
+    output Real reactorTripped = if reactorTrip then 1 else 0;
+    output Real turbineTripped = if turbineTrip then 1 else 0;
+    output Real gridConnected = if connected then 1 else 0;
+    output Real totalPlantStoredEnergyMJ;
+    output Real totalPlantMassKg;
+    output Real plantBoundaryPowerMW;
+    output Real plantBoundaryMassFlowKgS;
+    output Real integratedPlantBoundaryEnergyMJ(start=0,fixed=true);
+    output Real integratedPlantBoundaryMassKg(start=0,fixed=true);
+    output Real plantEnergyResidualMW;
+    output Real plantMassResidualKgS;
+    output Boolean valid;
+    output Real feedPumpPowerMW;
+    output Real generatorLossMW;
+    output Real shaftFrictionMW;
+    output Real condenserMassKg(start=initialCondenserMassKg,fixed=true,nominal=500000);
+    output Real condenserEnergyMJ;
+    output Real condenserDisplacementPowerMW "Moving liquid-surface pressure work into the unmodeled steam space";
+    output Real rotorEnergyMJ(start=nominalRotorEnergyMJ,fixed=true,nominal=4200);
+    output Real turbineMechanicalPowerMW;
+    output Real neutronPowerFraction = core.neutronPowerFraction;
+
+  protected
+    discrete Boolean reactorTrip(start=false,fixed=true);
+    discrete Boolean turbineTrip(start=false,fixed=true);
+    Boolean connected;
+    Real rodReactivityPcm(start=0,fixed=true);
+    Real turbineValve(start=1,fixed=true);
+    Real bypassValve(start=0,fixed=true);
+    Real turbineValveTarget;
+    Real bypassValveTarget;
+    Real feedwaterTarget;
+    Real condenserPressurePa(start=nominalCondenserPressurePa,fixed=true,nominal=10000,stateSelect=StateSelect.always);
+    Water.SaturationProperties condenserSat;
+    Water.ThermodynamicState steamState;
+    Real condenserDensity;
+    Real condenserEnthalpy;
+    Real condenserInternalEnergy;
+    Real condenserInternalEnergyDerivative;
+    Real condenserEnergyRateW;
+    Real condenserMassRate;
+    Real feedwaterEnthalpy;
+    Real pumpWorkJkg;
+    Real specificTurbineWorkJkg;
+    Real exhaustEnthalpy;
+    Real shaftElectricalPowerMW;
+    Real secondaryEnergyRateMW;
+    Real thermalFeedbackPcm;
+  equation
+    primary.reactorPowerMW = reactorPowerMW;
+    primary.steamTemperatureC = secondaryTemperatureC;
+    primary.pumpCommand = pumpCommand;
+    primary.heaterPowerMW = heaterPowerMW;
+    primary.sprayFlowKgS = sprayFlowKgS;
+    primary.chargingFlowKgS = chargingFlowKgS;
+    primary.letdownFlowKgS = letdownFlowKgS;
+    thermalFeedbackPcm = -2 * (fuelTemperatureC - 600) - 20 * ((hotLegTemperatureC + coldLegTemperatureC) / 2 - 307.5);
+    der(rodReactivityPcm) = if reactorTrip then 0 else noEvent(max(-5,min(5,40*(reactorDemandPercent/100-core.neutronPowerFraction))));
+    reactivityPcm = (if reactorTrip then -6000 else rodReactivityPcm + reactivityCommandPcm) + thermalFeedbackPcm;
+    core.reactivityPcm = reactivityPcm;
+
+    when tripCommand > 0.5 or turbineTripCommand > 0.5 or core.neutronPowerFraction > 1.1
+      or primaryPressureMPa > 17.2 or primaryPressureMPa < 12.5 or primaryFlowKgS < 0.6 * primary.nominalFlowKgS
+      or secondaryLevelPercent < 20 or secondaryLevelPercent > 90 or condenserPressureKPa > 20 or turbineRpm > 3300 then
+      reactorTrip = true;
+    end when;
+    when reactorTrip or turbineTripCommand > 0.5 or turbineRpm > 3300 then
+      turbineTrip = true;
+    end when;
+    connected = gridBreakerCommand > 0.5 and not turbineTrip and turbineRpm >= 2950 and turbineRpm <= 3050;
+    turbineValveTarget = if turbineTrip then 0 else noEvent(max(0,min(1.2,turbineValveFraction *
+      ((loadDemandMW + nominalAuxiliaryPowerMW) / (nominalNetPowerMW + nominalAuxiliaryPowerMW) + 3 * (secondary.pressurePa / nominalSecondaryPressurePa - 1)))));
+    der(turbineValve) = (turbineValveTarget - turbineValve) / 0.5;
+    bypassValveTarget = noEvent(max(0,min(1.2,(if turbineTrip then 1 else 0) + 20 * (secondary.pressurePa / nominalSecondaryPressurePa - 1))));
+    der(bypassValve) = (bypassValveTarget - bypassValve) / 0.5;
+    turbineFlowKgS = nominalSteamFlowKgS * turbineValve * secondary.pressurePa / nominalSecondaryPressurePa
+      * sqrt(nominalSteamTemperatureK / (secondaryTemperatureC + 273.15));
+    bypassFlowKgS = nominalSteamFlowKgS * bypassValve * secondary.pressurePa / nominalSecondaryPressurePa
+      * sqrt(nominalSteamTemperatureK / (secondaryTemperatureC + 273.15));
+    feedwaterTarget = noEvent(max(0,min(1.5*nominalSteamFlowKgS,feedwaterFraction *
+      (turbineFlowKgS + bypassFlowKgS + 30*(50-secondaryLevelPercent)))));
+    der(feedwaterFlowKgS) = (feedwaterTarget - feedwaterFlowKgS) / 2;
+    secondary.heatInputMW = heatToSteamMW;
+    secondary.feedwaterFlowKgS = feedwaterFlowKgS;
+    secondary.feedwaterEnthalpyJkg = feedwaterEnthalpy;
+    secondary.steamFlowKgS = turbineFlowKgS + bypassFlowKgS;
+
+    condenserSat = Water.setSat_p(condenserPressurePa);
+    condenserDensity = Water.bubbleDensity(condenserSat);
+    condenserEnthalpy = Water.bubbleEnthalpy(condenserSat);
+    condenserInternalEnergy = condenserEnthalpy - condenserPressurePa / condenserDensity;
+    condenserInternalEnergyDerivative = Water.dBubbleEnthalpy_dPressure(condenserSat) - 1/condenserDensity
+      + condenserPressurePa * Water.dBubbleDensity_dPressure(condenserSat) / condenserDensity^2;
+    pumpWorkJkg = (secondary.pressurePa - condenserPressurePa) / (condenserDensity * feedPumpEfficiency);
+    feedwaterEnthalpy = condenserEnthalpy + pumpWorkJkg;
+    feedwaterTemperatureC = Water.temperature(Water.setState_ph(secondary.pressurePa,feedwaterEnthalpy,1)) - 273.15;
+    feedPumpPowerMW = feedwaterFlowKgS * pumpWorkJkg / 1e6;
+    steamState = Water.setState_ph(secondary.pressurePa,secondary.steamEnthalpyJkg,2);
+    specificTurbineWorkJkg = turbineEfficiency * (secondary.steamEnthalpyJkg - Water.isentropicEnthalpy(condenserPressurePa,steamState));
+    turbineMechanicalPowerMW = turbineFlowKgS * specificTurbineWorkJkg / 1e6;
+    exhaustEnthalpy = secondary.steamEnthalpyJkg - specificTurbineWorkJkg;
+    turbineRpm = 3000 * sqrt(noEvent(max(0,rotorEnergyMJ)) / nominalRotorEnergyMJ);
+    shaftFrictionMW = nominalShaftFrictionMW * (turbineRpm/3000)^3;
+    shaftElectricalPowerMW = if connected then noEvent(max(0,turbineMechanicalPowerMW-shaftFrictionMW+(rotorEnergyMJ-nominalRotorEnergyMJ))) else 0;
+    der(rotorEnergyMJ) = turbineMechanicalPowerMW - shaftFrictionMW - shaftElectricalPowerMW;
+    grossPowerMW = generatorEfficiency * shaftElectricalPowerMW;
+    generatorLossMW = shaftElectricalPowerMW - grossPowerMW;
+    netPowerMW = grossPowerMW - (nominalAuxiliaryPowerMW - nominalFeedPumpPowerMW) - feedPumpPowerMW;
+    condenserTemperatureC = Water.saturationTemperature(condenserPressurePa) - 273.15;
+    condenserPressureKPa = condenserPressurePa / 1000;
+    coolingPowerMW = coolingFraction * condenserConductanceWK * (condenserTemperatureC + 273.15 - coolingWaterTemperatureK) / 1e6;
+    condenserMassRate = turbineFlowKgS + bypassFlowKgS - feedwaterFlowKgS;
+    condenserEnergyRateW = turbineFlowKgS * exhaustEnthalpy + bypassFlowKgS * secondary.steamEnthalpyJkg
+      - feedwaterFlowKgS * condenserEnthalpy - coolingPowerMW * 1e6 - condenserDisplacementPowerMW * 1e6;
+    der(condenserMassKg) = condenserMassRate;
+    der(condenserPressurePa) = (turbineFlowKgS * exhaustEnthalpy + bypassFlowKgS * secondary.steamEnthalpyJkg
+      - feedwaterFlowKgS * condenserEnthalpy - coolingPowerMW * 1e6 - condenserEnthalpy * condenserMassRate)
+      / (condenserMassKg * (Water.dBubbleEnthalpy_dPressure(condenserSat) - 1/condenserDensity));
+    condenserDisplacementPowerMW = condenserPressurePa * (der(condenserMassKg)/condenserDensity
+      - condenserMassKg * Water.dBubbleDensity_dPressure(condenserSat) * der(condenserPressurePa)/condenserDensity^2) / 1e6;
+    condenserEnergyMJ = condenserMassKg * condenserInternalEnergy / 1e6;
+
+    totalPlantStoredEnergyMJ = primary.thermalEnergyMJ + secondary.energyMJ + condenserEnergyMJ + rotorEnergyMJ;
+    totalPlantMassKg = primary.totalMassKg + secondary.massKg + condenserMassKg;
+    plantBoundaryPowerMW = primary.boundaryPowerMW + heatToSteamMW + feedPumpPowerMW
+      - coolingPowerMW - grossPowerMW - generatorLossMW - shaftFrictionMW - condenserDisplacementPowerMW;
+    plantBoundaryMassFlowKgS = primary.boundaryMassFlowKgS;
+    der(integratedPlantBoundaryEnergyMJ) = plantBoundaryPowerMW;
+    der(integratedPlantBoundaryMassKg) = plantBoundaryMassFlowKgS;
+    secondaryEnergyRateMW = heatToSteamMW + (feedwaterFlowKgS * feedwaterEnthalpy
+      - (turbineFlowKgS+bypassFlowKgS) * secondary.steamEnthalpyJkg) / 1e6;
+    plantEnergyResidualMW = primary.storedEnergyRateMW + secondaryEnergyRateMW + secondary.energyResidualMW
+      + (condenserInternalEnergy * der(condenserMassKg) + condenserMassKg * condenserInternalEnergyDerivative * der(condenserPressurePa))/1e6
+      + der(rotorEnergyMJ) - plantBoundaryPowerMW;
+    plantMassResidualKgS = primary.massResidualKgS + secondary.massResidualKgS + condenserMassRate
+      + feedwaterFlowKgS - turbineFlowKgS - bypassFlowKgS;
+    valid = primary.valid and secondary.valid and reactorPowerMW >= 0 and reactorPowerMW <= 3300
+      and core.neutronPowerFraction >= 0 and core.neutronPowerFraction < 1.2
+      and secondaryTemperatureC >= 240 and secondaryTemperatureC <= 300
+      and condenserPressurePa > 800 and condenserPressurePa < 30000
+      and condenserMassKg > 50000 and condenserMassKg < 1000000 and rotorEnergyMJ >= 0 and turbineRpm < 3600
+      and turbineEfficiency > 0 and turbineEfficiency <= 1 and abs(rodReactivityPcm) < 3000
+      and reactorDemandPercent >= 50 and reactorDemandPercent <= 105 and loadDemandMW >= 0 and loadDemandMW <= 1000
+      and reactivityCommandPcm >= -300 and reactivityCommandPcm <= 300
+      and turbineValveFraction >= 0 and turbineValveFraction <= 1.2 and feedwaterFraction >= 0 and feedwaterFraction <= 1.2
+      and coolingFraction >= 0 and coolingFraction <= 1.2 and tripCommand >= 0 and tripCommand <= 1
+      and turbineTripCommand >= 0 and turbineTripCommand <= 1 and gridBreakerCommand >= 0 and gridBreakerCommand <= 1;
+    annotation(experiment(StartTime=0,StopTime=300,Tolerance=1e-7,Interval=0.05));
+  end CoupledPlant;
+
   model PropertyReferenceChecks "Native IF97 observations for published tables and differential checks"
     input Real probePressurePa(start=15.5e6) "Property probe independent of PrimaryLoop validity envelope";
     input Real probeTemperatureK(start=598.15);
@@ -351,6 +680,6 @@ package OpenPWR "OpenPWR native engineering workbench"
     annotation(experiment(StartTime=0, StopTime=1, Interval=1));
   end PropertyReferenceChecks;
 
-  annotation(uses(Modelica(version="4.0.0")), version="0.4.0",
+  annotation(uses(Modelica(version="4.0.0")), version="0.5.0",
     Documentation(info="<html><p>Original OpenPWR engineering workbench models, Apache-2.0. Requires Modelica Standard Library 4.0.0 under its own BSD-3-Clause license.</p></html>"));
 end OpenPWR;

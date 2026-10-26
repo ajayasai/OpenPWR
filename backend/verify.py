@@ -24,18 +24,19 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def read_verified_manifest(fmu_path, source_path=ROOT / "models" / "OpenPWR" / "package.mo"):
+def read_verified_manifest(fmu_path, source_path=ROOT / "models" / "OpenPWR" / "package.mo", *,
+        expected_model="OpenPWR.PrimaryLoop", manifest_name="manifest.json"):
     """Bind evidence to both the compiled bytes and the current model source."""
     fmu_path = Path(fmu_path).resolve()
-    manifest_path = fmu_path.parent / "manifest.json"
+    manifest_path = fmu_path.parent / manifest_name
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         source_hash = hashlib.sha256(Path(source_path).read_bytes()).hexdigest()
         fmu_hash = hashlib.sha256(fmu_path.read_bytes()).hexdigest()
     except (OSError, ValueError) as error:
-        raise RuntimeError("Native verification requires the FMU, its adjacent manifest.json, and model source. Rebuild the engineering model.") from error
-    if not isinstance(manifest, dict) or manifest.get("model") != "OpenPWR.PrimaryLoop" or manifest.get("fmiVersion") != "2.0":
-        raise RuntimeError("The build manifest does not identify the expected FMI 2 primary-loop model. Rebuild the engineering model.")
+        raise RuntimeError(f"Native verification requires the FMU, its adjacent {manifest_name}, and model source. Rebuild the engineering model.") from error
+    if not isinstance(manifest, dict) or manifest.get("model") != expected_model or manifest.get("fmiVersion") != "2.0":
+        raise RuntimeError(f"The build manifest does not identify the expected FMI 2 {expected_model} model. Rebuild the engineering model.")
     if manifest.get("sourceSha256") != source_hash:
         raise RuntimeError("The compiled FMU belongs to different Modelica source. Rebuild before running native verification.")
     if manifest.get("fmuSha256") != fmu_hash:

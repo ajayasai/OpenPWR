@@ -1,8 +1,8 @@
 # Native engineering service
 
-This optional service runs the compiled **OpenPWR.PrimaryLoop FMI 2 co-simulation model** through FMPy. It serves the engineering workbench and the existing browser control room from the same loopback origin. It does not substitute JavaScript values when the native model is unavailable.
+This optional service runs the compiled **OpenPWR.PrimaryLoop** or **OpenPWR.CoupledPlant FMI 2 co-simulation model** through FMPy. It serves the selected engineering workbench and the existing browser control room from the same loopback origin. It does not substitute JavaScript values when the native model is unavailable.
 
-The engineering model is a hot primary-loop/pressurizer subsystem, with prescribed fuel heat input and secondary temperature. It is not the complete browser plant model and does not include neutron kinetics, a turbine, or the cold-start workflow.
+The default primary profile is a hot primary-loop/pressurizer subsystem, with prescribed fuel heat input and secondary temperature. The optional plant profile adds coupled native kinetics and balance-of-plant systems. Both start from a hot operating equilibrium; neither includes the browser model's cold-start workflow.
 
 ## Runtime
 
@@ -35,6 +35,8 @@ The backend owns one shared session. Multiple tabs control the same experiment; 
 | `GET /api/report` | Downloadable experiment report containing runtime identity, current/final state, command log, and any replay comparison |
 | `GET /engineering-verification.json` | Saved native subsystem evidence, including the tested FMU hash, compiler and source revision |
 | `GET /modelica-property-verification.json` | Saved native property-reference comparison report |
+| `GET /plant-verification.json` | Saved coupled native equation and conservation checks |
+| `GET /measured-validation.json` | Saved measured-transient comparison, including its limitations and assessment status |
 
 All API errors are JSON `{error,message}` with a corresponding HTTP status. An absent or unloadable FMU returns HTTP 503. A halted solver rejects additional control/step requests with HTTP 409 until reset. Native non-finite observations are never emitted as JSON numbers.
 
@@ -48,12 +50,34 @@ History returns `{schema,fmuSha256,samplePeriod,storageIncludesCommandBoundaries
 
 Evidence endpoints serve the actual saved reports without fabricating results or replacing their recorded provenance. A missing report returns HTTP 404. Compare its FMU identity and source revision with the running model before treating it as evidence for the current session.
 
+## Explicit native model selection
+
+The default `primary` profile retains the standalone hot primary-loop/pressurizer experiment. The separate `plant` profile loads `OpenPWR.CoupledPlant`, coupling native kinetics, decay heat, secondary water/steam inventory, turbine/generator, condenser/feedwater and generic protection to the primary model. Both use the same bounded HTTP and command-replay protocol. Model choice is explicit at service startup; a model-name or variable-contract mismatch is rejected before the FMU is instantiated. There is no fallback to another model.
+
+```sh
+npm run engineering:build
+npm run engineering:start
+npm run engineering:plant:start
+npm run engineering:plant:verify
+npm run engineering:plant:experiment -- --scenario load-following --output artifacts/native-load
+```
+
+Primary mode serves `http://127.0.0.1:8001/engineering.html`; plant mode serves `http://127.0.0.1:8002/plant.html`. Use `--port` to override either address. The Python equivalents are `python backend/server.py --model plant` and `python backend/experiments.py --model plant --scenario reactor-trip`. `--fmu` may select another compiled artifact, but that artifact must satisfy the selected model profile. `engineering:plant:build` rebuilds only the coupled plant; the full build also compiles the primary, isolated kinetics and property-reference FMUs.
+
+Health includes `profile`, `controlLimits`, `defaultControls`, `realOutputs`, `booleanOutputs` and `discreteControls`. State includes `profile`; the scenario catalogue includes both `profile` and `model`. Plant command inputs are `reactorDemandPercent`, `loadDemandMW`, `reactivityCommandPcm`, turbine/feedwater/cooling fractions, pump command, reactor/turbine trip commands, grid breaker command, and the four existing pressurizer/inventory controls. Trip and breaker commands accept exactly numeric `0` or `1`; all controls are validated before mutation. Clearing a trip command does not clear the model's trip latch; resetting starts a new initialized experiment.
+
+Plant scenarios are `load-following`, `reactor-trip`, `turbine-trip`, `feedwater`, `cooling`, and `pump`. The catalogue supplies exact schedules. Primary-only schedules are not offered by the plant service. These are generic model experiments, not real plant operating procedures. A model-domain halt remains visible and stops the sequence; a completed script alone does not establish fidelity.
+
+The primary outputs `thermalEnergyMJ`, `totalMassKg` and `boundaryPowerMW` retain their primary-subsystem meaning in both profiles. Plant-wide totals and boundary fluxes have the `Plant`/`plant` prefix. This distinction prevents a partial thermal balance from being presented as whole-plant conservation. `plant-verification.json` and `measured-validation.json` expose their corresponding saved reports; the measured-data report can contain failed or incomplete assessments and is never relabeled as a passing verification report.
+
 ## Tests and evidence
 
 ```sh
 python -m unittest backend.test_backend backend.test_experiments -v
 OPENPWR_FMU=artifacts/modelica/PrimaryLoop.fmu python -m unittest backend.test_backend backend.test_experiments -v
 python backend/verify.py --fmu artifacts/modelica/PrimaryLoop.fmu
+OPENPWR_PLANT_FMU=artifacts/modelica/CoupledPlant.fmu python -m unittest backend.test_plant -v
+python backend/verify_plant.py
 ```
 
 On PowerShell set `$env:OPENPWR_FMU` separately before running the tests. The protocol tests use a test-only fake slave to exercise input validation, time stepping, lifecycle, domain halts, CSV freshness, and HTTP origin/host boundaries. The fake is never an application backend. The optional native smoke test loads the actual FMU.
@@ -61,6 +85,10 @@ On PowerShell set `$env:OPENPWR_FMU` separately before running the tests. The pr
 `verify.py` records actual FMU identity, compiler, source revision, numerical tolerances, and traces in `artifacts/modelica-verification.json`. It compares the pump state against its exact first-order ODE solution and tests mass/energy conservation from physical inventories and boundary fluxes, equilibrium, qualitative pressure response, communication-step refinement, and reset/replay. A separate closed-inventory regression requires less than `1e-4 kg` total mass drift during the first five seconds of pump, heater, and internal-spray transients. These are equation/subsystem checks, **not measured plant-transient validation**.
 
 Native verification requires an adjacent `manifest.json` from the model build. It rejects a manifest whose source hash differs from the current `models/OpenPWR/package.mo`, or whose FMU hash differs from the compiled bytes. The report embeds that build manifest so a current repository revision cannot hide a stale compiled model. The interactive service can still load another compatible FMU explicitly; that does not give it verified status.
+
+`verify_plant.py` separately binds the coupled model to `plant-manifest.json` and the isolated reusable kinetics component to `kinetics-manifest.json`. Its independent matrix exponential checks six-group kinetics under two constant reactivity inputs; other checks cover equilibrium, causality, trip latching/decay heat, secondary and condenser responses, physical inventory/energy accounting, communication-step refinement and complete-output command replay. These checks are numerical or analytical equation verification; they do not use measured plant transients. A failed native integration records a failed check rather than counting an unexecuted case as passed.
+
+The turbine-trip energy check handles the breaker event explicitly. An input update can leave the FMI observation at the event's left limit until the first positive step. The report preserves that raw observation and its uncorrected trapezoid error, then checks the wholly observed post-event interval and a separate full-interval integral using zero electrical extraction at the commanded opening's right limit. Neither error is hidden by increasing the tolerance. The grid closing check covers the model's speed permissive only; it does not validate a phase/voltage synchronizer.
 
 ## Reproducible command-line experiments
 

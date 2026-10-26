@@ -15,9 +15,9 @@ from pathlib import Path
 import time
 
 try:
-    from .fmi_host import FMIPlant, REAL_OUTPUTS, CONTROL_LIMITS, ServiceError, finite_number, validate_controls
+    from .fmi_host import FMIPlant, REAL_OUTPUTS, CONTROL_LIMITS, ServiceError, finite_number, validate_controls, PROFILES
 except ImportError:
-    from fmi_host import FMIPlant, REAL_OUTPUTS, CONTROL_LIMITS, ServiceError, finite_number, validate_controls
+    from fmi_host import FMIPlant, REAL_OUTPUTS, CONTROL_LIMITS, ServiceError, finite_number, validate_controls, PROFILES
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,8 +41,35 @@ SCENARIOS = (
 )
 
 
-def scenarios():
-    return {"schema": "openpwr-fmi-scenarios-v1", "scenarios": copy.deepcopy(list(SCENARIOS))}
+PLANT_SCENARIOS = (
+    {"id": "load-following", "label": "Coupled load reduction", "duration": 45.0,
+     "description": "At 5 s request 90% reactor power and 900 MWe load; the core, primary and secondary respond through their coupled equations.",
+     "commands": [{"time": 5.0, "controls": {"reactorDemandPercent": 90.0, "loadDemandMW": 900.0}}]},
+    {"id": "reactor-trip", "label": "Reactor trip and residual heat", "duration": 20.0,
+     "description": "Latch a reactor trip at 5 s and observe fission reduction, retained decay heat and balance-of-plant response.",
+     "commands": [{"time": 5.0, "controls": {"tripCommand": 1.0}}]},
+    {"id": "turbine-trip", "label": "Turbine trip and steam bypass", "duration": 20.0,
+     "description": "Trip the turbine at 5 s; observe the modeled protection, generator breaker and steam bypass response.",
+     "commands": [{"time": 5.0, "controls": {"turbineTripCommand": 1.0}}]},
+    {"id": "feedwater", "label": "Feedwater reduction and recovery", "duration": 30.0,
+     "description": "Reduce feedwater command to 80% from 5 to 15 s; inspect secondary mass, pressure and energy response.",
+     "commands": [{"time": 5.0, "controls": {"feedwaterFraction": 0.8}}, {"time": 15.0, "controls": {"feedwaterFraction": 1.0}}]},
+    {"id": "cooling", "label": "Condenser cooling reduction", "duration": 30.0,
+     "description": "Reduce condenser cooling to 80% from 5 to 15 s; observe heat rejection, backpressure and electrical generation.",
+     "commands": [{"time": 5.0, "controls": {"coolingFraction": 0.8}}, {"time": 15.0, "controls": {"coolingFraction": 1.0}}]},
+    SCENARIOS[2],
+)
+
+
+def scenario_catalog(profile="primary"):
+    if profile not in PROFILES:
+        raise ValueError("Unknown native model profile")
+    return PLANT_SCENARIOS if profile == "plant" else SCENARIOS
+
+
+def scenarios(profile="primary"):
+    return {"schema": "openpwr-fmi-scenarios-v1", "profile": profile, "model": PROFILES[profile]["model"],
+        "scenarios": copy.deepcopy(list(scenario_catalog(profile)))}
 
 
 def ticks(value, step_size, label="time"):
@@ -54,7 +81,7 @@ def ticks(value, step_size, label="time"):
     return result
 
 
-def validated_schedule(commands, duration, step_size):
+def validated_schedule(commands, duration, step_size, control_validator=validate_controls):
     end_tick = ticks(duration, step_size, "duration")
     if not isinstance(commands, list) or len(commands) > MAX_COMMANDS:
         raise ServiceError(400, "invalid_experiment", f"commands must be an array of at most {MAX_COMMANDS} entries.")
@@ -66,25 +93,26 @@ def validated_schedule(commands, duration, step_size):
         tick = ticks(command["time"], step_size, f"Command {index + 1} time")
         if tick < previous or tick > end_tick:
             raise ServiceError(400, "invalid_experiment", "Command timestamps must be ordered and no later than the experiment end.")
-        validated.append({"tick": tick, "time": tick * step_size, "controls": validate_controls(command["controls"])})
+        validated.append({"tick": tick, "time": tick * step_size, "controls": control_validator(command["controls"])})
         previous = tick
     return end_tick, validated
 
 
-def validated_reference(value, end_tick, step_size):
+def validated_reference(value, end_tick, step_size, real_outputs=REAL_OUTPUTS, boolean_outputs=("valid",)):
     if not isinstance(value, dict) or set(value) != {"time", "outputs", "halted"}:
         raise ServiceError(400, "invalid_replay", "finalState must contain time, outputs, and halted.")
     if ticks(value["time"], step_size, "finalState time") != end_tick or type(value["halted"]) is not bool:
         raise ServiceError(400, "invalid_replay", "Final observation time/status is inconsistent with the command log.")
     outputs = value["outputs"]
-    if not isinstance(outputs, dict) or set(outputs) != {*REAL_OUTPUTS, "valid"}:
+    if not isinstance(outputs, dict) or set(outputs) != {*real_outputs, *boolean_outputs}:
         raise ServiceError(400, "invalid_replay", "Final observations must contain the complete declared output set.")
-    for name in REAL_OUTPUTS:
+    for name in real_outputs:
         item = outputs[name]
         if not finite_number(item):
             raise ServiceError(400, "invalid_replay", "Final observations must be finite numbers.")
-    if type(outputs["valid"]) is not bool:
-        raise ServiceError(400, "invalid_replay", "The final valid observation must be Boolean.")
+    for name in boolean_outputs:
+        if type(outputs[name]) is not bool:
+            raise ServiceError(400, "invalid_replay", f"The final {name} observation must be Boolean.")
     return copy.deepcopy(value)
 
 
@@ -105,20 +133,20 @@ def validate_replay(log, plant):
         raise ServiceError(409, "fmu_mismatch", "This command log was recorded with a different FMU. Load the matching native build to replay it.")
     if isinstance(log["stepSize"], bool) or log["stepSize"] != plant.step_size:
         raise ServiceError(409, "step_mismatch", "The command log communication step differs from the running native model.")
-    initial = validate_controls(log["initialControls"])
-    if set(initial) != set(CONTROL_LIMITS) or initial != plant.defaults:
+    initial = plant.validate_controls(log["initialControls"])
+    if set(initial) != set(plant.control_limits) or initial != plant.defaults:
         raise ServiceError(409, "initial_condition_mismatch", "The command log does not use the native model's declared initial controls.")
-    end_tick, commands = validated_schedule(log["commands"], log["time"], plant.step_size)
-    reference = validated_reference(log["finalState"], end_tick, plant.step_size) if schema.endswith("v2") else None
+    end_tick, commands = validated_schedule(log["commands"], log["time"], plant.step_size, plant.validate_controls)
+    reference = validated_reference(log["finalState"], end_tick, plant.step_size, plant.real_outputs, plant.boolean_outputs) if schema.endswith("v2") else None
     return {"id": "replay", "label": "Imported command replay", "endTick": end_tick,
         "commands": commands, "reference": reference, "sourceSchema": schema}
 
 
-def compare_observations(reference, actual):
+def compare_observations(reference, actual, real_outputs=REAL_OUTPUTS, boolean_outputs=("valid",)):
     if reference is None:
         return None
     checks = []
-    for name in REAL_OUTPUTS:
+    for name in real_outputs:
         expected, observed = reference["outputs"][name], actual["outputs"][name]
         error = abs(observed - expected)
         tolerance = 1e-8 + 1e-10 * abs(expected)
@@ -127,8 +155,8 @@ def compare_observations(reference, actual):
     checks += [{"name": "time", "reference": reference["time"], "actual": actual["time"],
         "error": abs(actual["time"] - reference["time"]), "tolerance": 1e-8,
         "pass": abs(actual["time"] - reference["time"]) <= 1e-8}]
-    for name, expected, observed in [("valid", reference["outputs"]["valid"], actual["outputs"]["valid"]),
-            ("halted", reference["halted"], actual["halted"])]:
+    flags = [(name, reference["outputs"][name], actual["outputs"][name]) for name in boolean_outputs]
+    for name, expected, observed in flags + [("halted", reference["halted"], actual["halted"])]:
         checks.append({"name": name, "reference": expected, "actual": observed, "pass": expected == observed})
     return {"pass": all(check["pass"] for check in checks),
         "maximumAbsoluteDifference": max(check["error"] for check in checks if "error" in check),
@@ -148,6 +176,9 @@ class ExperimentSession:
         result = self.plant.health()
         result.update({"experiments": True, "history": True, "commandReplay": True})
         return result
+
+    def scenarios(self):
+        return scenarios(self.plant.profile)
 
     def state(self):
         with self.lock:
@@ -175,10 +206,10 @@ class ExperimentSession:
 
     def start(self, identifier):
         with self.lock:
-            scenario = next((copy.deepcopy(item) for item in SCENARIOS if item["id"] == identifier), None)
+            scenario = next((copy.deepcopy(item) for item in scenario_catalog(self.plant.profile) if item["id"] == identifier), None)
             if scenario is None:
-                raise ServiceError(400, "unknown_scenario", "Choose heater, spray, pump, or inventory.")
-            end_tick, commands = validated_schedule(scenario["commands"], scenario["duration"], self.plant.step_size)
+                raise ServiceError(400, "unknown_scenario", f"Choose a scenario from the {self.plant.profile} model catalogue.")
+            end_tick, commands = validated_schedule(scenario["commands"], scenario["duration"], self.plant.step_size, self.plant.validate_controls)
             return self._arm({"id": scenario["id"], "label": scenario["label"], "endTick": end_tick,
                 "commands": commands, "reference": None})
 
@@ -222,7 +253,7 @@ class ExperimentSession:
         elif self.plant.steps >= self.plan["endTick"]:
             self.status = "complete"
         if self.status in {"complete", "halted"}:
-            self.comparison = compare_observations(self.plan["reference"], self.plant.state())
+            self.comparison = compare_observations(self.plan["reference"], self.plant.state(), self.plant.real_outputs, self.plant.boolean_outputs)
 
     def step(self, seconds):
         with self.lock:
@@ -249,7 +280,7 @@ class ExperimentSession:
             except ServiceError:
                 if self.plant.halted:
                     self.status = "halted"
-                    self.comparison = compare_observations(self.plan["reference"], self.plant.state())
+                    self.comparison = compare_observations(self.plan["reference"], self.plant.state(), self.plant.real_outputs, self.plant.boolean_outputs)
                 raise
             return self.state()
 
@@ -272,7 +303,7 @@ class ExperimentSession:
                     "error": error.error, "message": error.message}
             return {"schema": "openpwr-fmi-experiment-report-v1", "generatedAt": datetime.now(timezone.utc).isoformat(),
                 "runtime": runtime, "experiment": state["experiment"], "finalState": state,
-                "commandLog": self.export_commands(), "scope": "Generic native subsystem experiment; no measured plant validation."}
+                "commandLog": self.export_commands(), "scope": "Generic native model experiment; no measured plant validation."}
 
     def close(self): self.plant.close()
 
@@ -297,14 +328,15 @@ def read_log(path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--fmu", type=Path, default=ROOT / "artifacts" / "modelica" / "PrimaryLoop.fmu")
+    parser.add_argument("--model", choices=tuple(PROFILES), default="primary")
+    parser.add_argument("--fmu", type=Path)
     choice = parser.add_mutually_exclusive_group(required=True)
-    choice.add_argument("--scenario", choices=[item["id"] for item in SCENARIOS])
+    choice.add_argument("--scenario", choices=sorted({item["id"] for item in (*SCENARIOS, *PLANT_SCENARIOS)}))
     choice.add_argument("--replay", type=Path)
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts" / "native-experiment")
     args = parser.parse_args()
     try:
-        session = ExperimentSession(FMIPlant(args.fmu))
+        session = ExperimentSession(FMIPlant(args.fmu or ROOT / "artifacts/modelica" / PROFILES[args.model]["file"], profile=args.model))
     except ServiceError as error:
         print(json.dumps({"status": "unavailable", "error": error.error, "message": error.message}))
         return 2

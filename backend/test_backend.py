@@ -203,7 +203,9 @@ class HttpTest(HttpFixture, unittest.TestCase):
         (self.root / "engineering-evidence.html").write_text("<h1>Native evidence</h1>", encoding="utf-8")
         self.assertEqual(self.request("GET", "/engineering-evidence.html")[0], 200)
         reports = {"/engineering-verification.json": "artifacts/modelica-verification.json",
-            "/modelica-property-verification.json": "artifacts/modelica/property-verification.json"}
+            "/modelica-property-verification.json": "artifacts/modelica/property-verification.json",
+            "/plant-verification.json": "artifacts/plant-verification.json",
+            "/measured-validation.json": "artifacts/measured-validation.json"}
         for route, relative in reports.items():
             self.assertEqual(self.request("GET", route)[0], 404)
             path = self.root / relative

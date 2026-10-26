@@ -3,14 +3,20 @@ import { createPlantView } from './plant-view.js';
 // The engineering workbench renders only observations returned by the native FMU.
 // Display animation and charts never advance or calculate plant physics.
 const $ = id => document.getElementById(id);
-const plantView = createPlantView({ host: $('plant-3d'), schematic: $('plant-schematic'), mode: 'native' });
+const coupled = document.body.dataset.nativeModel === 'plant';
+const modelName = coupled ? 'OpenPWR.CoupledPlant' : 'OpenPWR.PrimaryLoop';
+const evidencePath = coupled ? './plant-verification.json' : './engineering-verification.json';
+const plantView = createPlantView({ host: $('plant-3d'), schematic: $('plant-schematic'), mode: coupled ? 'plant' : 'native' });
 const inputs = [...document.querySelectorAll('[data-engineering-control]')];
 const number = (value, digits = 1) => Number.isFinite(value)
   ? value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '—';
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const units = { reactorPowerMW: ' MW', pumpCommand: '%', steamTemperatureC: ' °C', heaterPowerMW: ' MW', sprayFlowKgS: ' kg/s', chargingFlowKgS: ' kg/s', letdownFlowKgS: ' kg/s' };
 const digits = { reactorPowerMW: 0, pumpCommand: 0, steamTemperatureC: 1, heaterPowerMW: 2, sprayFlowKgS: 1, chargingFlowKgS: 2, letdownFlowKgS: 2 };
+Object.assign(units, { reactorDemandPercent: '%', loadDemandMW: ' MWe', reactivityCommandPcm: ' pcm', turbineValveFraction: '%', feedwaterFraction: '%', coolingFraction: '%', tripCommand: '', turbineTripCommand: '', gridBreakerCommand: '' });
+Object.assign(digits, { reactorDemandPercent: 1, loadDemandMW: 0, reactivityCommandPcm: 0, turbineValveFraction: 0, feedwaterFraction: 0, coolingFraction: 0, tripCommand: 0, turbineTripCommand: 0, gridBreakerCommand: 0 });
 const expectedOutputs = ['hotLegTemperatureC', 'coldLegTemperatureC', 'fuelTemperatureC', 'primaryPressureMPa', 'pressurizerLevelPercent', 'primaryFlowKgS', 'pumpSpeed', 'heatToSteamMW', 'thermalEnergyMJ', 'pressurizerMassKg', 'pressurizerEnergyMJ', 'energyResidualMW', 'massResidualKgS'];
+if (coupled) expectedOutputs.push('reactorPowerMW', 'fissionPowerMW', 'decayHeatMW', 'reactivityPcm', 'secondaryPressureMPa', 'secondaryTemperatureC', 'secondaryLevelPercent', 'secondaryMassKg', 'turbineFlowKgS', 'bypassFlowKgS', 'feedwaterFlowKgS', 'turbineRpm', 'grossPowerMW', 'netPowerMW', 'condenserPressureKPa', 'condenserTemperatureC', 'coolingPowerMW', 'feedwaterTemperatureC', 'reactorTripped', 'turbineTripped', 'gridConnected', 'totalPlantStoredEnergyMJ', 'totalPlantMassKg', 'plantEnergyResidualMW', 'plantMassResidualKgS');
 let connected = false, paused = true, busy = false, connecting = false;
 let state = null, pendingControls = {}, resetQueued = false, exportQueued = false;
 let pendingSessionAction = null, scenarios = [];
@@ -28,7 +34,7 @@ function clock(time) {
   const seconds = Math.max(0, Math.floor(time));
   return `${String(Math.floor(seconds / 3600)).padStart(2, '0')}:${String(Math.floor(seconds / 60) % 60).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 }
-function text(id, value) { $(id).textContent = value; }
+function text(id, value) { const target = $(id); if (target) target.textContent = value; }
 function notice(message, persistent = false) {
   clearTimeout(noticeTimer);
   text('engineering-notice', message);
@@ -36,7 +42,9 @@ function notice(message, persistent = false) {
   if (!persistent) noticeTimer = setTimeout(() => { $('engineering-notice').hidden = true; }, 6500);
 }
 function commandLabel(key, value) {
-  return `${number(key === 'pumpCommand' ? value * 100 : value, digits[key])}${units[key]}`;
+  if (['tripCommand', 'turbineTripCommand'].includes(key)) return value === 1 ? 'Trip requested' : 'No manual request';
+  if (key === 'gridBreakerCommand') return value === 1 ? 'Close requested' : 'Open requested';
+  return `${number(['pumpCommand', 'turbineValveFraction', 'feedwaterFraction', 'coolingFraction'].includes(key) ? value * 100 : value, digits[key])}${units[key]}`;
 }
 async function request(path, body, { download = false } = {}) {
   const controller = new AbortController();
@@ -101,7 +109,7 @@ function updateAvailability() {
   $('engine-status').classList.toggle('halted', halted);
 }
 function acceptState(next, { reset = false } = {}) {
-  if (!next || next.backend !== 'fmi2' || next.model !== 'OpenPWR.PrimaryLoop'
+  if (!next || next.backend !== 'fmi2' || next.model !== modelName
       || !Number.isFinite(next.time) || next.time < 0 || typeof next.halted !== 'boolean'
       || !next.controls || !next.outputs || typeof next.outputs.valid !== 'boolean'
       || expectedOutputs.some(key => !Number.isFinite(next.outputs[key]))
@@ -131,15 +139,28 @@ function render() {
     'pump-note': `Pump speed ${number(out.pumpSpeed * 100, 1)}%`,
     'diagram-pressure': `${number(out.primaryPressureMPa, 3)} MPa`, 'diagram-level': `${number(out.pressurizerLevelPercent, 1)}% liquid`,
     'diagram-heater': `Heater ${number(controls.heaterPowerMW, 2)} MW`, 'diagram-spray': `Spray ${number(controls.sprayFlowKgS, 1)} kg/s`,
-    'diagram-power': `Input ${number(controls.reactorPowerMW, 0)} MW`, 'diagram-fuel': `Fuel ${number(out.fuelTemperatureC, 1)} °C`,
+    'diagram-power': `${coupled ? 'Core' : 'Input'} ${number(coupled ? out.reactorPowerMW : controls.reactorPowerMW, 0)} MW`, 'diagram-fuel': `Fuel ${number(out.fuelTemperatureC, 1)} °C`,
     'diagram-hot': `${number(out.hotLegTemperatureC, 1)} °C`, 'diagram-cold': `${number(out.coldLegTemperatureC, 1)} °C`,
-    'diagram-pump': `Pump ${number(out.pumpSpeed * 100, 1)}%`, 'diagram-transfer': `${number(out.heatToSteamMW, 1)} MW to boundary`,
-    'diagram-boundary': `${number(controls.steamTemperatureC, 1)} °C`,
+    'diagram-pump': `Pump ${number(out.pumpSpeed * 100, 1)}%`, 'diagram-transfer': `${number(out.heatToSteamMW, 1)} MW to ${coupled ? 'secondary' : 'boundary'}`,
+    'diagram-boundary': `${number(coupled ? out.secondaryTemperatureC : controls.steamTemperatureC, 1)} °C`,
     'energy-residual': `${number(out.energyResidualMW, 6)} MW`, 'mass-residual': `${number(out.massResidualKgS, 6)} kg/s`,
     'thermal-energy': `${number(out.thermalEnergyMJ, 0)} MJ`, 'pressurizer-mass': `${number(out.pressurizerMassKg, 0)} kg`,
     'pressurizer-energy': `${number(out.pressurizerEnergyMJ, 0)} MJ`,
     'sample-count': `${history.length.toLocaleString('en-US')} solver observations retained · last 10 minutes shown · time mm:ss`,
   };
+  if (coupled) Object.assign(values, {
+    'plant-net': number(out.netPowerMW, 1), 'plant-thermal': number(out.reactorPowerMW, 1),
+    'plant-secondary': number(out.secondaryPressureMPa, 3), 'plant-condenser': number(out.condenserPressureKPa, 2),
+    'plant-decay-note': `Decay heat ${number(out.decayHeatMW, 1)} MW`, 'plant-rpm-note': `Turbine ${number(out.turbineRpm, 0)} rpm`,
+    'plant-level-note': `Secondary level ${number(out.secondaryLevelPercent, 1)}%`, 'plant-cooling-note': `Heat rejection ${number(out.coolingPowerMW, 0)} MW`,
+    'plant-reactor-state': out.reactorTripped === 1 ? 'TRIPPED · latched' : 'Running',
+    'plant-turbine-state': out.turbineTripped === 1 ? 'TRIPPED · latched' : 'Available',
+    'plant-grid-state': out.gridConnected === 1 ? 'Connected' : 'Open',
+    'plant-reactivity': `${number(out.reactivityPcm, 1)} pcm`, 'plant-feedwater': `${number(out.feedwaterFlowKgS, 0)} kg/s`,
+    'plant-steam-flow': `${number(out.turbineFlowKgS, 0)} kg/s`, 'plant-bypass': `${number(out.bypassFlowKgS, 0)} kg/s`,
+    'plant-energy-residual': `${number(out.plantEnergyResidualMW, 6)} MW`, 'plant-mass-residual': `${number(out.plantMassResidualKgS, 6)} kg/s`,
+    'plant-stored-energy': `${number(out.totalPlantStoredEnergyMJ, 0)} MJ`, 'plant-mass': `${number(out.totalPlantMassKg, 0)} kg`,
+  });
   for (const [id, value] of Object.entries(values)) text(id, value);
   for (const input of inputs) {
     const key = input.dataset.engineeringControl;
@@ -152,7 +173,7 @@ function render() {
   $('pressurizer-liquid').setAttribute('height', String(94 * level));
   $('pressurizer-liquid').setAttribute('y', String(139 - 94 * level));
   $('heater-coil').style.opacity = String(.25 + .75 * clamp(controls.heaterPowerMW / 3, 0, 1));
-  $('engineering-core-heat').style.opacity = String(.08 + .92 * clamp(controls.reactorPowerMW / 3000, 0, 1));
+  $('engineering-core-heat').style.opacity = String(.08 + .92 * clamp((coupled ? out.reactorPowerMW : controls.reactorPowerMW) / 3000, 0, 1));
   $('engineering-halt').hidden = !state.halted && out.valid;
   if (state.halted || !out.valid) text('engineering-halt', `Model domain reached. ${state.haltReason || 'The solver state is outside this model’s supported range.'} Reset the hot initial condition to begin another experiment.`);
   const plan = state.experiment;
@@ -175,8 +196,8 @@ async function connect() {
   try {
     health = await request('/api/health');
     if (health.available !== true || health.backend !== 'fmi2' || health.fmiVersion !== '2.0'
-        || health.model !== 'OpenPWR.PrimaryLoop' || !validHash(health.fmuSha256)
-        || ![.025, .05].includes(health.stepSize)) throw new Error('The service did not provide a complete FMI 2.0 primary-loop model identity.');
+        || health.model !== modelName || !validHash(health.fmuSha256)
+        || ![.025, .05].includes(health.stepSize)) throw new Error(`This page requires ${modelName}. Start its matching local service and open the address shown below.`);
     const current = await request('/api/state');
     acceptState(current, { reset: Boolean(sessionHash && sessionHash !== health.fmuSha256) });
     sessionHash = health.fmuSha256;
@@ -247,21 +268,22 @@ function queueSessionAction(route, body, message, reset = true) {
 async function readNativeEvidence(health) {
   $('native-evidence-link').hidden = true;
   try {
-    const report = await request('./engineering-verification.json');
+    const report = await request(evidencePath);
     if (report.schemaVersion !== 1 || !Array.isArray(report.checks) || !report.checks.length
         || report.checks.some(check => !check || typeof check.name !== 'string' || typeof check.pass !== 'boolean')
-        || report.runtime?.backend !== 'fmi2' || report.runtime?.model !== 'OpenPWR.PrimaryLoop'
+        || report.runtime?.backend !== 'fmi2' || report.runtime?.model !== modelName
         || report.runtime?.fmiVersion !== '2.0' || !validHash(report.runtime?.fmuSha256)) throw new Error('Incomplete native report');
     const passed = report.checks.filter(check => check.pass === true).length;
     if (report.total !== report.checks.length || report.passed !== passed) throw new Error('Inconsistent native report totals');
     $('native-evidence-link').hidden = false;
+    $('native-evidence-link').href = evidencePath;
     const matches = health?.fmuSha256 && health.fmuSha256 === report.runtime.fmuSha256;
     const message = health?.fmuSha256 && !matches
       ? 'A native report is available for a different FMU. It does not verify this session.'
-      : `${passed}/${report.checks.length} native subsystem checks passed ${matches ? 'for this FMU' : 'in the published report'}. These checks do not establish measured plant validation.`;
+      : `${passed}/${report.checks.length} native ${coupled ? 'coupled-plant' : 'subsystem'} checks passed ${matches ? 'for this FMU' : 'in the published report'}. These checks do not establish measured plant validation.`;
     text('native-evidence-status', message);
   } catch {
-    text('native-evidence-status', 'No complete native verification report is available here. Run npm run engineering:verify to generate it.');
+    text('native-evidence-status', `No complete native verification report is available here. Run npm run engineering:${coupled ? 'plant:verify' : 'verify'} to generate it.`);
   }
 }
 function queueControls(changes, message) {
@@ -309,7 +331,7 @@ async function tick() {
       exportQueued = false;
       const file = kind === 'commands' ? new Blob([JSON.stringify(await request('/api/commands'), null, 2)], { type: 'application/json' }) : await request('/api/export', undefined, { download: true });
       const url = URL.createObjectURL(file), link = document.createElement('a');
-      link.href = url; link.download = `openpwr-engineering-${Math.floor(state.time)}s.${kind === 'commands' ? 'json' : 'csv'}`; link.click();
+      link.href = url; link.download = `openpwr-${coupled ? 'plant' : 'engineering'}-${Math.floor(state.time)}s.${kind === 'commands' ? 'json' : 'csv'}`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } else {
       const simulatedSeconds = .25 * Number($('engineering-speed').value);
@@ -380,6 +402,10 @@ function drawChart(id, series, defaults) {
 function charts() {
   drawChart('pressure-chart', [{ key: 'primaryPressureMPa', color: '#8bded1' }], [2, .04]);
   drawChart('temperature-chart', [{ key: 'hotLegTemperatureC', color: '#eabc79' }, { key: 'coldLegTemperatureC', color: '#72d2ca' }], [0, 1]);
+  if (coupled) {
+    drawChart('plant-power-chart', [{ key: 'reactorPowerMW', color: '#eabc79' }, { key: 'netPowerMW', color: '#8bded1' }], [0, 50]);
+    drawChart('plant-secondary-chart', [{ key: 'secondaryPressureMPa', color: '#83bdf4' }], [2, .04]);
+  }
 }
 const flowPaths = [...document.querySelectorAll('.flow')], droplets = [...$('spray-droplets').children];
 function animate(now) {
@@ -432,6 +458,12 @@ $('scenario-stop').addEventListener('click', () => {
   queueSessionAction('/api/experiment/stop', {}, 'Timed sequence stopped. Current model state retained; manual controls are available.', false);
 });
 const experiments = { power: [{ reactorPowerMW: 2700 }, 'Applying a 10% reactor heat-input reduction.'], pump: [{ pumpCommand: .8 }, 'Applying an 80% primary-pump command.'], spray: [{ sprayFlowKgS: 5 }, 'Applying 5 kg/s pressurizer spray.'], heater: [{ heaterPowerMW: 1 }, 'Applying 1 MW pressurizer heater power.'] };
+if (coupled) Object.assign(experiments, {
+  power: [{ reactorDemandPercent: 90, loadDemandMW: 900 }, 'Requesting 90% reactor power and 900 MWe load; coupled states evolve through the native solver.'],
+  trip: [{ tripCommand: 1 }, 'Requesting a reactor trip. Protection latches clear only on model reset.'],
+  turbineTrip: [{ turbineTripCommand: 1 }, 'Requesting a turbine trip. Watch the steam, primary and protection response.'],
+  feedwater: [{ feedwaterFraction: .8 }, 'Reducing feedwater capacity to 80%.'],
+});
 for (const button of document.querySelectorAll('[data-experiment]')) button.addEventListener('click', () => {
   const [changes, message] = experiments[button.dataset.experiment];
   queueControls(changes, message); paused = false; nextStepWall = performance.now(); updateAvailability();

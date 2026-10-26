@@ -77,3 +77,26 @@ test('visual normalization bounds geometry without clamping the displayed engine
   assert.equal(state.activity.pump, 2);
   assert.equal(state.activity.heat, 1);
 });
+
+test('coupled native view uses solver power, cycle inventory and breaker state', () => {
+  const snapshot = native(); snapshot.model = 'OpenPWR.CoupledPlant';
+  snapshot.controls.reactorDemandPercent = 90;
+  Object.assign(snapshot.outputs, { reactorPowerMW: 2701, secondaryTemperatureC: 275,
+    secondaryPressureMPa: 6, secondaryLevelPercent: 52, turbineFlowKgS: 1400,
+    bypassFlowKgS: 100, feedwaterFlowKgS: 1450, turbineRpm: 2990,
+    netPowerMW: 870, grossPowerMW: 920, condenserPressureKPa: 8,
+    condenserTemperatureC: 41, coolingPowerMW: 1800, plantEnergyResidualMW: .00001,
+    reactorTripped: 1, gridConnected: 0 });
+  const view = plant3DState(snapshot, 'plant');
+  assert.equal(view.available, true);
+  assert.equal(view.values.thermalPower, 2701, 'power demand is not a measured output');
+  assert.equal(view.values.steamFlow, 1500);
+  assert.equal(view.levels.steam, .52);
+  assert.equal(view.levels.pressurizer, .47);
+  assert.equal(view.activity.electricity, 0);
+  assert.ok(view.activity.turbine > 0, 'breaker opening does not freeze the rotor');
+  assert.equal(view.tripped, true);
+  assert.equal(plant3DState(snapshot, 'native').available, false, 'wrong model cannot supply primary-only session readings');
+  snapshot.outputs.gridConnected = 1;
+  assert.ok(plant3DState(snapshot, 'plant').activity.electricity > 0);
+});

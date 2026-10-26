@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 — 2026-10-26
+
+Adds a native coupled hot plant: six-group point kinetics, illustrative grouped decay heat, fuel-temperature feedback and reactor control, dynamic steam-generator mass/energy inventory, turbine expansion, rotor energy, generator connection permissive, condenser inventory/cooling, feedwater control and latched protection. All systems run within one OpenModelica FMU. The primary subsystem remains independently available.
+
+Adds a native plant workbench with 14 controls, full-cycle 3D observations, thermal/electrical trends, six timed experiments, command replay, and model-specific API validation. Adds conservation, independent kinetics, refinement, trip, inventory and replay checks against the actual compiled models. Publication verifies source, data and FMU hashes before replacing the static build.
+
+Adds reproducible extraction of measured Krško 2005 governor-closure traces from NRC NUREG/IA-0221 and a separate boundary-driven native comparison. Pressure and temperature are held out; measured power and steam/feed flows are inputs. Numerical results, discrepancies and geometry sensitivity are public. Missing plant geometry, controller details and instrument uncertainty leave validation inconclusive; no full-plant validation pass is claimed. Native cold startup, multi-loop/spatial response, containment and emergency systems remain future work.
+
 ## 0.4.0 — 2026-10-25
 
 Adds an interactive Three.js cutaway to both simulation editions: camera presets, orbit/zoom, equipment selection, live observation inspector, flow markers, shaft/pump animation, cutaway and label controls, keyboard/touch support, reduced-motion handling, and an explicit WebGL fallback. Three.js is pinned, locally vendored with its MIT license, and requires no runtime CDN. The original process schematic remains selectable.

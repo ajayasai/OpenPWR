@@ -10,10 +10,10 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlsplit
 
 try:
-    from .fmi_host import FMIPlant, ServiceError
+    from .fmi_host import FMIPlant, ServiceError, PROFILES
     from .experiments import ExperimentSession, MAX_REPLAY_BYTES, scenarios
 except ImportError:  # python backend/server.py
-    from fmi_host import FMIPlant, ServiceError
+    from fmi_host import FMIPlant, ServiceError, PROFILES
     from experiments import ExperimentSession, MAX_REPLAY_BYTES, scenarios
 
 
@@ -156,7 +156,7 @@ class Handler(BaseHTTPRequestHandler):
             elif route == "/api/commands":
                 self._json(200, self._plant().export_commands(), {"Content-Disposition": 'attachment; filename="openpwr-engineering.commands.json"'})
             elif route == "/api/scenarios":
-                self._json(200, scenarios())
+                self._json(200, self._plant().scenarios())
             elif route == "/api/history":
                 parameters = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
                 try:
@@ -204,10 +204,12 @@ class Handler(BaseHTTPRequestHandler):
             "modelica-verification.json": "artifacts/modelica-verification.json",
             "engineering-verification.json": "artifacts/modelica-verification.json",
             "modelica-property-verification.json": "artifacts/modelica/property-verification.json",
+            "plant-verification.json": "artifacts/plant-verification.json",
+            "measured-validation.json": "artifacts/measured-validation.json",
         }
         if name in report_paths:
             path = self.server.root / report_paths[name]
-        elif name in {"index.html", "engineering.html", "engineering-evidence.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
+        elif name in {"index.html", "engineering.html", "engineering-evidence.html", "plant.html", "plant-evidence.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
             path = self.server.root / name
         else:
             raise ServiceError(404, "not_found", "Not found.")
@@ -226,21 +228,23 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--fmu", type=Path, default=ROOT / "artifacts" / "modelica" / "PrimaryLoop.fmu")
-    parser.add_argument("--port", type=int, default=8001)
+    parser.add_argument("--model", choices=tuple(PROFILES), default="primary")
+    parser.add_argument("--fmu", type=Path)
+    parser.add_argument("--port", type=int)
     args = parser.parse_args()
+    args.port = args.port if args.port is not None else PROFILES[args.model]["port"]
     if not 1024 <= args.port <= 65535:
         parser.error("port must be between 1024 and 65535")
     plant, unavailable = None, None
     try:
-        plant = FMIPlant(args.fmu)
+        plant = FMIPlant(args.fmu or ROOT / "artifacts/modelica" / PROFILES[args.model]["file"], profile=args.model)
     except ServiceError as error:
         unavailable = error.message
         print(f"Engineering backend unavailable: {unavailable}", flush=True)
     server = None
     try:
         server = LocalServer(("127.0.0.1", args.port), plant=plant, unavailable=unavailable)
-        print(f"OpenPWR engineering: http://127.0.0.1:{args.port}/engineering.html", flush=True)
+        print(f"OpenPWR {args.model}: http://127.0.0.1:{args.port}/{PROFILES[args.model]['page']}", flush=True)
         server.serve_forever(poll_interval=0.2)
     except KeyboardInterrupt:
         pass

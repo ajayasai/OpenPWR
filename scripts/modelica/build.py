@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Build a native FMI 2.0 co-simulation artifact from the tracked Modelica source."""
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
@@ -21,7 +22,13 @@ OMC = os.environ.get('OPENPWR_OMC', 'omc')
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def run():
+def run(model_key='primary'):
+    model_name, file_prefix, manifest_name = {
+        'primary': ('OpenPWR.PrimaryLoop', 'PrimaryLoop', 'manifest.json'),
+        'plant': ('OpenPWR.CoupledPlant', 'CoupledPlant', 'plant-manifest.json'),
+        'kinetics': ('OpenPWR.KineticsReference', 'KineticsReference', 'kinetics-manifest.json'),
+    }[model_key]
+    source_hash = sha(SOURCE)
     os.environ['PATH'] = str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', '')
     compiler = subprocess.check_output([OMC, '--version'], text=True).strip()
     # Build in a fresh directory so a failed compilation cannot pass on an old FMU.
@@ -32,24 +39,27 @@ def run():
             'loadModel(Modelica, {"4.0.0"}, requireExactVersion=true);', 'getErrorString();',
             f'loadFile({json.dumps(SOURCE.as_posix())});', 'getErrorString();',
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
-            'buildModelFMU(OpenPWR.PrimaryLoop, version="2.0", fmuType="cs", fileNamePrefix="PrimaryLoop");',
+            f'buildModelFMU({model_name}, version="2.0", fmuType="cs", fileNamePrefix="{file_prefix}");',
             'getErrorString();',
         ]), encoding='utf-8')
         result = subprocess.run([OMC, str(script)], cwd=work, text=True, capture_output=True, timeout=600)
         log = result.stdout + '\n' + result.stderr
         for detail in sorted(Path(work).glob('*_FMU.log')):
             log += '\n' + detail.name + '\n' + detail.read_text(errors='replace')
-        (OUTPUT / 'build.log').write_text(log, encoding='utf-8')
-        built = Path(work) / 'PrimaryLoop.fmu'
+        log_name = 'build.log' if model_key == 'primary' else model_key + '-build.log'
+        (OUTPUT / log_name).write_text(log, encoding='utf-8')
+        built = Path(work) / (file_prefix + '.fmu')
+        if sha(SOURCE) != source_hash:
+            raise RuntimeError('Modelica source changed during compilation. Rebuild from a stable source tree.')
         if result.returncode or not built.is_file():
             print(log)
-            raise RuntimeError('FMU compilation failed; see artifacts/modelica/build.log')
+            raise RuntimeError(f'FMU compilation failed; see artifacts/modelica/{log_name}')
         with zipfile.ZipFile(built) as archive:
             xml = ET.fromstring(archive.read('modelDescription.xml'))
             if xml.attrib.get('fmiVersion') != '2.0' or xml.find('CoSimulation') is None:
                 raise RuntimeError('Compiler did not produce an FMI 2.0 CoSimulation model')
             platforms = sorted({p.split('/')[1] for p in archive.namelist() if p.startswith('binaries/') and len(p.split('/')) > 2})
-        target = OUTPUT / 'PrimaryLoop.fmu'
+        target = OUTPUT / (file_prefix + '.fmu')
         target.write_bytes(built.read_bytes())
         add_notices(target)
         try:
@@ -57,14 +67,16 @@ def run():
             dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip())
         except (OSError, subprocess.CalledProcessError):
             revision, dirty = None, None
-        manifest = {'model': 'OpenPWR.PrimaryLoop', 'compiler': compiler, 'fmiVersion': '2.0',
+        manifest = {'model': model_name, 'compiler': compiler, 'fmiVersion': '2.0',
                     'solver': 'CVODE', 'modelicaLibrary': '4.0.0', 'platforms': platforms,
-                    'hostPlatform': platform.platform(), 'sourceSha256': sha(SOURCE),
+                    'hostPlatform': platform.platform(), 'sourceSha256': source_hash,
                     'fmuSha256': sha(target), 'gitRevision': revision, 'dirty': dirty,
                     'version': json.loads((ROOT / 'package.json').read_text())['version']}
-        (OUTPUT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+        (OUTPUT / manifest_name).write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         print(json.dumps(manifest, indent=2))
         print('FMU built. Next: npm run engineering:verify, then npm run engineering:start')
 
 if __name__ == '__main__':
-    run()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics'), default='primary')
+    run(parser.parse_args().model)

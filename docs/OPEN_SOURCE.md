@@ -14,6 +14,8 @@
 | FMI host | FMPy 0.3.32, installed in an isolated Python environment | BSD-2-Clause plus bundled third-party notices |
 | Native solver/runtime | OpenModelica-generated FMU with CVODE and supporting runtime libraries | OpenModelica runtime's BSD-3-Clause option, SUNDIALS BSD-3-Clause, and supporting component licenses; generated artifact includes its license resources |
 | Local engineering service | Python standard-library HTTP service + FMPy | Original service Apache-2.0; dependencies retain their licenses |
+| Measured transient comparison | Original extraction/comparison scripts and numeric Krško 2005 trace data | Source report, figure mapping, transformations and hashes in `validation/krsko2005`; no report PDF or artwork bundled |
+| Optional PDF extraction | pdfplumber 0.11.9 | MIT; used only to regenerate the checked-in numeric observations, not by either simulator or the comparison runner |
 | Fonts | Operating-system font stack | No font files redistributed |
 | Tests, build, CLI, local HTTP server | Node.js standard library | Project scripts Apache-2.0; Node.js and bundled components under their own open-source licenses |
 | CI | Optional GitHub Actions; action commits pinned | Official actions have their own open-source licenses; not bundled into the application |

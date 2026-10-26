@@ -10,5 +10,8 @@ SUNDIALS solver libraries, and supporting components under their own licenses.
 Their notices are retained in models/licenses and inside the generated FMUs.
 OpenPWR's Apache license does not replace upstream licenses.
 Scientific references describe equations and data; their inclusion is not an endorsement.
+The Krško 2005 numeric comparison data is extracted from NRC NUREG/IA-0221.
+Its source, figure mapping and transformations are recorded in validation/krsko2005.
+No publisher PDF, report artwork or third-party simulator source is bundled.
 Node.js is optional development tooling, available under its own open-source license.
 GitHub Pages is optional hosting; the built files work on any static HTTP server.
