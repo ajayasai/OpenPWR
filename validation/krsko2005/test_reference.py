@@ -36,6 +36,37 @@ class MeasuredReferenceContract(unittest.TestCase):
     def test_reference_bytes_are_checkout_portable(self):
         self.assertNotIn(b'\r', DATA.read_bytes())
 
+    def test_source_parameters_do_not_fill_unidentified_geometry(self):
+        self.assertEqual(compare.sourced_parameters(), {
+            'pumpHeatMW': 6, 'initialPressurePa': 15480000,
+            'initialHotTemperatureK': 594.175, 'initialColdTemperatureK': 559.445})
+        self.assertEqual(set(compare.FIXED_CONTROLS.values()), {0})
+        self.assertTrue(all('chargingFlowLS' in row and 'letdownFlowLS' in row for row in self.rows))
+
+    def test_boundary_integrals_use_held_inputs_and_correct_enthalpy_direction(self):
+        held = dict(reactorPowerMW=1000, feedwaterFlowKgS=10, steamFlowKgS=8,
+                    chargingFlowKgS=3, letdownFlowKgS=1, heaterPowerMW=.2, sprayFlowKgS=7)
+        point = dict(pumpHeatInputMW=6, feedwaterEnthalpyJkg=1e6, steamEnthalpyJkg=2e6,
+                     chargingEnthalpyJkg=.3e6, coldLegEnthalpyJkg=.5e6,
+                     boundaryMassFlowKgS=-999, boundaryPowerMW=-999)
+        self.assertEqual(compare.boundary_mass(held, point), 4)
+        self.assertAlmostEqual(compare.boundary_energy(held, point), 1000.6)
+
+    def test_released_baseline_is_immutable(self):
+        self.assertEqual(compare.sha(compare.BASELINE),
+            '90024ac524d87165761fae591493229b06552298a7f5df3121e6ede1dd8a9bab')
+
+    def test_sensitivity_retains_domain_stop_without_swallowing_solver_failure(self):
+        terminal = {'time': 10.65, 'primaryPressureMPa': 19.001}
+        with patch.object(compare, 'simulate', side_effect=compare.NativeDomainExit(terminal)):
+            result = compare.sensitivity_run(self.rows, geometry_scale=.5)
+        self.assertFalse(result['completed'])
+        self.assertEqual(result['parameters'], {'geometry_scale': .5})
+        self.assertEqual(result['terminalObservation'], terminal)
+        with patch.object(compare, 'simulate', side_effect=RuntimeError('Numerical failure')):
+            with self.assertRaisesRegex(RuntimeError, 'Numerical failure'):
+                compare.sensitivity_run(self.rows, geometry_scale=.5)
+
     def test_build_identity_binds_comparison_script_and_rejects_stale_manifest(self):
         current = compare.identity()
         expected = hashlib.sha256(Path(__file__).with_name('compare.py').read_bytes()).hexdigest()

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 — 2026-10-26
+
+Adds an experimental native pressurizer with separate liquid/vapor temperatures, conservative phase inventories, and optional wall conduction/condensation. The Krško reference case applies the documented 6 MW pump heat and publishes a controlled equilibrium-model ablation alongside the immutable v0.5 baseline. The generic interactive native plant retains its existing equilibrium pressurizer pending broader validation.
+
+Adds the independent PACTEL ATWS-10 component comparison with published geometry, fixed boundary schedules, digitized measured pressure, and explicitly conditional instrument/reading allowances. Neither case tunes parameters to the response trace or claims full-plant validation. The evidence page can switch cases and displays discrepancies and numerical diagnostics.
+
+Audits Krško parameter availability, corrects the event date to 10 April 2005, and adds measured charging/letdown/level channels without inventing conversion conditions. Fixes independent boundary quadrature across held FMI inputs, adds conservation/refinement checks, and binds publication to comparison code, source ledgers, reference data and executable hashes. Missing historical geometry and controls remain explicit limitations.
+
 ## 0.5.0 — 2026-10-26
 
 Adds a native coupled hot plant: six-group point kinetics, illustrative grouped decay heat, fuel-temperature feedback and reactor control, dynamic steam-generator mass/energy inventory, turbine expansion, rotor energy, generator connection permissive, condenser inventory/cooling, feedwater control and latched protection. All systems run within one OpenModelica FMU. The primary subsystem remains independently available.

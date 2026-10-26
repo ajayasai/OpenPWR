@@ -1,0 +1,413 @@
+{
+  "schema": "openpwr-plant-source-ledger-v1",
+  "plant": "Krško",
+  "caseId": "krsko-2005-governor-closure-early",
+  "reviewedAt": "2026-10-26",
+  "purpose": "Separate published facts from usable 2005 model parameters, unresolved boundaries, and rejected substitutions. No value is inferred by fitting measured pressure or temperature.",
+  "sources": [
+    {
+      "id": "ia0221",
+      "title": "NUREG/IA-0221: Reactor Trip Analysis at Krško Nuclear Power Plant",
+      "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+      "sha256": "0d9355cb4a04d3cfac6db671e54d1000df745606ed9af7f324ac650ece6c9665",
+      "date": "2010-01",
+      "kind": "Primary event analysis; measured instrument curves distinguished from RELAP5 results"
+    },
+    {
+      "id": "nek2005",
+      "title": "Krško Nuclear Power Plant Annual Report 2005",
+      "url": "https://www.nek.si/upload/publications/nek_annual_report_2005.pdf",
+      "sha256": "7d7592fd41533169ed51832347c4efce4dad882aacaaadc2ffb31da332c08c52",
+      "kind": "Contemporaneous plant-operator report"
+    },
+    {
+      "id": "event2008",
+      "title": "RELAP5/MOD3.3 Code Validation with Plant Abnormal Event",
+      "url": "https://onlinelibrary.wiley.com/doi/10.1155/2008/745178",
+      "doi": "10.1155/2008/745178",
+      "date": "2008-07-15",
+      "kind": "Primary analysis by the event-report authors; same event, not independent validation data"
+    },
+    {
+      "id": "nekTechnical",
+      "title": "NEK Technical Information",
+      "url": "https://www.nek.si/en/operation/technical-information",
+      "accessed": "2026-10-26",
+      "kind": "Current operator reference data; date of applicability not specified"
+    },
+    {
+      "id": "nekLeaflet",
+      "title": "Krško Nuclear Power Plant operator technical leaflet",
+      "url": "https://www.nek.si/upload/publications/nek_leaflet.pdf",
+      "sha256": "635dd9f90e9b7c42fd9802841242e96e2c2c1be63f5907da0f451e468fafec69",
+      "location": "PDF page 10, Technical Data",
+      "kind": "Operator reference data; undated edition, post-uprate ratings"
+    },
+    {
+      "id": "nea1997",
+      "title": "NEA/CSNI/R(97)35 Volume 2, Report on the Uncertainty Methods Study; UMAE contribution",
+      "url": "https://www.oecd-nea.org/upload/docs/application/pdf/2020-01/csni-r1997-35-vol2.pdf",
+      "sha256": "d43475c8f85469999c853bc7aa5e1b125770afce6d83cfff71396586d60f41db",
+      "location": "Table 6, printed page 2.38, PDF page 172",
+      "kind": "Historical technical comparison; 1882 MW NSSS, before 2000 SG replacement"
+    },
+    {
+      "id": "pisa1994",
+      "title": "Evaluation of the data base from high power and low power small break LOCA counterpart tests performed in LOBI, SPES, BETHSY and LSTF facilities",
+      "url": "https://arpi.unipi.it/handle/11568/899756",
+      "report": "DCMN NT 237(94)",
+      "kind": "Institutional bibliographic record; no associated file available",
+      "availability": "Detailed geometry Tables 3.2–3.7 cited by NEA report could not be inspected from this record."
+    }
+  ],
+  "modelParameters": [
+    {"parameter": "pumpHeatMW", "value": 6, "unit": "MW", "source": "ia0221", "scope": "Nominal total heat from both reactor coolant pumps; printed page 3", "status": "event-era-reference-not-measured-history"},
+    {"parameter": "initialPressurePa", "value": 15480000, "unit": "Pa", "source": "ia0221", "scope": "Table 2 measured t=0 primary pressure", "status": "measured-initial-value"},
+    {"parameter": "initialHotTemperatureK", "value": 594.175, "unit": "K", "source": "ia0221", "scope": "Arithmetic mean of Table 2 measured t=0 hot-leg temperatures", "status": "measured-initial-aggregate"},
+    {"parameter": "initialColdTemperatureK", "value": 559.445, "unit": "K", "source": "ia0221", "scope": "Arithmetic mean of Table 2 measured t=0 cold-leg temperatures", "status": "measured-initial-aggregate"},
+    {"parameter": "hotVolumeM3", "value": null, "unit": "m3", "source": ["nekTechnical", "nekLeaflet", "nea1997"], "scope": "No identifiable hot-vessel/leg allocation; total volume definitions cannot supply a split", "status": "not-identified"},
+    {"parameter": "coldVolumeM3", "value": null, "unit": "m3", "source": ["nekTechnical", "nekLeaflet", "nea1997"], "scope": "No identifiable cold-vessel/leg/SG allocation", "status": "not-identified"},
+    {"parameter": "pressurizerVolumeM3", "value": null, "unit": "m3", "source": ["ia0221", "pisa1994"], "scope": "No inspected primary-source numeric value established for this case", "status": "not-identified"},
+    {"parameter": "initialPressurizerLiquidFraction", "value": null, "unit": "volume fraction", "source": "ia0221", "scope": "Table 2 gives indicated level52.95%; level fraction cannot automatically be treated as liquid-volume fraction", "status": "instrument-mapping-unresolved"},
+    {"parameter": "fuelCapacityJK", "value": null, "unit": "J/K", "source": ["ia0221", "nekTechnical", "nekLeaflet"], "scope": "Fuel mass alone cannot determine an equivalent heat capacity or initial fuel temperature profile", "status": "not-identified"},
+    {"parameter": "secondaryVolumeM3", "value": null, "unit": "m3", "source": ["nekTechnical", "nea1997"], "scope": "Current replacement-SG fluid volume not established; historical D4 value excluded", "status": "not-identified"},
+    {"parameter": "initialSecondaryLiquidFraction", "value": null, "unit": "volume fraction", "source": "ia0221", "scope": "Narrow-range indicated SG level is not a whole-vessel liquid volume fraction", "status": "instrument-mapping-unresolved"},
+    {"parameter": "chargingTemperatureK", "value": null, "unit": "K", "source": "ia0221", "scope": "Incoming charging-water enthalpy and instrument reference conditions not given", "status": "not-identified"}
+  ],
+  "facts": [
+    {
+      "id": "eventDate",
+      "value": "2005-04-10",
+      "sources": [
+        "nek2005",
+        "ia0221",
+        "event2008"
+      ],
+      "location": "Operator PDF page 13, Operational events; NRC abstract/introduction/conclusion",
+      "use": "accepted",
+      "qualification": "NRC event-description printed page 9 alone says April 5; operator's matching event independently resolves it as April 10."
+    },
+    {
+      "id": "ratedCorePowerMW",
+      "value": 1994,
+      "unit": "MW",
+      "sources": [
+        "ia0221"
+      ],
+      "location": "Printed page 3, Plant description",
+      "use": "event-era reference rating"
+    },
+    {
+      "id": "nominalPumpHeatMW",
+      "value": 6,
+      "unit": "MW",
+      "sources": [
+        "ia0221"
+      ],
+      "location": "Printed page 3, Plant description",
+      "use": "event-era total pump heat reference",
+      "qualification": "Nominal NSSS partition, not a time-resolved measured heater input; distinct from motor electrical nameplate power."
+    },
+    {
+      "id": "numberOfLoops",
+      "value": 2,
+      "unit": "count",
+      "sources": [
+        "ia0221"
+      ],
+      "location": "Printed page 3",
+      "use": "accepted"
+    },
+    {
+      "id": "operatorCoolantVolumeM3",
+      "value": 197,
+      "unit": "m3",
+      "sources": [
+        "nekTechnical",
+        "nekLeaflet"
+      ],
+      "location": "Reactor coolant / Total Volume",
+      "use": "reference-only-unresolved-boundary",
+      "qualification": "Operator does not specify whether this includes PRZ, at what thermodynamic state, or how to allocate hot/cold/SG/vessel volumes. Do not silently substitute for hotVolume+coldVolume."
+    },
+    {
+      "id": "operatorPrimaryFlowKgS",
+      "value": 9021,
+      "unit": "kg/s",
+      "sources": [
+        "nekLeaflet"
+      ],
+      "location": "PDF page 10, Reactor Coolant, Total Mass Flow",
+      "use": "nominal-reference-not-event-measurement",
+      "qualification": "Current webpage rounds to 9 t/s; no measured 2005 pump-flow history supplied."
+    },
+    {
+      "id": "operatorPumpCapacityM3S",
+      "value": 6.3,
+      "unit": "m3/s per pump",
+      "sources": [
+        "nekLeaflet"
+      ],
+      "location": "PDF page 10",
+      "use": "nominal-reference",
+      "qualification": "Two pumps. Current webpage gives aggregate 12.6 m3/s."
+    },
+    {
+      "id": "operatorPumpMotorPowerMW",
+      "value": 5.22,
+      "unit": "MW per pump motor",
+      "sources": [
+        "nekLeaflet",
+        "nekTechnical"
+      ],
+      "use": "electrical-nameplate-reference",
+      "qualification": "Do not equate two motors' electrical rating to the NRC nominal 6 MW total coolant heat."
+    },
+    {
+      "id": "operatorFeedwaterTemperatureC",
+      "value": 219.4,
+      "unit": "degC",
+      "sources": [
+        "nekTechnical"
+      ],
+      "location": "Steam Generator, Feedwater temperature at SG inlet",
+      "use": "nominal-reference-not-event-history",
+      "qualification": "Leaflet rounds to 219 degC. Not measured during the 91.94 percent power event."
+    },
+    {
+      "id": "operatorFuelMassT",
+      "value": 48.7,
+      "unit": "t as labelled nuclear fuel",
+      "sources": [
+        "nekLeaflet"
+      ],
+      "location": "PDF page 10, Nuclear Fuel",
+      "use": "reference-only-insufficient-for-heat-capacity",
+      "qualification": "Current page says uranium mass 49 t. U mass and UO2 mass are not interchangeable; no event fuel temperatures, radial profile, cladding heat storage or effective lumped heat capacity are given."
+    },
+    {
+      "id": "fuelAssemblies",
+      "value": 121,
+      "unit": "count",
+      "sources": [
+        "ia0221"
+      ],
+      "location": "Printed page 3",
+      "use": "event-era reference"
+    },
+    {
+      "id": "fuelRodsPerAssembly",
+      "value": 235,
+      "unit": "count",
+      "sources": [
+        "ia0221"
+      ],
+      "location": "Printed page 3",
+      "use": "event-era reference"
+    },
+    {
+      "id": "replacementSgTubeCount",
+      "value": 5428,
+      "unit": "count per SG",
+      "sources": [
+        "nekTechnical",
+        "nekLeaflet"
+      ],
+      "use": "operator-reference",
+      "qualification": "This alone does not determine whole SG fluid volume."
+    },
+    {
+      "id": "replacementSgHeatingAreaM2",
+      "value": 7177,
+      "unit": "m2",
+      "sources": [
+        "nekTechnical",
+        "nekLeaflet"
+      ],
+      "use": "operator-reference",
+      "qualification": "Do not infer secondary volume from heat-transfer surface; source does not specify fluid boundary allocation."
+    },
+    {
+      "id": "replacementSgTubeOutsideDiameterMm",
+      "value": 19.05,
+      "unit": "mm",
+      "sources": [
+        "nekTechnical",
+        "nekLeaflet"
+      ],
+      "use": "operator-reference"
+    },
+    {
+      "id": "replacementSgTubeWallThicknessMm",
+      "value": 1.09,
+      "unit": "mm",
+      "sources": [
+        "nekTechnical",
+        "nekLeaflet"
+      ],
+      "use": "operator-reference"
+    },
+    {
+      "id": "historicalPrimaryVolumeIncludingPrzM3",
+      "value": 166.3,
+      "unit": "m3",
+      "sources": [
+        "nea1997"
+      ],
+      "use": "excluded-from-2005-parameterization",
+      "qualification": "Table explicitly says with PRZ, but describes 1882 MW pre-replacement plant. Not interchangeable with current operator 197 m3."
+    },
+    {
+      "id": "historicalPrimaryMassExcludingPrzKg",
+      "value": 106020,
+      "unit": "kg",
+      "sources": [
+        "nea1997"
+      ],
+      "use": "excluded-from-2005-parameterization",
+      "qualification": "Table footnote explicitly excludes PRZ. This is a different boundary from the adjacent volume row."
+    },
+    {
+      "id": "historicalSgSecondaryVolumeM3",
+      "value": 161.3,
+      "unit": "m3 as tabled",
+      "sources": [
+        "nea1997"
+      ],
+      "use": "excluded-from-2005-parameterization",
+      "qualification": "Old SG configuration; table does not sufficiently disambiguate per-generator versus aggregate scope for direct use here."
+    },
+    {
+      "id": "historicalSgSecondaryMassKg",
+      "value": 21999,
+      "unit": "kg as tabled",
+      "sources": [
+        "nea1997"
+      ],
+      "use": "excluded-from-2005-parameterization",
+      "qualification": "Old SG configuration and inventory state; not a new replacement-SG inventory measurement."
+    }
+  ],
+  "controlHistories": [
+    {
+      "id": "chargingFlowLS",
+      "kind": "measured-curve",
+      "source": "ia0221",
+      "figure": "31(a)",
+      "pdfPage": 51,
+      "instrument": "AF00793_FT205",
+      "unit": "L/s",
+      "csv": "measured.csv",
+      "rangeSeconds": [
+        -49,
+        49
+      ],
+      "samples": 50,
+      "axisCalibration": "0 to 8 L/s labelled gridlines; exclude unlabelled upper axis extension",
+      "massConversionStatus": "unresolved",
+      "requiredForMassConversion": [
+        "instrument reference density or temperature/pressure",
+        "charging inlet enthalpy and boundary location"
+      ],
+      "permittedUse": "Volumetric measurement; mass-flow use must declare and bound conversion assumptions."
+    },
+    {
+      "id": "letdownFlowLS",
+      "kind": "measured-curve",
+      "source": "ia0221",
+      "figure": "32(a)",
+      "pdfPage": 52,
+      "instrument": "AF00795_FT132",
+      "unit": "L/s",
+      "csv": "measured.csv",
+      "rangeSeconds": [
+        -49,
+        49
+      ],
+      "samples": 50,
+      "massConversionStatus": "unresolved",
+      "requiredForMassConversion": [
+        "instrument location and reference density or temperature/pressure"
+      ],
+      "permittedUse": "Volumetric measurement; do not automatically use reactor cold-leg density at an unspecified flowmeter."
+    },
+    {
+      "id": "pressurizerLevelPercent",
+      "kind": "measured-response-curve",
+      "source": "ia0221",
+      "figure": "30(a)",
+      "pdfPage": 50,
+      "instrument": "AL00818_LT465",
+      "unit": "percent indicated",
+      "csv": "measured.csv",
+      "rangeSeconds": [
+        -49,
+        49
+      ],
+      "samples": 50,
+      "permittedUse": "Held-out indicated level. A level-to-liquid-volume transfer function is required before interpreting it as a physical volume fraction."
+    },
+    {
+      "id": "sprayFlowKgS",
+      "kind": "unavailable-numeric-history",
+      "sources": [
+        "ia0221",
+        "event2008"
+      ],
+      "location": "NRC printed page 27, primary-pressure discussion",
+      "availableEvidence": "Authors describe spray activation limiting the pre-trip pressure increase; no measured spray-flow trace, valve coefficient, or quantitative controller schedule is supplied.",
+      "permittedUse": "Documented missing input or explicitly bounded assumption; do not infer or fit spray flow from held-out pressure."
+    },
+    {
+      "id": "heaterPowerMW",
+      "kind": "unavailable-numeric-history",
+      "sources": [
+        "ia0221"
+      ],
+      "availableEvidence": "Pressurizer heaters exist; no time-resolved measured power trace or complete event controller specification found.",
+      "permittedUse": "Documented missing input or independently sourced component test; not a measured boundary."
+    },
+    {
+      "id": "governorPosition",
+      "kind": "reported-sparse-event-description",
+      "sources": [
+        "ia0221",
+        "event2008"
+      ],
+      "location": "NRC printed page 9",
+      "availableEvidence": "Narrative gives closure over approximately 5 s from 35.5 to 12.2 percent and operator reopening about 16 s; acquisition interval is 2 s.",
+      "permittedUse": "Event annotations only. No synthetic dense series is represented as measured valve data."
+    }
+  ],
+  "unavailable": [
+    {
+      "item": "2005 pressurizer vessel volume and level-to-volume mapping",
+      "reason": "No inspected primary source provides a directly applicable numeric volume/mapping. Secondary claims near 28 m3 were not adopted."
+    },
+    {
+      "item": "2005 primary hot/cold/vessel/SG volume allocation",
+      "reason": "Operator total lacks boundary definition; historical 166.3 m3 geometry predates SG replacement. Detailed cited Pisa geometry tables are not accessible from the institutional record."
+    },
+    {
+      "item": "2005 replacement steam-generator secondary total and initial liquid volumes",
+      "reason": "Tube dimensions and nominal level cannot uniquely identify the equilibrium lumped fluid volumes."
+    },
+    {
+      "item": "Effective fuel and structural heat capacities",
+      "reason": "Nominal fuel counts/mass do not specify temperatures, material properties, spatial storage or an equivalent lumped model."
+    },
+    {
+      "item": "Heater/spray controller gains, setpoints, delays and measured commands",
+      "reason": "Qualitative control action is published; complete numeric histories and controller specifications were not found."
+    },
+    {
+      "item": "Charging/letdown measurement conversion conditions and seal leakage",
+      "reason": "Litre-per-second curves are available, but reference density, meter locations, charging enthalpy and seal-flow histories are not identified."
+    }
+  ],
+  "policy": {
+    "calibration": "No fitting to pressure, temperature, or level response data.",
+    "redistribution": "Only numeric facts, original metadata and code are distributed. Source PDF artwork/prose are not bundled or relicensed.",
+    "meaning": "A sourced number does not by itself establish historical applicability or a model control-volume boundary."
+  }
+}

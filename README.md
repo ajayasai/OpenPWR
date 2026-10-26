@@ -4,7 +4,7 @@
 
 [Launch control room](https://ajayasai.github.io/OpenPWR/) · [Benchmark & verification evidence](https://ajayasai.github.io/OpenPWR/verification.html) · [Model equations](docs/MODEL.md) · [Validation scope](docs/VALIDATION.md)
 
-**New in v0.5:** a [native coupled plant](https://ajayasai.github.io/OpenPWR/plant.html) with reactor kinetics, a dynamic steam generator, turbine/generator, condenser and feedwater, connected to the existing primary loop and pressurizer. Interactive 3D equipment and controls now use those native outputs. A separate [measured-transient comparison](https://ajayasai.github.io/OpenPWR/plant-evidence.html) publishes discrepancies against the 2005 Krško governor-closure event, with reproducible data extraction and explicit limits. This is progress toward full scope; it is not a validated full-scope simulator.
+**New in v0.6:** a pressurizer model with separate liquid and vapor temperatures, an audited Krško parameter ledger, and an independent PACTEL component comparison. The [evidence page](https://ajayasai.github.io/OpenPWR/plant-evidence.html) preserves measured discrepancies, the released baseline, numerical diagnostics and uncertainty limits. The [native coupled plant](https://ajayasai.github.io/OpenPWR/plant.html) retains its interactive reactor, steam generator, turbine/generator, condenser and feedwater systems. The new pressure model is experimental and used by the reference cases; the interactive plant retains its verified equilibrium pressurizer. This is progress toward full scope; it is not a validated full-scope simulator.
 
 The optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs compiled models through FMI and FMPy. Its [coupled hot plant](docs/NATIVE_PLANT.md) and isolated [primary-loop workbench](docs/MODELICA_MODEL.md) are distinct experiments. The browser whole-plant model below remains available, including its generic cold-start experiment. Native cold startup is not yet implemented.
 
@@ -57,6 +57,7 @@ npm run engineering:build
 npm run engineering:test
 npm run engineering:plant:verify
 npm run engineering:measured -- --build
+npm run engineering:pressurizer -- --build
 npm run engineering:plant:start
 ```
 

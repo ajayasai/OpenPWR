@@ -140,8 +140,12 @@ def verify():
             # These are consistency checks, explicitly separate from published comparisons.
             # Central differences observe independent nearby property calls through FMI.
             # The analytical expressions are the exact thermodynamic identities used by
-            # PrimaryLoop's fixed-volume mass and internal-energy inventory derivatives.
-            states = [(p * 1e6, t) for p, t, *_ in REGION1_REFERENCES] + [(15.5e6, 563.15), (15.5e6, 598.15)]
+            # PrimaryLoop and DynamicPressurizer's inventory derivatives. The
+            # p,T medium automatically selects IF97 region 2 for the three
+            # superheated-steam states, including the high-pressure B23 side.
+            states = [(p * 1e6, t) for p, t, *_ in REGION1_REFERENCES] + [
+                (15.5e6, 563.15), (15.5e6, 598.15),
+                (6e6, 552), (15.5e6, 625), (18e6, 650)]
             for pressure, temperature in states:
                 center = probe(pressure, temperature)
                 dp, dt = 100.0, .002

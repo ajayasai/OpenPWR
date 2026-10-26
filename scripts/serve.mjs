@@ -19,9 +19,9 @@ const server = createServer(async (req, res) => {
     if (route.split(/[\\/]/).some(part => part === '..' || part === '.')) {
       res.writeHead(404); res.end('Not found'); return;
     }
-    const reports = { 'verification.json': 'artifacts/verification.json', 'benchmarks.json': 'artifacts/benchmarks.json', 'engineering-verification.json': 'artifacts/modelica-verification.json', 'modelica-property-verification.json': 'artifacts/modelica/property-verification.json', 'plant-verification.json': 'artifacts/plant-verification.json', 'measured-validation.json': 'artifacts/measured-validation.json' };
+    const reports = { 'verification.json': 'artifacts/verification.json', 'benchmarks.json': 'artifacts/benchmarks.json', 'engineering-verification.json': 'artifacts/modelica-verification.json', 'modelica-property-verification.json': 'artifacts/modelica/property-verification.json', 'plant-verification.json': 'artifacts/plant-verification.json', 'measured-validation.json': 'artifacts/measured-validation.json', 'pressurizer-validation.json': 'artifacts/pressurizer-validation.json' };
     if (source && reports[route]) route = reports[route];
-    if (!/^(index\.html|engineering\.html|engineering-evidence\.html|plant\.html|plant-evidence\.html|verification\.html|verification\.json|benchmarks\.json|engineering-verification\.json|modelica-property-verification\.json|plant-verification\.json|measured-validation\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks|modelica-verification|plant-verification|measured-validation|modelica\/property-verification)\.json)$/.test(route)) {
+    if (!/^(index\.html|engineering\.html|engineering-evidence\.html|plant\.html|plant-evidence\.html|verification\.html|verification\.json|benchmarks\.json|engineering-verification\.json|modelica-property-verification\.json|plant-verification\.json|measured-validation\.json|pressurizer-validation\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(verification|benchmarks|modelica-verification|plant-verification|measured-validation|pressurizer-validation|modelica\/property-verification)\.json)$/.test(route)) {
       res.writeHead(404); res.end('Not found'); return;
     }
     const path = resolve(root, route);

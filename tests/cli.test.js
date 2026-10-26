@@ -167,6 +167,8 @@ test('local preview serves only public files, blocks traversal, and implements H
   await writeFile(join(dir, 'package.json'), '{"private":"must not be exposed"}');
   await writeFile(join(dir, 'artifacts/verification.json'), '{"passed":10}');
   await writeFile(join(dir, 'artifacts/benchmarks.json'), '{"passed":20}');
+  const pressurizerBytes = '{"executed":true,"status":"inconclusive","caseId":"saved-pactel"}';
+  await writeFile(join(dir, 'artifacts/pressurizer-validation.json'), pressurizerBytes);
   const port = await unusedPort();
   const child = spawn(process.execPath, [join(dir, 'scripts/serve.mjs'), '--source', `--port=${port}`], { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   try {
@@ -186,6 +188,12 @@ test('local preview serves only public files, blocks traversal, and implements H
     assert.deepEqual(await evidence.json(), { passed: 10 });
     const benchmarks = await fetch(origin + '/benchmarks.json');
     assert.deepEqual(await benchmarks.json(), { passed: 20 });
+    const pressurizer = await fetch(origin + '/pressurizer-validation.json');
+    assert.equal(pressurizer.status, 200);
+    assert.equal(await pressurizer.text(), pressurizerBytes);
+    const pressurizerHead = await fetch(origin + '/pressurizer-validation.json', { method: 'HEAD' });
+    assert.equal(pressurizerHead.status, 200);
+    assert.equal(await pressurizerHead.text(), '');
     for (const route of ['/package.json', '/scripts/serve.mjs', '/src/a%2f..%2f..%2fpackage.json', '/src/%5c..%5cpackage.json', '/%FF']) {
       const response = await fetch(origin + route);
       assert.equal(response.status, 404, `excluded route ${route}`);

@@ -206,6 +206,7 @@ class Handler(BaseHTTPRequestHandler):
             "modelica-property-verification.json": "artifacts/modelica/property-verification.json",
             "plant-verification.json": "artifacts/plant-verification.json",
             "measured-validation.json": "artifacts/measured-validation.json",
+            "pressurizer-validation.json": "artifacts/pressurizer-validation.json",
         }
         if name in report_paths:
             path = self.server.root / report_paths[name]

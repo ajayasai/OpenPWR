@@ -55,16 +55,19 @@ try {
     else if (action === 'start') await run([runtime.venvPython, 'backend/server.py', ...extra]);
     else if (action === 'experiment') await run([runtime.venvPython, 'backend/experiments.py', ...extra]);
     else if (action === 'measured') await run([runtime.venvPython, 'validation/krsko2005/compare.py', ...extra]);
+    else if (action === 'pressurizer') await run([runtime.venvPython, 'validation/pactel1998/compare.py', ...extra]);
     else if (action === 'profile') await run([runtime.venvPython, 'models/performance-checks.py', ...extra]);
     else if (action === 'test') {
       await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'backend', '-p', 'test_*.py'], { OPENPWR_FMU: 'artifacts/modelica/PrimaryLoop.fmu', OPENPWR_PLANT_FMU: 'artifacts/modelica/CoupledPlant.fmu' });
       await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/krsko2005', '-p', 'test_*.py']);
+      await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/pactel1998', '-p', 'test_*.py']);
+      await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/tests', '-p', 'test_*.py']);
     }
     else if (action === 'verify') {
       await run([runtime.venvPython, 'backend/verify.py', ...extra]);
       await run([runtime.venvPython, 'models/reference-checks.py']);
     }
     else if (action === 'verify-plant') await run([runtime.venvPython, 'backend/verify_plant.py', ...extra]);
-    else throw new Error('Choose setup, build, build-plant, start, test, verify, verify-plant, measured, experiment, or profile.');
+    else throw new Error('Choose setup, build, build-plant, start, test, verify, verify-plant, measured, pressurizer, experiment, or profile.');
   }
 } catch (error) { console.error(error.message); process.exitCode = 1; }

@@ -63,29 +63,70 @@ try {
   if (process.argv.includes('--require-plant')) throw new Error(`Coupled plant evidence required: ${error.message}`);
   console.log('Coupled plant report omitted; build and verify the current native plant to include it.');
 }
-let includeMeasured = false;
-try {
-  const report = JSON.parse(await readFile(resolve(root, 'artifacts/measured-validation.json'), 'utf8'));
-  const manifest = JSON.parse(await readFile(resolve(root, 'artifacts/modelica/krsko-manifest.json'), 'utf8'));
-  const compiledHash = createHash('sha256').update(await readFile(resolve(root, 'artifacts/modelica/KrskoTransient.fmu'))).digest('hex');
-  const sources = { sourceSha256: 'models/OpenPWR/package.mo', benchmarkModelSha256: 'models/KrskoTransient.mo', inputDataSha256: 'validation/krsko2005/measured.csv', referenceMetadataSha256: 'validation/krsko2005/provenance.json', comparisonScriptSha256: 'validation/krsko2005/compare.py' };
+// Bind every comparison to the executable, its embedded report manifest and all
+// inputs to the experiment. Physical disagreement is evidence, not a build error.
+async function checkComparisonModel(report, record, model, manifestName, sources) {
+  const manifest = JSON.parse(await readFile(resolve(root, 'artifacts/modelica', manifestName), 'utf8'));
+  const compiledHash = createHash('sha256').update(await readFile(resolve(root, 'artifacts/modelica', `${model}.fmu`))).digest('hex');
+  const embedded = record?.buildManifest;
+  if (!embedded || manifest.model !== `OpenPWR.${model}` || embedded.model !== manifest.model
+      || record.runtime?.model !== manifest.model || manifest.fmuSha256 !== compiledHash
+      || embedded.fmuSha256 !== compiledHash || record.runtime?.fmuSha256 !== compiledHash) {
+    throw new Error(`${model} report does not identify the current compiled model`);
+  }
+  for (const identity of [report, manifest, embedded]) {
+    if (identity.version !== pkg.version || (revision && identity.gitRevision !== revision)) {
+      throw new Error(`${model} belongs to a different version or commit`);
+    }
+  }
   for (const [key, path] of Object.entries(sources)) {
     const actual = createHash('sha256').update(await readFile(resolve(root, path))).digest('hex');
-    if (report[key] !== actual || manifest[key] !== actual) throw new Error(`Measured case ${key} is stale`);
+    if (report[key] !== actual || manifest[key] !== actual || embedded[key] !== actual) throw new Error(`${model} ${key} is stale`);
   }
-  if (report.version !== pkg.version || (revision && report.gitRevision !== revision)
-      || manifest.fmuSha256 !== compiledHash || report.runtime?.fmuSha256 !== compiledHash
-      || report.runtime?.model !== 'OpenPWR.KrskoTransient' || report.executed !== true
-      || report.schema !== 'openpwr-measured-validation-v1' || !['inconclusive', 'failed', 'passed'].includes(report.status)
+}
+function checkComparisonResults(report) {
+  if (report.executed !== true || report.schema !== 'openpwr-measured-validation-v1'
+      || !['inconclusive', 'failed', 'passed'].includes(report.status)
       || !Array.isArray(report.channels) || !report.channels.length
       || report.channels.some(channel => !Array.isArray(channel.points) || !channel.points.length
         || channel.points.some(point => !Number.isFinite(point.time) || !Number.isFinite(point.measured) || !Number.isFinite(point.simulated)))) throw new Error('Measured case report or model provenance is incomplete');
+  // Physical disagreement is evidence; numerically invalid execution is not.
+  // Recompute each predicate so a forged aggregate or per-check pass cannot
+  // promote an out-of-tolerance residual into publishable evidence.
+  if (report.numericalPassed !== true || !Array.isArray(report.numericalChecks) || !report.numericalChecks.length
+      || report.numericalChecks.some(check => !check || typeof check.name !== 'string' || !check.name.trim()
+        || !Number.isFinite(check.value) || !Number.isFinite(check.absoluteTolerance) || check.absoluteTolerance < 0
+        || check.pass !== true || Math.abs(check.value) > check.absoluteTolerance)) throw new Error('Measured case numerical acceptance failed or is incomplete');
+}
+function comparisonSources(directory, model) {
+  return { sourceSha256: 'models/OpenPWR/package.mo', benchmarkModelSha256: `models/${model}.mo`,
+    inputDataSha256: `validation/${directory}/measured.csv`, referenceMetadataSha256: `validation/${directory}/provenance.json`,
+    comparisonScriptSha256: `validation/${directory}/compare.py`, sharedRunnerSha256: 'validation/native_fmi.py' };
+}
+let includeMeasured = false;
+try {
+  const report = JSON.parse(await readFile(resolve(root, 'artifacts/measured-validation.json'), 'utf8'));
+  const sources = { ...comparisonSources('krsko2005', 'KrskoTransient'),
+    parameterSourcesSha256: 'validation/krsko2005/reference-plant.json', baselineSha256: 'validation/baselines/krsko-v0.5.json' };
+  await checkComparisonModel(report, report, 'KrskoTransient', 'krsko-manifest.json', sources);
+  await checkComparisonModel(report, report.equilibriumComparison, 'KrskoEquilibrium', 'krsko-equilibrium-manifest.json', sources);
+  checkComparisonResults(report);
   // An inconclusive or failed physical comparison remains publishable evidence.
   // Requiring provenance must never silently discard unfavorable measurements.
   includeMeasured = true;
 } catch (error) {
   if (process.argv.includes('--require-measured')) throw new Error(`Measured comparison required: ${error.message}`);
   console.log('Measured comparison omitted; run the current measured-case model to include it.');
+}
+let includePressurizer = false;
+try {
+  const report = JSON.parse(await readFile(resolve(root, 'artifacts/pressurizer-validation.json'), 'utf8'));
+  await checkComparisonModel(report, report, 'PactelPressurizer', 'pactel-manifest.json', comparisonSources('pactel1998', 'PactelPressurizer'));
+  checkComparisonResults(report);
+  includePressurizer = true;
+} catch (error) {
+  if (process.argv.includes('--require-pressurizer')) throw new Error(`Pressurizer comparison required: ${error.message}`);
+  console.log('Pressurizer comparison omitted; run the current independent pressurizer case to include it.');
 }
 const output = resolve(root, 'dist');
 if (output !== root + sep + 'dist') throw new Error('Refusing unexpected build directory');
@@ -101,6 +142,7 @@ for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html
 if (includeNative) for (const [from, to] of nativeFiles) await cp(resolve(root, 'artifacts', from), resolve(output, to));
 if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), resolve(output, 'plant-verification.json'));
 if (includeMeasured) await cp(resolve(root, 'artifacts/measured-validation.json'), resolve(output, 'measured-validation.json'));
+if (includePressurizer) await cp(resolve(root, 'artifacts/pressurizer-validation.json'), resolve(output, 'pressurizer-validation.json'));
 for (const name of ['verification.json', 'benchmarks.json']) {
   try {
     await cp(resolve(root, 'artifacts', name), resolve(output, name));

@@ -21,6 +21,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     input Real circulation;
     input Real fuelHeat;
     input Real steamHeat;
+    input Real pumpHeat;
     input Real spray;
     input Real charging;
     input Real letdown;
@@ -49,7 +50,7 @@ package OpenPWR "OpenPWR native engineering workbench"
       A[3,:] := mp + mh + mc;
       A[4,:] := up + (mh + mc) * hs;
       b := {fuelHeat + circulation * (hCold - hHot) + cs * (hHot - hs),
-        circulation * (hHot - hCold) - cs * hHot - steamHeat - spray * hCold + charging * hCharging - letdown * hCold,
+        circulation * (hHot - hCold) - cs * hHot - steamHeat + pumpHeat - spray * hCold + charging * hCharging - letdown * hCold,
         charging - letdown, cs * hs + spray * hCold + heater - loss};
       // Scale pressure into MPa/s and the balance rows into MW / tonne/s before
       // the standard-library linear solve; restore Pa/s afterwards.
@@ -76,7 +77,218 @@ package OpenPWR "OpenPWR native engineering workbench"
     end for;
   end balanceRates;
 
-  model PrimaryLoop "Two primary volumes coupled to an equilibrium pressurizer"
+  model DynamicPressurizer "Separate liquid/vapor energy inventories with optional wall condensation"
+    // Original implementation of control-volume balances. Phase-work terms are
+    // retained explicitly; the wall and phase-transfer closures are assumptions,
+    // not gains fitted to the Krško transient. See docs/PRESSURIZER_MODEL.md.
+    parameter Real volumeM3 = 50;
+    parameter Real initialPressurePa = 15.5e6;
+    parameter Real initialLiquidVolumeM3 = 25;
+    package LiquidWater = Modelica.Media.Water.WaterIF97_R1pT;
+    package SteamWater = Modelica.Media.Water.WaterIF97_R2pT;
+    parameter Real initialLiquidTemperatureK = Water.saturationTemperature(initialPressurePa);
+    parameter Real initialVaporTemperatureK = Water.saturationTemperature(initialPressurePa);
+    parameter Boolean initializePressure = true;
+    parameter Real phaseRelaxationTimeS = 0.1 "Unfitted finite-rate relaxation of entrained phase mass";
+    parameter Real interfacialConductanceWK = 0 "Zero: insulated bulk interface, applicable to piston-like insurge assumption";
+    parameter Real ambientHeatLossW = 0 "Additional imposed external loss from liquid";
+    parameter Boolean includeWall = false;
+    parameter Integer wallSegments = 12 "Fixed axial wall cells; no wall mass moves with the interface";
+    parameter Integer wallRadialCells = 4 "Finite-volume radial conduction; equal radial widths";
+    parameter Real vesselHeightM = 10;
+    parameter Real innerRadiusM = sqrt(volumeM3/(Modelica.Constants.pi*vesselHeightM));
+    parameter Real wallThicknessM = 0.0143;
+    parameter Real wallDensityKgM3 = 7850 "Generic steel assumption, not identified TRACE material 6";
+    parameter Real wallHeatCapacityJKgK = 500 "Generic steel assumption";
+    parameter Real wallConductivityWMK = 16 "Generic steel assumption";
+    parameter Real initialWallTemperatureK = Water.saturationTemperature(initialPressurePa);
+    parameter Real ambientTemperatureK = 298.15;
+    parameter Real externalHeatTransferWm2K = 0;
+    parameter Real liquidWallHeatTransferWm2K = 500 "Unfitted liquid convection assumption; explicit sensitivity parameter";
+    parameter Real vaporWallHeatTransferWm2K = 10 "Unfitted vapor sensible-convection assumption when wall is above saturation";
+    input Real surgeFlowKgS(start=0) "Positive liquid injection; negative outflow uses the liquid inventory enthalpy";
+    input Real surgeEnthalpyJkg(start=1.4e6) "Inlet enthalpy used only for positive surge";
+    input Real sprayFlowKgS(start=0) "Liquid injection into the bulk pool; droplet/steam interaction is not resolved";
+    input Real sprayEnthalpyJkg(start=1.3e6);
+    input Real heaterPowerMW(start=0);
+    output Real pressurePa(start=initialPressurePa, fixed=initializePressure, nominal=1e6, stateSelect=StateSelect.always);
+    output Real pressureMPa = pressurePa/1e6;
+    output Real liquidVolumeM3(start=initialLiquidVolumeM3, fixed=true, nominal=1, stateSelect=StateSelect.always);
+    output Real liquidTemperatureK(start=initialLiquidTemperatureK, fixed=true, nominal=500, stateSelect=StateSelect.always);
+    output Real vaporTemperatureK(start=initialVaporTemperatureK, fixed=true, nominal=500, stateSelect=StateSelect.always);
+    output Real liquidEnthalpyJkg = LiquidWater.specificEnthalpy(liquidState);
+    output Real vaporEnthalpyJkg = SteamWater.specificEnthalpy(vaporState);
+    output Real saturationTemperatureK = Water.saturationTemperature(pressurePa);
+    output Real liquidDensityKgM3 = LiquidWater.density(liquidState);
+    output Real vaporDensityKgM3 = SteamWater.density(vaporState);
+    output Real liquidLevelM = liquidVolumeM3/crossSectionM2;
+    output Real levelPercent = 100*liquidVolumeM3/volumeM3;
+    output Real liquidMassKg = liquidVolumeM3*liquidDensityKgM3;
+    output Real vaporMassKg = (volumeM3-liquidVolumeM3)*vaporDensityKgM3;
+    output Real totalMassKg = liquidMassKg+vaporMassKg;
+    output Real fluidEnergyMJ = (liquidMassKg*liquidEnthalpyJkg+vaporMassKg*vaporEnthalpyJkg-pressurePa*volumeM3)/1e6;
+    output Real wallEnergyMJ = if includeWall then sum(wallCellCapacityJK[j]*(wallTemperatureK[i,j]-273.15) for i in 1:wallSegments,j in 1:wallRadialCells)/1e6 else 0;
+    output Real thermalEnergyMJ = fluidEnergyMJ+wallEnergyMJ;
+    output Real boundaryMassFlowKgS = surgeFlowKgS+sprayFlowKgS;
+    output Real boundaryPowerMW = (surgePowerW+sprayFlowKgS*sprayEnthalpyJkg-ambientHeatLossW-sum(wallAmbientPowerW))/1e6+heaterPowerMW;
+    output Real integratedBoundaryMassKg(start=0,fixed=true);
+    output Real integratedBoundaryEnergyMJ(start=0,fixed=true);
+    output Real massRateKgS;
+    output Real fluidEnergyRateW;
+    output Real energyResidualMW;
+    output Real massResidualKgS;
+    output Real wallCondensationKgS = sum(wallCondensation);
+    output Real bulkEvaporationKgS;
+    output Real bulkCondensationKgS;
+    output Real wallHeatLossMW = sum(wallAmbientPowerW)/1e6;
+    output Real wallTemperatureK[wallSegments,wallRadialCells](each start=initialWallTemperatureK,each fixed=true,each nominal=500);
+    output Boolean valid;
+  protected
+    parameter Real crossSectionM2 = volumeM3/vesselHeightM;
+    parameter Real cellHeightM = vesselHeightM/wallSegments;
+    parameter Real wallRadiusM[wallRadialCells+1] = {innerRadiusM+wallThicknessM*(j-1)/wallRadialCells for j in 1:wallRadialCells+1};
+    parameter Real wallCenterRadiusM[wallRadialCells] = {(wallRadiusM[j]+wallRadiusM[j+1])/2 for j in 1:wallRadialCells};
+    parameter Real wallCellCapacityJK[wallRadialCells] = {Modelica.Constants.pi*(wallRadiusM[j+1]^2-wallRadiusM[j]^2)*cellHeightM*wallDensityKgM3*wallHeatCapacityJKgK for j in 1:wallRadialCells};
+    parameter Real axialWallConductanceWK[wallRadialCells] = {wallConductivityWMK*Modelica.Constants.pi*(wallRadiusM[j+1]^2-wallRadiusM[j]^2)/cellHeightM for j in 1:wallRadialCells};
+    LiquidWater.ThermodynamicState liquidState;
+    SteamWater.ThermodynamicState vaporState;
+    Water.ThermodynamicState filmState[wallSegments];
+    Water.SaturationProperties sat;
+    Real liquidSatH;
+    Real vaporSatH;
+    Real latentHeat;
+    Real massLiquid[4];
+    Real massVapor[4];
+    Real energyLiquid[4];
+    Real energyVapor[4];
+    Real A[4,4];
+    Real rhs[4];
+    Real pressureRate;
+    Real volumeRate;
+    Real liquidTemperatureRate;
+    Real vaporTemperatureRate;
+    Real rhoLp;
+    Real rhoLT;
+    Real rhoVp;
+    Real rhoVT;
+    Real liquidInternalEnergy;
+    Real vaporInternalEnergy;
+    Real cpLiquid;
+    Real cpVapor;
+    Real alphaLiquid;
+    Real alphaVapor;
+    Real kappaLiquid;
+    Real kappaVapor;
+    Real surgePowerW;
+    Real phaseEnergyW;
+    Real interfacialHeatW;
+    Real wallLiquidPowerW[wallSegments];
+    Real wallVaporPowerW[wallSegments];
+    Real wallAmbientPowerW[wallSegments];
+    Real wallAxialPowerW[wallSegments,wallRadialCells];
+    Real wallRadialPowerW[wallSegments,wallRadialCells+1] "Positive radially outward";
+    Real wallCondensation[wallSegments];
+    Real wallFilmPowerW[wallSegments];
+    Real wettedFraction[wallSegments];
+    Real filmDeltaT[wallSegments];
+    Real filmCoefficient[wallSegments];
+    Real vaporHeightM;
+  equation
+    // Direct p,T Gibbs functions avoid the approximate IF97 p,h backward map.
+    // Fixed phase branches are continued at most 2 K past saturation only for
+    // the declared finite phase-transfer relaxation; they never switch regions.
+    liquidState = LiquidWater.setState_pT(pressurePa,liquidTemperatureK);
+    vaporState = SteamWater.setState_pT(pressurePa,vaporTemperatureK);
+    sat = Water.setSat_p(pressurePa);
+    liquidSatH = Water.bubbleEnthalpy(sat);
+    vaporSatH = Water.dewEnthalpy(sat);
+    latentHeat = vaporSatH-liquidSatH;
+    liquidInternalEnergy = LiquidWater.specificInternalEnergy(liquidState);
+    vaporInternalEnergy = SteamWater.specificInternalEnergy(vaporState);
+    cpLiquid = LiquidWater.specificHeatCapacityCp(liquidState);
+    cpVapor = SteamWater.specificHeatCapacityCp(vaporState);
+    alphaLiquid = LiquidWater.isobaricExpansionCoefficient(liquidState);
+    alphaVapor = SteamWater.isobaricExpansionCoefficient(vaporState);
+    kappaLiquid = LiquidWater.isothermalCompressibility(liquidState);
+    kappaVapor = SteamWater.isothermalCompressibility(vaporState);
+    rhoLp = liquidDensityKgM3*kappaLiquid;
+    rhoLT = -liquidDensityKgM3*alphaLiquid;
+    rhoVp = vaporDensityKgM3*kappaVapor;
+    rhoVT = -vaporDensityKgM3*alphaVapor;
+    // State order is p, V_l, T_l, T_v. Internal interface work is -p*dV_l
+    // for liquid and +p*dV_l for vapor, and cancels for the rigid vessel.
+    massLiquid = {liquidVolumeM3*rhoLp,liquidDensityKgM3,liquidVolumeM3*rhoLT,0};
+    massVapor = {(volumeM3-liquidVolumeM3)*rhoVp,-vaporDensityKgM3,0,(volumeM3-liquidVolumeM3)*rhoVT};
+    energyLiquid = {liquidVolumeM3*(rhoLp*liquidInternalEnergy+pressurePa*kappaLiquid-liquidTemperatureK*alphaLiquid),liquidDensityKgM3*liquidInternalEnergy,
+      liquidVolumeM3*(liquidDensityKgM3*cpLiquid+rhoLT*liquidInternalEnergy-pressurePa*alphaLiquid),0};
+    energyVapor = {(volumeM3-liquidVolumeM3)*(rhoVp*vaporInternalEnergy+pressurePa*kappaVapor-vaporTemperatureK*alphaVapor),-vaporDensityKgM3*vaporInternalEnergy,
+      0,(volumeM3-liquidVolumeM3)*(vaporDensityKgM3*cpVapor+rhoVT*vaporInternalEnergy-pressurePa*alphaVapor)};
+    bulkEvaporationKgS = noEvent(max(0,liquidMassKg*(liquidEnthalpyJkg-liquidSatH)/(latentHeat*phaseRelaxationTimeS)));
+    bulkCondensationKgS = noEvent(max(0,vaporMassKg*(vaporSatH-vaporEnthalpyJkg)/(latentHeat*phaseRelaxationTimeS)));
+    phaseEnergyW = bulkEvaporationKgS*vaporSatH-bulkCondensationKgS*liquidSatH;
+    interfacialHeatW = interfacialConductanceWK*(vaporTemperatureK-liquidTemperatureK);
+    surgePowerW = noEvent(surgeFlowKgS*(if surgeFlowKgS>=0 then surgeEnthalpyJkg else liquidEnthalpyJkg));
+    vaporHeightM = max(0.01,vesselHeightM-liquidLevelM);
+    for i in 1:wallSegments loop
+      wettedFraction[i] = noEvent(min(1,max(0,(liquidLevelM-(i-1)*cellHeightM)/cellHeightM)));
+      filmDeltaT[i] = noEvent(max(0,saturationTemperatureK-wallTemperatureK[i,1]));
+      filmState[i] = PrimaryWater.setState_pT(pressurePa,min(saturationTemperatureK-0.01,(saturationTemperatureK+wallTemperatureK[i,1])/2));
+      // Nusselt gravity-film correlation, 0.943 coefficient; no multiplier is
+      // tuned to either plant or PACTEL pressure. Finite 0.1 K regularization
+      // affects only the zero-heat-flux limit. Cylindrical curvature is neglected.
+      filmCoefficient[i] = 0.943*(Modelica.Constants.g_n*PrimaryWater.density(filmState[i])*
+        (PrimaryWater.density(filmState[i])-Water.dewDensity(sat))*PrimaryWater.thermalConductivity(filmState[i])^3*latentHeat/
+        (PrimaryWater.dynamicViscosity(filmState[i])*vaporHeightM*max(0.1,filmDeltaT[i])))^0.25;
+      wallFilmPowerW[i] = if includeWall then filmCoefficient[i]*2*Modelica.Constants.pi*innerRadiusM*cellHeightM*(1-wettedFraction[i])*filmDeltaT[i] else 0;
+      wallCondensation[i] = wallFilmPowerW[i]/max(1e5,vaporEnthalpyJkg-liquidSatH);
+      wallLiquidPowerW[i] = if includeWall then liquidWallHeatTransferWm2K*2*Modelica.Constants.pi*innerRadiusM*cellHeightM*wettedFraction[i]*(liquidTemperatureK-wallTemperatureK[i,1]) else 0;
+      wallVaporPowerW[i] = if includeWall then vaporWallHeatTransferWm2K*2*Modelica.Constants.pi*innerRadiusM*cellHeightM*(1-wettedFraction[i])*noEvent(min(0,vaporTemperatureK-wallTemperatureK[i,1])) else 0;
+      wallAmbientPowerW[i] = if includeWall then externalHeatTransferWm2K*2*Modelica.Constants.pi*(innerRadiusM+wallThicknessM)*cellHeightM*(wallTemperatureK[i,wallRadialCells]-ambientTemperatureK) else 0;
+      wallRadialPowerW[i,1] = wallLiquidPowerW[i]+wallVaporPowerW[i]+wallFilmPowerW[i];
+      wallRadialPowerW[i,wallRadialCells+1] = wallAmbientPowerW[i];
+      for j in 1:wallRadialCells-1 loop
+        wallRadialPowerW[i,j+1] = if includeWall then 2*Modelica.Constants.pi*wallConductivityWMK*cellHeightM*
+          (wallTemperatureK[i,j]-wallTemperatureK[i,j+1])/log(wallCenterRadiusM[j+1]/wallCenterRadiusM[j]) else 0;
+      end for;
+      for j in 1:wallRadialCells loop
+        wallAxialPowerW[i,j] = if includeWall then axialWallConductanceWK[j]*((if i>1 then wallTemperatureK[i-1,j]-wallTemperatureK[i,j] else 0)+(if i<wallSegments then wallTemperatureK[i+1,j]-wallTemperatureK[i,j] else 0)) else 0;
+        wallCellCapacityJK[j]*der(wallTemperatureK[i,j]) = wallRadialPowerW[i,j]-wallRadialPowerW[i,j+1]+wallAxialPowerW[i,j];
+      end for;
+    end for;
+    A[1,:] = massLiquid .* {1e6,1,1,1};
+    A[2,:] = massVapor .* {1e6,1,1,1};
+    A[3,:] = (energyLiquid+{0,pressurePa,0,0}) .* {1e6,1,1,1}/1e6;
+    A[4,:] = (energyVapor-{0,pressurePa,0,0}) .* {1e6,1,1,1}/1e6;
+    rhs = {surgeFlowKgS+sprayFlowKgS-bulkEvaporationKgS+bulkCondensationKgS+wallCondensationKgS,
+      bulkEvaporationKgS-bulkCondensationKgS-wallCondensationKgS,
+      (surgePowerW+sprayFlowKgS*sprayEnthalpyJkg+heaterPowerMW*1e6-ambientHeatLossW+interfacialHeatW-sum(wallLiquidPowerW)-phaseEnergyW+wallCondensationKgS*liquidSatH)/1e6,
+      (phaseEnergyW-interfacialHeatW-sum(wallVaporPowerW)-wallCondensationKgS*vaporEnthalpyJkg)/1e6};
+    for row in 1:4 loop
+      A[row,1]*pressureRate/1e6+A[row,2]*volumeRate+A[row,3]*liquidTemperatureRate+A[row,4]*vaporTemperatureRate = rhs[row];
+    end for;
+    der(pressurePa) = pressureRate;
+    der(liquidVolumeM3) = volumeRate;
+    der(liquidTemperatureK) = liquidTemperatureRate;
+    der(vaporTemperatureK) = vaporTemperatureRate;
+    massRateKgS = (massLiquid[1]+massVapor[1])*pressureRate+(massLiquid[2]+massVapor[2])*volumeRate
+      +massLiquid[3]*liquidTemperatureRate+massVapor[4]*vaporTemperatureRate;
+    fluidEnergyRateW = (energyLiquid[1]+energyVapor[1])*pressureRate+(energyLiquid[2]+energyVapor[2])*volumeRate
+      +energyLiquid[3]*liquidTemperatureRate+energyVapor[4]*vaporTemperatureRate;
+    massResidualKgS = massRateKgS-boundaryMassFlowKgS;
+    energyResidualMW = (fluidEnergyRateW+(if includeWall then sum(wallCellCapacityJK[j]*der(wallTemperatureK[i,j]) for i in 1:wallSegments,j in 1:wallRadialCells) else 0))/1e6-boundaryPowerMW;
+    der(integratedBoundaryMassKg) = boundaryMassFlowKgS;
+    der(integratedBoundaryEnergyMJ) = boundaryPowerMW;
+    valid = pressurePa>1e6 and pressurePa<19e6 and liquidVolumeM3>0.01*volumeM3 and liquidVolumeM3<0.99*volumeM3
+      and (pressurePa<16.5291643e6 or (vaporTemperatureK>=623.15 and pressurePa<Modelica.Media.Water.IF97_Utilities.BaseIF97.Regions.boundary23ofT(vaporTemperatureK)))
+      and liquidTemperatureK>373.15 and liquidTemperatureK<623.15 and liquidTemperatureK<saturationTemperatureK+2
+      and vaporTemperatureK>saturationTemperatureK-2 and vaporTemperatureK<800
+      and sprayFlowKgS>=0 and phaseRelaxationTimeS>0 and min(wallCellCapacityJK)>0;
+  end DynamicPressurizer;
+
+  model PrimaryLoop "Two primary volumes with selectable equilibrium or dynamic pressurizer"
+    parameter Boolean useDynamicPressurizer = false "Structural choice; compile a distinct FMU for the two-temperature formulation";
+    parameter Real pressurizerPhaseRelaxationTimeS = 0.1;
+    parameter Real pressurizerInterfacialConductanceWK = 0 "Unidentified plant interface transfer; adiabatic bulk interface assumption";
     parameter Real initialPressurePa = 15.5e6;
     parameter Real initialHotTemperatureK = 598.15;
     parameter Real initialColdTemperatureK = 563.15;
@@ -87,6 +299,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     parameter Real initialLiquidVolumeM3 = 25;
     parameter Real fuelCapacityJK = 60e6;
     parameter Real nominalThermalPowerW = 3000e6;
+    parameter Real nominalPumpHeatW = 0 "External pump heat deposited in cold coolant; zero preserves the generic case";
     parameter Real nominalSteamTemperatureK = 549.15;
     parameter Real pumpHeadPa = 0.6e6;
     parameter Real pumpTimeConstantS = 7;
@@ -102,7 +315,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     parameter Real hydraulicResistance = (pumpHeadPa + nominalBuoyancyPa) / nominalFlowKgS^2;
     parameter Real hydraulicInertia = 2 * hydraulicResistance * nominalFlowKgS * flowTimeConstantS;
     parameter Real fuelConductanceWK = nominalThermalPowerW / (initialFuelTemperatureK - initialHotTemperatureK);
-    parameter Real steamGeneratorConductanceWK = nominalThermalPowerW / (initialColdTemperatureK - nominalSteamTemperatureK);
+    parameter Real steamGeneratorConductanceWK = (nominalThermalPowerW + nominalPumpHeatW) / (initialColdTemperatureK - nominalSteamTemperatureK);
 
     input Real reactorPowerMW(min=0, max=3300, start=3000) "Prescribed fuel heat input, not neutron kinetics";
     input Real pumpCommand(min=0, max=1, start=1);
@@ -117,8 +330,8 @@ package OpenPWR "OpenPWR native engineering workbench"
     output Real fuelTemperatureC;
     output Real primaryPressureMPa;
     output Real pressurizerLevelPercent;
-    output Real primaryFlowKgS(start=nominalFlowKgS, fixed=true);
-    output Real pumpSpeed(start=1, fixed=true);
+    output Real primaryFlowKgS(start=nominalFlowKgS, fixed=true, stateSelect=StateSelect.always);
+    output Real pumpSpeed(start=1, fixed=true, stateSelect=StateSelect.always);
     output Real heatToSteamMW;
     output Real thermalEnergyMJ;
     output Real pressurizerMassKg;
@@ -139,10 +352,24 @@ package OpenPWR "OpenPWR native engineering workbench"
     output Real integratedBoundaryMassKg(start=0, fixed=true);
     output Real primarySubcoolingK;
     output Real nominalPrimaryFlowKgS = nominalFlowKgS;
+    output Real pumpHeatMW = nominalPumpHeatW * pumpSpeed^3 / 1e6 "Assumed speed-cubed dissipation; boundary work, not core power";
+    output Real pressurizerLiquidTemperatureC;
+    output Real pressurizerVaporTemperatureC;
+    output Real coldLegEnthalpyJkg = hCold;
+    output Real chargingEnthalpyJkg = chargingEnthalpy;
+
+    DynamicPressurizer dynamicPressurizer(
+      volumeM3=pressurizerVolumeM3,
+      initialPressurePa=initialPressurePa,
+      initialLiquidVolumeM3=initialLiquidVolumeM3,
+      initializePressure=false,
+      phaseRelaxationTimeS=pressurizerPhaseRelaxationTimeS,
+      interfacialConductanceWK=pressurizerInterfacialConductanceWK,
+      ambientHeatLossW=ambientHeatLossW) if useDynamicPressurizer;
 
   protected
     Real pressurePa(start=initialPressurePa, fixed=true, nominal=1e6, stateSelect=StateSelect.always);
-    Real liquidVolumeM3(start=initialLiquidVolumeM3, fixed=true, nominal=25, stateSelect=StateSelect.always);
+    Real liquidVolumeM3(start=initialLiquidVolumeM3, fixed=not useDynamicPressurizer, nominal=25, stateSelect=StateSelect.prefer);
     Real hotTemperatureK(start=initialHotTemperatureK, fixed=true, nominal=500, stateSelect=StateSelect.always);
     Real coldTemperatureK(start=initialColdTemperatureK, fixed=true, nominal=500, stateSelect=StateSelect.always);
     Real fuelTemperatureK(start=initialFuelTemperatureK, fixed=true, nominal=873, stateSelect=StateSelect.always);
@@ -200,6 +427,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     Real coldMassCoefficients[4];
     Real hotEnergyCoefficients[4];
     Real coldEnergyCoefficients[4];
+    Boolean pressurizerValid;
 
   equation
     hotState = PrimaryWater.setState_pT(pressurePa, hotTemperatureK);
@@ -217,10 +445,17 @@ package OpenPWR "OpenPWR native engineering workbench"
     alphaCold = PrimaryWater.isobaricExpansionCoefficient(coldState);
     kappaHot = PrimaryWater.isothermalCompressibility(hotState);
     kappaCold = PrimaryWater.isothermalCompressibility(coldState);
-    rhoLiquid = Water.bubbleDensity(saturation);
-    rhoVapor = Water.dewDensity(saturation);
-    hLiquid = Water.bubbleEnthalpy(saturation);
-    hVapor = Water.dewEnthalpy(saturation);
+    if useDynamicPressurizer then
+      rhoLiquid = dynamicPressurizer.liquidDensityKgM3;
+      rhoVapor = dynamicPressurizer.vaporDensityKgM3;
+      hLiquid = dynamicPressurizer.liquidEnthalpyJkg;
+      hVapor = dynamicPressurizer.vaporEnthalpyJkg;
+    else
+      rhoLiquid = Water.bubbleDensity(saturation);
+      rhoVapor = Water.dewDensity(saturation);
+      hLiquid = Water.bubbleEnthalpy(saturation);
+      hVapor = Water.dewEnthalpy(saturation);
+    end if;
     rhoLiquidDerivative = Water.dBubbleDensity_dPressure(saturation);
     rhoVaporDerivative = Water.dDewDensity_dPressure(saturation);
     hLiquidDerivative = Water.dBubbleEnthalpy_dPressure(saturation);
@@ -250,8 +485,13 @@ package OpenPWR "OpenPWR native engineering workbench"
     energyPressureDerivative = liquidVolumeM3 * (rhoLiquidDerivative * hLiquid + rhoLiquid * hLiquidDerivative)
       + (pressurizerVolumeM3 - liquidVolumeM3) * (rhoVaporDerivative * hVapor + rhoVapor * hVaporDerivative) - pressurizerVolumeM3;
     energyVolumeDerivative = rhoLiquid * hLiquid - rhoVapor * hVapor;
-    pressurizerMassRate = massPressureDerivative * der(pressurePa) + massVolumeDerivative * der(liquidVolumeM3);
-    pressurizerEnergyRateW = energyPressureDerivative * der(pressurePa) + energyVolumeDerivative * der(liquidVolumeM3);
+    if useDynamicPressurizer then
+      pressurizerMassRate = dynamicPressurizer.massRateKgS;
+      pressurizerEnergyRateW = dynamicPressurizer.fluidEnergyRateW;
+    else
+      pressurizerMassRate = massPressureDerivative * der(pressurePa) + massVolumeDerivative * der(liquidVolumeM3);
+      pressurizerEnergyRateW = energyPressureDerivative * der(pressurePa) + energyVolumeDerivative * der(liquidVolumeM3);
+    end if;
 
     // A closed circulation path; expansion/compression and external inventory
     // inputs determine surge. Spray is an internal cold-leg transfer.
@@ -271,18 +511,30 @@ package OpenPWR "OpenPWR native engineering workbench"
       0, hotVolumeM3*(rhoHot*cpHot - rhoHot*alphaHot*uHot - pressurePa*alphaHot), 0};
     coldEnergyCoefficients = {coldVolumeM3*(rhoCold*kappaCold*uCold + pressurePa*kappaCold - coldTemperatureK*alphaCold),
       0, 0, coldVolumeM3*(rhoCold*cpCold - rhoCold*alphaCold*uCold - pressurePa*alphaCold)};
-    (pressureRate, liquidVolumeRate, hotTemperatureRate, coldTemperatureRate) = balanceRates(hotMassCoefficients, coldMassCoefficients, hotEnergyCoefficients, coldEnergyCoefficients,
-      {massPressureDerivative, massVolumeDerivative, 0, 0}, {energyPressureDerivative, energyVolumeDerivative, 0, 0},
-      hHot, hCold, hLiquid, chargingEnthalpy, primaryFlowKgS, heatToCoolantW, heatToSteamW,
-      sprayFlowKgS, chargingFlowKgS, letdownFlowKgS, heaterPowerMW*1e6, ambientHeatLossW);
+    if useDynamicPressurizer then
+      pressurePa = dynamicPressurizer.pressurePa;
+      liquidVolumeM3 = dynamicPressurizer.liquidVolumeM3;
+      dynamicPressurizer.surgeFlowKgS = surgeFlowKgS;
+      dynamicPressurizer.surgeEnthalpyJkg = hHot;
+      dynamicPressurizer.sprayFlowKgS = sprayFlowKgS;
+      dynamicPressurizer.sprayEnthalpyJkg = hCold;
+      dynamicPressurizer.heaterPowerMW = heaterPowerMW;
+      hotEnergyRateW/1e6 = (heatToCoolantW+coldToHotPowerW-hotToColdPowerW-surgePowerW)/1e6;
+      coldEnergyRateW/1e6 = (hotToColdPowerW-coldToHotPowerW-heatToSteamW+pumpHeatMW*1e6-sprayFlowKgS*hCold+chargingFlowKgS*chargingEnthalpy-letdownFlowKgS*hCold)/1e6;
+    else
+      (pressureRate, liquidVolumeRate, hotTemperatureRate, coldTemperatureRate) = balanceRates(hotMassCoefficients, coldMassCoefficients, hotEnergyCoefficients, coldEnergyCoefficients,
+        {massPressureDerivative, massVolumeDerivative, 0, 0}, {energyPressureDerivative, energyVolumeDerivative, 0, 0},
+        hHot, hCold, hLiquid, chargingEnthalpy, primaryFlowKgS, heatToCoolantW, heatToSteamW, pumpHeatMW*1e6,
+        sprayFlowKgS, chargingFlowKgS, letdownFlowKgS, heaterPowerMW*1e6, ambientHeatLossW);
+    end if;
     der(pressurePa) = pressureRate;
     der(liquidVolumeM3) = liquidVolumeRate;
     der(hotTemperatureK) = hotTemperatureRate;
     der(coldTemperatureK) = coldTemperatureRate;
 
     // Generic momentum balance, including natural-circulation buoyancy. Pump
-    // electrical consumption, pump heating, and distributed pressure loss are
-    // outside this thermal subsystem's energy boundary.
+    // electrical consumption and distributed pressure-loss work are not solved.
+    // Configured pump heat is an explicit external thermal boundary contribution.
     der(pumpSpeed) = (pumpCommand - pumpSpeed) / pumpTimeConstantS;
     buoyancyPa = Modelica.Constants.g_n * elevationM * (rhoCold - rhoHot);
     hydraulicInertia * der(primaryFlowKgS) = pumpHeadPa * pumpSpeed^2 + buoyancyPa
@@ -294,6 +546,15 @@ package OpenPWR "OpenPWR native engineering workbench"
     primaryPressureMPa = pressurePa / 1e6;
     pressurizerLevelPercent = 100 * liquidVolumeM3 / pressurizerVolumeM3;
     pressurizerTemperatureC = Water.saturationTemperature(pressurePa) - 273.15;
+    if useDynamicPressurizer then
+      pressurizerLiquidTemperatureC = dynamicPressurizer.liquidTemperatureK-273.15;
+      pressurizerVaporTemperatureC = dynamicPressurizer.vaporTemperatureK-273.15;
+      pressurizerValid = dynamicPressurizer.valid;
+    else
+      pressurizerLiquidTemperatureC = pressurizerTemperatureC;
+      pressurizerVaporTemperatureC = pressurizerTemperatureC;
+      pressurizerValid = true;
+    end if;
     primarySubcoolingK = Water.saturationTemperature(pressurePa) - max(hotTemperatureK, coldTemperatureK);
     heatToSteamMW = heatToSteamW / 1e6;
     primaryMassKg = hotMass + coldMass;
@@ -301,7 +562,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     pressurizerEnergyMJ = pressurizerEnergyJ / 1e6;
     thermalEnergyMJ = (fuelCapacityJK * (fuelTemperatureK - 273.15) + hotEnergyJ + coldEnergyJ + pressurizerEnergyJ) / 1e6;
     storedEnergyRateMW = (fuelCapacityJK * der(fuelTemperatureK) + hotEnergyRateW + coldEnergyRateW + pressurizerEnergyRateW) / 1e6;
-    boundaryPowerMW = reactorPowerMW + heaterPowerMW - heatToSteamMW
+    boundaryPowerMW = reactorPowerMW + pumpHeatMW + heaterPowerMW - heatToSteamMW
       + (chargingFlowKgS * chargingEnthalpy - letdownFlowKgS * hCold - ambientHeatLossW) / 1e6;
     boundaryMassFlowKgS = chargingFlowKgS - letdownFlowKgS;
     energyResidualMW = storedEnergyRateMW - boundaryPowerMW;
@@ -309,7 +570,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     der(integratedBoundaryEnergyMJ) = boundaryPowerMW;
     der(integratedBoundaryMassKg) = boundaryMassFlowKgS;
     valid = pressurePa > 8e6 and pressurePa < 19e6 and primarySubcoolingK > 3
-      and liquidVolumeM3 > 2.5 and liquidVolumeM3 < pressurizerVolumeM3 - 2.5
+      and liquidVolumeM3 > 0.05*pressurizerVolumeM3 and liquidVolumeM3 < 0.95*pressurizerVolumeM3
       and hotTemperatureK > 473.15 and hotTemperatureK < 613.15
       and coldTemperatureK > 473.15 and coldTemperatureK < 603.15
       and fuelTemperatureK > 473.15 and fuelTemperatureK < 1173.15
@@ -320,7 +581,8 @@ package OpenPWR "OpenPWR native engineering workbench"
       and heaterPowerMW >= 0 and heaterPowerMW <= 3
       and sprayFlowKgS >= 0 and sprayFlowKgS <= 30
       and chargingFlowKgS >= 0 and chargingFlowKgS <= 10
-      and letdownFlowKgS >= 0 and letdownFlowKgS <= 10;
+      and letdownFlowKgS >= 0 and letdownFlowKgS <= 10
+      and pressurizerValid;
     annotation(experiment(StartTime=0, StopTime=300, Tolerance=1e-7, Interval=0.1),
       Documentation(info="<html><p>Generic hot-primary-system experiment. Prescribed reactor heat and secondary temperature; no neutron kinetics, turbine, secondary inventory, or real plant protection. IF97 primary properties and saturated liquid/vapor pressurizer balances are coupled through mass and energy conservation. See docs/MODELICA_MODEL.md.</p></html>"));
   end PrimaryLoop;
@@ -680,6 +942,6 @@ package OpenPWR "OpenPWR native engineering workbench"
     annotation(experiment(StartTime=0, StopTime=1, Interval=1));
   end PropertyReferenceChecks;
 
-  annotation(uses(Modelica(version="4.0.0")), version="0.5.0",
+  annotation(uses(Modelica(version="4.0.0")), version="0.6.0",
     Documentation(info="<html><p>Original OpenPWR engineering workbench models, Apache-2.0. Requires Modelica Standard Library 4.0.0 under its own BSD-3-Clause license.</p></html>"));
 end OpenPWR;

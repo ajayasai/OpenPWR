@@ -26,6 +26,12 @@ SERIES = {
     'hotLeg1TemperatureC': (45, 25, 'AT05973_TE410A', 560, 600, 1, -273.15),
     'hotLeg2TemperatureC': (46, 26, 'AT05974_TE420A', 560, 600, 1, -273.15),
     'primaryPressureMPa': (49, 29, 'AP00874_PT455', 144, 162, .1, 0),
+    'pressurizerLevelPercent': (50, 30, 'AL00818_LT465', 0, 70, 1, 0),
+    # Preserve the instrument's volumetric unit. Reference temperature/pressure
+    # and incoming charging-water enthalpy are not supplied; do not invent a
+    # mass-flow conversion or treat indicated PRZ level as a volume fraction.
+    'chargingFlowLS': (51, 31, 'AF00793_FT205', 0, 8, 1, 0),
+    'letdownFlowLS': (52, 32, 'AF00795_FT132', 0, 8, 1, 0),
     'steam1PressureMPa': (53, 33, 'AP00871_PT514', 64, 80, .1, 0),
     'steam2PressureMPa': (54, 34, 'AP00872_PT524', 64, 80, .1, 0),
     'steam1FlowKgS': (57, 37, 'AF00799_FT512A', 0, 700, 1, 0),
@@ -51,10 +57,19 @@ def extract(pdf: Path):
             axis = axes[0]
             top, bottom, left = axis['top'], axis['bottom'], axis['x0']
             frame = [line for line in page.lines if line['width'] > 300
-                     and abs(line['top'] - top) < .02 and abs(line['x0'] - left) < .02]
+                     and abs(line['top'] - bottom) < .02 and abs(line['x0'] - left) < .02]
             if len(frame) != 1:
-                raise ValueError(f'Expected one upper frame line for {name}')
+                raise ValueError(f'Expected one lower frame line for {name}')
             right = frame[0]['x1']
+            # Figs 31–32 extend the vertical axis above the highest labelled
+            # tick (8 L/s). Calibrate to its horizontal gridline, not the
+            # unlabelled axis endpoint. Other selected figures have a labelled
+            # top border, which this identical gridline rule preserves.
+            grids = [line for line in page.lines if line['width'] > 300
+                     and abs(line['x0'] - left) < .02
+                     and abs(line['x1'] - right) < .02
+                     and top-.02 <= line['top'] <= bottom+.02]
+            top = min(line['top'] for line in grids)
             measured = [c for c in page.curves if c['stroking_color'] == (1.0, 0.0, 1.0)
                         and c['top'] < 240 and len(c['pts']) == 50]
             if len(measured) != 1:
@@ -76,6 +91,7 @@ def extract(pdf: Path):
             diagnostics[name] = {'pdfPage': page_number, 'figure': f'{figure}(a)',
                 'instrument': instrument, 'vertices': 50,
                 'axisBoxPoints': [left, top, right, bottom],
+                'calibration': 'Lowest and highest labelled horizontal gridlines; the unlabelled axis extension is excluded.',
                 'maximumTimeRoundingS': maximum_time_rounding,
                 'halfPointReadingAllowance': .5 * (high-low) / (bottom-top) * abs(scale)}
     rows = []

@@ -50,8 +50,9 @@ jobs:
       - run: npm run engineering:verify
       - run: npm run engineering:plant:verify
       - run: npm run engineering:measured -- --build
+      - run: npm run engineering:pressurizer -- --build
       - run: npm run verify
-      - run: npm run build -- --require-native --require-plant --require-measured
+      - run: npm run build -- --require-native --require-plant --require-measured --require-pressurizer
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
@@ -67,6 +68,7 @@ jobs:
             artifacts/modelica-verification.json
             artifacts/plant-verification.json
             artifacts/measured-validation.json
+            artifacts/pressurizer-validation.json
           if-no-files-found: warn
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

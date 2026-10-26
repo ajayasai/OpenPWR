@@ -1,12 +1,12 @@
-# Measured plant transient: what this comparison does and does not establish
+# Measured comparisons: plant transient and independent component experiment
 
 **Plant validation is inconclusive.** OpenPWR now executes a native thermal/inventory replay against published operating-plant measurements. The discrepancies are retained in the evidence report. A completed calculation is not a validation pass, and this case does not establish full-scope simulator accuracy.
 
 ## Primary source and reproducible reference
 
-The reference is [NUREG/IA-0221, *Reactor Trip Analysis at Krško Nuclear Power Plant*](https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf), by Andrej Prošek and Borut Mavko, published by the U.S. NRC in February 2010 (ADAMS ML100680300). It describes the 5 April 2005 governor-valve closure at the two-loop Krško PWR. The report identifies a 1,994 MW core thermal rating and 6 MW pump heat after the uprate; this is a distinct plant from OpenPWR's generic 1,000 MWe plant.
+The reference is [NUREG/IA-0221, *Reactor Trip Analysis at Krško Nuclear Power Plant*](https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf), by Andrej Prošek and Borut Mavko, published by the U.S. NRC in January 2010 (ADAMS ML100680300). It describes the **10 April 2005** governor-valve closure at the two-loop Krško PWR. The report has a conflicting April 5 sentence; [NEK's 2005 annual report](https://www.nek.si/upload/publications/nek_annual_report_2005.pdf) independently confirms April 10. The report identifies a 1,994 MW core thermal rating and 6 MW pump heat after the uprate; this is a distinct plant from OpenPWR's generic 1,000 MWe plant.
 
-The [checked-in CSV](https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/measured.csv) contains 50 acquisition times, at 2 s intervals from −49 to 49 s, for 12 measured instrument channels and derived loop aggregates. The [extractor](https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/extract.py) reads the magenta measured vector paths in Figures 22–26, 29, 33–34 and 37–40, panel (a). It rejects the blue curves labeled `cal`, which are RELAP5 calculations. It checks the source PDF's SHA-256, page and instrument identities, curve count and acquisition grid.
+The [checked-in CSV](https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/measured.csv) contains 50 acquisition times, at 2 s intervals from −49 to 49 s, for 15 measured instrument channels and derived loop aggregates. The [extractor](https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/extract.py) reads the magenta measured vector paths in Figures 22–26, 29–34 and 37–40, panel (a). It rejects the blue curves labeled `cal`, which are RELAP5 calculations. It checks the source PDF's SHA-256, page and instrument identities, curve count and acquisition grid. The additional channels are charging flow, letdown flow and indicated pressurizer level; all original channel values are unchanged.
 
 The [provenance record](https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/provenance.json) gives page/figure mappings, transformations, source hash and qualifications. The PDF, artwork and report prose are not distributed with OpenPWR. Numeric facts and original extraction/comparison code are distributed without asserting a new license over the source publication.
 
@@ -22,15 +22,17 @@ The published pre-event flow curves also disagree with Table 2: aggregate steam 
 
 The comparison covers **0–15 s**, ending before the reported operator reopening at about 16 s and inferred SI/reactor trip at about 17 s. The source cautions that post-trip neutron power is not total decay heat and that the immediate post-trip steam/feedwater indications are unreliable. Those intervals are excluded.
 
-The native [KrskoTransient model](https://github.com/ajayasai/OpenPWR/blob/main/models/KrskoTransient.mo) couples the existing Modelica primary loop to the equilibrium steam-generator component. Three measured channels are imposed as boundaries: pre-trip neutron-power percent multiplied by 1,994 MW, aggregate steam flow, and aggregate feedwater flow. Four response channels are held out: primary pressure, mean hot-leg temperature, mean cold-leg temperature, and mean secondary pressure.
+The native [KrskoTransient model](https://github.com/ajayasai/OpenPWR/blob/main/models/KrskoTransient.mo) couples the primary loop, a [pressurizer with separate phase temperatures](PRESSURIZER_MODEL.md), and the equilibrium steam-generator component. Three measured channels are imposed as boundaries: pre-trip neutron-power percent multiplied by 1,994 MW, aggregate steam flow, and aggregate feedwater flow. Four response channels are held out: primary pressure, mean hot-leg temperature, mean cold-leg temperature, and mean secondary pressure. The documented nominal 6 MW pump heat is a separate constant input, rather than an adjustment to measured core power.
+
+The [parameter ledger](https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/reference-plant.json) distinguishes applicable numeric values, historical/current figures with unresolved applicability, and missing information. Charging/letdown remain raw L/s because meter reference density and incoming enthalpy are unknown. Heater and spray numeric histories are unavailable. These four controls remain explicit zero assumptions; pressure is not used to invent them. Indicated pressurizer level is not established as a physical liquid-volume fraction; using it as one remains a declared approximation.
 
 Table 2 initial conditions determine initial states, nominal heat-transfer conductances, and a constant feedwater enthalpy from an initial secondary energy balance. No post-initialization response is used to fit geometry, heat capacity, control gain, or time constant. The initial mass-flow imbalance remains present. The unknown volumes and heat capacities are the declared generic OpenPWR values, scaled by initial core thermal power divided by 3,000 MW. The additional 0.5× and 2× geometry/capacity runs show sensitivity; neither is selected as a fitted plant representation.
 
 Errors are evaluated at the eight acquired samples at 1, 3, …, 15 s. The t=0 point is interpolated and shown only to expose initialization bias. The machine-readable report includes absolute and change-from-initial RMSE, maximum error, signed bias, communication-step refinement, acquisition-time allowance, and geometry sensitivity. It also integrates the external mass/energy boundaries independently of the model's algebraic residuals.
 
-## Observed discrepancies
+## Preserved released baseline
 
-The native run on 26 October 2026 produced these results. RMSE and maximum errors use the eight acquired samples; the refinement column is the largest difference between 0.05 s and 0.025 s communication steps at the plotted times.
+The immutable [v0.5 report](https://github.com/ajayasai/OpenPWR/blob/main/validation/baselines/krsko-v0.5.json) preserves these results. Its old descriptive date is retained as historical evidence, and corrected in current metadata. RMSE and maximum errors use the eight acquired samples; the refinement column is the largest difference between 0.05 s and 0.025 s communication steps at the plotted times.
 
 | Held-out response | RMSE | Maximum absolute error | Maximum step-refinement difference |
 | --- | ---: | ---: | ---: |
@@ -43,7 +45,11 @@ The measurement discrepancies substantially exceed the figure-reading allowances
 
 ## Limitations that govern the conclusion
 
-The report does not supply the complete plant input deck, geometry, thermal-storage data, or instrument uncertainty needed to qualify this reduced model. Generic pressure-volume response, omitted wall heat storage and transport delays, and homogeneous secondary mixing can materially change predictions. The 6 MW pump heat is omitted. Pressurizer control and inventory histories are not replayed in this scoped case, further limiting primary-pressure interpretation.
+The v0.6 local comparison passes 16 numerical checks, but **the new adiabatic two-temperature pressurizer worsens the Krško pressure agreement**. Primary-pressure RMSE rises from 0.357 MPa in the released baseline to 0.694 MPa; hot/cold-leg RMSE changes from 0.914/1.241°C to 1.409/1.391°C. Secondary-pressure RMSE is nearly unchanged, 0.178 MPa. The same-boundary equilibrium ablation retains about 0.36 MPa primary-pressure RMSE, so adding documented pump heat alone does not explain the new discrepancy. These results do not establish that the new formulation is a better plant predictor. Missing wall exchange, controls, geometry and spatial thermal storage remain unresolved; the interactive plant has not adopted the experimental formulation.
+
+The 0.5× geometry/capacity sensitivity reaches its declared property domain at 10.65 s. Its terminal observation is retained, and no full-window geometry spread is reported. The remaining complete sensitivity runs meet the same numerical balance tolerances. Published JSON retains exact metrics, source hashes and the controlled ablation.
+
+The report does not supply the complete plant input deck, geometry, thermal-storage data, or instrument uncertainty needed to qualify this reduced model. Generic pressure-volume response, omitted plant wall heat storage and transport delays, and homogeneous secondary mixing can materially change predictions. The new model includes nominal pump heat, but unmeasured pressurizer controls and unidentified geometry still limit primary-pressure interpretation. The generic interactive native plant retains the equilibrium pressurizer; the separate-temperature component remains experimental in the reference cases.
 
 Because core power and secondary flow are measured inputs, agreement would not validate neutron kinetics, turbine/generator response, feedwater control, trip logic, emergency cooling, or the remainder of a full-scope plant. The comparison also does not validate cold startup. There is no physical acceptance band or automatic upgrade from `inconclusive` to `passed`.
 
@@ -62,7 +68,11 @@ python validation/krsko2005/compare.py --build
 python -m unittest discover -s validation/krsko2005 -p test_reference.py
 ```
 
-The build creates `artifacts/modelica/KrskoTransient.fmu` and `artifacts/modelica/krsko-manifest.json`; comparison creates `artifacts/measured-validation.json`. Without `--build`, the script reruns the existing FMU and rejects mismatched model, reference data, metadata, or FMU hashes. Reports identify the package version, Git revision/dirty state, compiler, model and FMU. Source identity is checked before and after compilation.
+The build creates `artifacts/modelica/KrskoTransient.fmu` and its same-boundary `KrskoEquilibrium.fmu` ablation, each with a build manifest; comparison creates `artifacts/measured-validation.json`. The report compares the new model against both the released baseline and the equilibrium ablation with the same pump heat, geometry and boundaries. This isolates model form from changed inputs. Phase-relaxation sensitivities of 0.05/0.2 s accompany the declared 0.1 s default; none is selected to fit pressure.
+
+Without `--build`, the script rejects mismatched model, reference data, metadata, source ledger, comparison code, shared runner, baseline or FMU hashes. Reports identify the package version, Git revision/dirty state, compiler, model and FMU. Source hashes are checked before and after compilation. Boundary integrals use each externally held input at both endpoints of its communication step. This fixes a v0.5 diagnostic error caused by treating cached FMI algebraic outputs after `setReal` as newly evaluated inputs; the frozen historical report is not silently rewritten.
+
+Numerical acceptance requires absolute mass/energy closure within 0.05 kg/0.1 MJ for every completed nominal, refined, equilibrium-ablation and sensitivity run, and communication-step differences within 0.01 MPa or 0.05°C. These are numerical tolerances, not bounds on physical prediction error. Failed numerical runs prevent publication; physical discrepancies remain visible. If a sensitivity reaches the model's declared property domain, its terminal observation and failure time are retained and the full-window sensitivity spread is left unavailable. The parameter is not changed to avoid that result.
 
 Normal comparisons require only Python's standard library and FMPy; they use the checked-in CSV without a network request. To independently reproduce the figure extraction, install `pdfplumber==0.11.9` in a separate environment and run:
 
@@ -71,3 +81,19 @@ python validation/krsko2005/extract.py --download
 ```
 
 The downloaded PDF and extraction diagnostics stay under ignored `artifacts/measured-transients/`. The reference contract tests check units against the independently published initial-condition table, prohibit extrapolation, verify loop aggregation, and enforce separation of forcing channels from held-out predictions.
+
+## Independent PACTEL ATWS-10 experiment
+
+[NUREG/IA-0231](https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS124697/pdf/GOVPUB-Y3_N88-PURL-LPS124697.pdf) reports a 1998 PACTEL pressurizer insurge/outsurge test, including measured pressure, vessel geometry, initial conditions, a reported pressure error bound, and the study's boundary-input approximation. The checked-in [reference package](https://github.com/ajayasai/OpenPWR/blob/main/validation/pactel1998/README.md) records sources, extraction and qualifications. Only the red measured path in Figure 5 is extracted; the black TRACE calculation is excluded.
+
+The 491 positions from 5–495 s are correlated readings on a 1 s graphical grid, not 491 independent acquisition samples. The native model runs 0–500 s with the printed schedules unchanged. The conditional envelope combines the reported ±0.094 MPa instrument bound, ±0.014286 MPa graphical reading allowance, and separate ±1.20048 s graphical time allowance. It is not a statistical confidence interval or complete uncertainty budget. Boundary flow and inlet temperature use the published calculation's approximation, not raw measured histories.
+
+The component uses the documented 8.8 m height, 139.7 mm inner diameter, 14.3 mm wall and published external heat-loss coefficient. Liquid and vapor inventories have separate temperatures; wall conduction and condensation are included. See [equations and closure assumptions](PRESSURIZER_MODEL.md). This is independent of the Krško event, but not a blind holdout: the report's mechanistic discussion informed model development. No pressure samples tune parameters, offsets, or event timing. PACTEL is a scaled VVER facility component experiment, not validation of a 1,000 MWe PWR plant.
+
+```sh
+npm run engineering:pressurizer -- --build
+```
+
+This creates `PactelPressurizer.fmu`, `pactel-manifest.json` and `artifacts/pressurizer-validation.json`. It uses the same provenance-bound runner, independent boundary accounting and 0.1/0.05 s communication refinement. The evidence page switches between cases and exposes their raw metrics and numerical checks. The comparison's stated applicability remains inconclusive even if numerical checks pass.
+
+The v0.6 candidate comparison gives pressure RMSE **0.180 MPa** and maximum same-time error **0.774 MPa**. The modeled peak is **8.29 MPa at 220 s**, versus **7.56 MPa at 219 s** in the digitized measurement. The conditional envelope covers 373 of 491 correlated positions; this fraction is descriptive, not a probability of accuracy. The maximum communication-step difference is 0.00395 MPa. All eight inventory checks pass, with independent mass/energy errors below 0.000004 kg/0.000005 MJ. Thus numerical convergence does not explain the observed peak mismatch. Unidentified heat-transfer closures, unresolved liquid stratification and unassessed spatial convergence remain material limits. The deployed JSON is authoritative for the exact released run and source/binary hashes.
