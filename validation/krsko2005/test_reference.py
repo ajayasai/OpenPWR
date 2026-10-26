@@ -1,8 +1,13 @@
 """Guard the measured reference's physical units, independence and time domain."""
 # SPDX-License-Identifier: Apache-2.0
 import json
+import hashlib
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
+import compare
 from compare import CHANNELS, DATA, INPUTS, PROVENANCE, at, load_data
 
 
@@ -30,6 +35,24 @@ class MeasuredReferenceContract(unittest.TestCase):
 
     def test_reference_bytes_are_checkout_portable(self):
         self.assertNotIn(b'\r', DATA.read_bytes())
+
+    def test_build_identity_binds_comparison_script_and_rejects_stale_manifest(self):
+        current = compare.identity()
+        expected = hashlib.sha256(Path(__file__).with_name('compare.py').read_bytes()).hexdigest()
+        self.assertEqual(current['comparisonScriptSha256'], expected)
+        with TemporaryDirectory() as directory:
+            manifest = Path(directory) / 'manifest.json'
+            for stale in (None, '0' * 64):
+                invalid = dict(current)
+                if stale is None:
+                    del invalid['comparisonScriptSha256']
+                else:
+                    invalid['comparisonScriptSha256'] = stale
+                manifest.write_text(json.dumps(invalid), encoding='utf-8')
+                with patch.object(compare, 'MANIFEST', manifest), patch.object(compare, 'simulate') as simulate:
+                    with self.assertRaisesRegex(ValueError, 'comparisonScriptSha256'):
+                        compare.compare()
+                    simulate.assert_not_called()
 
     def test_reference_extrapolation_is_rejected(self):
         for time in (-50, 50):

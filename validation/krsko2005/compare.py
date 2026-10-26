@@ -51,7 +51,8 @@ def identity():
     return {'version': json.loads((ROOT/'package.json').read_text())['version'],
             'gitRevision': revision, 'gitDirty': dirty, 'sourceSha256': sha(COMMON),
             'benchmarkModelSha256': sha(MODEL), 'inputDataSha256': sha(DATA),
-            'referenceMetadataSha256': sha(PROVENANCE)}
+            'referenceMetadataSha256': sha(PROVENANCE),
+            'comparisonScriptSha256': sha(Path(__file__))}
 
 def build():
     os.environ['PATH'] = str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', '')
@@ -173,7 +174,7 @@ def simulate(rows, step=.05, geometry_scale=1):
 def compare():
     manifest = json.loads(MANIFEST.read_text())
     current_identity = identity()
-    for key in ('sourceSha256', 'benchmarkModelSha256', 'inputDataSha256', 'referenceMetadataSha256'):
+    for key in ('sourceSha256', 'benchmarkModelSha256', 'inputDataSha256', 'referenceMetadataSha256', 'comparisonScriptSha256'):
         if manifest.get(key) != current_identity[key]:
             raise ValueError(f'Stale native measured-case {key}; rebuild first.')
     if manifest['fmuSha256'] != sha(FMU):
@@ -204,7 +205,6 @@ def compare():
                    'maximumReferenceTimingAllowance': max(abs(at(rows, time+offset, key)-at(rows, time, key)) for time in measured_times[1:] for offset in (-1, 1))}
         channels.append({'key': key, 'name': name, 'unit': unit, 'metrics': metrics, 'points': points})
     report = {'schema': 'openpwr-measured-validation-v1', **current_identity,
-        'comparisonScriptSha256': sha(Path(__file__)),
         'generatedAt': datetime.now(timezone.utc).isoformat(), 'executed': True,
         'status': 'inconclusive', 'validationPassed': False,
         'conclusion': 'The measured transient comparison ran successfully, but plant validation is not established. Geometry, thermal storage and instrument uncertainties remain incompletely specified; all measured-response discrepancies are retained.',
