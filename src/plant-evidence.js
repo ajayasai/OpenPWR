@@ -37,7 +37,7 @@ async function nativeEvidence() {
 }
 let measured = null;
 let evidenceRequest = 0;
-const casePaths = { krsko: './measured-validation.json', pactel: './pressurizer-validation.json' };
+const casePaths = { krsko: './measured-validation.json', pactel: './pressurizer-validation.json', 'pactel-holdout': './pressurizer-validation.json' };
 const NS = 'http://www.w3.org/2000/svg';
 function svg(tag, attributes, text) {
   const el = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attributes)) el.setAttribute(key, value);
@@ -93,8 +93,10 @@ async function measuredEvidence() {
   $('baseline-legend').hidden = true;
   drawComparison();
   try {
-    const report = await read(path);
+    const parent = await read(path);
+    const report = $('measured-case').value === 'pactel-holdout' ? parent.holdoutComparison : parent;
     if (request !== evidenceRequest) return;
+    if (!report) throw new Error('The reserved-event comparison is not available in this build.');
     if (report.executed !== true) throw new Error(`Comparison did not complete. ${report.error || 'Read the saved report for diagnostics.'}`);
     if (report.schema !== 'openpwr-measured-validation-v1' || !Array.isArray(report.channels) || !report.channels.length || report.channels.length > 30
         || !hash(report.runtime?.fmuSha256) || !hash(report.inputDataSha256)

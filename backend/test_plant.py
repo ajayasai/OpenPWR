@@ -75,6 +75,7 @@ class PlantProfileTest(unittest.TestCase):
         self.assertEqual(set(health["controlLimits"]), set(PROFILES["plant"]["defaults"]))
         baseline = self.plant.state()
         for controls in [{"reactorPowerMW": 3000}, {"tripCommand": 0.5}, {"tripCommand": True},
+                {"auxAutoEnable": .5}, {"auxPumpAAvailable": True}, {"auxValveBOpen": .2},
                 {"loadDemandMW": 900, "reactivityCommandPcm": 301}]:
             with self.assertRaises(ServiceError): self.plant.control(controls)
             self.assertEqual(self.plant.state(), baseline)
@@ -84,6 +85,20 @@ class PlantProfileTest(unittest.TestCase):
         self.assertIn("secondaryMassKg", row)
         self.assertIn("plantBoundaryPowerMW", row)
         self.assertEqual(set(self.plant.history_points()["points"][0]["outputs"]), set(self.plant.outputs))
+
+    def test_auxiliary_controls_are_recorded_and_missing_train_observations_are_rejected(self):
+        self.plant.control({"auxAutoEnable": 0, "auxPumpACommand": .6, "auxPumpBAvailable": 0})
+        row = list(csv.DictReader(io.StringIO(self.plant.export_csv())))[-1]
+        self.assertEqual(float(row['auxPumpACommand']), .6)
+        self.assertEqual(float(row['auxPumpBAvailable']), 0)
+        self.assertIn('auxTankMassKg', row)
+        self.assertIn('auxTrainAFlowKgS', row)
+        bad = description()
+        bad.modelVariables = [v for v in bad.modelVariables if v.name != 'auxTrainBFlowKgS']
+        with self.assertRaises(ServiceError):
+            FMIPlant(self.path, profile='plant', description=bad,
+                slave_factory=lambda **_: self.fail('Incomplete plant must not instantiate'),
+                extractor=lambda _: self.fail('Incomplete plant must not extract'))
 
     def test_replay_checks_plant_only_observations_and_validates_before_reset(self):
         self.plant.control({"loadDemandMW": 900})

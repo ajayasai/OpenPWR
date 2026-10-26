@@ -78,8 +78,9 @@ async function loadProperties() {
     const properties = await report('./modelica-property-verification.json');
     if (!hash(properties.fmuSha256) || !hash(properties.sourceSha256)) throw new Error('Property-probe provenance is incomplete.');
     if (native && native.buildManifest.sourceSha256 !== properties.sourceSha256) throw new Error('Property probe and subsystem reports use different model source. Rebuild both before comparing them.');
-    const published = properties.checks.filter(check => check.source?.url);
-    const consistency = properties.checks.filter(check => !check.source?.url);
+    const isPublished = check => check.category === 'published-water-property' || (!check.category && Boolean(check.source?.url));
+    const published = properties.checks.filter(isPublished);
+    const consistency = properties.checks.filter(check => !isPublished(check));
     $('property-status').textContent = `${published.filter(check => check.pass).length}/${published.length} published reference comparisons passed${consistency.length ? ` · ${consistency.filter(check => check.pass).length}/${consistency.length} numerical consistency checks passed` : ''}`;
     $('property-checks').replaceChildren(...published.map(check => {
       const row = make('tr'), title = make('td', check.name);

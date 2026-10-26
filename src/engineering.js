@@ -15,9 +15,12 @@ const units = { reactorPowerMW: ' MW', pumpCommand: '%', steamTemperatureC: ' °
 const digits = { reactorPowerMW: 0, pumpCommand: 0, steamTemperatureC: 1, heaterPowerMW: 2, sprayFlowKgS: 1, chargingFlowKgS: 2, letdownFlowKgS: 2 };
 Object.assign(units, { reactorDemandPercent: '%', loadDemandMW: ' MWe', reactivityCommandPcm: ' pcm', turbineValveFraction: '%', feedwaterFraction: '%', coolingFraction: '%', tripCommand: '', turbineTripCommand: '', gridBreakerCommand: '' });
 Object.assign(digits, { reactorDemandPercent: 1, loadDemandMW: 0, reactivityCommandPcm: 0, turbineValveFraction: 0, feedwaterFraction: 0, coolingFraction: 0, tripCommand: 0, turbineTripCommand: 0, gridBreakerCommand: 0 });
+Object.assign(units, { auxPumpACommand: '%', auxPumpBCommand: '%' });
+Object.assign(digits, { auxPumpACommand: 0, auxPumpBCommand: 0 });
 const expectedOutputs = ['hotLegTemperatureC', 'coldLegTemperatureC', 'fuelTemperatureC', 'primaryPressureMPa', 'pressurizerLevelPercent', 'primaryFlowKgS', 'pumpSpeed', 'heatToSteamMW', 'thermalEnergyMJ', 'pressurizerMassKg', 'pressurizerEnergyMJ', 'energyResidualMW', 'massResidualKgS'];
 if (coupled) expectedOutputs.push('reactorPowerMW', 'fissionPowerMW', 'decayHeatMW', 'reactivityPcm', 'secondaryPressureMPa', 'secondaryTemperatureC', 'secondaryLevelPercent', 'secondaryMassKg', 'turbineFlowKgS', 'bypassFlowKgS', 'feedwaterFlowKgS', 'turbineRpm', 'grossPowerMW', 'netPowerMW', 'condenserPressureKPa', 'condenserTemperatureC', 'coolingPowerMW', 'feedwaterTemperatureC', 'reactorTripped', 'turbineTripped', 'gridConnected', 'totalPlantStoredEnergyMJ', 'totalPlantMassKg', 'plantEnergyResidualMW', 'plantMassResidualKgS');
 let connected = false, paused = true, busy = false, connecting = false;
+if (coupled) expectedOutputs.push('totalFeedwaterFlowKgS', 'auxFeedwaterFlowKgS', 'auxTrainAFlowKgS', 'auxTrainBFlowKgS', 'auxPumpASpeed', 'auxPumpBSpeed', 'auxTankMassKg', 'auxTankLevelPercent', 'auxTankTemperatureC', 'auxPumpPowerMW', 'auxAutoActuated', 'auxTankDepleted');
 let state = null, pendingControls = {}, resetQueued = false, exportQueued = false;
 let pendingSessionAction = null, scenarios = [];
 const planActive = () => ['ready', 'running'].includes(state?.experiment?.status);
@@ -44,7 +47,10 @@ function notice(message, persistent = false) {
 function commandLabel(key, value) {
   if (['tripCommand', 'turbineTripCommand'].includes(key)) return value === 1 ? 'Trip requested' : 'No manual request';
   if (key === 'gridBreakerCommand') return value === 1 ? 'Close requested' : 'Open requested';
-  return `${number(['pumpCommand', 'turbineValveFraction', 'feedwaterFraction', 'coolingFraction'].includes(key) ? value * 100 : value, digits[key])}${units[key]}`;
+  if (key === 'auxAutoEnable') return value === 1 ? 'Enabled' : 'Disabled';
+  if (['auxPumpAAvailable', 'auxPumpBAvailable'].includes(key)) return value === 1 ? 'Available' : 'Failed';
+  if (['auxValveAOpen', 'auxValveBOpen'].includes(key)) return value === 1 ? 'Open' : 'Isolated';
+  return `${number(['pumpCommand', 'turbineValveFraction', 'feedwaterFraction', 'coolingFraction', 'auxPumpACommand', 'auxPumpBCommand'].includes(key) ? value * 100 : value, digits[key])}${units[key]}`;
 }
 async function request(path, body, { download = false } = {}) {
   const controller = new AbortController();
@@ -157,6 +163,14 @@ function render() {
     'plant-turbine-state': out.turbineTripped === 1 ? 'TRIPPED · latched' : 'Available',
     'plant-grid-state': out.gridConnected === 1 ? 'Connected' : 'Open',
     'plant-reactivity': `${number(out.reactivityPcm, 1)} pcm`, 'plant-feedwater': `${number(out.feedwaterFlowKgS, 0)} kg/s`,
+    'plant-total-feedwater': `${number(out.totalFeedwaterFlowKgS, 1)} kg/s`,
+    'aux-flow': `${number(out.auxFeedwaterFlowKgS, 1)} kg/s`,
+    'aux-a-flow': `${number(out.auxTrainAFlowKgS, 1)} kg/s · ${number(out.auxPumpASpeed * 100, 0)}% speed`,
+    'aux-b-flow': `${number(out.auxTrainBFlowKgS, 1)} kg/s · ${number(out.auxPumpBSpeed * 100, 0)}% speed`,
+    'aux-tank': `${number(out.auxTankMassKg / 1000, 2)} t · ${number(out.auxTankLevelPercent, 1)}%`,
+    'aux-temperature': `${number(out.auxTankTemperatureC, 1)} °C`,
+    'aux-power': `${number(out.auxPumpPowerMW, 3)} MW`,
+    'aux-state': out.auxTankDepleted === 1 ? 'Usable inventory depleted' : out.auxAutoActuated === 1 ? 'Auto demand latched' : 'Standby / manual',
     'plant-steam-flow': `${number(out.turbineFlowKgS, 0)} kg/s`, 'plant-bypass': `${number(out.bypassFlowKgS, 0)} kg/s`,
     'plant-energy-residual': `${number(out.plantEnergyResidualMW, 6)} MW`, 'plant-mass-residual': `${number(out.plantMassResidualKgS, 6)} kg/s`,
     'plant-stored-energy': `${number(out.totalPlantStoredEnergyMJ, 0)} MJ`, 'plant-mass': `${number(out.totalPlantMassKg, 0)} kg`,
@@ -405,6 +419,8 @@ function charts() {
   if (coupled) {
     drawChart('plant-power-chart', [{ key: 'reactorPowerMW', color: '#eabc79' }, { key: 'netPowerMW', color: '#8bded1' }], [0, 50]);
     drawChart('plant-secondary-chart', [{ key: 'secondaryPressureMPa', color: '#83bdf4' }], [2, .04]);
+    drawChart('plant-aux-flow-chart', [{ key: 'auxTrainAFlowKgS', color: '#e9a56f' }, { key: 'auxTrainBFlowKgS', color: '#83bdf4' }], [0, 60]);
+    drawChart('plant-aux-tank-chart', [{ key: 'auxTankLevelPercent', color: '#86dfd0' }], [0, 100]);
   }
 }
 const flowPaths = [...document.querySelectorAll('.flow')], droplets = [...$('spray-droplets').children];

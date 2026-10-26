@@ -19,7 +19,9 @@ import sys
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'validation'))
+sys.path.insert(0, str(HERE))
 from native_fmi import COMMON, build_case, run_case, sha
+from holdout_compare import run_holdout
 
 MODEL_NAME = 'OpenPWR.PactelPressurizer'
 MODEL = ROOT / 'models/PactelPressurizer.mo'
@@ -34,6 +36,15 @@ STEPS = (.1, .05)
 SOLVER_RELATIVE_TOLERANCE = 1e-9
 MASS_TOLERANCE_KG = 1e-4
 ENERGY_TOLERANCE_MJ = .005
+MESH_CASES = (('PactelCoarse', 'pactel-coarse-manifest.json', 12, 4),
+              ('PactelRadialRefined', 'pactel-radial-manifest.json', 12, 8),
+              ('PactelSpatialRefined', 'pactel-spatial-manifest.json', 24, 8))
+HOLDOUT_SOURCES = {'holdoutDataSha256': HERE / 'holdout-measured.csv',
+    'holdoutMetadataSha256': HERE / 'holdout-provenance.json',
+    'holdoutComparatorSha256': HERE / 'holdout_compare.py',
+    'holdoutProtocolSha256': HERE / 'holdout-protocol.json',
+    'holdoutExtractorSha256': HERE / 'holdout_extract.py',
+    'holdoutFreezeSha256': HERE / 'holdout-freeze.json'}
 INPUTS = ('surgeFlowKgS', 'surgeTemperatureK', 'heaterPowerMW')
 OUTPUTS = ('pressureMPa', 'liquidLevelM', 'liquidTemperatureK', 'vaporTemperatureK',
            'totalMassKg', 'thermalEnergyMJ', 'boundaryMassFlowKgS', 'boundaryPowerMW',
@@ -53,13 +64,18 @@ def identity():
             'gitRevision': revision, 'gitDirty': dirty, 'sourceSha256': sha(COMMON),
             'benchmarkModelSha256': sha(MODEL), 'inputDataSha256': sha(DATA),
             'referenceMetadataSha256': sha(PROVENANCE),
-            'comparisonScriptSha256': sha(Path(__file__)), 'sharedRunnerSha256': sha(SHARED_RUNNER)}
+            'comparisonScriptSha256': sha(Path(__file__)), 'sharedRunnerSha256': sha(SHARED_RUNNER),
+            **{key: sha(path) for key, path in HOLDOUT_SOURCES.items()}}
 
 
 def build():
-    return build_case(MODEL_NAME, MODEL, FMU, MANIFEST, identity,
-        resources=((DATA, 'documentation/reference/pactel1998-measured.csv'),
-                   (PROVENANCE, 'documentation/reference/pactel1998-provenance.json')))
+    resources = ((DATA, 'documentation/reference/pactel1998-measured.csv'),
+                 (PROVENANCE, 'documentation/reference/pactel1998-provenance.json'),
+                 *((path, f'documentation/reference/{path.name}') for path in HOLDOUT_SOURCES.values()))
+    result = build_case(MODEL_NAME, MODEL, FMU, MANIFEST, identity, resources=resources)
+    for model, manifest, _, _ in MESH_CASES:
+        build_case(f'OpenPWR.{model}', MODEL, FMU.with_name(f'{model}.fmu'), MANIFEST.with_name(manifest), identity, resources=resources)
+    return result
 
 
 def load_data():
@@ -133,9 +149,9 @@ def energy_flux(held, observation):
     return flow * enthalpy / 1e6 + held['heaterPowerMW'] - observation['wallHeatLossMW']
 
 
-def simulate(metadata, step):
+def simulate(metadata, step, *, model=MODEL_NAME, fmu=None):
     forcing, events = make_forcing(metadata)
-    return run_case(FMU, MODEL_NAME, OUTPUTS, INPUTS, forcing, DURATION, step,
+    return run_case(FMU if fmu is None else fmu, model, OUTPUTS, INPUTS, forcing, DURATION, step,
                     event_times=events, boundary_integrals=(('massKg', mass_flux), ('energyMJ', energy_flux)),
                     solver_tolerance=SOLVER_RELATIVE_TOLERANCE)
 
@@ -251,7 +267,7 @@ def make_report(rows, metadata, manifest, current_identity, primary, refined):
             'requestedSolverRelativeTolerance': primary['requestedSolverRelativeTolerance'],
             'massIntegralErrorKg': balances[0]['massIntegralErrorKg'], 'energyIntegralErrorMJ': balances[0]['energyIntegralErrorMJ'],
             'refinedMassIntegralErrorKg': balances[1]['massIntegralErrorKg'], 'refinedEnergyIntegralErrorMJ': balances[1]['energyIntegralErrorMJ'],
-            'exactEventTimesS': events, 'wallMesh': {'axialSegments': 12, 'radialCells': 4},
+            'exactEventTimesS': events, 'wallMesh': {'axialSegments': 48, 'radialCells': 8},
             'spatialConvergenceAssessed': False,
             'boundaryMethod': 'For each communication interval, integrate the held imposed mass flow and held heater power; use endpoint inlet enthalpy for positive flow, actual liquid enthalpy for negative flow, and endpoint external wall heat loss. Stored thermalEnergyMJ includes fluid and wall.',
             'scope': 'Independent conservation and communication-step diagnostics. Spatial convergence and a complete input/model uncertainty budget are not established.'},
@@ -262,6 +278,49 @@ def make_report(rows, metadata, manifest, current_identity, primary, refined):
             'endpointPolicy': 'Timing windows are clipped to the available 5-495 s measured trace; no extrapolation.'},
         'trace': primary['points'], 'refinedTrace': refined['points']})
     return report
+
+
+def add_spatial_evidence(report, metadata, nominal, current_identity):
+    """Compare meshes at identical communication steps without fitting to data."""
+    records = []
+    runs = []
+    for model, manifest_name, axial, radial in MESH_CASES:
+        fmu = FMU.with_name(f'{model}.fmu')
+        manifest = json.loads(MANIFEST.with_name(manifest_name).read_text(encoding='utf-8'))
+        if manifest.get('model') != f'OpenPWR.{model}' or manifest.get('fmuSha256') != sha(fmu):
+            raise ValueError(f'{model} executable differs from its manifest.')
+        for key, value in current_identity.items():
+            if key.endswith('Sha256') and manifest.get(key) != value:
+                raise ValueError(f'Stale {model} {key}; rebuild first.')
+        run = simulate(metadata, STEPS[1], model=f'OpenPWR.{model}', fmu=fmu)
+        if [point['time'] for point in run['points']] != list(range(501)):
+            raise ValueError(f'{model} did not preserve the full observation grid.')
+        if any(not math.isfinite(value) for point in run['points'] for value in point.values()):
+            raise ValueError(f'{model} contains a nonfinite observation.')
+        if any(not math.isfinite(run['integrals'][key]) for key in ('massKg', 'energyMJ')):
+            raise ValueError(f'{model} contains nonfinite boundary quadrature.')
+        if run['runtime']['model'] != f'OpenPWR.{model}' or run['runtime']['fmuSha256'] != manifest['fmuSha256'] or sha(fmu) != manifest['fmuSha256']:
+            raise ValueError(f'{model} executed runtime differs from its bound executable.')
+        balance = balance_evidence(run)
+        record = {'model': f'OpenPWR.{model}', 'wallMesh': {'axialSegments': axial, 'radialCells': radial},
+            'buildManifest': manifest, 'runtime': run['runtime'], 'balance': balance,
+            'trace': run['points']}
+        records.append(record)
+        report['numericalChecks'].extend({'name': f'{model}: {check["name"]}', 'value': check['error'],
+            'absoluteTolerance': check['tolerance'], 'pass': check['pass'], 'unit': check['unit']} for check in balance['checks'])
+        runs.append(run)
+    for record, run, next_run in zip(records, runs, runs[1:] + [nominal]):
+        differences = [a['pressureMPa'] - b['pressureMPa'] for a, b in zip(next_run['points'], run['points'])]
+        record.update({'nextMeshModel': next_run['runtime']['model'],
+            'maximumPressureChangeToNextMeshMPa': max(map(abs, differences)),
+            'rmsPressureChangeToNextMeshMPa': math.sqrt(sum(d * d for d in differences) / len(differences))})
+    report['spatialComparisons'] = records
+    report['numericalPassed'] = all(check['pass'] for check in report['numericalChecks'])
+    report['numericalEvidence'].update({'pass': report['numericalPassed'], 'spatialConvergenceAssessed': True,
+        'spatialStepSeconds': STEPS[1], 'spatialComparisons': [{key: value for key, value in record.items()
+            if key not in ('trace', 'buildManifest', 'runtime', 'balance')} for record in records],
+        'candidateSelection': '48×8 was selected as the finest tested mesh, with shrinking axial differences, before measured scoring. Residual spatial error remains unresolved; no asymptotic or grid-convergence-index claim.',
+        'scope': 'Independent conservation, communication-step and wall-mesh differences. Mesh differences are numerical diagnostics, not uncertainty bounds or measured-accuracy acceptance criteria.'})
 
 
 def compare():
@@ -281,6 +340,12 @@ def compare():
         if any(after[key] != value for key, value in current_identity.items() if key.endswith('Sha256')) or sha(FMU) != manifest['fmuSha256']:
             raise RuntimeError('Native source/artifact changed during comparison; rerun from stable files.')
         report = make_report(rows, metadata, manifest, current_identity, primary, refined)
+        add_spatial_evidence(report, metadata, refined, current_identity)
+        report['holdoutComparison'] = run_holdout(manifest, fmu_path=FMU)
+        report['numericalPassed'] = report['numericalPassed'] and report['holdoutComparison']['numericalPassed']
+        report['numericalEvidence']['pass'] = report['numericalPassed']
+        if any(identity()[key] != value for key, value in current_identity.items() if key.endswith('Sha256')):
+            raise RuntimeError('Source changed during mesh or reserved-event comparison.')
     except Exception as error:
         report = base_report(metadata, manifest, current_identity)
         report.update({'executed': False, 'status': 'failed', 'channels': [], 'numericalPassed': False, 'numericalChecks': [],

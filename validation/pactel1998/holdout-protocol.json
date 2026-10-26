@@ -1,0 +1,60 @@
+{
+  "schema": "openpwr-heldout-protocol-v1",
+  "caseId": "pactel-1998-atws11-compression-holdout",
+  "selectedAtUTC": "2026-10-26T09:14:50Z",
+  "selectionBasis": "Initial conditions and operator-event input completeness in NUREG/IA-0231 Tables 1 and 2, before extracting or evaluating the ATWS-11 measured pressure response.",
+  "sourceSha256": "ee74a7b5315bed710d4a89dfe43347613b8fb85349640de253aa4c4d8c981369",
+  "sourceTables": [
+    {"table": 1, "printedPage": 6, "pdfPageOneBased": 10},
+    {"table": 2, "printedPage": 7, "pdfPageOneBased": 11}
+  ],
+  "referenceFigure": {"figure": 6, "printedPage": 15, "pdfPageOneBased": 18},
+  "simulationWindowS": [0, 295],
+  "comparisonWindowS": [5, 295],
+  "windowReason": "The published outsurge mass flow is not tabulated for ATWS-11. Stop two seconds before the Table 2 draining event at 297 s; do not infer outflow from pressure or extend the comparison through an unidentified boundary.",
+  "modelParameters": {
+    "initialPressurePa": 5900000,
+    "initialLevelM": 3.5,
+    "initialLiquidTemperatureK": 547.64,
+    "initialVaporTemperatureK": 547.64,
+    "initialWallTemperatureK": 547.0
+  },
+  "forcing": {
+    "surgeMassFlowKgS": [[0, 0], [118, 0], [119, 0.217], [295, 0.217]],
+    "heaterPowerW": [[0, 4000], [99, 4000], [100, 0]],
+    "inletTemperatureK": 547.0,
+    "interpolation": "Piecewise linear between knots; hold the terminal value only within the declared simulation window."
+  },
+  "inputQualifications": [
+    "5.9 MPa, 3.5 m and 0.217 kg/s are the rounded measured initial/input values in Table 1.",
+    "Heater shutdown at 100 s and insurge initiation at 119 s are Table 2 operator events.",
+    "The one-second boundary ramps are a declared approximation following the ATWS-10 appendix input convention. ATWS-11's actual high-frequency flow ramp is unavailable.",
+    "The ATWS-10 appendix supplies 547 K inlet/wall and 547.64 K fluid temperatures. ATWS-11 has the same initial pressure; reusing these thermal initial/boundary assumptions is explicit, not an additional measured ATWS-11 temperature record.",
+    "The vessel geometry, material and exterior-loss assumptions are shared unchanged with the fixed candidate model. No held-out pressure point may set them.",
+    "The facility's 245 kW core power maintains external loop conditions and is not deposited directly into the pressurizer."
+  ],
+  "numericalProtocol": {
+    "communicationStepsS": [0.1, 0.05],
+    "retainedObservationIntervalS": 1,
+    "solverRelativeTolerance": 1e-9,
+    "massBalanceAbsoluteToleranceKg": 0.0001,
+    "energyBalanceAbsoluteToleranceMJ": 0.005,
+    "spatialConvergence": "Use the model configuration frozen before unblinding. Do not select a mesh by held-out response error."
+  },
+  "scoring": {
+    "rawMetrics": ["RMSE", "maximum absolute error", "signed bias", "initial bias", "final error"],
+    "measurementPressureBoundMPa": 0.094,
+    "graphicalAllowance": "Two pixels in each axis, determined from reviewed Figure 6 axis calibration independently of model results.",
+    "timeAlignment": "None; retain printed times and operator events.",
+    "offsetCorrection": "None; retain any mismatch between Table 1 initialization and Figure 6 pressure.",
+    "acceptance": "No blanket physical-validation pass. Report conditional envelope coverage descriptively and separately from numerical acceptance."
+  },
+  "developmentSeparation": {
+    "heldOutResponse": "ATWS-11 pressure",
+    "responseSharedWithModelDeveloperBeforeFreeze": false,
+    "candidateFreezeRequired": true,
+    "candidateFreezeRecord": "holdout-freeze.json",
+    "rule": "Record candidate model, wrapper, runner and comparator hashes before computing held-out errors. A later model change invalidates the original holdout claim; retain prior results and label subsequent evaluations as post-unblinding.",
+    "qualification": "Same-facility independent experiment with response withheld from this development cycle. The source report's general discussion was already available; this is not a historically blind external certification study."
+  }
+}

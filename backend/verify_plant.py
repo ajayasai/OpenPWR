@@ -97,6 +97,62 @@ def kinetics_reference(fmu_path):
         "scope": "Numerical solution of the declared generic point-kinetics equations; not measured reactor data."}
 
 
+def component_boundary_power(values):
+    """Reconstruct the declared external power from individual observations."""
+    return (values["boundaryPowerMW"] + values["heatToSteamMW"] + values["feedPumpPowerMW"]
+        + values["auxPumpPowerMW"] - values["auxMotorLossMW"] - values["auxTankDisplacementPowerMW"]
+        - values["coolingPowerMW"] - values["grossPowerMW"] - values["generatorLossMW"]
+        - values["shaftFrictionMW"] - values["condenserDisplacementPowerMW"])
+
+
+def low_aux_inventory_reference(fmu_path, seconds=12, step=.025):
+    """Exercise a physically finite source using a documented test-only parameter.
+
+    The public session has no hidden parameter mutation. This independent FMI
+    initialization uses 1500 kg instead of 100000 kg solely to reach the suction
+    heel within a short verification run, without changing flow or timing.
+    """
+    from fmpy import extract, read_model_description
+    from fmpy.fmi2 import FMU2Slave
+    description = read_model_description(str(fmu_path), validate=True)
+    if description.modelName != "OpenPWR.CoupledPlant":
+        raise RuntimeError("Auxiliary-inventory probe needs the coupled plant FMU")
+    variables = {variable.name: variable for variable in description.modelVariables}
+    names = [name for name, variable in variables.items() if variable.causality == "output" and variable.type == "Real"]
+    inputs = {name: float(variable.start) for name, variable in variables.items() if variable.causality == "input" and variable.type == "Real"}
+    inputs.update(auxAutoEnable=0, auxPumpACommand=1, auxPumpBCommand=1)
+    directory = extract(str(fmu_path))
+    slave = None
+    try:
+        slave = FMU2Slave(guid=description.guid, unzipDirectory=directory,
+            modelIdentifier=description.coSimulation.modelIdentifier, instanceName="auxiliary_inventory_reference")
+        slave.instantiate(); slave.setupExperiment(startTime=0)
+        slave.enterInitializationMode()
+        slave.setReal([variables["auxInitialTankMassKg"].valueReference], [1500.0])
+        slave.setReal([variables[name].valueReference for name in inputs], list(inputs.values()))
+        slave.exitInitializationMode()
+        def point(time):
+            values = slave.getReal([variables[name].valueReference for name in names])
+            if not all(math.isfinite(value) for value in values):
+                raise RuntimeError("Nonfinite low-inventory observation")
+            valid = bool(slave.getBoolean([variables["valid"].valueReference])[0])
+            return {"time": time, "outputs": dict(zip(names, values)), "halted": not valid}
+        trace = [point(0)]
+        for tick in range(1, round(seconds / step) + 1):
+            status = slave.doStep(currentCommunicationPoint=(tick - 1) * step, communicationStepSize=step)
+            if status not in (None, 0, 1):
+                raise RuntimeError(f"Low-inventory FMI step status {status}")
+            trace.append(point(tick * step))
+            if trace[-1]["halted"]:
+                break
+        return trace
+    finally:
+        if slave is not None:
+            try: slave.terminate()
+            finally: slave.freeInstance()
+        shutil.rmtree(directory, ignore_errors=True)
+
+
 def verify(fmu_path, kinetics_path, output_path):
     manifest = read_verified_manifest(fmu_path, expected_model="OpenPWR.CoupledPlant", manifest_name="plant-manifest.json")
     start_wall = time.perf_counter()
@@ -209,14 +265,14 @@ def verify(fmu_path, kinetics_path, output_path):
         secondary_change = end["secondaryMassKg"] - initial["secondaryMassKg"]
         def secondary_flux(point):
             values = point["outputs"]
-            return values["feedwaterFlowKgS"] - values["turbineFlowKgS"] - values["bypassFlowKgS"]
+            return values["totalFeedwaterFlowKgS"] - values["turbineFlowKgS"] - values["bypassFlowKgS"]
         secondary_integral = sum((b["time"] - a["time"]) * .5 * (secondary_flux(a) + secondary_flux(b))
             for a, b in zip(feedwater, feedwater[1:]))
         add("Secondary inventory follows independently integrated feed and steam flow", not feedwater[-1]["halted"]
             and abs(secondary_change - secondary_integral) < .1,
             {"actualMassChangeKg": secondary_change, "hostIntegratedMassChangeKg": secondary_integral,
              "absoluteErrorKg": abs(secondary_change - secondary_integral), "toleranceKg": .1,
-             "reference": "0.1 s host trapezoid of feedwater minus turbine and bypass steam flows."}, "numerical conservation reference")
+             "reference": "0.1 s host trapezoid of total main-plus-auxiliary feedwater minus turbine and bypass steam flows."}, "numerical conservation reference")
         traces["feedwater"] = feedwater[::5]
 
         initial = reset()
@@ -240,9 +296,9 @@ def verify(fmu_path, kinetics_path, output_path):
         expected_mass = 1.5 * inventory[-1]["time"]
         add("Coupled water inventories conserve external mass", not inventory[-1]["halted"] and abs(actual_mass - expected_mass) < .001,
             {"actualMassChangeKg": actual_mass, "referenceMassChangeKg": expected_mass, "absoluteErrorKg": abs(actual_mass - expected_mass),
-             "toleranceKg": .001, "scope": "Primary, pressurizer, secondary and condenser water; internal feedwater and steam transfers cancel."}, "analytical conservation reference")
+             "toleranceKg": .001, "scope": "Primary, pressurizer, secondary, condenser and auxiliary-tank water; internal main/auxiliary feedwater and steam transfers cancel."}, "analytical conservation reference")
         energy = end["totalPlantStoredEnergyMJ"] - initial["totalPlantStoredEnergyMJ"]
-        integrated = sum((b["time"] - a["time"]) * .5 * (a["outputs"]["plantBoundaryPowerMW"] + b["outputs"]["plantBoundaryPowerMW"])
+        integrated = sum((b["time"] - a["time"]) * .5 * (component_boundary_power(a["outputs"]) + component_boundary_power(b["outputs"]))
             for a, b in zip(inventory, inventory[1:]))
         integral_error = abs(energy - end["integratedPlantBoundaryEnergyMJ"])
         add("Coupled stored energy follows independently integrated boundaries", not inventory[-1]["halted"] and abs(energy - integrated) < .5 and integral_error < .1,
@@ -250,6 +306,124 @@ def verify(fmu_path, kinetics_path, output_path):
              "nativeIntegralErrorMJ": integral_error, "tolerances": "0.1 s host quadrature <0.5 MJ; native integrated flux <0.1 MJ.",
              "scope": "Declared thermal inventories plus rotor energy; see model documentation for auxiliary-load exclusions."}, "numerical conservation reference")
         traces["inventory"] = inventory[::5]
+
+        nominal_end = nominal[-1]["outputs"]
+        add("Auxiliary feedwater remains in standby at nominal conditions", nominal_end["auxAutoActuated"] == 0
+            and abs(nominal_end["auxFeedwaterFlowKgS"]) < 1e-8 and abs(nominal_end["auxPumpPowerMW"]) < 1e-8
+            and abs(nominal_end["auxTankMassKg"] - nominal[0]["outputs"]["auxTankMassKg"]) < 1e-6,
+            {"flowKgS": nominal_end["auxFeedwaterFlowKgS"], "powerMW": nominal_end["auxPumpPowerMW"],
+             "tankMassKg": nominal_end["auxTankMassKg"], "automaticLatch": nominal_end["auxAutoActuated"],
+             "acceptance": "No auxiliary flow, electrical draw or tank-mass change at the constructed nominal point."})
+
+        initial = reset()
+        plant.control({"auxAutoEnable": 0, "auxPumpACommand": 1, "auxPumpBCommand": 1})
+        auxiliary = run_for(plant, 10, .1)
+        end = auxiliary[-1]["outputs"]
+        speed_error = max(abs(point["outputs"][name] - (1 - math.exp(-point["time"] / 2)))
+            for point in auxiliary for name in ("auxPumpASpeed", "auxPumpBSpeed"))
+        add("Auxiliary pump acceleration follows independent first-order reference", not auxiliary[-1]["halted"]
+            and speed_error < 2e-5 and end["auxFeedwaterFlowKgS"] > 50
+            and auxiliary[1]["outputs"]["auxFeedwaterFlowKgS"] == 0,
+            {"maximumSpeedFractionError": speed_error, "tolerance": 2e-5, "timeConstantS": 2,
+             "reference": "n(t)=1-exp(-t/2) for each initially stopped pump commanded to full speed.",
+             "earlyFlowKgS": auxiliary[1]["outputs"]["auxFeedwaterFlowKgS"], "finalFlowKgS": end["auxFeedwaterFlowKgS"],
+             "scope": "Pump-head check valve blocks delivery until developed head exceeds steam-generator pressure."}, "analytical dynamics reference")
+        actual_auxiliary_transfer = initial["auxTankMassKg"] - end["auxTankMassKg"]
+        host_auxiliary_transfer = sum((b["time"] - a["time"]) * .5 * (a["outputs"]["auxFeedwaterFlowKgS"] + b["outputs"]["auxFeedwaterFlowKgS"])
+            for a, b in zip(auxiliary, auxiliary[1:]))
+        whole_mass_error = abs(end["totalPlantMassKg"] - initial["totalPlantMassKg"])
+        add("Auxiliary delivery transfers finite tank water without creating plant mass", not auxiliary[-1]["halted"]
+            and actual_auxiliary_transfer > 100 and whole_mass_error < .005
+            and abs(actual_auxiliary_transfer - host_auxiliary_transfer) < .25,
+            {"tankMassLossKg": actual_auxiliary_transfer, "integratedDeliveryKg": host_auxiliary_transfer,
+             "deliveryQuadratureErrorKg": abs(actual_auxiliary_transfer - host_auxiliary_transfer),
+             "wholePlantMassErrorKg": whole_mass_error, "tolerances": "Whole-plant mass 0.005 kg; 100 ms flow quadrature 0.25 kg, including regularized check-valve opening.",
+             "scope": "Tank, secondary and condenser are internal water inventories; no external makeup is imposed."}, "numerical conservation reference")
+        energy_change = end["totalPlantStoredEnergyMJ"] - initial["totalPlantStoredEnergyMJ"]
+        energy_quadrature = sum((b["time"] - a["time"]) * .5 * (component_boundary_power(a["outputs"]) + component_boundary_power(b["outputs"]))
+            for a, b in zip(auxiliary, auxiliary[1:]))
+        native_energy_error = abs(energy_change - (end["integratedPlantBoundaryEnergyMJ"] - initial["integratedPlantBoundaryEnergyMJ"]))
+        add("Auxiliary tank and pump energy close the whole-plant balance", not auxiliary[-1]["halted"]
+            and abs(energy_change - energy_quadrature) < .1 and native_energy_error < .1,
+            {"storedEnergyChangeMJ": energy_change, "independentComponentPowerIntegralMJ": energy_quadrature,
+             "hostErrorMJ": abs(energy_change - energy_quadrature), "nativeIntegralErrorMJ": native_energy_error,
+             "toleranceMJ": .1, "pumpElectricalMW": end["auxPumpPowerMW"], "motorLossMW": end["auxMotorLossMW"],
+             "tankDisplacementWorkMW": end["auxTankDisplacementPowerMW"],
+             "scope": "Includes finite tank internal energy, atmospheric surface work, pump work and ambient motor losses."}, "numerical conservation reference")
+        fixed_auxiliary_load = initial["grossPowerMW"] - initial["netPowerMW"] - initial["feedPumpPowerMW"]
+        electrical_error = abs(end["grossPowerMW"] - end["netPowerMW"] - fixed_auxiliary_load - end["feedPumpPowerMW"] - end["auxPumpPowerMW"])
+        add("Auxiliary motor consumption reduces exported electricity", not auxiliary[-1]["halted"]
+            and end["auxPumpPowerMW"] > end["auxPumpFluidPowerMW"] > 0 and electrical_error < 1e-8,
+            {"electricalDrawMW": end["auxPumpPowerMW"], "fluidWorkMW": end["auxPumpFluidPowerMW"],
+             "motorLossMW": end["auxMotorLossMW"], "electricalAccountingErrorMW": electrical_error,
+             "toleranceMW": 1e-8, "scope": "Electrical consumption includes hydraulic work, motor inefficiency and speed-dependent idle losses."})
+        traces["auxiliaryManual"] = auxiliary[::5]
+
+        fine_auxiliary_plant = FMIPlant(fmu_path, profile="plant", step_size=.025)
+        try:
+            fine_auxiliary_plant.control({"auxAutoEnable": 0, "auxPumpACommand": 1, "auxPumpBCommand": 1})
+            fine_auxiliary = run_for(fine_auxiliary_plant, 10, .1)[-1]
+        finally:
+            fine_auxiliary_plant.close()
+        auxiliary_limits = {"auxTankMassKg": .05, "auxFeedwaterFlowKgS": .05,
+            "auxPumpASpeed": 2e-5, "secondaryPressureMPa": .002, "totalPlantStoredEnergyMJ": .2}
+        auxiliary_differences = {name: abs(end[name] - fine_auxiliary["outputs"][name]) for name in auxiliary_limits}
+        add("Auxiliary delivery converges under communication-step refinement", not auxiliary[-1]["halted"]
+            and not fine_auxiliary["halted"]
+            and all(auxiliary_differences[name] < limit for name, limit in auxiliary_limits.items()),
+            {"stepsSeconds": [.05, .025], "absoluteDifferences": auxiliary_differences,
+             "absoluteTolerances": auxiliary_limits,
+             "scope": "Ten-second manual two-train maneuver; communication refinement with the same adaptive native CVODE solver."})
+
+        reset()
+        plant.control({"auxAutoEnable": 0, "auxPumpACommand": 1, "auxPumpBCommand": 1,
+                       "auxPumpBAvailable": 0, "auxValveAOpen": 0})
+        isolated = run_for(plant, 5, .1)
+        blocked = isolated[-1]["outputs"]
+        plant.control({"auxValveAOpen": 1})
+        available = run_for(plant, 2, .1)
+        delivered = available[-1]["outputs"]
+        add("Auxiliary train isolation and independent unavailability block delivery", not isolated[-1]["halted"] and not available[-1]["halted"]
+            and abs(blocked["auxFeedwaterFlowKgS"]) < 1e-8 and blocked["auxPumpASpeed"] > .9
+            and blocked["auxPumpPowerMW"] > 0 and abs(blocked["auxPumpBSpeed"]) < 1e-8
+            and delivered["auxTrainAFlowKgS"] > 10 and abs(delivered["auxTrainBFlowKgS"]) < 1e-8,
+            {"isolated": {name: blocked[name] for name in ("auxPumpASpeed", "auxPumpBSpeed", "auxFeedwaterFlowKgS", "auxPumpPowerMW")},
+             "afterOpeningTrainA": {name: delivered[name] for name in ("auxTrainAFlowKgS", "auxTrainBFlowKgS")},
+             "acceptance": "Isolated running train has zero delivery but nonzero idle electrical draw; unavailable train cannot start. Opening only A restores only A flow."})
+        traces["auxiliaryIsolation"] = isolated[::5] + available[::5]
+
+        reset()
+        plant.control({"feedwaterFraction": 0})
+        automatic = run_for(plant, 10, .1)
+        end = automatic[-1]["outputs"]
+        actuation_times = [point["time"] for point in automatic if point["outputs"]["auxAutoActuated"] > .5]
+        add("Main-feedwater loss automatically starts available auxiliary trains", not automatic[-1]["halted"]
+            and actuation_times and end["auxTrainAFlowKgS"] > 10 and end["auxTrainBFlowKgS"] > 10
+            and automatic[-1]["controls"]["auxPumpACommand"] == 0 and automatic[-1]["controls"]["auxPumpBCommand"] == 0,
+            {"firstObservedActuationSeconds": actuation_times[0] if actuation_times else None,
+             "endTimeSeconds": automatic[-1]["time"], "mainFlowKgS": end["mainFeedwaterFlowKgS"],
+             "trainAFlowKgS": end["auxTrainAFlowKgS"], "trainBFlowKgS": end["auxTrainBFlowKgS"],
+             "scope": "Generic automatic initiation and hydraulic response, not proof of adequate emergency heat removal."}, "generic automatic response")
+        traces["auxiliaryAutomatic"] = automatic
+
+        depletion = low_aux_inventory_reference(fmu_path)
+        first, last = depletion[0]["outputs"], depletion[-1]["outputs"]
+        stopped = [point for point in depletion if point["outputs"]["auxTankDepleted"] > .5]
+        heel_overshoot = 1000 - last["auxTankMassKg"]
+        heel_overshoot_limit = .025 * max(point["outputs"]["auxFeedwaterFlowKgS"] for point in depletion) + .01
+        add("Auxiliary source exhaustion stops flow without resetting tank mass", not depletion[-1]["halted"]
+            and abs(first["auxTankMassKg"] - 1500) < 1e-6 and stopped and last["auxTankDepleted"] == 1
+            and -.01 <= heel_overshoot < heel_overshoot_limit and abs(last["auxFeedwaterFlowKgS"]) < 1e-8
+            and abs(last["totalPlantMassKg"] - first["totalPlantMassKg"]) < .005,
+            {"initialTankMassKg": first["auxTankMassKg"], "finalTankMassKg": last["auxTankMassKg"],
+             "firstObservedDepletionSeconds": stopped[0]["time"] if stopped else None,
+             "finalFlowKgS": last["auxFeedwaterFlowKgS"],
+             "heelOvershootKg": heel_overshoot, "heelOvershootToleranceKg": heel_overshoot_limit,
+             "wholePlantMassErrorKg": abs(last["totalPlantMassKg"] - first["totalPlantMassKg"]),
+             "testOnlyParameter": "auxInitialTankMassKg=1500; nominal tank remains 100000 kg, suction heel 1000 kg.",
+             "acceptance": "Usable water runs out, both deliveries stop, heel overshoot is less than one 25 ms observed maximum-flow step plus 0.01 kg, and closed whole-plant water stays within 0.005 kg.",
+             "eventTiming": "Native FMI event detection occurs on communication boundaries; an overshot heel is preserved, never clipped or reset."}, "finite-inventory conservation")
+        traces["auxiliaryDepletion"] = depletion[::10]
 
         def maneuver(model):
             model.control({"reactivityCommandPcm": -10, "loadDemandMW": 950})

@@ -1,6 +1,6 @@
 {
   "name": "openpwr",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "An open, reproducible 1000 MWe PWR system-dynamics laboratory and interactive control room",
   "type": "module",
   "private": true,

@@ -165,6 +165,12 @@ test('independent pressurizer publication requires current runner, reference and
     referenceMetadataSha256: ['validation/pactel1998/provenance.json', '{"source":"fixture only"}'],
     comparisonScriptSha256: ['validation/pactel1998/compare.py', '# Packaging fixture comparison\n'],
     sharedRunnerSha256: ['validation/native_fmi.py', '# Packaging fixture native runner\n'],
+    holdoutDataSha256: ['validation/pactel1998/holdout-measured.csv', 'time,pressureMPa\n5,5.9\n'],
+    holdoutMetadataSha256: ['validation/pactel1998/holdout-provenance.json', '{}'],
+    holdoutComparatorSha256: ['validation/pactel1998/holdout_compare.py', '# Reserved-event fixture\n'],
+    holdoutExtractorSha256: ['validation/pactel1998/holdout_extract.py', '# Extraction fixture\n'],
+    holdoutProtocolSha256: ['validation/pactel1998/holdout-protocol.json', '{"caseId":"fixture","modelParameters":{"initialLevelM":3.5},"comparisonWindowS":[5,295],"simulationWindowS":[0,295]}'],
+    holdoutFreezeSha256: ['validation/pactel1998/holdout-freeze.json', '{"frozen":true}'],
   };
   const hashes = { sourceSha256: f.sourceSha256 };
   for (const [key, [path, bytes]] of Object.entries(sources)) { await writeFile(join(f.dir, path), bytes); hashes[key] = sha(bytes); }
@@ -173,6 +179,20 @@ test('independent pressurizer publication requires current runner, reference and
     schema: 'openpwr-measured-validation-v1', runtime: { model: 'OpenPWR.PactelPressurizer', fmuSha256: compiled.manifest.fmuSha256 },
     buildManifest: compiled.manifest, executed: true, validationPassed: false, ...numericalEvidence(), status: 'inconclusive',
     channels: [{ name: 'Pressure', unit: 'MPa', points: [{ time: 0, measured: 5.9, simulated: 5.9 }, { time: 1, measured: 6.0, simulated: 6.3 }] }] };
+  report.holdoutComparison = { ...structuredClone(report), inputDataSha256: hashes.holdoutDataSha256,
+    referenceMetadataSha256: hashes.holdoutMetadataSha256, comparisonScriptSha256: hashes.holdoutComparatorSha256,
+    appliedParameters: { initialLevelM: 3.5 }, caseId: 'fixture', comparisonWindowS: [5, 295], simulationWindowS: [0, 295],
+    channels: [{ name: 'Pressure', points: Array.from({ length: 291 }, (_, index) => ({ time: index + 5, measured: 5.9, simulated: 6.1 })) }],
+    trace: Array.from({ length: 296 }, (_, time) => ({ time, pressureMPa: 6.1 })),
+    refinedTrace: Array.from({ length: 296 }, (_, time) => ({ time, pressureMPa: 6.1 })) };
+  report.spatialComparisons = [];
+  const meshArtifacts = [];
+  for (const [model, manifest, axial, radial] of [['PactelCoarse', 'pactel-coarse-manifest.json', 12, 4], ['PactelRadialRefined', 'pactel-radial-manifest.json', 12, 8], ['PactelSpatialRefined', 'pactel-spatial-manifest.json', 24, 8]]) {
+    const artifact = await f.artifact(model, manifest, hashes); meshArtifacts.push([`artifacts/modelica/${model}.fmu`, artifact.bytes]);
+    report.spatialComparisons.push({ wallMesh: { axialSegments: axial, radialCells: radial },
+      runtime: { model: `OpenPWR.${model}`, fmuSha256: artifact.manifest.fmuSha256 }, buildManifest: artifact.manifest,
+      maximumPressureChangeToNextMeshMPa: .01, balance: { checks: [{ pass: true, error: .001, tolerance: .005 }] } });
+  }
   for (const status of ['inconclusive', 'failed']) {
     report.status = status;
     await f.json('artifacts/pressurizer-validation.json', report);
@@ -181,7 +201,7 @@ test('independent pressurizer publication requires current runner, reference and
   }
   const saved = await readFile(join(f.dir, 'dist/pressurizer-validation.json'), 'utf8');
   const marker = join(f.dir, 'dist/last-good.txt'); await writeFile(marker, 'previous pressurizer assessment');
-  const changedFiles = [['artifacts/modelica/PactelPressurizer.fmu', compiled.bytes], ['models/OpenPWR/package.mo', f.source], ...Object.values(sources)];
+  const changedFiles = [['artifacts/modelica/PactelPressurizer.fmu', compiled.bytes], ...meshArtifacts, ['models/OpenPWR/package.mo', f.source], ...Object.values(sources)];
   for (const [path, original] of changedFiles) {
     await writeFile(join(f.dir, path), Buffer.concat([Buffer.from(original), Buffer.from('changed')]));
     await assert.rejects(f.build('--require-pressurizer'), /Pressurizer comparison required/, path);
@@ -193,6 +213,13 @@ test('independent pressurizer publication requires current runner, reference and
     { ...report, channels: [{ points: [{ time: 0, measured: null, simulated: 5.9 }] }] },
     { ...report, buildManifest: { ...compiled.manifest, sharedRunnerSha256: '0'.repeat(64) } },
     { ...report, runtime: { ...report.runtime, model: 'OpenPWR.KrskoTransient' } },
+    { ...report, spatialComparisons: [] },
+    { ...report, holdoutComparison: { ...report.holdoutComparison, inputDataSha256: '0'.repeat(64) } },
+    { ...report, holdoutComparison: { ...report.holdoutComparison, appliedParameters: { initialLevelM: 4 } } },
+    { ...report, holdoutComparison: { ...report.holdoutComparison, numericalPassed: false } },
+    { ...report, holdoutComparison: { ...report.holdoutComparison, gitRevision: 'other' } },
+    { ...report, holdoutComparison: { ...report.holdoutComparison, caseId: 'other' } },
+    { ...report, holdoutComparison: { ...report.holdoutComparison, trace: report.holdoutComparison.trace.slice(0, 295) } },
     { ...report, gitRevision: 'other-commit' }]) {
     await f.json('artifacts/pressurizer-validation.json', invalid);
     await assert.rejects(f.build('--require-pressurizer'), /Pressurizer comparison required/);

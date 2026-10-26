@@ -4,6 +4,9 @@ import { plant3DState, advanceVisualPhase, visualMotionAllowed } from './plant3d
 // Original, deliberately generic equipment geometry. This is a view of supplied
 // model observations, never a source of plant state or engineering dimensions.
 const COMPONENTS = {
+  auxiliary: { name: 'Auxiliary feedwater', short: 'AUXILIARY FEEDWATER', position: [6.7, 1.8, 5.3], label: [6.7, 4.3, 5.3],
+    description: 'Two motor-driven trains draw from a finite water tank. Rotor speed, branch flow and tank level follow separate native solver observations; isolated valves can stop flow while a pump still turns.',
+    rows: [['Tank inventory', 'auxTankMass', 'kg', 0], ['Tank level', 'auxTankLevel', '%', 1], ['Tank temperature', 'auxTankTemperature', '°C', 1], ['Train A flow', 'auxAFlow', 'kg/s', 1], ['Train B flow', 'auxBFlow', 'kg/s', 1], ['Pump electrical load', 'auxPumpPower', 'MW', 3]], metric: ['auxFlow', 'kg/s', 1] },
   reactor: { name: 'Reactor vessel', short: 'REACTOR', position: [-5, 3, 0], label: [-5, 6.3, 0],
     description: 'Cut away the pressure vessel to inspect the core, upper internals and coolant paths. Core color follows the displayed model thermal power.',
     rows: [['Thermal power', 'thermalPower', 'MWth', 0], ['Fuel temperature', 'fuelTemperature', '°C', 1], ['Hot-leg temperature', 'hotTemperature', '°C', 1], ['Primary pressure', 'pressure', 'MPa', 2]], metric: ['thermalPower', 'MWth', 0] },
@@ -33,7 +36,7 @@ export function mountPlant3D(host, { mode = 'browser' } = {}) {
   if (!host?.appendChild) throw new TypeError('A 3D viewer host element is required');
   if (!['browser', 'native', 'plant'].includes(mode)) throw new TypeError('Unknown 3D observation source');
   const native = mode === 'native';
-  const ids = native ? CORE_IDS : Object.keys(COMPONENTS);
+  const ids = native ? CORE_IDS : Object.keys(COMPONENTS).filter(id => mode === 'plant' || id !== 'auxiliary');
   const root = document.createElement('section'); root.className = 'p3d';
   root.setAttribute('aria-label', native ? 'Interactive 3D primary-loop observation view' : 'Interactive 3D plant observation view');
   root.innerHTML = `<div class="p3d-toolbar"><div class="p3d-title"><span class="p3d-title-icon" aria-hidden="true">◇</span><div><strong>${native ? 'Primary loop · spatial view' : 'Plant systems · spatial view'}</strong><small>${mode !== 'browser' ? 'OPENMODELICA OBSERVATIONS' : 'BROWSER MODEL OBSERVATIONS'} · THREE.JS</small></div></div><div class="p3d-tools"><label><span>Camera</span><select data-camera aria-label="3D camera preset"><option value="overview">Overview</option><option value="primary">Primary circuit</option><option value="reactor">Core detail</option>${native ? '' : '<option value="turbine">Turbine hall</option>'}<option value="top">Plan view</option></select></label><button type="button" data-cutaway aria-pressed="true">Cutaway</button><button type="button" data-flow aria-pressed="true">Flow</button><button type="button" data-label-toggle aria-pressed="true">Labels</button></div></div>
@@ -46,6 +49,7 @@ export function mountPlant3D(host, { mode = 'browser' } = {}) {
   const abort = new AbortController(); const on = (element, type, handler, options = {}) => element.addEventListener(type, handler, { ...options, signal: abort.signal });
   let state = plant3DState(null, mode), flags = { paused: true, hidden: false, animate: true };
   let disposed = false, failed = false, selected = 'reactor', cutaway = true, flowVisible = true, labelsVisible = true;
+  $('[data-equipment]').value = selected;
   let sceneView = null, inViewport = true, frame = 0, lastFrame = 0, dirty = true;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const labelElements = new Map();
@@ -141,7 +145,7 @@ export function mountPlant3D(host, { mode = 'browser' } = {}) {
   let resizeObserver = null;
   const ready = Promise.all([import('./vendor/three/three.module.js'), import('./vendor/three/OrbitControls.js')]).then(([THREE, { OrbitControls }]) => {
     if (disposed) return false;
-    sceneView = buildScene(THREE, OrbitControls, viewport, { native, ids, labelElements, on, select, requestRender });
+    sceneView = buildScene(THREE, OrbitControls, viewport, { native, coupled: mode === 'plant', ids, labelElements, on, select, requestRender });
     sceneView.cutaway(cutaway); sceneView.flow(flowVisible); sceneView.select(selected);
     help.hidden = true; updateReadings();
     if (typeof ResizeObserver === 'function') {
@@ -165,7 +169,7 @@ export function mountPlant3D(host, { mode = 'browser' } = {}) {
   };
 }
 
-function buildScene(T, OrbitControls, viewport, { native, ids, labelElements, on, select, requestRender }) {
+function buildScene(T, OrbitControls, viewport, { native, coupled, ids, labelElements, on, select, requestRender }) {
   const scene = new T.Scene(); scene.background = new T.Color('#111e2b'); scene.fog = new T.Fog('#111e2b', 40, 85);
   const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
@@ -372,6 +376,25 @@ function buildScene(T, OrbitControls, viewport, { native, ids, labelElements, on
     processPipe([[15.5, 2.15, 1], [17, 2.15, 1], [17.5, 2.15, 2.5]], '#fee58b', black, 'electricity', .07, 10);
     // The bypass is a distinct path, so a closed turbine does not imply zero SG flow.
     processPipe([[5, 7.5, 0], [5.5, 6, -2.5], [7, 3.5, -4], [9, 2.1, -4]], '#f5f4d9', steel, 'bypass', .09, 10);
+  }
+  if (coupled) {
+    const aux = equipment('auxiliary');
+    const auxMaterial = mat('#3f9e92');
+    box(aux, [7, .25, 3], [7.5, .13, 5.3], darkSteel);
+    vessel(aux, 5.2, 5.3, 1.05, .4, 2.8);
+    const tankWater = cylinder(aux, .96, 1, [5.2, .9, 5.3], mat('#53d9bd', { transparent: true, opacity: .4, metalness: .05, depthWrite: false }));
+    tankWater.visible = false; water.push({ object: tankWater, key: 'auxTank', base: .45, height: 2.65 });
+    for (const [x, train] of [[8, 'A'], [10, 'B']]) {
+      cylinder(aux, .43, .65, [x, .8, 5.3], auxMaterial);
+      cylinder(aux, .35, .8, [x, 1.5, 5.3], darkSteel);
+      const rotor = new T.Group(); rotor.position.set(x, 1.95, 5.3); aux.add(rotor);
+      for (let i = 0; i < 6; i++) { const blade = box(rotor, [.3, .06, .08], [.18 * Math.cos(i * Math.PI / 3), 0, .18 * Math.sin(i * Math.PI / 3)], bronze); blade.rotation.y = -i * Math.PI / 3; }
+      ring(aux, .4, .03, [x, 1.95, 5.3]);
+      moving.push({ object: rotor, axis: 'y', key: `aux${train}Pump`, phase: 0 });
+      processPipe([[5.2, .75, 5.3], [5.2, .75, 6.5], [x, .75, 6.5], [x, .75, 5.3]], '#85f2d4', auxMaterial, `aux${train}Flow`, .075, 10);
+      processPipe([[x, 1, 5.3], [x, 1, 4.3], [6.6, 1, 4.3]], '#85f2d4', auxMaterial, `aux${train}Flow`, .075, 10);
+    }
+    processPipe([[6.6, 1, 4.3], [3.4, 1, 4.3], [3.4, 3.2, 2], [2, 3.2, 1.1]], '#85f2d4', auxMaterial, 'auxiliary', .1, 14);
   }
   const selector = mesh(new T.TorusGeometry(1.8, .025, 5, 64), basic('#68e2db', { transparent: true, opacity: .75 }), scene);
   selector.rotation.x = Math.PI / 2; selector.position.set(-5, .055, 0); selector.castShadow = false;

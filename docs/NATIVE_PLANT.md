@@ -51,15 +51,18 @@ The feedwater pump raises condensate enthalpy by `(p_SG-p_cond)/(rho_cond * 0.8)
 
 The condenser has a dynamic liquid mass, initially 500,000 kg, and a saturated-liquid pressure/temperature state. Its total liquid internal energy is `M [h_l(p) - p/rho_l(p)]`. Exhaust steam and bypass steam enter with their actual post-expansion/upstream enthalpies; condensate exits to the feed pump. Heat rejection is `coolingFraction * UA * (T_cond-T_cooling)`, with `UA` calibrated to the initial equilibrium. The liquid volume `M/rho_l(p)` can change; pressure work `p dV/dt` at its moving surface is explicitly removed from this liquid-store energy boundary as `condenserDisplacementPowerMW`. This is a liquid-store approximation, not a rigid single-phase volume. Saturated-liquid properties make pressure a temperature-dependent vacuum indicator; steam-space inventory, noncondensable gases, air ejectors and separate condensation kinetics are not modeled.
 
-`totalPlantStoredEnergyMJ` includes fuel and primary/pressurizer thermal inventories, secondary internal energy, condenser liquid internal energy and rotor kinetic energy. It excludes nuclear binding-energy inventories, primary pump kinetic energy, structural heat outside the stated nodes and the electrical grid. Its external power boundary is:
+The [auxiliary-feedwater system](AUXILIARY_FEEDWATER.md) adds a finite atmospheric tank and two motor-driven trains. Main and auxiliary water enter the steam generator at their mass-weighted enthalpy. `feedwaterFlowKgS` remains main flow; `totalFeedwaterFlowKgS` includes the auxiliary supply. The condenser supplies only main feedwater.
+
+`totalPlantStoredEnergyMJ` includes fuel and primary/pressurizer thermal inventories, secondary internal energy, condenser and auxiliary-tank liquid internal energy, and rotor kinetic energy. It excludes nuclear binding-energy inventories, primary pump kinetic energy, structural heat outside the stated nodes and the electrical grid. Its external power boundary is:
 
 ```text
 core heat + pressurizer heat + charging enthalpy - letdown enthalpy
 + feed-pump input - condenser heat rejection
++ auxiliary pump electrical input - auxiliary motor loss - auxiliary tank surface pressure work
 - gross electrical output - generator loss - shaft friction - condenser surface pressure work
 ```
 
-Primary pump heating and consumption remain outside the inherited primary thermal model. Other auxiliary loads are included in net electrical output but dissipate outside this accounting boundary. `totalPlantMassKg` sums primary/pressurizer, secondary and condenser mass. Steam, bypass and feedwater transfers are internal; charging minus letdown is the only external mass boundary. Integrated boundary outputs support independent inventory-change comparisons; near-zero instantaneous equation residuals alone do not validate the model.
+Primary pump heating and consumption remain outside the inherited primary thermal model. Other auxiliary loads are included in net electrical output but dissipate outside this accounting boundary. `totalPlantMassKg` sums primary/pressurizer, secondary, condenser and auxiliary-tank mass. Steam, bypass and all feedwater transfers are internal; charging minus letdown is the only external mass boundary. Net export includes the auxiliary-feedwater pump electrical demand. Independent quadrature reconstructs the boundary from component observations and imposed controls; near-zero instantaneous equation residuals alone do not validate the model.
 
 The legacy `thermalEnergyMJ`, `totalMassKg`, `boundaryPowerMW` and related outputs retain their **primary-subsystem-only** meaning. Use the `totalPlant*`, `plantBoundary*` and `integratedPlantBoundary*` outputs for coupled-cycle accounting.
 

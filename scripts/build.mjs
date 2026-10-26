@@ -121,8 +121,40 @@ try {
 let includePressurizer = false;
 try {
   const report = JSON.parse(await readFile(resolve(root, 'artifacts/pressurizer-validation.json'), 'utf8'));
-  await checkComparisonModel(report, report, 'PactelPressurizer', 'pactel-manifest.json', comparisonSources('pactel1998', 'PactelPressurizer'));
+  const sources = { ...comparisonSources('pactel1998', 'PactelPressurizer'),
+    holdoutDataSha256: 'validation/pactel1998/holdout-measured.csv', holdoutMetadataSha256: 'validation/pactel1998/holdout-provenance.json',
+    holdoutComparatorSha256: 'validation/pactel1998/holdout_compare.py', holdoutExtractorSha256: 'validation/pactel1998/holdout_extract.py',
+    holdoutProtocolSha256: 'validation/pactel1998/holdout-protocol.json', holdoutFreezeSha256: 'validation/pactel1998/holdout-freeze.json' };
+  await checkComparisonModel(report, report, 'PactelPressurizer', 'pactel-manifest.json', sources);
   checkComparisonResults(report);
+  if (!Array.isArray(report.spatialComparisons) || report.spatialComparisons.length !== 3) throw new Error('Wall mesh evidence is incomplete');
+  for (const [index, model, manifest, axial, radial] of [[0, 'PactelCoarse', 'pactel-coarse-manifest.json', 12, 4], [1, 'PactelRadialRefined', 'pactel-radial-manifest.json', 12, 8], [2, 'PactelSpatialRefined', 'pactel-spatial-manifest.json', 24, 8]]) {
+    const record = report.spatialComparisons[index];
+    await checkComparisonModel(report, record, model, manifest, sources);
+    if (record.wallMesh?.axialSegments !== axial || record.wallMesh?.radialCells !== radial
+        || !Number.isFinite(record.maximumPressureChangeToNextMeshMPa)
+        || !Array.isArray(record.balance?.checks) || !record.balance.checks.length
+        || record.balance.checks.some(check => check.pass !== true || !Number.isFinite(check.error)
+          || !Number.isFinite(check.tolerance) || check.tolerance < 0 || Math.abs(check.error) > check.tolerance)) throw new Error('Wall mesh numerical acceptance failed');
+  }
+  const held = report.holdoutComparison;
+  await checkComparisonModel(report, held, 'PactelPressurizer', 'pactel-manifest.json', sources);
+  checkComparisonResults(held);
+  for (const [key, parent] of [['inputDataSha256', 'holdoutDataSha256'], ['referenceMetadataSha256', 'holdoutMetadataSha256'],
+      ['comparisonScriptSha256', 'holdoutComparatorSha256'], ['sourceSha256', 'sourceSha256'], ['benchmarkModelSha256', 'benchmarkModelSha256'],
+      ['sharedRunnerSha256', 'sharedRunnerSha256'], ['holdoutProtocolSha256', 'holdoutProtocolSha256'],
+      ['holdoutExtractorSha256', 'holdoutExtractorSha256'], ['holdoutFreezeSha256', 'holdoutFreezeSha256']]) {
+    if (held[key] !== report[parent]) throw new Error(`Reserved event ${key} is stale`);
+  }
+  const protocol = JSON.parse(await readFile(resolve(root, sources.holdoutProtocolSha256), 'utf8'));
+  if (JSON.stringify(held.appliedParameters) !== JSON.stringify(protocol.modelParameters)) throw new Error('Reserved event parameters differ from its protocol');
+  if (held.version !== report.version || held.gitRevision !== report.gitRevision || held.caseId !== protocol.caseId
+      || JSON.stringify(held.comparisonWindowS) !== JSON.stringify(protocol.comparisonWindowS)
+      || JSON.stringify(held.simulationWindowS) !== JSON.stringify(protocol.simulationWindowS)
+      || held.channels.length !== 1 || held.channels[0].points.length !== 291
+      || held.channels[0].points.some((point, index) => point.time !== index + 5)
+      || !Array.isArray(held.trace) || held.trace.length !== 296 || held.trace.some((point, index) => point.time !== index || !Number.isFinite(point.pressureMPa))
+      || !Array.isArray(held.refinedTrace) || held.refinedTrace.length !== 296 || held.refinedTrace.some((point, index) => point.time !== index || !Number.isFinite(point.pressureMPa))) throw new Error('Reserved event window or identity differs from its protocol');
   includePressurizer = true;
 } catch (error) {
   if (process.argv.includes('--require-pressurizer')) throw new Error(`Pressurizer comparison required: ${error.message}`);

@@ -35,6 +35,8 @@ export function plant3DState(snapshot, mode = 'browser') {
     condenserTemperature: number(o.condenserTemp), steamPressure: number(o.steamPressure),
     turbineSteamFlow: number(o.turbineSteamFlow), bypassSteamFlow: number(o.bypassSteamFlow),
   };
+  Object.assign(values, { auxFlow: null, auxAFlow: null, auxBFlow: null, auxASpeed: null, auxBSpeed: null,
+    auxTankLevel: null, auxTankMass: null, auxTankTemperature: null, auxPumpPower: null });
   if (coupled) Object.assign(values, {
     thermalPower: number(o.reactorPowerMW), steamTemperature: number(o.secondaryTemperatureC),
     steamLevel: number(o.secondaryLevelPercent), steamPressure: number(o.secondaryPressureMPa),
@@ -44,6 +46,10 @@ export function plant3DState(snapshot, mode = 'browser') {
     electricPower: number(o.netPowerMW), grossPower: number(o.grossPowerMW),
     condenserPressure: number(o.condenserPressureKPa), condenserTemperature: number(o.condenserTemperatureC),
     energyResidual: number(o.plantEnergyResidualMW),
+    auxFlow: number(o.auxFeedwaterFlowKgS), auxAFlow: number(o.auxTrainAFlowKgS), auxBFlow: number(o.auxTrainBFlowKgS),
+    auxASpeed: number(o.auxPumpASpeed), auxBSpeed: number(o.auxPumpBSpeed),
+    auxTankLevel: number(o.auxTankLevelPercent), auxTankMass: number(o.auxTankMassKg),
+    auxTankTemperature: number(o.auxTankTemperatureC), auxPumpPower: number(o.auxPumpPowerMW),
   });
   const time = number(s.time);
   const identity = !native || (s.backend === 'fmi2' && s.model === (coupled ? 'OpenPWR.CoupledPlant' : 'OpenPWR.PrimaryLoop') && typeof o.valid === 'boolean');
@@ -58,6 +64,8 @@ export function plant3DState(snapshot, mode = 'browser') {
     steamHeader: relative(values.steamFlow, 1500),
     bypass: relative(values.bypassSteamFlow, 1500),
     feed: relative(values.feedFlow, 1500),
+    auxiliary: relative(values.auxFlow, 120), auxAFlow: relative(values.auxAFlow, 60), auxBFlow: relative(values.auxBFlow, 60),
+    auxAPump: relative(values.auxASpeed), auxBPump: relative(values.auxBSpeed),
     cooling: coupled ? relative(number(o.coolingPowerMW), 2000) : native || s.faults?.lossOfHeatSink ? 0 : relative(number(c.cooling)),
     turbine: relative(values.turbineSpeed, 3000),
     generator: relative(values.turbineSpeed, 3000),
@@ -72,6 +80,7 @@ export function plant3DState(snapshot, mode = 'browser') {
     levels: {
       pressurizer: available && values.pressurizerLevel !== null ? bounded(values.pressurizerLevel / 100, 0, 1) : null,
       steam: available && values.steamLevel !== null ? bounded(values.steamLevel / 100, 0, 1) : null,
+      auxTank: available && values.auxTankLevel !== null ? bounded(values.auxTankLevel / 100, 0, 1) : null,
     } };
 }
 

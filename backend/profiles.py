@@ -26,6 +26,9 @@ PLANT_CONTROL_LIMITS = {
     "feedwaterFraction": (0.0, 1.2), "coolingFraction": (0.0, 1.2),
     "pumpCommand": (0.0, 1.0), "tripCommand": (0.0, 1.0),
     "turbineTripCommand": (0.0, 1.0), "gridBreakerCommand": (0.0, 1.0),
+    "auxAutoEnable": (0.0, 1.0), "auxPumpACommand": (0.0, 1.0), "auxPumpBCommand": (0.0, 1.0),
+    "auxPumpAAvailable": (0.0, 1.0), "auxPumpBAvailable": (0.0, 1.0),
+    "auxValveAOpen": (0.0, 1.0), "auxValveBOpen": (0.0, 1.0),
     **{name: CONTROL_LIMITS[name] for name in ("heaterPowerMW", "sprayFlowKgS", "chargingFlowKgS", "letdownFlowKgS")},
 }
 PLANT_DEFAULT_CONTROLS = {
@@ -33,6 +36,8 @@ PLANT_DEFAULT_CONTROLS = {
     "turbineValveFraction": 1.0, "feedwaterFraction": 1.0, "coolingFraction": 1.0,
     "pumpCommand": 1.0, "tripCommand": 0.0, "turbineTripCommand": 0.0, "gridBreakerCommand": 1.0,
     "heaterPowerMW": 0.0, "sprayFlowKgS": 0.0, "chargingFlowKgS": 0.0, "letdownFlowKgS": 0.0,
+    "auxAutoEnable": 1.0, "auxPumpACommand": 0.0, "auxPumpBCommand": 0.0,
+    "auxPumpAAvailable": 1.0, "auxPumpBAvailable": 1.0, "auxValveAOpen": 1.0, "auxValveBOpen": 1.0,
 }
 PLANT_REAL_OUTPUTS = REAL_OUTPUTS + (
     "reactorPowerMW", "fissionPowerMW", "decayHeatMW", "reactivityPcm",
@@ -44,6 +49,11 @@ PLANT_REAL_OUTPUTS = REAL_OUTPUTS + (
     "integratedPlantBoundaryMassKg", "plantEnergyResidualMW", "plantMassResidualKgS",
     "feedPumpPowerMW", "generatorLossMW", "shaftFrictionMW", "condenserMassKg",
     "condenserEnergyMJ", "rotorEnergyMJ", "turbineMechanicalPowerMW", "neutronPowerFraction",
+    "mainFeedwaterFlowKgS", "totalFeedwaterFlowKgS", "auxFeedwaterFlowKgS",
+    "auxTrainAFlowKgS", "auxTrainBFlowKgS", "auxPumpASpeed", "auxPumpBSpeed",
+    "auxTankMassKg", "auxTankLevelPercent", "auxTankTemperatureC", "auxTankEnergyMJ",
+    "auxPumpPowerMW", "auxTankDisplacementPowerMW", "auxAutoActuated", "auxTankDepleted",
+    "auxPumpFluidPowerMW", "auxMotorLossMW", "auxFeedwaterEnthalpyJkg", "condenserDisplacementPowerMW",
 )
 PROFILES = {
     "primary": {"model": "OpenPWR.PrimaryLoop", "file": "PrimaryLoop.fmu", "manifest": "manifest.json",
@@ -52,5 +62,6 @@ PROFILES = {
     "plant": {"model": "OpenPWR.CoupledPlant", "file": "CoupledPlant.fmu", "manifest": "plant-manifest.json",
         "port": 8002, "page": "plant.html", "limits": PLANT_CONTROL_LIMITS, "defaults": PLANT_DEFAULT_CONTROLS,
         "real_outputs": PLANT_REAL_OUTPUTS, "boolean_outputs": ("valid",),
-        "discrete_controls": ("tripCommand", "turbineTripCommand", "gridBreakerCommand")},
+        "discrete_controls": ("tripCommand", "turbineTripCommand", "gridBreakerCommand", "auxAutoEnable",
+                              "auxPumpAAvailable", "auxPumpBAvailable", "auxValveAOpen", "auxValveBOpen")},
 }

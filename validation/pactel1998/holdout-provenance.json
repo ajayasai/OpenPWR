@@ -1,0 +1,109 @@
+{
+  "schema": "openpwr-measured-reference-v1",
+  "caseId": "pactel-1998-atws11-compression-holdout",
+  "title": "PACTEL ATWS-11 held-out compression response",
+  "source": {
+    "title": "NUREG/IA-0231: An Assessment of TRACE V4.160 Code Against PACTEL ATWS-10-13 and ATWS-20-21 Pressurizer Experiments",
+    "author": "E. Takasuo",
+    "publisher": "U.S. Nuclear Regulatory Commission / VTT Processes",
+    "publicationDate": "2010-06",
+    "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS124697/pdf/GOVPUB-Y3_N88-PURL-LPS124697.pdf",
+    "adamsAccession": "ML101650292",
+    "sha256": "ee74a7b5315bed710d4a89dfe43347613b8fb85349640de253aa4c4d8c981369",
+    "sourceKind": "Red measured pressure in Figure 6; black dashed TRACE predictions are excluded.",
+    "redistribution": "Only numerical facts, original metadata and extraction/comparison code are distributed. The PDF, artwork and TRACE input deck are not bundled or relicensed."
+  },
+  "experiment": {
+    "facility": "PACTEL, Lappeenranta University of Technology, Finland",
+    "year": 1998,
+    "test": "ATWS-11",
+    "type": "Pressurizer insurge; prespecified pre-drain window",
+    "protocol": "validation/pactel1998/holdout-protocol.json",
+    "selectedAtUTC": "2026-10-26T09:14:50Z",
+    "referenceWindowS": [5, 295],
+    "simulationWindowS": [0, 295],
+    "fullExperimentWindowS": [0, 600],
+    "originalAcquisitionPeriodS": null,
+    "operatorEvents": [
+      {"time": 0, "event": "Test starts"},
+      {"time": 100, "event": "Pressurizer heaters switched off"},
+      {"time": 111, "event": "External facility core power increase"},
+      {"time": 119, "event": "Insurge starts"},
+      {"time": 297, "event": "Insurge stops; draining starts (outside selected window)"}
+    ],
+    "windowReason": "ATWS-11's outsurge mass-flow magnitude is not published in the tables or printed input decks. The comparison stops before draining rather than inferring the missing boundary from pressure.",
+    "independence": "Different experiment from ATWS-10, in the same facility and publication. ATWS-11 pressure is withheld from the model developer until a candidate hash freeze for this development cycle.",
+    "qualification": "The report's general mechanisms were already available during development; this is a development-separated response holdout, not historically blind external validation or certification."
+  },
+  "extraction": {
+    "script": "validation/pactel1998/holdout_extract.py",
+    "csv": "validation/pactel1998/holdout-measured.csv",
+    "csvSha256": "9441b0c56b7e3c2dd7c60adaea2cb8c9e4a07e6c40ca6f8c976c743d662e1501",
+    "method": "Decode the sole embedded RGB image on PDF page 18; retain only the red Pactel measurement path below the legend and only columns needed by the prespecified pre-drain window. Linearly resample median path height between adjacent represented pixel columns.",
+    "softwareUsed": {"pypdf": "6.10.0", "Pillow": "12.2.0"},
+    "figure": 6,
+    "pdfPageOneBased": 18,
+    "printedPage": 15,
+    "embeddedImageSize": [970, 690],
+    "framePixelsLeftRightTopBottom": [97, 930, 55, 615],
+    "axisTimeS": [0, 600],
+    "axisPressureMPa": [5, 9],
+    "redSelection": "R>=240 and R-G>=50 and R-B>=50. Rows 120..614 exclude the legend. Disjoint red branches in a required column are rejected.",
+    "samples": 291,
+    "resamplingIntervalS": 1,
+    "measuredPixelColumns": 402,
+    "maximumBridgedPixelGap": 3,
+    "figureReadingAllowanceMPa": 0.014285714285714285,
+    "figureTimeReadingAllowanceS": 1.440576230492197,
+    "readingGridQualification": "291 correlated positions along a published curve, not 291 independent instrument acquisitions. Six decimals preserve reproducibility, not measurement precision.",
+    "endpointPolicy": "No extrapolation. Discard 0-4 s; no values after 295 s enter this reference. The time allowance is clipped at the available reference-window edges."
+  },
+  "measuredInitialConditions": {
+    "basis": "Table 1, printed page 6/PDF page 10",
+    "pressureMPa": 5.9,
+    "liquidLevelM": 3.5,
+    "insurgeMassFlowKgS": 0.217,
+    "facilityCorePowerKW": 245
+  },
+  "publishedBoundaryModel": {
+    "classification": "Conditional replay combining ATWS-11 table values with explicitly inherited ATWS-10 input-deck approximations; not a complete raw measured input record.",
+    "surgeMassFlowKgS": [[0, 0], [118, 0], [119, 0.217], [295, 0.217]],
+    "heaterPowerW": [[0, 4000], [99, 4000], [100, 0]],
+    "inletTemperatureK": 547.0,
+    "initialLiquidTemperatureK": 547.64,
+    "initialVaporTemperatureK": 547.64,
+    "initialWallTemperatureK": 547.0,
+    "geometryAndWallParameters": "Shared unchanged with the frozen PactelPressurizer model: 8.8 m height, 0.1397 m inner diameter, 0.0143 m wall, 3.44 W/(m2 K) exterior coefficient, 298 K ambient. Constitutive assumptions are separately recorded by the model.",
+    "forcingQualification": "One-second ramps and 547 K inlet/wall conditions follow the printed ATWS-10 input pattern; they are not additional ATWS-11 measurements. Fluid temperatures correspond to the same 5.9 MPa initial pressure. No input is recovered from pressure response.",
+    "outsurgeMassFlowKgS": null,
+    "sprayMassFlowKgS": 0,
+    "ventMassFlowKgS": 0
+  },
+  "measurementUncertainty": {
+    "pressureMaximumAbsoluteErrorMPa": 0.094,
+    "basis": "Section 4.1 printed page 13/PDF page 16 states this maximum pressure-measurement error also applies to the other experiments in the report.",
+    "distribution": "Unspecified; this is a reported bound, not a standard deviation.",
+    "conditionalPressureEnvelopeMPa": 0.10828571428571429,
+    "conditionalEnvelopeBasis": "Arithmetic sum of 0.094 MPa reported pressure bound and 0.0142857 MPa graphical allowance, combined with a separate ±1.440576 s graphical-time window. Not a confidence interval or complete uncertainty budget.",
+    "insurgeFlowUncertaintyKgS": null,
+    "inletTemperatureUncertaintyK": null
+  },
+  "calibrationAndHoldout": {
+    "forcingChannels": ["surgeFlowKgS", "surgeTemperatureK", "heaterPowerMW"],
+    "heldOutResponseChannels": ["pressureMPa"],
+    "parameterFitting": "No ATWS-11 pressure value may select coefficients, wall properties, mesh, initial conditions, boundary timing, offsets, or the model revision.",
+    "candidateFreezeRequired": true,
+    "freezeRecord": "validation/pactel1998/holdout-freeze.json",
+    "acceptance": "Report raw discrepancies and descriptive conditional-envelope coverage separately from numerical checks. No whole-plant validation pass is inferred."
+  },
+  "limitations": [
+    "This is a PACTEL component experiment, not a 1000 MWe PWR operating-plant transient or operator-training qualification.",
+    "The model developer was kept separate from ATWS-11 response values during this development cycle, but the same publication's general discussion was already known. This is not an externally certified blind study.",
+    "Only the compression phase is scored. ATWS-11 outsurge magnitude is unavailable and has not been invented; the subsequent expansion response is not validated.",
+    "The 1 s extraction grid samples a plotted curve; positions are correlated and original acquisition timestamps/calibration data are unavailable.",
+    "Boundary ramp duration, inlet temperature and initial wall/fluid temperatures partly reuse ATWS-10 assumptions. Their ATWS-11 uncertainties are not documented.",
+    "The conditional pressure envelope is incomplete because input, geometry and model uncertainties are not fully characterized.",
+    "No pressure offset correction or time alignment is applied, including any mismatch between the measured initial table and plotted curve.",
+    "A successful numerical balance does not establish agreement with measurements, and the held-out event cannot establish full-plant fidelity."
+  ]
+}

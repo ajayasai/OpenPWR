@@ -1,0 +1,21 @@
+{
+  "schema": "openpwr-heldout-freeze-v1",
+  "caseId": "pactel-1998-atws11-compression-holdout",
+  "frozenAtUTC": "2026-10-26T09:39:59.613433+00:00",
+  "selectedAtUTC": "2026-10-26T09:14:50Z",
+  "sourceRevisionAtFreeze": "f6e379387ebb42bde0995feade5dea808b6d850d",
+  "sourceDirtyAtFreeze": true,
+  "candidate": {
+    "sourceSha256": "c3a2943ac6aefd984b9a324e9497de241e171ca7ecc892e86c69c6724e792f96",
+    "benchmarkModelSha256": "43415d2a1bce00b055fb2eaeebd89b91afec29b4a1e8a7e51471f09a2bfe17b4",
+    "sharedRunnerSha256": "59fbafcf08cc4a53ff3f8c97c9e86ef2f9be2e78f83f3414a0f0443c4f98a247",
+    "holdoutComparatorSha256": "da5e85287dba98149a89582115c9bfeaa944bedd167a851b7fdcd3aee99e11e8",
+    "case10ComparatorSha256": "74536ba6e88a15ec96268b73c74fbd15d29cfa3df69d8f10804835f9767046f3",
+    "holdoutDataSha256": "9441b0c56b7e3c2dd7c60adaea2cb8c9e4a07e6c40ca6f8c976c743d662e1501",
+    "holdoutMetadataSha256": "7783152fb0657cfc048329274871c68eadd262cccd2c374673a30de364e736e2",
+    "holdoutProtocolSha256": "65418b27a6958ca8d09de68f263135e5fedccd858b1ece1ebcdfa0a7e700dbfd",
+    "holdoutExtractorSha256": "296dd89f9abe13fae31e3b9ffeb28fbc720cacd53c3e33cf62d6973e9751e549"
+  },
+  "responseUsedForModelSelection": false,
+  "scope": "The ATWS-11 pressure response was withheld from this model-development cycle. The source report general discussion was already available. This is not historically blind external validation."
+}

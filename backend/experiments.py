@@ -42,6 +42,13 @@ SCENARIOS = (
 
 
 PLANT_SCENARIOS = (
+    {"id": "auxiliary-isolation", "label": "Auxiliary train A isolation and delivery", "duration": 7.0,
+     "description": "Disable auto, fail train B and start train A against its closed discharge valve. Open A at 5 s; compare rotor speed, delivered water, tank inventory and electrical draw.",
+     "commands": [{"time": 0.0, "controls": {"auxAutoEnable": 0, "auxPumpACommand": 1, "auxPumpBAvailable": 0, "auxValveAOpen": 0}},
+                  {"time": 5.0, "controls": {"auxValveAOpen": 1}}]},
+    {"id": "auxiliary-auto", "label": "Main feed loss with one auxiliary train", "duration": 10.0,
+     "description": "Remove main feedwater and make auxiliary train B unavailable. Observe the generic automatic latch, A acceleration and finite-tank supply over this short hot-operation window.",
+     "commands": [{"time": 0.0, "controls": {"feedwaterFraction": 0, "auxPumpBAvailable": 0}}]},
     {"id": "load-following", "label": "Coupled load reduction", "duration": 45.0,
      "description": "At 5 s request 90% reactor power and 900 MWe load; the core, primary and secondary respond through their coupled equations.",
      "commands": [{"time": 5.0, "controls": {"reactorDemandPercent": 90.0, "loadDemandMW": 900.0}}]},

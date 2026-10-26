@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -45,6 +46,11 @@ REGION1_REFERENCES = [
 PROBE_OUTPUTS = ('probeDensityKgM3', 'probeSpecificVolumeM3Kg', 'probeEnthalpyKJkg',
                  'probeInternalEnergyKJkg', 'probeCpKJkgK', 'probeExpansionPerK',
                  'probeCompressibilityPerPa')
+WALL_OUTPUTS = ('wallSteelCpJKgK', 'wallSteelEnthalpyJKg', 'wallSteelConductivityPotentialWM',
+                'wallConstantCpJKgK', 'wallConstantEnthalpyJKg', 'wallConstantConductivityPotentialWM')
+STEEL_SOURCE = {'title': 'NISTIR 7401, section 3.1.1 and Figure 1, printed page 7',
+                'url': 'https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=860705',
+                'scope': 'Published AISI 304 material correlations; consistency checks are not independent material measurements.'}
 
 
 def sha(path):
@@ -170,6 +176,49 @@ def verify():
                                    'units': units, 'pass': error <= tolerance,
                                    'method': {'pressureDifferencePa': dp, 'temperatureDifferenceK': dt,
                                               'scheme': 'Central difference vs thermodynamic identity; not published validation'}})
+            def wall_probe(temperature):
+                unit.setReal([refs['probeWallTemperatureK']], [temperature])
+                return dict(zip(WALL_OUTPUTS, unit.getReal([refs[name] for name in WALL_OUTPUTS])))
+
+            def wall_check(label, actual, expected, units, method):
+                error = abs(actual - expected)
+                tolerance = max(1e-8, abs(expected) * 2e-7)
+                checks.append({'name': label, 'category': 'wall-material-consistency',
+                               'measured': actual, 'reference': expected, 'absoluteError': error,
+                               'relativeError': error / max(abs(expected), 1e-12), 'tolerance': tolerance,
+                               'units': units, 'pass': error <= tolerance, 'method': method,
+                               'source': STEEL_SOURCE})
+
+            for temperature in (300.0, 550.0, 1000.0):
+                center = wall_probe(temperature)
+                dt = .002
+                plus, minus = wall_probe(temperature + dt), wall_probe(temperature - dt)
+                for material, conductivity in [('Steel', 9.705 + .0176 * temperature - 1.60e-6 * temperature**2), ('Constant', 15.0)]:
+                    wall_check(f'{material} wall enthalpy derivative at {temperature:g} K',
+                               (plus[f'wall{material}EnthalpyJKg'] - minus[f'wall{material}EnthalpyJKg']) / (2 * dt),
+                               center[f'wall{material}CpJKgK'], 'J/(kg K)',
+                               'Central difference of compiled enthalpy vs compiled cp; not measured validation.')
+                    wall_check(f'{material} wall conductivity-potential derivative at {temperature:g} K',
+                               (plus[f'wall{material}ConductivityPotentialWM'] - minus[f'wall{material}ConductivityPotentialWM']) / (2 * dt),
+                               conductivity, 'W/(m K)',
+                               'Central difference of compiled Kirchhoff potential vs separately evaluated k(T).')
+
+            # Composite Simpson quadrature checks the complete integral over useful
+            # temperature intervals, independently of the closed-form primitive.
+            for low, high in ((273.15, 300.0), (300.0, 550.0), (550.0, 1000.0)):
+                count = 200
+                width = (high - low) / count
+                def integrate(function):
+                    return width / 3 * sum((1 if i in (0, count) else 4 if i % 2 else 2) * function(low + i * width) for i in range(count + 1))
+                left, right = wall_probe(low), wall_probe(high)
+                wall_check(f'Steel wall enthalpy integral over {low:g}–{high:g} K',
+                           right['wallSteelEnthalpyJKg'] - left['wallSteelEnthalpyJKg'],
+                           integrate(lambda t: 6.683 + .04906 * t + 80.74 * math.log(t)), 'J/kg',
+                           'Compiled primitive vs 200-panel Simpson quadrature of the published cp correlation.')
+                wall_check(f'Steel wall conductivity integral over {low:g}–{high:g} K',
+                           right['wallSteelConductivityPotentialWM'] - left['wallSteelConductivityPotentialWM'],
+                           integrate(lambda t: 9.705 + .0176 * t - 1.60e-6 * t**2), 'W/m',
+                           'Compiled Kirchhoff potential vs 200-panel Simpson quadrature of the published k correlation.')
             unit.terminate()
         finally:
             unit.freeInstance()
@@ -187,15 +236,16 @@ def verify():
     passed = sum(item['pass'] for item in checks)
     report = {**metadata(), 'model': manifest['model'], 'compiler': manifest['compiler'],
               'modelicaLibrary': manifest['modelicaLibrary'], 'fmuSha256': sha(FMU),
-              'scope': 'Published pure-water property comparisons and separately labeled thermodynamic-derivative consistency checks through a compiled native Modelica Standard Library IF97 FMU. These do not validate the primary-loop/pressurizer transients or the whole plant.',
+              'scope': 'Published pure-water property comparisons, separately labeled thermodynamic-derivative checks, and wall-material integral/derivative consistency through a compiled native FMU. These do not validate primary-loop/pressurizer transients, facility-specific steel properties or the whole plant.',
               'publishedComparisons': sum(c['category'] == 'published-water-property' for c in checks),
               'derivativeConsistencyChecks': sum(c['category'] == 'thermodynamic-derivative-consistency' for c in checks),
+              'wallMaterialConsistencyChecks': sum(c['category'] == 'wall-material-consistency' for c in checks),
               'passed': passed, 'total': len(checks), 'checks': checks}
     (OUTPUT / 'property-verification.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     for item in checks:
         print(('PASS' if item['pass'] else 'FAIL') + ' ' + item['name'] + f": {item['measured']:.9g} {item['units']}; reference {item['reference']}")
     print(f'{passed}/{len(checks)} native property/derivative checks passed; '
-          f"{report['publishedComparisons']} published comparisons and {report['derivativeConsistencyChecks']} consistency checks.")
+          f"{report['publishedComparisons']} published water comparisons, {report['derivativeConsistencyChecks']} thermodynamic and {report['wallMaterialConsistencyChecks']} wall-material consistency checks.")
     if passed != len(checks):
         raise SystemExit(1)
 

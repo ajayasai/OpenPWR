@@ -100,3 +100,26 @@ test('coupled native view uses solver power, cycle inventory and breaker state',
   snapshot.outputs.gridConnected = 1;
   assert.ok(plant3DState(snapshot, 'plant').activity.electricity > 0);
 });
+
+test('auxiliary animation follows actual train flow and speed separately from commands', () => {
+  const snapshot = native(); snapshot.model = 'OpenPWR.CoupledPlant';
+  Object.assign(snapshot.controls, { auxPumpACommand: 1, auxPumpBCommand: 1 });
+  Object.assign(snapshot.outputs, { auxFeedwaterFlowKgS: 30, auxTrainAFlowKgS: 0, auxTrainBFlowKgS: 30,
+    auxPumpASpeed: .8, auxPumpBSpeed: .5, auxTankLevelPercent: 65, auxTankMassKg: 65000,
+    auxTankTemperatureC: 25, auxPumpPowerMW: .4 });
+  const view = plant3DState(snapshot, 'plant');
+  assert.equal(view.activity.auxAPump, .8);
+  assert.equal(view.activity.auxAFlow, 0, 'an isolated discharge does not freeze the rotor');
+  assert.equal(view.activity.auxBPump, .5);
+  assert.equal(view.activity.auxBFlow, .5);
+  assert.equal(view.activity.auxiliary, .25);
+  assert.equal(view.levels.auxTank, .65);
+  assert.equal(view.values.auxTankMass, 65000);
+  snapshot.outputs.auxTrainBFlowKgS = NaN;
+  assert.equal(plant3DState(snapshot, 'plant').activity.auxBFlow, 0);
+  for (const state of [plant3DState(native(), 'native'), plant3DState(new PWRPlant().snapshot())]) {
+    assert.equal(state.values.auxFlow, null);
+    assert.equal(state.levels.auxTank, null);
+    for (const key of ['auxiliary', 'auxAFlow', 'auxBFlow', 'auxAPump', 'auxBPump']) assert.equal(state.activity[key], 0);
+  }
+});
