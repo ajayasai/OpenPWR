@@ -393,7 +393,10 @@ equation
   secondary.liquidFlowKgS = 0;
   secondary.liquidEnthalpyJkg = 0;
   secondary.heatInputW = heatToSteamMW*1e6;
-  secondaryVentFraction = if secondary.temperatureK > 383.15 and secondary.gasMassKg > 0.05 then 1 else 0;
+  // Generic modulating purge: 1 K opening band and 0.05 kg gas-inventory taper.
+  // Continuous flow avoids an ideal instantaneous valve event in FMI co-simulation.
+  secondaryVentFraction = noEvent(max(0,min(1,(secondary.temperatureK-383.15)/1))
+    *max(0,min(1,(secondary.gasMassKg-0.05)/0.05)));
   secondary.ventFraction = secondaryVentFraction;
   hotLegTemperatureC = hotTemperatureK-273.15;
   coldLegTemperatureC = coldTemperatureK-273.15;

@@ -60,8 +60,9 @@ def boundary_flux(controls, point):
         power=steam_flow*enthalpy+gas_flow*1040*(point[prefix+'TemperatureC']+273.15)
         return flow,power
     primary_vent,primary_vent_power=mixture_vent('pressurizer',pressure*1e6,vent,.5)
+    secondary_fraction=clamp((point['secondaryTemperatureC']-110)/1,1)*clamp((point['secondaryGasMassKg']-.05)/.05,1)
     secondary_vent,secondary_vent_power=mixture_vent('secondary',point['secondaryPressureMPa']*1e6,
-        1 if point['secondaryTemperatureC']>110 and point['secondaryGasMassKg']>.05 else 0,2)
+        secondary_fraction,2)
     pump_power=12*point['pumpSpeed']**3
     shutdown_cooling=controls['shutdownCoolingFraction']*.5*max(0,point['coldLegTemperatureC']-30)
     energy=controls['startupHeatMW']+pump_power+heater-shutdown_cooling+(

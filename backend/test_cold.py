@@ -6,10 +6,30 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from backend.verify_cold import saturation_pressure_pa, pump_energy_mj, startup_inputs, verify
+from backend.verify_cold import saturation_pressure_pa, pump_energy_mj, startup_inputs, verify, boundary_flux, constant_inputs
 
 
 class ColdReferenceTests(unittest.TestCase):
+    def test_secondary_modulating_purge_closed_midband_and_open_fluxes(self):
+        # A 0.2 MPa valve differential gives 2 kg/s at full opening.
+        # Check actual boundary mass/enthalpy at both control-band midpoints,
+        # as well as exact closure and full-open limits.
+        point={'primaryPressureMPa':.101325,'pressurizerLevelPercent':50,
+               'pressurizerGasMassKg':1,'pressurizerVaporMassKg':1,
+               'pressurizerSteamEnthalpyJkg':2_500_000,'pressurizerTemperatureC':40,
+               'secondaryPressureMPa':.301325,'secondaryVaporMassKg':.225,
+               'secondarySteamEnthalpyJkg':2_500_000,'pumpSpeed':0,
+               'coldLegTemperatureC':40,'chargingEnthalpyJkg':170_000,'coldLegEnthalpyJkg':190_000}
+        for temperature,gas,expected_flow in [(109,.1,0),(110,.1,0),(111,.05,0),
+                (110.5,.1,1),(111,.075,1),(110.5,.075,.5),(111,.1,2),(120,1,2)]:
+            with self.subTest(temperature=temperature,gas=gas):
+                state={**point,'secondaryTemperatureC':temperature,'secondaryGasMassKg':gas}
+                energy,mass=boundary_flux(constant_inputs()(0),state)
+                gas_flow=expected_flow*gas/(gas+.225)
+                expected_energy=-(gas_flow*1040*(temperature+273.15)+(expected_flow-gas_flow)*2_500_000)/1e6
+                self.assertAlmostEqual(mass,-expected_flow,places=12)
+                self.assertAlmostEqual(energy,expected_energy,places=12)
+
     def test_independent_saturation_equation_matches_published_if97_table_35(self):
         # IAPWS-IF97 region 4, Table 35: p_s(T) verification values in MPa.
         for temperature,pressure in [(300,.00353658941),(500,2.63889776),(600,12.3443146)]:
