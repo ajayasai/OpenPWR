@@ -68,10 +68,32 @@ PLANT_SCENARIOS = (
 )
 
 
+COLD_STARTUP_COMMANDS = [
+    {"time": 0.0, "controls": {"pumpCommand": 1.0, "startupHeatMW": 15.0,
+        "shutdownCoolingFraction": 0.0, "pressureControlEnable": 1.0,
+        "pressureTargetMPa": 15.5, "inventoryControlEnable": 1.0}},
+    {"time": 3600.0, "controls": {"ventFraction": 1.0}},
+    {"time": 7200.0, "controls": {"ventFraction": 0.0}},
+]
+COLD_SCENARIOS = (
+    {"id": "cold-startup", "label": "Cold water to hot standby", "duration": 18000.0,
+     "description": "Five simulated hours of continuous native heatup, gas removal and inventory control using prescribed thermal input. This generic thermal experiment does not model criticality or transfer into the hot-plant engine.",
+     "commands": COLD_STARTUP_COMMANDS},
+    {"id": "cold-cooldown", "label": "Heatup followed by shutdown cooling", "duration": 21600.0,
+     "description": "Run the five-hour heatup, then remove prescribed fuel heat, reduce pump speed and apply shutdown cooling for one simulated hour in the same native model instance.",
+     "commands": [*COLD_STARTUP_COMMANDS, {"time": 18000.0,
+         "controls": {"startupHeatMW": 0.0, "pumpCommand": 0.5, "shutdownCoolingFraction": 0.3}}]},
+    {"id": "cold-pump", "label": "Pump heat and shutdown cooling", "duration": 600.0,
+     "description": "Run the primary pump with shutdown cooling isolated for 300 simulated seconds, then stop the pump and restore cooling. No fuel heat is imposed. This is a generic model experiment.",
+     "commands": [{"time": 0.0, "controls": {"pumpCommand": 1.0, "shutdownCoolingFraction": 0.0}},
+                  {"time": 300.0, "controls": {"pumpCommand": 0.0, "shutdownCoolingFraction": 1.0}}]},
+)
+
+
 def scenario_catalog(profile="primary"):
     if profile not in PROFILES:
         raise ValueError("Unknown native model profile")
-    return PLANT_SCENARIOS if profile == "plant" else SCENARIOS
+    return {"plant": PLANT_SCENARIOS, "primary": SCENARIOS, "cold": COLD_SCENARIOS}[profile]
 
 
 def scenarios(profile="primary"):
@@ -268,8 +290,9 @@ class ExperimentSession:
                 self.plant.step(seconds)
                 return self.state()
             count = ticks(seconds, self.plant.step_size, "step seconds")
-            if not 0.1 <= seconds <= 10:
-                raise ServiceError(400, "invalid_step", "seconds must be between 0.1 and 10.")
+            maximum = getattr(self.plant, "max_step_seconds", 10)
+            if not max(0.1, self.plant.step_size) <= seconds <= maximum:
+                raise ServiceError(400, "invalid_step", f"seconds must be between {max(0.1, self.plant.step_size):g} and {maximum:g}.")
             if self.status == "complete":
                 return self.state()
             if self.plant.halted:
@@ -338,7 +361,7 @@ def main():
     parser.add_argument("--model", choices=tuple(PROFILES), default="primary")
     parser.add_argument("--fmu", type=Path)
     choice = parser.add_mutually_exclusive_group(required=True)
-    choice.add_argument("--scenario", choices=sorted({item["id"] for item in (*SCENARIOS, *PLANT_SCENARIOS)}))
+    choice.add_argument("--scenario", choices=sorted({item["id"] for item in (*SCENARIOS, *PLANT_SCENARIOS, *COLD_SCENARIOS)}))
     choice.add_argument("--replay", type=Path)
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts" / "native-experiment")
     args = parser.parse_args()

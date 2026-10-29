@@ -140,7 +140,9 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
             return values
 
         held = inputs(0)
-        slave.setReal(input_refs, [held[name] for name in input_names])
+        applied_values = tuple(held[name] for name in input_names)
+        slave.setReal(input_refs, list(applied_values))
+        input_updates = 1
         slave.exitInitializationMode()
 
         def observation(time):
@@ -158,7 +160,15 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
             while current_time < boundary - 1e-10:
                 delta = min(step, boundary - current_time)
                 held = inputs(current_time)
-                slave.setReal(input_refs, [held[name] for name in input_names])
+                next_values = tuple(held[name] for name in input_names)
+                # Keep the same held inputs without redundant FMI setters.
+                # Some co-simulation engines discard solver history on setReal,
+                # even when the supplied values have not changed. A tuple also
+                # protects this comparison when a forcing reuses a mutable dict.
+                if next_values != applied_values:
+                    slave.setReal(input_refs, list(next_values))
+                    applied_values = next_values
+                    input_updates += 1
                 status = slave.doStep(currentCommunicationPoint=current_time, communicationStepSize=delta)
                 if status not in (None, 0, 1):
                     raise RuntimeError(f'FMI step failed with status {status}.')
@@ -174,6 +184,7 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
             if abs(boundary / sample_interval - round(boundary / sample_interval)) < 1e-8:
                 points.append(dict(previous))
         return {'points': points, 'integrals': integrals, 'steps': steps, 'stepSeconds': step,
+                'inputUpdates': input_updates,
                 'solverRelativeTolerance': declared_tolerance,
                 'requestedSolverRelativeTolerance': solver_tolerance,
                 'solverToleranceBasis': 'FMU DefaultExperiment annotation, checked against the setupExperiment request; OpenModelica CVODE uses the compiled annotation.',

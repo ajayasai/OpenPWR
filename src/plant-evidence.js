@@ -61,6 +61,7 @@ function drawComparison() {
   }
   const hasBaseline = points.some(point => Number.isFinite(point.baseline));
   $('baseline-legend').hidden = !hasBaseline;
+  $('baseline-legend').textContent = measured.releasedBaseline?.version ? `Released v${measured.releasedBaseline.version}` : 'Released v0.5 baseline';
   const bounded = points.filter(point => Number.isFinite(point.lowerAllowance) && Number.isFinite(point.upperAllowance));
   if (bounded.length) {
     const polygon = [...bounded.map(point => `${x(point.time)},${y(point.upperAllowance)}`), ...bounded.slice().reverse().map(point => `${x(point.time)},${y(point.lowerAllowance)}`)].join(' ');
@@ -96,7 +97,7 @@ async function measuredEvidence() {
     const parent = await read(path);
     const report = $('measured-case').value === 'pactel-holdout' ? parent.holdoutComparison : parent;
     if (request !== evidenceRequest) return;
-    if (!report) throw new Error('The reserved-event comparison is not available in this build.');
+    if (!report) throw new Error('The ATWS-11 development comparison is not available in this build.');
     if (report.executed !== true) throw new Error(`Comparison did not complete. ${report.error || 'Read the saved report for diagnostics.'}`);
     if (report.schema !== 'openpwr-measured-validation-v1' || !Array.isArray(report.channels) || !report.channels.length || report.channels.length > 30
         || !hash(report.runtime?.fmuSha256) || !hash(report.inputDataSha256)
@@ -109,6 +110,11 @@ async function measuredEvidence() {
     const identity = $('measured-identity');
     definition(identity, 'Source revision', report.gitRevision); definition(identity, 'Benchmark FMU', report.runtime.model);
     definition(identity, 'Benchmark FMU SHA-256', report.runtime.fmuSha256); definition(identity, 'Measured data SHA-256', report.inputDataSha256);
+    if (report.comparisonRole) definition(identity, 'Comparison role', report.comparisonRole);
+    if (report.releasedBaseline) {
+      definition(identity, 'Historical baseline', `v${report.releasedBaseline.version} · ${report.releasedBaseline.gitRevision}`);
+      definition(identity, 'Baseline report SHA-256', report.releasedBaseline.reportSha256);
+    }
     if (report.source?.title) definition(identity, 'Measurement source', report.source.title);
     if (report.source?.url && /^https:\/\//.test(report.source.url)) { const link = make('a', 'Original published report ↗'); link.href = report.source.url; $('measurement-links').append(link); }
     for (const assumption of report.assumptions || []) $('measurement-assumptions').append(make('li', typeof assumption === 'string' ? assumption : describe(assumption)));

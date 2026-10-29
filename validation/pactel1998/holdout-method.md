@@ -1,5 +1,7 @@
 # ATWS-11 reserved response protocol
 
+**Historical v0.7 protocol.** The response was scored and published in v0.7.0. Reproduce the original frozen run from that tag. Later releases use [the post-unblinding comparison](post-unblinding-method.md); ATWS-11 is no longer held out from development. The original source, freeze, data and published result are preserved.
+
 ATWS-11 is a different PACTEL experiment from the ATWS-10 development comparison. Its pressure response was withheld from the pressure-model developer during the v0.7 development cycle. The report's general discussion was already available. This is a development-separated component comparison, not historically blind external validation or operating-plant qualification.
 
 The case and window were selected using the published input tables before extracting the response. [The protocol](holdout-protocol.json) records the selection time and predeclared inputs, numerical settings and scoring. [The provenance](holdout-provenance.json) identifies every measured value and inherited approximation.
@@ -35,7 +37,7 @@ python validation/pactel1998/holdout_compare.py --freeze
 
 This development action creates `holdout-freeze.json` and refuses to overwrite it. Users reproducing the published candidate must use the committed freeze; they must not regenerate it. The freeze binds model, wrapper, shared runner, both comparators, extraction code, reference, provenance and protocol. The subsequent FMU build manifest additionally binds the freeze and the compiled executable. Changed candidate sources fail before held-out execution.
 
-The normal PACTEL build/comparison command then evaluates the frozen model and includes the result as `holdoutComparison` in `artifacts/pressurizer-validation.json`:
+In the `v0.7.0` checkout, the normal PACTEL build/comparison command evaluates the frozen model and includes the result as `holdoutComparison` in `artifacts/pressurizer-validation.json`:
 
 ```sh
 npm run engineering:pressurizer -- --build

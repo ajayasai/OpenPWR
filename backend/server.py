@@ -205,12 +205,13 @@ class Handler(BaseHTTPRequestHandler):
             "engineering-verification.json": "artifacts/modelica-verification.json",
             "modelica-property-verification.json": "artifacts/modelica/property-verification.json",
             "plant-verification.json": "artifacts/plant-verification.json",
+            "cold-verification.json": "artifacts/cold-verification.json",
             "measured-validation.json": "artifacts/measured-validation.json",
             "pressurizer-validation.json": "artifacts/pressurizer-validation.json",
         }
         if name in report_paths:
             path = self.server.root / report_paths[name]
-        elif name in {"index.html", "engineering.html", "engineering-evidence.html", "plant.html", "plant-evidence.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
+        elif name in {"index.html", "engineering.html", "engineering-evidence.html", "plant.html", "plant-evidence.html", "startup.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
             path = self.server.root / name
         else:
             raise ServiceError(404, "not_found", "Not found.")

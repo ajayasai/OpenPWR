@@ -47,12 +47,30 @@ jobs:
       - run: npm run engineering:test
         env:
           OPENPWR_FMU: artifacts/modelica/PrimaryLoop.fmu
+          OPENPWR_COLD_FMU: artifacts/modelica/ColdStartPlant.fmu
       - run: npm run engineering:verify
       - run: npm run engineering:plant:verify
       - run: npm run engineering:measured -- --build
-      - run: npm run engineering:pressurizer -- --build
+      - name: Verify cold startup and pressure comparisons concurrently
+        shell: bash
+        run: |
+          set +e
+          npm run engineering:cold:verify > artifacts/cold-verification.log 2>&1 &
+          cold_pid=$!
+          npm run engineering:pressurizer -- --build > artifacts/pressurizer-verification.log 2>&1 &
+          pressure_pid=$!
+          wait "$cold_pid"
+          cold_status=$?
+          wait "$pressure_pid"
+          pressure_status=$?
+          printf 'Cold verification exit: %s; pressure comparison exit: %s\n' "$cold_status" "$pressure_status"
+          if [ "$cold_status" -ne 0 ] || [ "$pressure_status" -ne 0 ]; then
+            tail -n 100 artifacts/cold-verification.log
+            tail -n 100 artifacts/pressurizer-verification.log
+            exit 1
+          fi
       - run: npm run verify
-      - run: npm run build -- --require-native --require-plant --require-measured --require-pressurizer
+      - run: npm run build -- --require-native --require-plant --require-cold --require-measured --require-pressurizer
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
@@ -67,8 +85,11 @@ jobs:
             artifacts/modelica/*.log
             artifacts/modelica-verification.json
             artifacts/plant-verification.json
+            artifacts/cold-verification.json
+            artifacts/cold-verification.log
             artifacts/measured-validation.json
             artifacts/pressurizer-validation.json
+            artifacts/pressurizer-verification.log
           if-no-files-found: warn
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

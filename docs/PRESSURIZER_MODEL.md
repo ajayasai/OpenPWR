@@ -65,7 +65,7 @@ The generic optional wall has 12 fixed axial cells and four finite-volume radial
 
 Inner and outer surface temperatures are separate algebraic unknowns. Fluid-side transfer and exterior convection are balanced against conduction through the appropriate cylindrical half-cell resistance. The earlier cell-center-as-surface approximation is available only as the explicit `resolveWallFaces=false` ablation. `PactelCoarse` (12×4), `PactelRadialRefined` (12×8), `PactelSpatialRefined` (24×8) and nominal `PactelPressurizer` (48×8) keep all physics and inputs fixed. Their discrepancies are numerical mesh evidence, not parameter fitting or a physical accuracy claim. Wall end caps, flange masses, heater sheaths and liquid thermal stratification remain absent.
 
-Condensation on exposed wall uses the classical gravity-film expression:
+The legacy closure, retained for generic models with `useRegimeCondensation=false`, uses the classical gravity-film expression:
 
 ```text
 Hfilm = 0.943 [g rho_f (rho_f−rho_v,s) k_f^3 hfg /
@@ -75,6 +75,8 @@ cw = Qfilm/(hv−hl,s)
 ```
 
 Film liquid properties are evaluated near the mean of saturation and inner-wall temperatures. A 273.15 K lower bound protects property evaluation during nonlinear solver trial iterates; it is inactive for accepted temperatures inside the declared wall domain. The 0.1 K denominator regularization gives finite coefficients at zero temperature difference; heat flux still vanishes there. Vapor height, bounded below by 0.01 m, supplies the film length. The formula and its classical assumptions are documented in the [ht library's Nusselt correlation reference](https://ht.readthedocs.io/en/latest/ht.condensation.html#ht.condensation.Nusselt_laminar). No correlation multiplier is fitted to either measured pressure curve. Curvature, waves, entrainment, noncondensables and an explicit superheated-vapor boundary layer are omitted.
+
+The v0.8 PACTEL candidate selects a local film-regime closure with cumulative condensate flow and the Chen gravity-film blend. Its equations, transition assumptions and development comparisons are recorded separately in [the v0.8 pressure investigation](PRESSURE_V08.md). The legacy equation above remains the ablation; it should not be mistaken for the selected PACTEL candidate. No new independent validation event is created by changing the closure.
 
 Liquid-to-wall convection uses an assumed 500 W/(m² K). A 10 W/(m² K) vapor convection term allows heating by a wall hotter than the bulk vapor. These are disclosed closure assumptions, not identified facility coefficients. The film term handles cooling/condensation at a wall below saturation. Exterior loss is the specified exterior coefficient times exterior area and wall-to-ambient temperature difference.
 
@@ -96,7 +98,7 @@ Temperature is in kelvin. The implementation restricts these wall functions to 2
 
 For Krško, all four pressurizer controls are explicit inputs; unidentified histories default to zero. Published CVCS volumetric flows are not silently converted to kg/s without instrument reference conditions. The 6 MW pump-heat contribution documented for the 2005 plant is deposited directly in cold coolant and included in the energy boundary, separately from fuel heat. Its initial secondary heat-transfer calibration includes that contribution. Primary volumes, their hot/cold allocation, pressurizer volume, fuel capacity and secondary inventory remain explicit parameters where no event-applicable geometry was established. The Krško wrapper omits the wall because its geometry and thermal conditions remain unidentified; this is an adiabatic assumption, not an identified plant boundary.
 
-No post-initialization response is used to tune geometry, gains, transfer coefficients, wall properties or time constants. A new formulation can worsen a held-out discrepancy; comparison results must retain that outcome.
+The v0.6/v0.7 cases did not fit geometry, gains, transfer coefficients, wall properties or time constants to post-initialization pressure. ATWS-11 was scored and disclosed in v0.7. Subsequent evaluations are [post-unblinding development comparisons](../validation/pactel1998/post-unblinding-method.md), with the exact v0.7 report retained as an immutable baseline. A change in measured error on these disclosed cases is not independent predictive validation. Any fitting or model selection using the response must be described as development work.
 
 ## Numerical checks and applicability
 
@@ -105,6 +107,8 @@ The PACTEL runner requests a `1e-9` relative solver tolerance; Krško requests `
 Measured boundaries are held over each FMI communication step, with all published event knots retained exactly. Independent external-flux quadrature uses the imposed input for both endpoints of each step, avoiding stale algebraic outputs immediately after FMI `setReal`. Time-step refinement and integrated mass/energy errors are reported separately from measured-response errors.
 
 The compiled property check additionally verifies wall enthalpy and conductivity-potential derivatives at 300, 550 and 1000 K, plus their integrals across three temperature intervals. These 18 checks are reported separately from the 24 published water-property comparisons and 40 thermodynamic consistency checks. They verify implementation of the selected material correlations; they are not independent measurements of the test vessel's steel.
+
+Nine additional checks verify the native film closure: four comparisons with the independently printed compact Chen equation, a numerical integral of native local laminar heat transfer against the classical mean-Nusselt plate solution, and value/first-derivative continuity at both numerical transition boundaries. These carry the separate `film-correlation-verification` category. The integrated analytical-limit check permits 0.2% for rounded 1.1 and 0.943 coefficients and disables only the tiny-Reynolds numerical floor. These checks establish implementation consistency, not correlation applicability or measured pressure fidelity.
 
 Before measured scoring, the development mesh comparison at a common 0.1 s communication step found maximum pressure changes of 0.00720 MPa for 12×4→12×8, 0.07094 MPa for 12×8→24×8, and 0.03352 MPa for 24×8→48×8. All four runs passed independent inventory checks. The finest tested mesh was selected because axial differences decreased with refinement; the selected material and transfer closures were unchanged. These differences do not establish asymptotic convergence or bound the remaining spatial error. The release report repeats the mesh sequence at a common 0.05 s communication step and retains the unresolved spatial error explicitly.
 

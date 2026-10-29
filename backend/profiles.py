@@ -55,6 +55,32 @@ PLANT_REAL_OUTPUTS = REAL_OUTPUTS + (
     "auxPumpPowerMW", "auxTankDisplacementPowerMW", "auxAutoActuated", "auxTankDepleted",
     "auxPumpFluidPowerMW", "auxMotorLossMW", "auxFeedwaterEnthalpyJkg", "condenserDisplacementPowerMW",
 )
+COLD_CONTROL_LIMITS = {
+    "pumpCommand": (0.0, 1.0), "startupHeatMW": (0.0, 90.0), "heaterPowerMW": (0.0, 3.0),
+    "shutdownCoolingFraction": (0.0, 1.0), "chargingFlowKgS": (0.0, 10.0),
+    "letdownFlowKgS": (0.0, 20.0), "ventFraction": (0.0, 1.0),
+    "pressureControlEnable": (0.0, 1.0), "pressureTargetMPa": (0.2, 15.5),
+    "inventoryControlEnable": (0.0, 1.0),
+}
+COLD_DEFAULT_CONTROLS = {
+    "pumpCommand": 0.0, "startupHeatMW": 0.0, "heaterPowerMW": 0.0,
+    "shutdownCoolingFraction": 1.0, "chargingFlowKgS": 0.0, "letdownFlowKgS": 0.0,
+    "ventFraction": 0.0, "pressureControlEnable": 0.0, "pressureTargetMPa": 0.3,
+    "inventoryControlEnable": 1.0,
+}
+COLD_REAL_OUTPUTS = (
+    "hotLegTemperatureC", "coldLegTemperatureC", "fuelTemperatureC", "primaryPressureMPa",
+    "pressurizerTemperatureC", "pressurizerLevelPercent", "primaryFlowKgS", "pumpSpeed", "pumpHeatMW",
+    "reactorPowerMW", "heatToSteamMW", "shutdownCoolingMW", "secondaryTemperatureC",
+    "secondaryPressureMPa", "secondaryLevelPercent", "secondaryMassKg", "pressurizerGasMassKg",
+    "pressurizerVaporMassKg", "ventSteamFlowKgS", "ventGasFlowKgS", "actualHeaterPowerMW",
+    "actualLetdownFlowKgS", "actualChargingFlowKgS", "primarySubcoolingK", "totalPlantStoredEnergyMJ",
+    "totalPlantMassKg", "plantBoundaryPowerMW", "plantBoundaryMassFlowKgS", "integratedPlantBoundaryEnergyMJ",
+    "integratedPlantBoundaryMassKg", "plantEnergyResidualMW", "plantMassResidualKgS", "hotStandbyReady",
+    "secondaryGasMassKg", "secondarySteamVentKgS", "secondaryGasVentKgS", "surgeFlowKgS", "primaryMassKg",
+    "coldLegEnthalpyJkg", "chargingEnthalpyJkg", "pressurizerSteamEnthalpyJkg",
+    "secondarySteamEnthalpyJkg", "secondaryVaporMassKg",
+)
 PROFILES = {
     "primary": {"model": "OpenPWR.PrimaryLoop", "file": "PrimaryLoop.fmu", "manifest": "manifest.json",
         "port": 8001, "page": "engineering.html", "limits": CONTROL_LIMITS, "defaults": DEFAULT_CONTROLS,
@@ -64,4 +90,9 @@ PROFILES = {
         "real_outputs": PLANT_REAL_OUTPUTS, "boolean_outputs": ("valid",),
         "discrete_controls": ("tripCommand", "turbineTripCommand", "gridBreakerCommand", "auxAutoEnable",
                               "auxPumpAAvailable", "auxPumpBAvailable", "auxValveAOpen", "auxValveBOpen")},
+    "cold": {"model": "ColdStartPlant", "file": "ColdStartPlant.fmu", "manifest": "cold-manifest.json",
+        "port": 8003, "page": "startup.html", "limits": COLD_CONTROL_LIMITS, "defaults": COLD_DEFAULT_CONTROLS,
+        "real_outputs": COLD_REAL_OUTPUTS, "boolean_outputs": ("valid",),
+        "discrete_controls": ("pressureControlEnable", "inventoryControlEnable"),
+        "step_size": 5.0, "supported_steps": (0.25, 0.5, 2.5, 5.0), "max_step_seconds": 120},
 }

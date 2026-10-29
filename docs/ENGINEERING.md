@@ -1,8 +1,8 @@
 # OpenModelica engineering workbench
 
-The optional engineering workbench executes compiled **OpenModelica FMI 2.0 co-simulation models**, hosted locally by FMPy. Choose the native coupled hot plant or the isolated primary-loop/pressurizer subsystem. The existing JavaScript whole-plant laboratory remains a separate browser-only edition; readings are never silently blended between engines.
+The optional engineering workbench executes compiled **OpenModelica FMI 2.0 co-simulation models**, hosted locally by FMPy. Choose the native cold-start experiment, coupled hot plant or isolated primary-loop/pressurizer subsystem. The existing JavaScript whole-plant laboratory remains a separate browser-only edition; readings are never silently blended between engines.
 
-The coupled model adds six-group reactor kinetics and decay heat, fuel feedback, steam-generator phase inventories, turbine expansion, rotor energy and generator connection, condenser inventory/cooling, feedwater control and protection. It remains a generic hot-operation model with a deliberately limited domain; native cold startup is not implemented. Its 3D cutaway displays the same observations as the gauges. See [coupled equations and scope](NATIVE_PLANT.md). The isolated primary model retains prescribed reactor heat and secondary temperature boundaries; see [primary equations](MODELICA_MODEL.md).
+The coupled model adds six-group reactor kinetics and decay heat, fuel feedback, steam-generator phase inventories, turbine expansion, rotor energy and generator connection, condenser inventory/cooling, feedwater control and protection. It remains a generic hot-operation model with a deliberately limited domain. Native thermal startup and cooldown are implemented in a separate continuous cold-start model; a transition through criticality into the hot coupled model remains unimplemented. The hot plant's 3D cutaway displays the same observations as the gauges. See [coupled equations and scope](NATIVE_PLANT.md). The isolated primary model retains prescribed reactor heat and secondary temperature boundaries; see [primary equations](MODELICA_MODEL.md).
 
 ![Native OpenModelica workbench with solver readings and primary circuit controls](engineering-workbench.jpg)
 
@@ -25,7 +25,7 @@ npm run engineering:plant:start
 
 Open **http://127.0.0.1:8002/plant.html**. For the isolated primary workbench, use `npm run engineering:start` and **http://127.0.0.1:8001/engineering.html**. Both start paused. Run advances the native solver; controls set actual FMI inputs. Pause stops simulation time. Reset creates a nominal initial state. CSV contains native observations; the command log records applied control changes and simulation times. Commands and replay files are validated against the selected model profile.
 
-Setup creates an isolated `artifacts/engineering-venv` and installs `backend/requirements.txt`. No Python libraries are added to the browser edition. The build command compiles `PrimaryLoop.fmu`, `CoupledPlant.fmu`, `KineticsReference.fmu` and `PropertyReferenceChecks.fmu` under `artifacts/modelica`. The measured command separately compiles `KrskoTransient.fmu` and its same-boundary `KrskoEquilibrium.fmu` ablation. The pressurizer command compiles `PactelPressurizer.fmu`. Each has a manifest with source/artifact hashes, compiler, platform and Git revision; build logs remain alongside it. Temporary compilation directories prevent reuse of stale generated files.
+Setup creates an isolated `artifacts/engineering-venv` and installs `backend/requirements.txt`. No Python libraries are added to the browser edition. The build command compiles `PrimaryLoop.fmu`, `CoupledPlant.fmu`, `ColdStartPlant.fmu`, `KineticsReference.fmu` and `PropertyReferenceChecks.fmu` under `artifacts/modelica`. The measured command separately compiles `KrskoTransient.fmu` and its same-boundary `KrskoEquilibrium.fmu` ablation. The pressurizer command compiles `PactelPressurizer.fmu`. Each has a manifest with source/artifact hashes, compiler, platform and Git revision; build logs remain alongside it. Temporary compilation directories prevent reuse of stale generated files.
 
 ### Windows with WSL
 
@@ -44,12 +44,12 @@ Browser engineering controls
          │ same-origin JSON requests / observations
 Loopback Python service + FMPy
          │ FMI 2.0 input, doStep, output calls
-OpenModelica PrimaryLoop or CoupledPlant FMU + CVODE
+OpenModelica PrimaryLoop / CoupledPlant / ColdStartPlant FMU + CVODE
          │
 Modelica Standard Library IF97 water properties
 ```
 
-One FMU owns all states in the selected experiment, including the coupled plant's secondary and electrical systems. The host uses 50 ms communication steps; CVODE integrates internally. Browser display timing never changes the equations. Real-time performance is measured on the target machine, not guaranteed by FMI. Simulated time is explicitly displayed and is authoritative.
+One FMU owns all states in the selected experiment, including the coupled plant's secondary and electrical systems. The hot-model host uses 50 ms communication steps. Cold-start uses 5 s communication steps (2.5 s for full-trajectory refinement and shorter steps for local checks); CVODE integrates internally. Cold-start requests are bounded to 120 simulated seconds, with every intermediate step checked for domain validity. Browser display timing never changes the equations. Real-time performance is measured on the target machine, not guaranteed by FMI. Simulated time is explicitly displayed and is authoritative.
 
 The service binds only to `127.0.0.1`. It serves the UI and API from one origin, checks Host and Origin on control requests, bounds inputs and request sizes, and stops advancement on nonfinite outputs, solver errors or the model's declared validity boundary. It is a local single-session service, not an authenticated multiuser cloud deployment.
 
@@ -73,13 +73,13 @@ Each run writes a CSV, command history and report; a domain halt or failed compa
 
 ## Evidence
 
-The [primary evidence page](https://ajayasai.github.io/OpenPWR/engineering-evidence.html) and [coupled plant evidence page](https://ajayasai.github.io/OpenPWR/plant-evidence.html) present source/binary identity, traces, check tolerances and measured discrepancies. GitHub deployment requires current successful numerical reports and completed, current Krško and PACTEL comparisons. `npm run build -- --require-native --require-plant --require-measured --require-pressurizer` enforces this locally. Measured disagreement or an inconclusive applicability result is published, not suppressed. Ordinary browser-only builds omit missing or stale native reports.
+The [primary evidence page](https://ajayasai.github.io/OpenPWR/engineering-evidence.html) and [coupled plant evidence page](https://ajayasai.github.io/OpenPWR/plant-evidence.html) present source/binary identity, traces, check tolerances and measured discrepancies. GitHub deployment requires current successful numerical reports and completed, current Krško and PACTEL comparisons. `npm run build -- --require-native --require-plant --require-cold --require-measured --require-pressurizer` enforces this locally. Measured disagreement or an inconclusive applicability result is published, not suppressed. Ordinary browser-only builds omit missing or stale native reports.
 
 `npm run engineering:verify` runs the actual compiled FMUs. The primary checks cover nominal equilibrium, analytical pump lag, heater and spray response directions, closed-system mass conservation, external mass accounting, independently integrated boundary energy, communication-step refinement, and deterministic reset/replay. A separate probe makes 24 published comparisons: twelve NISTIR 5078 saturation values and twelve official IAPWS-IF97 compressed-liquid verification values. It also reports 40 numerical derivative-consistency checks separately, including 15 at steam-region states used to exercise the new pressurizer derivatives. The NIST 0.05% tolerance accounts for table precision and IF97/IAPWS-95 differences; exact inputs and tolerances are in the report and model guide.
 
 These are separate from the browser engine's 71 published component comparisons. Coupled checks add independent matrix-exponential kinetics, reactor and turbine trip responses, grid permissives, feedwater/cooling causality, whole-plant mass/energy accounting, refinement and replay. The [measured Krško comparison](MEASURED_VALIDATION.md) separately assesses held-out pressure and temperature traces with measured boundary inputs. Generic geometry and incomplete instrument/configuration information prevent a validation pass.
 
-Reports are `artifacts/modelica-verification.json`, `artifacts/modelica/property-verification.json`, `artifacts/plant-verification.json`, `artifacts/measured-validation.json` and `artifacts/pressurizer-validation.json`. The local workbench checks its evidence FMU hash against the running model. Build guards verify actual FMU bytes, common and benchmark source, comparison code, CSV, parameter ledger and provenance hashes before replacing a deployment. Numerical correctness and real-plant agreement remain distinct claims.
+Reports are `artifacts/modelica-verification.json`, `artifacts/modelica/property-verification.json`, `artifacts/plant-verification.json`, `artifacts/cold-verification.json`, `artifacts/measured-validation.json` and `artifacts/pressurizer-validation.json`. The local workbench checks its evidence FMU hash against the running model. Build guards verify actual FMU bytes, common and benchmark source, comparison code, CSV, parameter ledger and provenance hashes before replacing a deployment. Numerical correctness and real-plant agreement remain distinct claims.
 
 The public GitHub Pages workbench cannot run a native FMU. It presents local launch instructions and disables controls until the local service is available; it does not substitute sample numbers. Native FMUs and their evidence can be distributed as release artifacts with their platform, source revision and compiler identified.
 
@@ -89,4 +89,10 @@ The original model, UI, host and build scripts are Apache-2.0. OpenModelica, the
 
 ## Next model increments
 
-Next priorities are independently specified geometry and controller data, additional measured transients with uncertainty, native cold operation/shutdown cooling, multi-loop hydraulics, spatial core response and more detailed secondary equipment. Containment and emergency systems require their own models and evidence. The 3D view must continue to distinguish modeled states from illustrative geometry. See [the roadmap](ROADMAP.md).
+Next priorities are independently specified geometry and controller data, additional measured transients with uncertainty, continuous native startup through criticality/full power, multi-loop hydraulics, spatial core response and more detailed secondary equipment. Containment and emergency systems require their own models and evidence. The 3D view must continue to distinguish modeled states from illustrative geometry. See [the roadmap](ROADMAP.md).
+
+## Native cold-to-hot-standby experiment
+
+`npm run engineering:cold:build`, `npm run engineering:cold:verify` and `npm run engineering:cold:start` build, verify and serve the standalone `ColdStartPlant` on `http://127.0.0.1:8003/startup.html`. Its source is `models/ColdStartPlant.mo`, its manifest is `artifacts/modelica/cold-manifest.json`, and its report is `artifacts/cold-verification.json`. The manifest binds common/cold Modelica sources, verifier, host and profile files. This is a continuous thermal heatup/cooldown experiment with prescribed fuel heat; it does not model criticality or silently replace its state with the hot plant. Read [native cold-start scope](NATIVE_COLD_STARTUP.md).
+
+The local model can accelerate simulated time using bounded native steps, export actual CSV observations, and replay applied commands against the exact FMU identity. GitHub Pages serves the interface and evidence; native calculation still requires the local open-source service.

@@ -1,0 +1,3379 @@
+{
+  "schema": "openpwr-measured-validation-v1",
+  "version": "0.7.0",
+  "gitRevision": "fb00e13f03c3f200e8acd8e8ff4a5b5b1316c523",
+  "gitDirty": false,
+  "sourceSha256": "8a018a8419950c935fe9f837ff5c46aaf0d689a2e296624516d49713cd983192",
+  "benchmarkModelSha256": "62f9505d5ffaf2cbec4f5a517bf7e8a42f49397dd6005df4879dec43a6638013",
+  "inputDataSha256": "f2160bb33271b1b80774df8edee13d805a2b7abe24a6a7a4de356035001b0407",
+  "referenceMetadataSha256": "e23a13b539f57507445bb215fd21a59024d75be00b9a9b4f80d2a17c2ea1b4b1",
+  "parameterSourcesSha256": "ed3d41193e0835cc70c68303ca7797c4651a499a8f864972fbc4d2c33b458ba4",
+  "baselineSha256": "90024ac524d87165761fae591493229b06552298a7f5df3121e6ede1dd8a9bab",
+  "comparisonScriptSha256": "328234eab48f42cac542a7cfca0a3662d9081bb469711088d9944eb5500edb8c",
+  "sharedRunnerSha256": "59fbafcf08cc4a53ff3f8c97c9e86ef2f9be2e78f83f3414a0f0443c4f98a247",
+  "generatedAt": "2026-10-26T10:10:24.997039+00:00",
+  "executed": true,
+  "status": "inconclusive",
+  "validationPassed": false,
+  "conclusion": "The measured comparison and controlled pressure-model ablation completed. Missing event-era geometry, control histories and instrument uncertainty still prevent plant validation; every discrepancy is retained.",
+  "scope": "Boundary-driven early thermal response; measured reactor power and steam/feedwater flows do not validate reactor kinetics or plant controls.",
+  "caseId": "krsko-2005-governor-closure-early",
+  "title": "Krško 10 April 2005 governor-closure transient: early thermal response",
+  "source": {
+    "title": "NUREG/IA-0221: Reactor Trip Analysis at Krško Nuclear Power Plant",
+    "authors": [
+      "Andrej Prošek",
+      "Borut Mavko"
+    ],
+    "publisher": "U.S. Nuclear Regulatory Commission / Jožef Stefan Institute",
+    "publicationDate": "2010-01",
+    "publicationDateBasis": "Report title page, PDF page 3: January 2010. Earlier OpenPWR metadata incorrectly used February.",
+    "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+    "adamsAccession": "ML100680300",
+    "sha256": "0d9355cb4a04d3cfac6db671e54d1000df745606ed9af7f324ac650ece6c9665",
+    "accessed": "2026-10-26",
+    "sourceKind": "Measured operating-plant instrument curves published in a primary technical report",
+    "redistribution": "Only numerical facts extracted from the measured curves and original extraction code are distributed. The publisher PDF, artwork, and report prose are not bundled or relicensed."
+  },
+  "sourceURL": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+  "dataURL": "https://github.com/ajayasai/OpenPWR/blob/main/validation/krsko2005/measured.csv",
+  "runtime": {
+    "model": "OpenPWR.KrskoTransient",
+    "fmuSha256": "389a65e5f54da7a5172da95714dd808710b833761e39e3ff0070795505d399a0",
+    "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+    "fmiVersion": "2.0"
+  },
+  "buildManifest": {
+    "version": "0.7.0",
+    "gitRevision": "fb00e13f03c3f200e8acd8e8ff4a5b5b1316c523",
+    "gitDirty": false,
+    "sourceSha256": "8a018a8419950c935fe9f837ff5c46aaf0d689a2e296624516d49713cd983192",
+    "benchmarkModelSha256": "62f9505d5ffaf2cbec4f5a517bf7e8a42f49397dd6005df4879dec43a6638013",
+    "inputDataSha256": "f2160bb33271b1b80774df8edee13d805a2b7abe24a6a7a4de356035001b0407",
+    "referenceMetadataSha256": "e23a13b539f57507445bb215fd21a59024d75be00b9a9b4f80d2a17c2ea1b4b1",
+    "parameterSourcesSha256": "ed3d41193e0835cc70c68303ca7797c4651a499a8f864972fbc4d2c33b458ba4",
+    "baselineSha256": "90024ac524d87165761fae591493229b06552298a7f5df3121e6ede1dd8a9bab",
+    "comparisonScriptSha256": "328234eab48f42cac542a7cfca0a3662d9081bb469711088d9944eb5500edb8c",
+    "sharedRunnerSha256": "59fbafcf08cc4a53ff3f8c97c9e86ef2f9be2e78f83f3414a0f0443c4f98a247",
+    "model": "OpenPWR.KrskoTransient",
+    "compiler": "OpenModelica 1.27.1~2-g6db4671",
+    "fmuSha256": "389a65e5f54da7a5172da95714dd808710b833761e39e3ff0070795505d399a0",
+    "fmiVersion": "2.0",
+    "modelicaLibrary": "4.0.0",
+    "hostPlatform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+  },
+  "metadata": {
+    "schema": "openpwr-measured-reference-v1",
+    "caseId": "krsko-2005-governor-closure-early",
+    "title": "Krško 10 April 2005 governor-closure transient: early thermal response",
+    "source": {
+      "title": "NUREG/IA-0221: Reactor Trip Analysis at Krško Nuclear Power Plant",
+      "authors": [
+        "Andrej Prošek",
+        "Borut Mavko"
+      ],
+      "publisher": "U.S. Nuclear Regulatory Commission / Jožef Stefan Institute",
+      "publicationDate": "2010-01",
+      "publicationDateBasis": "Report title page, PDF page 3: January 2010. Earlier OpenPWR metadata incorrectly used February.",
+      "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+      "adamsAccession": "ML100680300",
+      "sha256": "0d9355cb4a04d3cfac6db671e54d1000df745606ed9af7f324ac650ece6c9665",
+      "accessed": "2026-10-26",
+      "sourceKind": "Measured operating-plant instrument curves published in a primary technical report",
+      "redistribution": "Only numerical facts extracted from the measured curves and original extraction code are distributed. The publisher PDF, artwork, and report prose are not bundled or relicensed."
+    },
+    "experiment": {
+      "plant": "Krško, Westinghouse two-loop PWR, post-2000 uprate, core cycle 21",
+      "eventDate": "2005-04-10",
+      "eventDateResolution": {
+        "status": "resolved-with-independent-operator-report",
+        "reportConflict": "NUREG/IA-0221 abstract (PDF page 5), introduction (printed page 1) and conclusion (printed page 55) say 10 April; the event-description paragraph on printed page 9 says 5 April.",
+        "independentSource": "NEK Annual Report 2005, PDF page 13, Operational events: 10 April 2005 turbine-valve test followed by SI and trip. The separate condenser-vacuum event is dated 11 April.",
+        "independentSourceURL": "https://www.nek.si/upload/publications/nek_annual_report_2005.pdf",
+        "independentSourceSha256": "7d7592fd41533169ed51832347c4efce4dad882aacaaadc2ffb31da332c08c52",
+        "corroborationURL": "https://onlinelibrary.wiley.com/doi/10.1155/2008/745178",
+        "priorOpenPWRValue": "2005-04-05",
+        "effectOnTimeSeries": "None. Relative time convention and original numeric channels are unchanged."
+      },
+      "ratedCoreThermalPowerMW": 1994,
+      "reportedPumpHeatMW": 6,
+      "samplePeriodS": 2,
+      "eventTimeConvention": "Report section 4: t=0 is the inferred start of governor-valve closure, 53 seconds after the source acquisition began.",
+      "referenceWindowS": [
+        -49,
+        49
+      ],
+      "comparisonWindowS": [
+        0,
+        15
+      ],
+      "windowRationale": "End before operator reopening at approximately 16 s and inferred SI/reactor trip at approximately 17 s. The report warns that post-trip neutron-power and flow indications do not directly represent total decay heat and actual flows; those intervals are excluded.",
+      "measurementTimingAllowanceS": 1,
+      "measurementTimingAllowanceBasis": "Half of the reported 2 s acquisition interval; a comparison allowance, not a quantified instrument-delay distribution."
+    },
+    "extraction": {
+      "method": "Read PDF vector vertices of the magenta measured instrument curve in panel (a); exclude blue curves labeled cal and all legend symbols.",
+      "software": "pdfplumber 0.11.9",
+      "script": "validation/krsko2005/extract.py",
+      "csv": "validation/krsko2005/measured.csv",
+      "figures": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40
+      ],
+      "pdfPagesOneBased": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        57,
+        58,
+        59,
+        60
+      ],
+      "printedPages": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        45,
+        46,
+        47,
+        48
+      ],
+      "instrumentChannelCount": 15,
+      "samplesPerInstrument": 50,
+      "timeRounding": "Vector x-coordinates match -49,-47,...,49 s within 0.06 s. They are snapped to that stated acquisition grid; values are rounded to six decimals for reproducibility, not six-digit measurement accuracy.",
+      "readingAllowance": "A conservative half-PDF-point vertical reading allowance is recorded per channel by the extractor. It is roughly 0.006 MPa for primary pressure, 0.005 MPa for SG pressure, 0.04 K for cold legs and 0.13 K for hot legs. It covers figure extraction only, not instrument uncertainty.",
+      "pressureAxisCorrection": "Figures 29,33,34 label pressure in MPa but print bar-valued ticks (primary 144–162; SG 64–80). Multiply these tick values by 0.1 to recover MPa. This is corroborated independently by measured Table 2 initial pressure 15.48 MPa and SG pressures 6.42/6.40 MPa; raw printed values must not be treated as 154.8 MPa or 64.2 MPa.",
+      "temperatureConversion": "Printed kelvin values minus 273.15.",
+      "additionalControls": "chargingFlowLS (AF00793_FT205, Figure 31) and letdownFlowLS (AF00795_FT132, Figure 32) retain the source litres/second unit. Their highest labelled horizontal gridline is 8 L/s; the vertical axis extends above it, so the extractor uses the labelled gridline rather than the unlabelled endpoint. No density, reference-temperature, pressure, or incoming-enthalpy conversion is invented.",
+      "additionalResponse": "pressurizerLevelPercent (AL00818_LT465, Figure 30) is an indicated level with a 0–70 percent plotted scale. It is not a measured liquid-volume fraction; geometry and level-instrument transfer functions are required for that interpretation.",
+      "aggregation": "Hot/cold temperatures and SG pressures are unweighted means of the two reported loop instruments. Steam and feedwater flows are sums. These means do not resolve loop asymmetry.",
+      "powerConversion": "Before trip, reported neutron power percent multiplied by 1994 MW / 100. It is a thermal-input proxy, not direct calorimetry and not a valid post-trip decay-heat measurement."
+    },
+    "initialConditions": {
+      "basis": "Measured t=0 column of Table 2 (printed page 13, PDF page 25), with arithmetic means for two-loop temperatures and pressure.",
+      "primaryPressureMPa": 15.48,
+      "hotTemperatureK": 594.175,
+      "coldTemperatureK": 559.445,
+      "steamPressureMPa": 6.41,
+      "pressurizerLevelPercent": 52.95,
+      "nuclearPowerPercent": 91.94,
+      "coreThermalPowerMW": 1833.2836,
+      "steamFlowKgS": 994.1,
+      "feedwaterFlowKgS": 1004.6
+    },
+    "calibrationAndHoldout": {
+      "initializationData": "Only Table 2 initial values calibrate the nominal heat-transfer conductances and feedwater enthalpy needed for constructed equilibrium.",
+      "forcingChannels": [
+        "reactorPowerMW",
+        "steamFlowKgS",
+        "feedwaterFlowKgS"
+      ],
+      "heldOutResponseChannels": [
+        "primaryPressureMPa",
+        "hotLegTemperatureC",
+        "coldLegTemperatureC",
+        "steamPressureMPa"
+      ],
+      "parameterFitting": "No transient response channel is used to fit volumes, heat capacities, conductances, control gains or time constants. No optimization is performed.",
+      "acceptance": "No plant-validation acceptance band is asserted: the source does not supply instrument uncertainties or the complete plant geometry/input deck needed for this reduced model. Errors are reported even when large. Numerical success does not turn the applicability assessment into a validation pass."
+    },
+    "limitations": [
+      "This is a short, boundary-driven thermal/inventory comparison. Measured core power and secondary flows are inputs, so the test does not validate neutron kinetics, turbine controls, generator, feedwater controls or trip logic.",
+      "The primary hot/cold volumes, fuel heat capacity, pressurizer volume, and secondary volume remain generic assumptions scaled from OpenPWR by initial core thermal power/3000 MW. They are not identified Krško geometry.",
+      "A homogeneous equilibrium secondary model omits distributed boiling, subcooled feedwater mixing, SG walls and instrument shrink/swell. The primary model omits wall heat storage and transport delays.",
+      "Initial feedwater enthalpy is inferred from a zero initial secondary energy-rate balance because inlet enthalpy is not given in the selected report. The measured feedwater/steam mismatch is retained, so initial secondary mass inventory need not be exactly stationary.",
+      "The v0.5 replay omitted pump heat. The current case applies the documented nominal 6 MW as a separate constant boundary, not as a measured time history or fitted parameter.",
+      "The v0.5 replay fixed heater, spray, charging and letdown to zero. Measured charging/letdown curves in litres per second are now included, but instrument reference conditions and incoming-water enthalpy remain unestablished. Heater and spray numerical histories are unavailable in the reviewed event sources; their omission or assumed reconstruction limits pressure interpretation.",
+      "The pre-event figure curves indicate aggregate steam flow around 1003 kg/s and feedwater around 996 kg/s, while Table 2 lists roughly the reverse. Instrument identifiers in Table 3 and captions are followed without swapping, offsetting or fitting the curves. The inconsistency remains a source-input limitation.",
+      "Instrument calibration accuracy and delay distributions are unavailable; graphical reading allowances cannot replace them.",
+      "The published curves are a rendered representation of measurements, not the original raw acquisition dataset."
+    ],
+    "sourceLedger": "validation/krsko2005/reference-plant.json",
+    "referenceRevision": {
+      "baselineCommit": "17ae3019e9241306db66a6c2b5ac3660280de5b5",
+      "baselinePreservedLocally": "artifacts/measured-transients/baseline-v0.5-17ae301",
+      "changes": [
+        "Corrected event date and publication month from primary sources",
+        "Added two measured volumetric-flow channels and one measured level channel",
+        "Recorded geometry/control availability without fitting transient responses"
+      ],
+      "originalChannelValuesUnchanged": true
+    }
+  },
+  "parameterSources": {
+    "schema": "openpwr-plant-source-ledger-v1",
+    "plant": "Krško",
+    "caseId": "krsko-2005-governor-closure-early",
+    "reviewedAt": "2026-10-26",
+    "purpose": "Separate published facts from usable 2005 model parameters, unresolved boundaries, and rejected substitutions. No value is inferred by fitting measured pressure or temperature.",
+    "sources": [
+      {
+        "id": "ia0221",
+        "title": "NUREG/IA-0221: Reactor Trip Analysis at Krško Nuclear Power Plant",
+        "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+        "sha256": "0d9355cb4a04d3cfac6db671e54d1000df745606ed9af7f324ac650ece6c9665",
+        "date": "2010-01",
+        "kind": "Primary event analysis; measured instrument curves distinguished from RELAP5 results"
+      },
+      {
+        "id": "nek2005",
+        "title": "Krško Nuclear Power Plant Annual Report 2005",
+        "url": "https://www.nek.si/upload/publications/nek_annual_report_2005.pdf",
+        "sha256": "7d7592fd41533169ed51832347c4efce4dad882aacaaadc2ffb31da332c08c52",
+        "kind": "Contemporaneous plant-operator report"
+      },
+      {
+        "id": "event2008",
+        "title": "RELAP5/MOD3.3 Code Validation with Plant Abnormal Event",
+        "url": "https://onlinelibrary.wiley.com/doi/10.1155/2008/745178",
+        "doi": "10.1155/2008/745178",
+        "date": "2008-07-15",
+        "kind": "Primary analysis by the event-report authors; same event, not independent validation data"
+      },
+      {
+        "id": "nekTechnical",
+        "title": "NEK Technical Information",
+        "url": "https://www.nek.si/en/operation/technical-information",
+        "accessed": "2026-10-26",
+        "kind": "Current operator reference data; date of applicability not specified"
+      },
+      {
+        "id": "nekLeaflet",
+        "title": "Krško Nuclear Power Plant operator technical leaflet",
+        "url": "https://www.nek.si/upload/publications/nek_leaflet.pdf",
+        "sha256": "635dd9f90e9b7c42fd9802841242e96e2c2c1be63f5907da0f451e468fafec69",
+        "location": "PDF page 10, Technical Data",
+        "kind": "Operator reference data; undated edition, post-uprate ratings"
+      },
+      {
+        "id": "nea1997",
+        "title": "NEA/CSNI/R(97)35 Volume 2, Report on the Uncertainty Methods Study; UMAE contribution",
+        "url": "https://www.oecd-nea.org/upload/docs/application/pdf/2020-01/csni-r1997-35-vol2.pdf",
+        "sha256": "d43475c8f85469999c853bc7aa5e1b125770afce6d83cfff71396586d60f41db",
+        "location": "Table 6, printed page 2.38, PDF page 172",
+        "kind": "Historical technical comparison; 1882 MW NSSS, before 2000 SG replacement"
+      },
+      {
+        "id": "pisa1994",
+        "title": "Evaluation of the data base from high power and low power small break LOCA counterpart tests performed in LOBI, SPES, BETHSY and LSTF facilities",
+        "url": "https://arpi.unipi.it/handle/11568/899756",
+        "report": "DCMN NT 237(94)",
+        "kind": "Institutional bibliographic record; no associated file available",
+        "availability": "Detailed geometry Tables 3.2–3.7 cited by NEA report could not be inspected from this record."
+      }
+    ],
+    "modelParameters": [
+      {
+        "parameter": "pumpHeatMW",
+        "value": 6,
+        "unit": "MW",
+        "source": "ia0221",
+        "scope": "Nominal total heat from both reactor coolant pumps; printed page 3",
+        "status": "event-era-reference-not-measured-history"
+      },
+      {
+        "parameter": "initialPressurePa",
+        "value": 15480000,
+        "unit": "Pa",
+        "source": "ia0221",
+        "scope": "Table 2 measured t=0 primary pressure",
+        "status": "measured-initial-value"
+      },
+      {
+        "parameter": "initialHotTemperatureK",
+        "value": 594.175,
+        "unit": "K",
+        "source": "ia0221",
+        "scope": "Arithmetic mean of Table 2 measured t=0 hot-leg temperatures",
+        "status": "measured-initial-aggregate"
+      },
+      {
+        "parameter": "initialColdTemperatureK",
+        "value": 559.445,
+        "unit": "K",
+        "source": "ia0221",
+        "scope": "Arithmetic mean of Table 2 measured t=0 cold-leg temperatures",
+        "status": "measured-initial-aggregate"
+      },
+      {
+        "parameter": "hotVolumeM3",
+        "value": null,
+        "unit": "m3",
+        "source": [
+          "nekTechnical",
+          "nekLeaflet",
+          "nea1997"
+        ],
+        "scope": "No identifiable hot-vessel/leg allocation; total volume definitions cannot supply a split",
+        "status": "not-identified"
+      },
+      {
+        "parameter": "coldVolumeM3",
+        "value": null,
+        "unit": "m3",
+        "source": [
+          "nekTechnical",
+          "nekLeaflet",
+          "nea1997"
+        ],
+        "scope": "No identifiable cold-vessel/leg/SG allocation",
+        "status": "not-identified"
+      },
+      {
+        "parameter": "pressurizerVolumeM3",
+        "value": null,
+        "unit": "m3",
+        "source": [
+          "ia0221",
+          "pisa1994"
+        ],
+        "scope": "No inspected primary-source numeric value established for this case",
+        "status": "not-identified"
+      },
+      {
+        "parameter": "initialPressurizerLiquidFraction",
+        "value": null,
+        "unit": "volume fraction",
+        "source": "ia0221",
+        "scope": "Table 2 gives indicated level52.95%; level fraction cannot automatically be treated as liquid-volume fraction",
+        "status": "instrument-mapping-unresolved"
+      },
+      {
+        "parameter": "fuelCapacityJK",
+        "value": null,
+        "unit": "J/K",
+        "source": [
+          "ia0221",
+          "nekTechnical",
+          "nekLeaflet"
+        ],
+        "scope": "Fuel mass alone cannot determine an equivalent heat capacity or initial fuel temperature profile",
+        "status": "not-identified"
+      },
+      {
+        "parameter": "secondaryVolumeM3",
+        "value": null,
+        "unit": "m3",
+        "source": [
+          "nekTechnical",
+          "nea1997"
+        ],
+        "scope": "Current replacement-SG fluid volume not established; historical D4 value excluded",
+        "status": "not-identified"
+      },
+      {
+        "parameter": "initialSecondaryLiquidFraction",
+        "value": null,
+        "unit": "volume fraction",
+        "source": "ia0221",
+        "scope": "Narrow-range indicated SG level is not a whole-vessel liquid volume fraction",
+        "status": "instrument-mapping-unresolved"
+      },
+      {
+        "parameter": "chargingTemperatureK",
+        "value": null,
+        "unit": "K",
+        "source": "ia0221",
+        "scope": "Incoming charging-water enthalpy and instrument reference conditions not given",
+        "status": "not-identified"
+      }
+    ],
+    "facts": [
+      {
+        "id": "eventDate",
+        "value": "2005-04-10",
+        "sources": [
+          "nek2005",
+          "ia0221",
+          "event2008"
+        ],
+        "location": "Operator PDF page 13, Operational events; NRC abstract/introduction/conclusion",
+        "use": "accepted",
+        "qualification": "NRC event-description printed page 9 alone says April 5; operator's matching event independently resolves it as April 10."
+      },
+      {
+        "id": "ratedCorePowerMW",
+        "value": 1994,
+        "unit": "MW",
+        "sources": [
+          "ia0221"
+        ],
+        "location": "Printed page 3, Plant description",
+        "use": "event-era reference rating"
+      },
+      {
+        "id": "nominalPumpHeatMW",
+        "value": 6,
+        "unit": "MW",
+        "sources": [
+          "ia0221"
+        ],
+        "location": "Printed page 3, Plant description",
+        "use": "event-era total pump heat reference",
+        "qualification": "Nominal NSSS partition, not a time-resolved measured heater input; distinct from motor electrical nameplate power."
+      },
+      {
+        "id": "numberOfLoops",
+        "value": 2,
+        "unit": "count",
+        "sources": [
+          "ia0221"
+        ],
+        "location": "Printed page 3",
+        "use": "accepted"
+      },
+      {
+        "id": "operatorCoolantVolumeM3",
+        "value": 197,
+        "unit": "m3",
+        "sources": [
+          "nekTechnical",
+          "nekLeaflet"
+        ],
+        "location": "Reactor coolant / Total Volume",
+        "use": "reference-only-unresolved-boundary",
+        "qualification": "Operator does not specify whether this includes PRZ, at what thermodynamic state, or how to allocate hot/cold/SG/vessel volumes. Do not silently substitute for hotVolume+coldVolume."
+      },
+      {
+        "id": "operatorPrimaryFlowKgS",
+        "value": 9021,
+        "unit": "kg/s",
+        "sources": [
+          "nekLeaflet"
+        ],
+        "location": "PDF page 10, Reactor Coolant, Total Mass Flow",
+        "use": "nominal-reference-not-event-measurement",
+        "qualification": "Current webpage rounds to 9 t/s; no measured 2005 pump-flow history supplied."
+      },
+      {
+        "id": "operatorPumpCapacityM3S",
+        "value": 6.3,
+        "unit": "m3/s per pump",
+        "sources": [
+          "nekLeaflet"
+        ],
+        "location": "PDF page 10",
+        "use": "nominal-reference",
+        "qualification": "Two pumps. Current webpage gives aggregate 12.6 m3/s."
+      },
+      {
+        "id": "operatorPumpMotorPowerMW",
+        "value": 5.22,
+        "unit": "MW per pump motor",
+        "sources": [
+          "nekLeaflet",
+          "nekTechnical"
+        ],
+        "use": "electrical-nameplate-reference",
+        "qualification": "Do not equate two motors' electrical rating to the NRC nominal 6 MW total coolant heat."
+      },
+      {
+        "id": "operatorFeedwaterTemperatureC",
+        "value": 219.4,
+        "unit": "degC",
+        "sources": [
+          "nekTechnical"
+        ],
+        "location": "Steam Generator, Feedwater temperature at SG inlet",
+        "use": "nominal-reference-not-event-history",
+        "qualification": "Leaflet rounds to 219 degC. Not measured during the 91.94 percent power event."
+      },
+      {
+        "id": "operatorFuelMassT",
+        "value": 48.7,
+        "unit": "t as labelled nuclear fuel",
+        "sources": [
+          "nekLeaflet"
+        ],
+        "location": "PDF page 10, Nuclear Fuel",
+        "use": "reference-only-insufficient-for-heat-capacity",
+        "qualification": "Current page says uranium mass 49 t. U mass and UO2 mass are not interchangeable; no event fuel temperatures, radial profile, cladding heat storage or effective lumped heat capacity are given."
+      },
+      {
+        "id": "fuelAssemblies",
+        "value": 121,
+        "unit": "count",
+        "sources": [
+          "ia0221"
+        ],
+        "location": "Printed page 3",
+        "use": "event-era reference"
+      },
+      {
+        "id": "fuelRodsPerAssembly",
+        "value": 235,
+        "unit": "count",
+        "sources": [
+          "ia0221"
+        ],
+        "location": "Printed page 3",
+        "use": "event-era reference"
+      },
+      {
+        "id": "replacementSgTubeCount",
+        "value": 5428,
+        "unit": "count per SG",
+        "sources": [
+          "nekTechnical",
+          "nekLeaflet"
+        ],
+        "use": "operator-reference",
+        "qualification": "This alone does not determine whole SG fluid volume."
+      },
+      {
+        "id": "replacementSgHeatingAreaM2",
+        "value": 7177,
+        "unit": "m2",
+        "sources": [
+          "nekTechnical",
+          "nekLeaflet"
+        ],
+        "use": "operator-reference",
+        "qualification": "Do not infer secondary volume from heat-transfer surface; source does not specify fluid boundary allocation."
+      },
+      {
+        "id": "replacementSgTubeOutsideDiameterMm",
+        "value": 19.05,
+        "unit": "mm",
+        "sources": [
+          "nekTechnical",
+          "nekLeaflet"
+        ],
+        "use": "operator-reference"
+      },
+      {
+        "id": "replacementSgTubeWallThicknessMm",
+        "value": 1.09,
+        "unit": "mm",
+        "sources": [
+          "nekTechnical",
+          "nekLeaflet"
+        ],
+        "use": "operator-reference"
+      },
+      {
+        "id": "historicalPrimaryVolumeIncludingPrzM3",
+        "value": 166.3,
+        "unit": "m3",
+        "sources": [
+          "nea1997"
+        ],
+        "use": "excluded-from-2005-parameterization",
+        "qualification": "Table explicitly says with PRZ, but describes 1882 MW pre-replacement plant. Not interchangeable with current operator 197 m3."
+      },
+      {
+        "id": "historicalPrimaryMassExcludingPrzKg",
+        "value": 106020,
+        "unit": "kg",
+        "sources": [
+          "nea1997"
+        ],
+        "use": "excluded-from-2005-parameterization",
+        "qualification": "Table footnote explicitly excludes PRZ. This is a different boundary from the adjacent volume row."
+      },
+      {
+        "id": "historicalSgSecondaryVolumeM3",
+        "value": 161.3,
+        "unit": "m3 as tabled",
+        "sources": [
+          "nea1997"
+        ],
+        "use": "excluded-from-2005-parameterization",
+        "qualification": "Old SG configuration; table does not sufficiently disambiguate per-generator versus aggregate scope for direct use here."
+      },
+      {
+        "id": "historicalSgSecondaryMassKg",
+        "value": 21999,
+        "unit": "kg as tabled",
+        "sources": [
+          "nea1997"
+        ],
+        "use": "excluded-from-2005-parameterization",
+        "qualification": "Old SG configuration and inventory state; not a new replacement-SG inventory measurement."
+      }
+    ],
+    "controlHistories": [
+      {
+        "id": "chargingFlowLS",
+        "kind": "measured-curve",
+        "source": "ia0221",
+        "figure": "31(a)",
+        "pdfPage": 51,
+        "instrument": "AF00793_FT205",
+        "unit": "L/s",
+        "csv": "measured.csv",
+        "rangeSeconds": [
+          -49,
+          49
+        ],
+        "samples": 50,
+        "axisCalibration": "0 to 8 L/s labelled gridlines; exclude unlabelled upper axis extension",
+        "massConversionStatus": "unresolved",
+        "requiredForMassConversion": [
+          "instrument reference density or temperature/pressure",
+          "charging inlet enthalpy and boundary location"
+        ],
+        "permittedUse": "Volumetric measurement; mass-flow use must declare and bound conversion assumptions."
+      },
+      {
+        "id": "letdownFlowLS",
+        "kind": "measured-curve",
+        "source": "ia0221",
+        "figure": "32(a)",
+        "pdfPage": 52,
+        "instrument": "AF00795_FT132",
+        "unit": "L/s",
+        "csv": "measured.csv",
+        "rangeSeconds": [
+          -49,
+          49
+        ],
+        "samples": 50,
+        "massConversionStatus": "unresolved",
+        "requiredForMassConversion": [
+          "instrument location and reference density or temperature/pressure"
+        ],
+        "permittedUse": "Volumetric measurement; do not automatically use reactor cold-leg density at an unspecified flowmeter."
+      },
+      {
+        "id": "pressurizerLevelPercent",
+        "kind": "measured-response-curve",
+        "source": "ia0221",
+        "figure": "30(a)",
+        "pdfPage": 50,
+        "instrument": "AL00818_LT465",
+        "unit": "percent indicated",
+        "csv": "measured.csv",
+        "rangeSeconds": [
+          -49,
+          49
+        ],
+        "samples": 50,
+        "permittedUse": "Held-out indicated level. A level-to-liquid-volume transfer function is required before interpreting it as a physical volume fraction."
+      },
+      {
+        "id": "sprayFlowKgS",
+        "kind": "unavailable-numeric-history",
+        "sources": [
+          "ia0221",
+          "event2008"
+        ],
+        "location": "NRC printed page 27, primary-pressure discussion",
+        "availableEvidence": "Authors describe spray activation limiting the pre-trip pressure increase; no measured spray-flow trace, valve coefficient, or quantitative controller schedule is supplied.",
+        "permittedUse": "Documented missing input or explicitly bounded assumption; do not infer or fit spray flow from held-out pressure."
+      },
+      {
+        "id": "heaterPowerMW",
+        "kind": "unavailable-numeric-history",
+        "sources": [
+          "ia0221"
+        ],
+        "availableEvidence": "Pressurizer heaters exist; no time-resolved measured power trace or complete event controller specification found.",
+        "permittedUse": "Documented missing input or independently sourced component test; not a measured boundary."
+      },
+      {
+        "id": "governorPosition",
+        "kind": "reported-sparse-event-description",
+        "sources": [
+          "ia0221",
+          "event2008"
+        ],
+        "location": "NRC printed page 9",
+        "availableEvidence": "Narrative gives closure over approximately 5 s from 35.5 to 12.2 percent and operator reopening about 16 s; acquisition interval is 2 s.",
+        "permittedUse": "Event annotations only. No synthetic dense series is represented as measured valve data."
+      }
+    ],
+    "unavailable": [
+      {
+        "item": "2005 pressurizer vessel volume and level-to-volume mapping",
+        "reason": "No inspected primary source provides a directly applicable numeric volume/mapping. Secondary claims near 28 m3 were not adopted."
+      },
+      {
+        "item": "2005 primary hot/cold/vessel/SG volume allocation",
+        "reason": "Operator total lacks boundary definition; historical 166.3 m3 geometry predates SG replacement. Detailed cited Pisa geometry tables are not accessible from the institutional record."
+      },
+      {
+        "item": "2005 replacement steam-generator secondary total and initial liquid volumes",
+        "reason": "Tube dimensions and nominal level cannot uniquely identify the equilibrium lumped fluid volumes."
+      },
+      {
+        "item": "Effective fuel and structural heat capacities",
+        "reason": "Nominal fuel counts/mass do not specify temperatures, material properties, spatial storage or an equivalent lumped model."
+      },
+      {
+        "item": "Heater/spray controller gains, setpoints, delays and measured commands",
+        "reason": "Qualitative control action is published; complete numeric histories and controller specifications were not found."
+      },
+      {
+        "item": "Charging/letdown measurement conversion conditions and seal leakage",
+        "reason": "Litre-per-second curves are available, but reference density, meter locations, charging enthalpy and seal-flow histories are not identified."
+      }
+    ],
+    "policy": {
+      "calibration": "No fitting to pressure, temperature, or level response data.",
+      "redistribution": "Only numeric facts, original metadata and code are distributed. Source PDF artwork/prose are not bundled or relicensed.",
+      "meaning": "A sourced number does not by itself establish historical applicability or a model control-volume boundary."
+    }
+  },
+  "appliedSourceParameters": {
+    "pumpHeatMW": 6,
+    "initialPressurePa": 15480000,
+    "initialHotTemperatureK": 594.175,
+    "initialColdTemperatureK": 559.445
+  },
+  "fixedControlAssumptions": {
+    "heaterPowerMW": 0.0,
+    "sprayFlowKgS": 0.0,
+    "chargingFlowKgS": 0.0,
+    "letdownFlowKgS": 0.0
+  },
+  "comparisonWindowS": [
+    0,
+    15
+  ],
+  "inputs": [
+    {
+      "name": "reactorPowerMW",
+      "points": [
+        {
+          "time": 0,
+          "value": 1834.662102
+        },
+        {
+          "time": 1,
+          "value": 1835.420849
+        },
+        {
+          "time": 2,
+          "value": 1832.76522
+        },
+        {
+          "time": 3,
+          "value": 1830.109591
+        },
+        {
+          "time": 4,
+          "value": 1824.7983224999998
+        },
+        {
+          "time": 5,
+          "value": 1819.487054
+        },
+        {
+          "time": 6,
+          "value": 1817.9695505
+        },
+        {
+          "time": 7,
+          "value": 1816.452047
+        },
+        {
+          "time": 8,
+          "value": 1804.3120165
+        },
+        {
+          "time": 9,
+          "value": 1792.171986
+        },
+        {
+          "time": 10,
+          "value": 1780.0319555
+        },
+        {
+          "time": 11,
+          "value": 1767.891925
+        },
+        {
+          "time": 12,
+          "value": 1742.8531174999998
+        },
+        {
+          "time": 13,
+          "value": 1717.81431
+        },
+        {
+          "time": 14,
+          "value": 1698.086761
+        },
+        {
+          "time": 15,
+          "value": 1678.359212
+        }
+      ]
+    },
+    {
+      "name": "steamFlowKgS",
+      "points": [
+        {
+          "time": 0,
+          "value": 1005.220197
+        },
+        {
+          "time": 1,
+          "value": 1005.61883
+        },
+        {
+          "time": 2,
+          "value": 926.1579340000001
+        },
+        {
+          "time": 3,
+          "value": 846.697038
+        },
+        {
+          "time": 4,
+          "value": 578.5497335
+        },
+        {
+          "time": 5,
+          "value": 310.402429
+        },
+        {
+          "time": 6,
+          "value": 420.5580865
+        },
+        {
+          "time": 7,
+          "value": 530.713744
+        },
+        {
+          "time": 8,
+          "value": 604.195141
+        },
+        {
+          "time": 9,
+          "value": 677.676538
+        },
+        {
+          "time": 10,
+          "value": 794.7418375
+        },
+        {
+          "time": 11,
+          "value": 911.807137
+        },
+        {
+          "time": 12,
+          "value": 965.3568715
+        },
+        {
+          "time": 13,
+          "value": 1018.906606
+        },
+        {
+          "time": 14,
+          "value": 1040.2999245
+        },
+        {
+          "time": 15,
+          "value": 1061.693243
+        }
+      ]
+    },
+    {
+      "name": "feedwaterFlowKgS",
+      "points": [
+        {
+          "time": 0,
+          "value": 994.5330295000001
+        },
+        {
+          "time": 1,
+          "value": 994.53303
+        },
+        {
+          "time": 2,
+          "value": 994.53303
+        },
+        {
+          "time": 3,
+          "value": 994.53303
+        },
+        {
+          "time": 4,
+          "value": 941.002278
+        },
+        {
+          "time": 5,
+          "value": 887.471526
+        },
+        {
+          "time": 6,
+          "value": 853.3029610000001
+        },
+        {
+          "time": 7,
+          "value": 819.134396
+        },
+        {
+          "time": 8,
+          "value": 781.3211845000001
+        },
+        {
+          "time": 9,
+          "value": 743.507973
+        },
+        {
+          "time": 10,
+          "value": 795.8997724999999
+        },
+        {
+          "time": 11,
+          "value": 848.291572
+        },
+        {
+          "time": 12,
+          "value": 886.5603645
+        },
+        {
+          "time": 13,
+          "value": 924.829157
+        },
+        {
+          "time": 14,
+          "value": 943.166287
+        },
+        {
+          "time": 15,
+          "value": 961.503417
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    "This is a short, boundary-driven thermal/inventory comparison. Measured core power and secondary flows are inputs, so the test does not validate neutron kinetics, turbine controls, generator, feedwater controls or trip logic.",
+    "The primary hot/cold volumes, fuel heat capacity, pressurizer volume, and secondary volume remain generic assumptions scaled from OpenPWR by initial core thermal power/3000 MW. They are not identified Krško geometry.",
+    "A homogeneous equilibrium secondary model omits distributed boiling, subcooled feedwater mixing, SG walls and instrument shrink/swell. The primary model omits wall heat storage and transport delays.",
+    "Initial feedwater enthalpy is inferred from a zero initial secondary energy-rate balance because inlet enthalpy is not given in the selected report. The measured feedwater/steam mismatch is retained, so initial secondary mass inventory need not be exactly stationary.",
+    "The v0.5 replay omitted pump heat. The current case applies the documented nominal 6 MW as a separate constant boundary, not as a measured time history or fitted parameter.",
+    "The v0.5 replay fixed heater, spray, charging and letdown to zero. Measured charging/letdown curves in litres per second are now included, but instrument reference conditions and incoming-water enthalpy remain unestablished. Heater and spray numerical histories are unavailable in the reviewed event sources; their omission or assumed reconstruction limits pressure interpretation.",
+    "The pre-event figure curves indicate aggregate steam flow around 1003 kg/s and feedwater around 996 kg/s, while Table 2 lists roughly the reverse. Instrument identifiers in Table 3 and captions are followed without swapping, offsetting or fitting the curves. The inconsistency remains a source-input limitation.",
+    "Instrument calibration accuracy and delay distributions are unavailable; graphical reading allowances cannot replace them.",
+    "The published curves are a rendered representation of measurements, not the original raw acquisition dataset.",
+    "Documented nominal pump heat is 6 MW. It is a constant boundary assumption, not a measured time history.",
+    "Charging and letdown are preserved as measured L/s but not replayed without meter reference density and inlet enthalpy. Heater/spray histories are unavailable; these controls are explicitly held at zero.",
+    "Reported pressurizer indicated level is an explicitly unverified volume-fraction approximation. No event-era geometry has been inferred from pressure.",
+    "The dynamic pressurizer separates liquid and vapor temperatures. Its unmeasured phase relaxation time is declared before comparison; 0.05/0.2 s runs are sensitivities, not calibration.",
+    "The released baseline differs in model form and pump-heat boundary. The same-boundary equilibrium run isolates pressurizer model form. Neither comparison is an independent validation event."
+  ],
+  "channels": [
+    {
+      "key": "primaryPressureMPa",
+      "name": "Primary pressure",
+      "unit": "MPa",
+      "metrics": {
+        "samples": 8,
+        "rmse": 0.6940856210010975,
+        "maximumAbsoluteError": 1.2006022380345946,
+        "meanError": 0.5083548924434409,
+        "initialBias": 0.003689999999998861,
+        "finalError": 1.2006022380345946,
+        "changeRmse": 0.6913875948223599,
+        "releasedBaselineRmse": 0.35744164964396513,
+        "rmseChangeFromBaseline": 0.33664397135713237,
+        "sameBoundaryEquilibriumRmse": 0.35733795605391483,
+        "maximumStepRefinementDifference": 0.0031159375797642497,
+        "maximumGeometrySensitivitySpread": null,
+        "maximumPhaseTimeSensitivitySpread": 0.0001413581744778014,
+        "maximumReferenceTimingAllowance": 0.10660600000000109
+      },
+      "points": [
+        {
+          "time": 0,
+          "measured": 15.47631,
+          "simulated": 15.479999999999999,
+          "refined": 15.479999999999999,
+          "equilibrium": 15.479999999999999,
+          "baseline": 15.479999999999999
+        },
+        {
+          "time": 1,
+          "measured": 15.47631,
+          "simulated": 15.479068187891933,
+          "refined": 15.47906812794315,
+          "equilibrium": 15.479165081553411,
+          "baseline": 15.47916509724246
+        },
+        {
+          "time": 3,
+          "measured": 15.500911,
+          "simulated": 15.49708486891717,
+          "refined": 15.497505554127013,
+          "equilibrium": 15.47953954013276,
+          "baseline": 15.479533819462528
+        },
+        {
+          "time": 5,
+          "measured": 15.696355,
+          "simulated": 15.689820124042061,
+          "refined": 15.692229391350166,
+          "equilibrium": 15.490295247238194,
+          "baseline": 15.490263993999992
+        },
+        {
+          "time": 7,
+          "measured": 15.836446,
+          "simulated": 16.15960780780217,
+          "refined": 16.162723745381935,
+          "equilibrium": 15.516606829230733,
+          "baseline": 15.516538939152895
+        },
+        {
+          "time": 9,
+          "measured": 16.049658,
+          "simulated": 16.6200861160028,
+          "refined": 16.622807654095283,
+          "equilibrium": 15.543447204715504,
+          "baseline": 15.543344977358876
+        },
+        {
+          "time": 11,
+          "measured": 16.087244,
+          "simulated": 16.97246015174183,
+          "refined": 16.974139817053338,
+          "equilibrium": 15.565383582758216,
+          "baseline": 15.565244715724887
+        },
+        {
+          "time": 13,
+          "measured": 16.040774,
+          "simulated": 17.135807645114966,
+          "refined": 17.136357977328792,
+          "equilibrium": 15.57665207545055,
+          "baseline": 15.576490730718694
+        },
+        {
+          "time": 15,
+          "measured": 15.939636,
+          "simulated": 17.140238238034595,
+          "refined": 17.139946621491635,
+          "equilibrium": 15.575899988796355,
+          "baseline": 15.575710164663443
+        }
+      ]
+    },
+    {
+      "key": "hotLegTemperatureC",
+      "name": "Mean hot-leg temperature",
+      "unit": "°C",
+      "metrics": {
+        "samples": 8,
+        "rmse": 1.408698812115122,
+        "maximumAbsoluteError": 2.232083285625606,
+        "meanError": 1.0822276327083244,
+        "initialBias": -0.013024500000028638,
+        "finalError": 1.9511372984514423,
+        "changeRmse": 1.4187293358704076,
+        "releasedBaselineRmse": 0.9136791783230058,
+        "rmseChangeFromBaseline": 0.4950196337921162,
+        "sameBoundaryEquilibriumRmse": 0.9157371304056695,
+        "maximumStepRefinementDifference": 0.005181431659025293,
+        "maximumGeometrySensitivitySpread": null,
+        "maximumPhaseTimeSensitivitySpread": 8.966617053829395e-05,
+        "maximumReferenceTimingAllowance": 0.2280499999999961
+      },
+      "points": [
+        {
+          "time": 0,
+          "measured": 321.0380245,
+          "simulated": 321.025,
+          "refined": 321.025,
+          "equilibrium": 321.025,
+          "baseline": 321.025
+        },
+        {
+          "time": 1,
+          "measured": 321.011388,
+          "simulated": 321.0249926098493,
+          "refined": 321.02499439436497,
+          "equilibrium": 321.02505400409325,
+          "baseline": 321.02505412592427
+        },
+        {
+          "time": 3,
+          "measured": 321.011388,
+          "simulated": 321.0367346557915,
+          "refined": 321.03711590459636,
+          "equilibrium": 321.0270339019802,
+          "baseline": 321.0270084143177
+        },
+        {
+          "time": 5,
+          "measured": 321.011388,
+          "simulated": 321.21886815255175,
+          "refined": 321.2214130778492,
+          "equilibrium": 321.11052867496596,
+          "baseline": 321.1102721608015
+        },
+        {
+          "time": 7,
+          "measured": 321.133154,
+          "simulated": 321.8082873925979,
+          "refined": 321.81303651003236,
+          "equilibrium": 321.468291965984,
+          "baseline": 321.4673409553135
+        },
+        {
+          "time": 9,
+          "measured": 321.186426,
+          "simulated": 322.59239402567266,
+          "refined": 322.5975754573317,
+          "equilibrium": 322.04180760166855,
+          "baseline": 322.04008585400175
+        },
+        {
+          "time": 11,
+          "measured": 321.186426,
+          "simulated": 323.33349364112644,
+          "refined": 323.3377056696489,
+          "equilibrium": 322.63761865809,
+          "baseline": 322.6350575273766
+        },
+        {
+          "time": 13,
+          "measured": 321.596831,
+          "simulated": 323.8289142856256,
+          "refined": 323.8312209303733,
+          "equilibrium": 323.086485125379,
+          "baseline": 323.08322545837063
+        },
+        {
+          "time": 15,
+          "measured": 322.052931,
+          "simulated": 324.00406829845144,
+          "refined": 324.00444455914067,
+          "equilibrium": 323.28958407334335,
+          "baseline": 323.28579369883914
+        }
+      ]
+    },
+    {
+      "key": "coldLegTemperatureC",
+      "name": "Mean cold-leg temperature",
+      "unit": "°C",
+      "metrics": {
+        "samples": 8,
+        "rmse": 1.391431498955851,
+        "maximumAbsoluteError": 2.493228060636852,
+        "meanError": 1.0197796010182856,
+        "initialBias": 0.0005300000000829641,
+        "finalError": -0.03824174135189651,
+        "changeRmse": 1.391043108896801,
+        "releasedBaselineRmse": 1.2409646543819426,
+        "rmseChangeFromBaseline": 0.15046684457390835,
+        "sameBoundaryEquilibriumRmse": 1.2442570339137886,
+        "maximumStepRefinementDifference": 0.010722632088913997,
+        "maximumGeometrySensitivitySpread": null,
+        "maximumPhaseTimeSensitivitySpread": 4.1148415789393766e-05,
+        "maximumReferenceTimingAllowance": 0.7963624999999865
+      },
+      "points": [
+        {
+          "time": 0,
+          "measured": 286.29447,
+          "simulated": 286.2950000000001,
+          "refined": 286.2950000000001,
+          "equilibrium": 286.2950000000001,
+          "baseline": 286.2950000000001
+        },
+        {
+          "time": 1,
+          "measured": 286.29447,
+          "simulated": 286.28222388847587,
+          "refined": 286.28222041822346,
+          "equilibrium": 286.28225178255775,
+          "baseline": 286.28225184204257
+        },
+        {
+          "time": 3,
+          "measured": 286.29447,
+          "simulated": 286.3653186564519,
+          "refined": 286.3674593630327,
+          "equilibrium": 286.359923980477,
+          "baseline": 286.359607938359
+        },
+        {
+          "time": 5,
+          "measured": 286.310458,
+          "simulated": 287.23023127126305,
+          "refined": 287.2407310561906,
+          "equilibrium": 287.1760273460384,
+          "baseline": 287.1738328046248
+        },
+        {
+          "time": 7,
+          "measured": 286.85546,
+          "simulated": 289.05011782128895,
+          "refined": 289.06084045337786,
+          "equilibrium": 288.89619023643104,
+          "baseline": 288.8920243270517
+        },
+        {
+          "time": 9,
+          "measured": 287.952306,
+          "simulated": 290.4455340606369,
+          "refined": 290.4529456137443,
+          "equilibrium": 290.2079142075912,
+          "baseline": 290.2024870637847
+        },
+        {
+          "time": 11,
+          "measured": 289.545031,
+          "simulated": 291.2586538386213,
+          "refined": 291.26164152360775,
+          "equilibrium": 290.9616091941032,
+          "baseline": 290.9550984751835
+        },
+        {
+          "time": 13,
+          "measured": 290.587442,
+          "simulated": 291.40403601276023,
+          "refined": 291.4037787315308,
+          "equilibrium": 291.08498779584136,
+          "baseline": 291.0782019184244
+        },
+        {
+          "time": 15,
+          "measured": 291.219044,
+          "simulated": 291.1808022586481,
+          "refined": 291.1790527856275,
+          "equilibrium": 290.8652547303101,
+          "baseline": 290.8583595955589
+        }
+      ]
+    },
+    {
+      "key": "steamPressureMPa",
+      "name": "Mean secondary pressure",
+      "unit": "MPa",
+      "metrics": {
+        "samples": 8,
+        "rmse": 0.17773454427825777,
+        "maximumAbsoluteError": 0.3609435261501437,
+        "meanError": -0.09348333949207965,
+        "initialBias": -0.012627000000000166,
+        "finalError": 0.1117400026412021,
+        "changeRmse": 0.17142981392764492,
+        "releasedBaselineRmse": 0.1784327239955653,
+        "rmseChangeFromBaseline": -0.0006981797173075399,
+        "sameBoundaryEquilibriumRmse": 0.1784021605032944,
+        "maximumStepRefinementDifference": 0.001807915173363206,
+        "maximumGeometrySensitivitySpread": null,
+        "maximumPhaseTimeSensitivitySpread": 1.0693902456893056e-06,
+        "maximumReferenceTimingAllowance": 0.2019745000000004
+      },
+      "points": [
+        {
+          "time": 0,
+          "measured": 6.422627,
+          "simulated": 6.41,
+          "refined": 6.41,
+          "equilibrium": 6.41,
+          "baseline": 6.41
+        },
+        {
+          "time": 1,
+          "measured": 6.439787,
+          "simulated": 6.40591774721633,
+          "refined": 6.405916572690419,
+          "equilibrium": 6.405918506583546,
+          "baseline": 6.40590781638924
+        },
+        {
+          "time": 3,
+          "measured": 6.568261,
+          "simulated": 6.435081812024678,
+          "refined": 6.435501565277774,
+          "equilibrium": 6.434978119103065,
+          "baseline": 6.434963601427353
+        },
+        {
+          "time": 5,
+          "measured": 6.97221,
+          "simulated": 6.611266473849856,
+          "refined": 6.613074389023219,
+          "equilibrium": 6.609456666424184,
+          "baseline": 6.609343345506246
+        },
+        {
+          "time": 7,
+          "measured": 7.063934,
+          "simulated": 6.815066469433738,
+          "refined": 6.815993080791627,
+          "equilibrium": 6.807026291326896,
+          "baseline": 6.8069699367985645
+        },
+        {
+          "time": 9,
+          "measured": 7.086105,
+          "simulated": 6.93307434639018,
+          "refined": 6.933675523399583,
+          "equilibrium": 6.916698855396523,
+          "baseline": 6.916361399052309
+        },
+        {
+          "time": 11,
+          "measured": 6.978284,
+          "simulated": 6.973155646551447,
+          "refined": 6.973125799160976,
+          "equilibrium": 6.948989145153361,
+          "baseline": 6.948488695803987
+        },
+        {
+          "time": 13,
+          "measured": 6.874715,
+          "simulated": 6.950126785955931,
+          "refined": 6.949902285019294,
+          "equilibrium": 6.920775500913973,
+          "baseline": 6.920129470398707
+        },
+        {
+          "time": 15,
+          "measured": 6.795141,
+          "simulated": 6.906881002641202,
+          "refined": 6.90660738058979,
+          "equilibrium": 6.875374994672345,
+          "baseline": 6.874664816146842
+        }
+      ]
+    }
+  ],
+  "numericalChecks": [
+    {
+      "name": "nominal massIntegralErrorKg",
+      "value": 0.00394036341458559,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "nominal energyIntegralErrorMJ",
+      "value": 0.012292999706005503,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "refined massIntegralErrorKg",
+      "value": 0.013179881118503545,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined energyIntegralErrorMJ",
+      "value": 0.041175200432917336,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "equilibrium ablation massIntegralErrorKg",
+      "value": 0.004719209362519905,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium ablation energyIntegralErrorMJ",
+      "value": 0.012780205913259124,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "geometry 2 massIntegralErrorKg",
+      "value": 0.0047360024764202535,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "geometry 2 energyIntegralErrorMJ",
+      "value": 0.018687154832150554,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "phase time 0.05 massIntegralErrorKg",
+      "value": 0.004546838375972584,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "phase time 0.05 energyIntegralErrorMJ",
+      "value": 0.014070917828576057,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "phase time 0.2 massIntegralErrorKg",
+      "value": 0.004860194865614176,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "phase time 0.2 energyIntegralErrorMJ",
+      "value": 0.014794106565204856,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "Primary pressure communication refinement",
+      "value": 0.0031159375797642497,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Mean hot-leg temperature communication refinement",
+      "value": 0.005181431659025293,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean cold-leg temperature communication refinement",
+      "value": 0.010722632088913997,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean secondary pressure communication refinement",
+      "value": 0.001807915173363206,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    }
+  ],
+  "numericalPassed": true,
+  "numericalEvidence": {
+    "massIntegralErrorKg": 0.00394036341458559,
+    "solverRelativeTolerance": 1e-11,
+    "solverToleranceBasis": "FMU DefaultExperiment annotation, checked against the setupExperiment request; OpenModelica CVODE uses the compiled annotation.",
+    "energyIntegralErrorMJ": 0.012292999706005503,
+    "refinedMassIntegralErrorKg": 0.013179881118503545,
+    "refinedEnergyIntegralErrorMJ": 0.041175200432917336,
+    "stepsComparedS": [
+      0.05,
+      0.025
+    ],
+    "geometrySensitivityScales": [
+      0.5,
+      1,
+      2
+    ],
+    "phaseRelaxationSensitivityS": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "sensitivityDomainStops": [
+      {
+        "completed": false,
+        "parameters": {
+          "geometry_scale": 0.5
+        },
+        "domainStop": "Native reference domain exit at 10.65 s.",
+        "terminalObservation": {
+          "time": 10.65000000000001,
+          "primaryPressureMPa": 19.00806975294161,
+          "hotLegTemperatureC": 327.1998316279894,
+          "coldLegTemperatureC": 295.81457312517796,
+          "steamPressureMPa": 7.461718876616272,
+          "thermalEnergyMJ": 177280.24048361473,
+          "totalMassKg": 121075.19862352582,
+          "boundaryMassFlowKgS": -37.646165000000565,
+          "boundaryPowerMW": 147.03893883425917,
+          "energyResidualMW": 2.842170943040401e-14,
+          "massResidualKgS": 1.4210854715202004e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2766353.9442873653,
+          "chargingEnthalpyJkg": 225659.6215791399,
+          "coldLegEnthalpyJkg": 1312648.151261268,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.91983337061436,
+          "pressurizerVaporTemperatureC": 371.13569524715547,
+          "pressurizerLevelPercent": 59.99363585246707
+        }
+      }
+    ],
+    "sensitivityPolicy": "A declared property-domain stop is retained with its terminal observation. No full-window spread is calculated for an incomplete sensitivity pair; no parameter is changed to avoid the stop.",
+    "metricSampleTimesS": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "initialPoint": "Interpolated t=0 exposes initialization bias and is excluded from error statistics.",
+    "boundaryQuadrature": "Both endpoints use the same externally held inputs; cached FMI algebraic outputs cannot introduce a fictitious forcing ramp.",
+    "scope": "Numerical conservation and unfitted sensitivities; not physical acceptance or uncertainty propagation."
+  },
+  "releasedBaseline": {
+    "version": "0.5.0",
+    "gitRevision": "17ae3019e9241306db66a6c2b5ac3660280de5b5",
+    "reportSha256": "90024ac524d87165761fae591493229b06552298a7f5df3121e6ede1dd8a9bab"
+  },
+  "equilibriumComparison": {
+    "runtime": {
+      "model": "OpenPWR.KrskoEquilibrium",
+      "fmuSha256": "7c89a7c89e9829d7b4b474828247511d3d31a64f59064bae71891ef02f99312c",
+      "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+      "fmiVersion": "2.0"
+    },
+    "buildManifest": {
+      "version": "0.7.0",
+      "gitRevision": "fb00e13f03c3f200e8acd8e8ff4a5b5b1316c523",
+      "gitDirty": false,
+      "sourceSha256": "8a018a8419950c935fe9f837ff5c46aaf0d689a2e296624516d49713cd983192",
+      "benchmarkModelSha256": "62f9505d5ffaf2cbec4f5a517bf7e8a42f49397dd6005df4879dec43a6638013",
+      "inputDataSha256": "f2160bb33271b1b80774df8edee13d805a2b7abe24a6a7a4de356035001b0407",
+      "referenceMetadataSha256": "e23a13b539f57507445bb215fd21a59024d75be00b9a9b4f80d2a17c2ea1b4b1",
+      "parameterSourcesSha256": "ed3d41193e0835cc70c68303ca7797c4651a499a8f864972fbc4d2c33b458ba4",
+      "baselineSha256": "90024ac524d87165761fae591493229b06552298a7f5df3121e6ede1dd8a9bab",
+      "comparisonScriptSha256": "328234eab48f42cac542a7cfca0a3662d9081bb469711088d9944eb5500edb8c",
+      "sharedRunnerSha256": "59fbafcf08cc4a53ff3f8c97c9e86ef2f9be2e78f83f3414a0f0443c4f98a247",
+      "model": "OpenPWR.KrskoEquilibrium",
+      "compiler": "OpenModelica 1.27.1~2-g6db4671",
+      "fmuSha256": "7c89a7c89e9829d7b4b474828247511d3d31a64f59064bae71891ef02f99312c",
+      "fmiVersion": "2.0",
+      "modelicaLibrary": "4.0.0",
+      "hostPlatform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39"
+    },
+    "points": [
+      {
+        "time": 0,
+        "primaryPressureMPa": 15.479999999999999,
+        "hotLegTemperatureC": 321.025,
+        "coldLegTemperatureC": 286.2950000000001,
+        "steamPressureMPa": 6.41,
+        "thermalEnergyMJ": 339156.1177199545,
+        "totalMassKg": 237966.68594377808,
+        "boundaryMassFlowKgS": -10.687167499999873,
+        "boundaryPowerMW": -38.79599136191018,
+        "energyResidualMW": -2.5979218776228663e-14,
+        "massResidualKgS": 0.0,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2779900.7265308313,
+        "chargingEnthalpyJkg": 222637.09817436663,
+        "coldLegEnthalpyJkg": 1264877.5961507217,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.68754665341373,
+        "pressurizerVaporTemperatureC": 344.68754665341373,
+        "pressurizerLevelPercent": 52.949999999999996
+      },
+      {
+        "time": 1.0,
+        "primaryPressureMPa": 15.479165081553411,
+        "hotLegTemperatureC": 321.02505400409325,
+        "coldLegTemperatureC": 286.28225178255775,
+        "steamPressureMPa": 6.405918506583546,
+        "thermalEnergyMJ": 339117.13017904013,
+        "totalMassKg": 237955.80942583922,
+        "boundaryMassFlowKgS": -11.065868374999923,
+        "boundaryPowerMW": -39.17641403036123,
+        "energyResidualMW": -6.750155989720952e-14,
+        "massResidualKgS": 7.993605777301127e-15,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2779948.937201626,
+        "chargingEnthalpyJkg": 222636.38239571443,
+        "coldLegEnthalpyJkg": 1264812.00758848,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.68320247845236,
+        "pressurizerVaporTemperatureC": 344.68320247845236,
+        "pressurizerLevelPercent": 52.937390164150266
+      },
+      {
+        "time": 2.0,
+        "primaryPressureMPa": 15.478558625490388,
+        "hotLegTemperatureC": 321.0239158284146,
+        "coldLegTemperatureC": 286.27864969167274,
+        "steamPressureMPa": 6.412098868413812,
+        "thermalEnergyMJ": 339181.61766133417,
+        "totalMassKg": 237982.46755135304,
+        "boundaryMassFlowKgS": 64.40205120000007,
+        "boundaryPowerMW": 168.20355333767156,
+        "energyResidualMW": -1.5276668818842154e-13,
+        "massResidualKgS": 8.881784197001252e-16,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2779875.920819266,
+        "chargingEnthalpyJkg": 222635.86247855544,
+        "coldLegEnthalpyJkg": 1264793.650942308,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.68004689876113,
+        "pressurizerVaporTemperatureC": 344.68004689876113,
+        "pressurizerLevelPercent": 52.932600715681744
+      },
+      {
+        "time": 3.0,
+        "primaryPressureMPa": 15.47953954013276,
+        "hotLegTemperatureC": 321.0270339019802,
+        "coldLegTemperatureC": 286.359923980477,
+        "steamPressureMPa": 6.434978119103065,
+        "thermalEnergyMJ": 339464.5005441527,
+        "totalMassKg": 238088.58657280015,
+        "boundaryMassFlowKgS": 143.86294719999978,
+        "boundaryPowerMW": 386.66989568924487,
+        "energyResidualMW": 9.237055564881302e-14,
+        "massResidualKgS": 7.105427357601002e-15,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2779604.911036377,
+        "chargingEnthalpyJkg": 222636.70342045964,
+        "coldLegEnthalpyJkg": 1265213.9005633998,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.6851508524562,
+        "pressurizerVaporTemperatureC": 344.6851508524562,
+        "pressurizerLevelPercent": 53.02628468630716
+      },
+      {
+        "time": 4.0,
+        "primaryPressureMPa": 15.482653998081243,
+        "hotLegTemperatureC": 321.0470683834353,
+        "coldLegTemperatureC": 286.6029629911228,
+        "steamPressureMPa": 6.495269409145995,
+        "thermalEnergyMJ": 340190.4035284359,
+        "totalMassKg": 238338.36542500378,
+        "boundaryMassFlowKgS": 351.7217168749993,
+        "boundaryPowerMW": 1054.252138779133,
+        "energyResidualMW": -8.526512829121202e-14,
+        "massResidualKgS": 0.0,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2778885.431074431,
+        "chargingEnthalpyJkg": 222639.373455109,
+        "coldLegEnthalpyJkg": 1266471.1749872607,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.7013544309218,
+        "pressurizerVaporTemperatureC": 344.7013544309218,
+        "pressurizerLevelPercent": 53.32397236763067
+      },
+      {
+        "time": 5.0,
+        "primaryPressureMPa": 15.490295247238194,
+        "hotLegTemperatureC": 321.11052867496596,
+        "coldLegTemperatureC": 287.1760273460384,
+        "steamPressureMPa": 6.609456666424184,
+        "thermalEnergyMJ": 341607.47416181344,
+        "totalMassKg": 238802.76081794358,
+        "boundaryMassFlowKgS": 566.3382693749993,
+        "boundaryPowerMW": 1745.2920867750133,
+        "energyResidualMW": 0.0,
+        "massResidualKgS": -2.842170943040401e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2777501.894864336,
+        "chargingEnthalpyJkg": 222645.9243082879,
+        "coldLegEnthalpyJkg": 1269439.537838467,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.74109822298817,
+        "pressurizerVaporTemperatureC": 344.74109822298817,
+        "pressurizerLevelPercent": 54.05433073367249
+      },
+      {
+        "time": 6.0,
+        "primaryPressureMPa": 15.50272478786407,
+        "hotLegTemperatureC": 321.25006785837445,
+        "coldLegTemperatureC": 288.0439263091939,
+        "steamPressureMPa": 6.725609919105632,
+        "thermalEnergyMJ": 343226.5902237346,
+        "totalMassKg": 239311.27838344136,
+        "boundaryMassFlowKgS": 439.9610856250006,
+        "boundaryPowerMW": 1458.4346274372854,
+        "energyResidualMW": 6.788832251913844e-14,
+        "massResidualKgS": 1.1368683772161603e-13,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2776066.91004707,
+        "chargingEnthalpyJkg": 222656.58012801982,
+        "coldLegEnthalpyJkg": 1273945.3771710028,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.80571266578534,
+        "pressurizerVaporTemperatureC": 344.80571266578534,
+        "pressurizerLevelPercent": 55.23691133241242
+      },
+      {
+        "time": 7.0,
+        "primaryPressureMPa": 15.516606829230733,
+        "hotLegTemperatureC": 321.468291965984,
+        "coldLegTemperatureC": 288.89619023643104,
+        "steamPressureMPa": 6.807026291326896,
+        "thermalEnergyMJ": 344507.4459105667,
+        "totalMassKg": 239675.46989467368,
+        "boundaryMassFlowKgS": 295.63686312500045,
+        "boundaryPowerMW": 1120.2199798233082,
+        "energyResidualMW": 0.0,
+        "massResidualKgS": 2.842170943040401e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2775044.7254470224,
+        "chargingEnthalpyJkg": 222668.48111193095,
+        "coldLegEnthalpyJkg": 1278381.9096996016,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.87782772442074,
+        "pressurizerVaporTemperatureC": 344.87782772442074,
+        "pressurizerLevelPercent": 56.537312737751186
+      },
+      {
+        "time": 8.0,
+        "primaryPressureMPa": 15.530305058399309,
+        "hotLegTemperatureC": 321.74123326124516,
+        "coldLegTemperatureC": 289.61559602116745,
+        "steamPressureMPa": 6.868437157981756,
+        "thermalEnergyMJ": 345491.8178248252,
+        "totalMassKg": 239911.02598369052,
+        "boundaryMassFlowKgS": 182.69077392500037,
+        "boundaryPowerMW": 865.456682324398,
+        "energyResidualMW": 5.684341886080802e-14,
+        "massResidualKgS": 1.1368683772161603e-13,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2774264.909020452,
+        "chargingEnthalpyJkg": 222680.22445098648,
+        "coldLegEnthalpyJkg": 1282135.7134289194,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.94893610733163,
+        "pressurizerVaporTemperatureC": 344.94893610733163,
+        "pressurizerLevelPercent": 57.78574473003951
+      },
+      {
+        "time": 9.0,
+        "primaryPressureMPa": 15.543447204715504,
+        "hotLegTemperatureC": 322.04180760166855,
+        "coldLegTemperatureC": 290.2079142075912,
+        "steamPressureMPa": 6.916698855396523,
+        "thermalEnergyMJ": 346225.8239009314,
+        "totalMassKg": 240035.28769281157,
+        "boundaryMassFlowKgS": 71.39616542499846,
+        "boundaryPowerMW": 615.0888548938954,
+        "energyResidualMW": -1.7329148249700664e-13,
+        "massResidualKgS": 2.842170943040401e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2773646.8018771377,
+        "chargingEnthalpyJkg": 222691.49100679986,
+        "coldLegEnthalpyJkg": 1285232.2368006625,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.01710953145243,
+        "pressurizerVaporTemperatureC": 345.01710953145243,
+        "pressurizerLevelPercent": 58.942828350760166
+      },
+      {
+        "time": 10.0,
+        "primaryPressureMPa": 15.555520852683909,
+        "hotLegTemperatureC": 322.34786039697156,
+        "coldLegTemperatureC": 290.67042230337324,
+        "steamPressureMPa": 6.945156098090777,
+        "thermalEnergyMJ": 346691.4335465892,
+        "totalMassKg": 240070.39970310155,
+        "boundaryMassFlowKgS": 4.391609999999105,
+        "boundaryPowerMW": 328.6348199892948,
+        "energyResidualMW": -2.8421709430404007e-13,
+        "massResidualKgS": 3.552713678800501e-15,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2773280.18121205,
+        "chargingEnthalpyJkg": 222701.84150429216,
+        "coldLegEnthalpyJkg": 1287653.4482504046,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.07969860902756,
+        "pressurizerVaporTemperatureC": 345.07969860902756,
+        "pressurizerLevelPercent": 59.96748444366043
+      },
+      {
+        "time": 11.0,
+        "primaryPressureMPa": 15.565383582758216,
+        "hotLegTemperatureC": 322.63761865809,
+        "coldLegTemperatureC": 290.9616091941032,
+        "steamPressureMPa": 6.948989145153361,
+        "thermalEnergyMJ": 346868.59868821944,
+        "totalMassKg": 240040.83778242161,
+        "boundaryMassFlowKgS": -60.281890000000885,
+        "boundaryPowerMW": 40.08436874341123,
+        "energyResidualMW": 1.6200374375330284e-12,
+        "massResidualKgS": 7.815970093361102e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2773230.6774079623,
+        "chargingEnthalpyJkg": 222710.2965894239,
+        "coldLegEnthalpyJkg": 1289178.432347035,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.1307968698226,
+        "pressurizerVaporTemperatureC": 345.1307968698226,
+        "pressurizerLevelPercent": 60.77475482307986
+      },
+      {
+        "time": 12.0,
+        "primaryPressureMPa": 15.572370759100009,
+        "hotLegTemperatureC": 322.88943416195445,
+        "coldLegTemperatureC": 291.0822639536983,
+        "steamPressureMPa": 6.938491522230952,
+        "thermalEnergyMJ": 346828.4854658705,
+        "totalMassKg": 239970.06385123997,
+        "boundaryMassFlowKgS": -78.03245990000016,
+        "boundaryPowerMW": -105.89656729454941,
+        "energyResidualMW": -7.105427357601002e-14,
+        "massResidualKgS": 2.842170943040401e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2773366.185402493,
+        "chargingEnthalpyJkg": 222716.2865104811,
+        "coldLegEnthalpyJkg": 1289809.043187317,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.1669809811174,
+        "pressurizerVaporTemperatureC": 345.1669809811174,
+        "pressurizerLevelPercent": 61.327722588727774
+      },
+      {
+        "time": 13.0,
+        "primaryPressureMPa": 15.57665207545055,
+        "hotLegTemperatureC": 323.086485125379,
+        "coldLegTemperatureC": 291.08498779584136,
+        "steamPressureMPa": 6.920775500913973,
+        "thermalEnergyMJ": 346649.8522984613,
+        "totalMassKg": 239884.00889966634,
+        "boundaryMassFlowKgS": -93.31340190000014,
+        "boundaryPowerMW": -244.47362660627118,
+        "energyResidualMW": -1.1368683772161603e-13,
+        "massResidualKgS": 0.0,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2773594.379565718,
+        "chargingEnthalpyJkg": 222719.95676134282,
+        "coldLegEnthalpyJkg": 1289820.8503139364,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.189145824005,
+        "pressurizerVaporTemperatureC": 345.189145824005,
+        "pressurizerLevelPercent": 61.65704576101715
+      },
+      {
+        "time": 14.0,
+        "primaryPressureMPa": 15.57832513045752,
+        "hotLegTemperatureC": 323.21990505352073,
+        "coldLegTemperatureC": 291.0012958130087,
+        "steamPressureMPa": 6.898779739131023,
+        "thermalEnergyMJ": 346368.77317465906,
+        "totalMassKg": 239788.47976998618,
+        "boundaryMassFlowKgS": -96.98082807500009,
+        "boundaryPowerMW": -310.76940558819024,
+        "energyResidualMW": 2.4020391720114274e-13,
+        "massResidualKgS": 1.3322676295501878e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2773876.8376461803,
+        "chargingEnthalpyJkg": 222721.39102217995,
+        "coldLegEnthalpyJkg": 1289379.5768109623,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.1978060550165,
+        "pressurizerVaporTemperatureC": 345.1978060550165,
+        "pressurizerLevelPercent": 61.78306141491723
+      },
+      {
+        "time": 15,
+        "primaryPressureMPa": 15.575899988796355,
+        "hotLegTemperatureC": 323.28958407334335,
+        "coldLegTemperatureC": 290.8652547303101,
+        "steamPressureMPa": 6.875374994672345,
+        "thermalEnergyMJ": 346025.1932876641,
+        "totalMassKg": 239689.89444369994,
+        "boundaryMassFlowKgS": -100.03701657499994,
+        "boundaryPowerMW": -373.28717958634616,
+        "energyResidualMW": -4.121147867408581e-13,
+        "massResidualKgS": -5.329070518200751e-15,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2774176.33752082,
+        "chargingEnthalpyJkg": 222719.3120192719,
+        "coldLegEnthalpyJkg": 1288665.5969708005,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 345.1852525509381,
+        "pressurizerVaporTemperatureC": 345.1852525509381,
+        "pressurizerLevelPercent": 61.74661530073833
+      }
+    ]
+  },
+  "sensitivity": [
+    {
+      "geometryScale": 0.5,
+      "completed": false,
+      "parameters": {
+        "geometry_scale": 0.5
+      },
+      "domainStop": "Native reference domain exit at 10.65 s.",
+      "terminalObservation": {
+        "time": 10.65000000000001,
+        "primaryPressureMPa": 19.00806975294161,
+        "hotLegTemperatureC": 327.1998316279894,
+        "coldLegTemperatureC": 295.81457312517796,
+        "steamPressureMPa": 7.461718876616272,
+        "thermalEnergyMJ": 177280.24048361473,
+        "totalMassKg": 121075.19862352582,
+        "boundaryMassFlowKgS": -37.646165000000565,
+        "boundaryPowerMW": 147.03893883425917,
+        "energyResidualMW": 2.842170943040401e-14,
+        "massResidualKgS": 1.4210854715202004e-14,
+        "pumpHeatInputMW": 6.0,
+        "steamEnthalpyJkg": 2766353.9442873653,
+        "chargingEnthalpyJkg": 225659.6215791399,
+        "coldLegEnthalpyJkg": 1312648.151261268,
+        "feedwaterEnthalpyJkg": 919983.7868249048,
+        "pressurizerLiquidTemperatureC": 344.91983337061436,
+        "pressurizerVaporTemperatureC": 371.13569524715547,
+        "pressurizerLevelPercent": 59.99363585246707
+      }
+    },
+    {
+      "geometryScale": 2,
+      "completed": true,
+      "points": [
+        {
+          "time": 0,
+          "primaryPressureMPa": 15.479999999999999,
+          "hotLegTemperatureC": 321.025,
+          "coldLegTemperatureC": 286.2950000000001,
+          "steamPressureMPa": 6.41,
+          "thermalEnergyMJ": 678312.235439909,
+          "totalMassKg": 475933.37188755616,
+          "boundaryMassFlowKgS": -10.687167499999873,
+          "boundaryPowerMW": -38.79599136191018,
+          "energyResidualMW": -2.5979218776228663e-14,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779900.7265308313,
+          "chargingEnthalpyJkg": 222637.09817436663,
+          "coldLegEnthalpyJkg": 1264877.5961507217,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.68754665341373,
+          "pressurizerVaporTemperatureC": 344.68754665341373,
+          "pressurizerLevelPercent": 52.949999999999996
+        },
+        {
+          "time": 1.0,
+          "primaryPressureMPa": 15.479721309906008,
+          "hotLegTemperatureC": 321.0250738589407,
+          "coldLegTemperatureC": 286.2910947369386,
+          "steamPressureMPa": 6.407778127058933,
+          "thermalEnergyMJ": 678273.2598578036,
+          "totalMassKg": 475922.4953696161,
+          "boundaryMassFlowKgS": -11.065868374999923,
+          "boundaryPowerMW": -39.1543296111638,
+          "energyResidualMW": -2.653433028854124e-12,
+          "massResidualKgS": -1.9095836023552692e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779926.975742411,
+          "chargingEnthalpyJkg": 222636.85925235122,
+          "coldLegEnthalpyJkg": 1264857.514490416,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.68628288923514,
+          "pressurizerVaporTemperatureC": 344.68597109802135,
+          "pressurizerLevelPercent": 52.94634795079123
+        },
+        {
+          "time": 2.0,
+          "primaryPressureMPa": 15.479646361404232,
+          "hotLegTemperatureC": 321.02510271170877,
+          "coldLegTemperatureC": 286.2880844272071,
+          "steamPressureMPa": 6.410907119772301,
+          "thermalEnergyMJ": 678337.7596836865,
+          "totalMassKg": 475949.1534948313,
+          "boundaryMassFlowKgS": 64.40205120000007,
+          "boundaryPowerMW": 168.19045154237642,
+          "energyResidualMW": -1.8243184740640572e-12,
+          "massResidualKgS": 1.4654943925052066e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779890.0067873653,
+          "chargingEnthalpyJkg": 222636.79499872783,
+          "coldLegEnthalpyJkg": 1264841.968772984,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6848901582306,
+          "pressurizerVaporTemperatureC": 344.68613828747084,
+          "pressurizerLevelPercent": 52.94274344403488
+        },
+        {
+          "time": 3.0,
+          "primaryPressureMPa": 15.484784341679127,
+          "hotLegTemperatureC": 321.0282545227652,
+          "coldLegTemperatureC": 286.3139457991176,
+          "steamPressureMPa": 6.423549757476318,
+          "thermalEnergyMJ": 678620.5823441888,
+          "totalMassKg": 476055.27251634107,
+          "boundaryMassFlowKgS": 143.86294719999978,
+          "boundaryPowerMW": 386.5546207291334,
+          "energyResidualMW": -2.255973186038318e-12,
+          "massResidualKgS": -2.1316282072803006e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779740.4218089366,
+          "chargingEnthalpyJkg": 222641.19980352477,
+          "coldLegEnthalpyJkg": 1264973.3952690617,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6840043574506,
+          "pressurizerVaporTemperatureC": 344.7275015285603,
+          "pressurizerLevelPercent": 52.95538613867282
+        },
+        {
+          "time": 4.0,
+          "primaryPressureMPa": 15.50294955321122,
+          "hotLegTemperatureC": 321.04119880240614,
+          "coldLegTemperatureC": 286.40261624961454,
+          "steamPressureMPa": 6.4568458859221325,
+          "thermalEnergyMJ": 679346.2969159455,
+          "totalMassKg": 476305.05101123103,
+          "boundaryMassFlowKgS": 351.7217168749993,
+          "boundaryPowerMW": 1053.9801867159692,
+          "energyResidualMW": -8.242295734817162e-13,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779344.8428523275,
+          "chargingEnthalpyJkg": 222656.7728184111,
+          "coldLegEnthalpyJkg": 1265423.8007900394,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.68090289792735,
+          "pressurizerVaporTemperatureC": 344.8736703673412,
+          "pressurizerLevelPercent": 53.00001610863892
+        },
+        {
+          "time": 5.0,
+          "primaryPressureMPa": 15.549596354402684,
+          "hotLegTemperatureC": 321.07731604234345,
+          "coldLegTemperatureC": 286.6252424158546,
+          "steamPressureMPa": 6.520859440998821,
+          "thermalEnergyMJ": 680763.0450916265,
+          "totalMassKg": 476769.4463593048,
+          "boundaryMassFlowKgS": 566.3382693749993,
+          "boundaryPowerMW": 1744.943717873532,
+          "energyResidualMW": 1.4037086657481267e-12,
+          "massResidualKgS": 2.4158453015843406e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2778577.73910282,
+          "chargingEnthalpyJkg": 222696.76255628697,
+          "coldLegEnthalpyJkg": 1266554.453213528,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.67315812562526,
+          "pressurizerVaporTemperatureC": 345.2485207719735,
+          "pressurizerLevelPercent": 53.114139244268834
+        },
+        {
+          "time": 6.0,
+          "primaryPressureMPa": 15.630464274533075,
+          "hotLegTemperatureC": 321.14718165578074,
+          "coldLegTemperatureC": 286.9977419038088,
+          "steamPressureMPa": 6.588140117518406,
+          "thermalEnergyMJ": 682381.6413867222,
+          "totalMassKg": 477277.96230580215,
+          "boundaryMassFlowKgS": 439.9610856250006,
+          "boundaryPowerMW": 1457.7309830092443,
+          "energyResidualMW": 3.410605131648481e-13,
+          "massResidualKgS": -2.4158453015843406e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2777762.233293185,
+          "chargingEnthalpyJkg": 222766.08790230306,
+          "coldLegEnthalpyJkg": 1268445.8771568774,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6604889107083,
+          "pressurizerVaporTemperatureC": 345.8966677368554,
+          "pressurizerLevelPercent": 53.31035582655659
+        },
+        {
+          "time": 7.0,
+          "primaryPressureMPa": 15.727527672442998,
+          "hotLegTemperatureC": 321.2450299707066,
+          "coldLegTemperatureC": 287.4198719707799,
+          "steamPressureMPa": 6.635980758217873,
+          "thermalEnergyMJ": 683661.5831391147,
+          "totalMassKg": 477642.15392505744,
+          "boundaryMassFlowKgS": 295.63686312500045,
+          "boundaryPowerMW": 1119.1002819825835,
+          "energyResidualMW": 9.60815668804571e-13,
+          "massResidualKgS": 3.694822225952521e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2777176.646871234,
+          "chargingEnthalpyJkg": 222849.2941674576,
+          "coldLegEnthalpyJkg": 1270588.0742543864,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6465741724519,
+          "pressurizerVaporTemperatureC": 346.6717732490722,
+          "pressurizerLevelPercent": 53.543184115792165
+        },
+        {
+          "time": 8.0,
+          "primaryPressureMPa": 15.826722782865623,
+          "hotLegTemperatureC": 321.3617043993685,
+          "coldLegTemperatureC": 287.82213805860533,
+          "steamPressureMPa": 6.671415324761452,
+          "thermalEnergyMJ": 684644.6466661626,
+          "totalMassKg": 477877.7097272616,
+          "boundaryMassFlowKgS": 182.69077392500037,
+          "boundaryPowerMW": 863.9704108950579,
+          "energyResidualMW": -5.115907697472721e-13,
+          "massResidualKgS": -7.105427357601002e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776739.8786771786,
+          "chargingEnthalpyJkg": 222934.32452374767,
+          "coldLegEnthalpyJkg": 1272627.469418548,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6338470431813,
+          "pressurizerVaporTemperatureC": 347.46069967159144,
+          "pressurizerLevelPercent": 53.778160261135
+        },
+        {
+          "time": 9.0,
+          "primaryPressureMPa": 15.922062400437698,
+          "hotLegTemperatureC": 321.489555171422,
+          "coldLegTemperatureC": 288.18156678819423,
+          "steamPressureMPa": 6.698918200357925,
+          "thermalEnergyMJ": 685376.976736645,
+          "totalMassKg": 478001.9713415523,
+          "boundaryMassFlowKgS": 71.39616542499846,
+          "boundaryPowerMW": 613.2337952768432,
+          "energyResidualMW": -7.389644451905042e-13,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776399.1057702354,
+          "chargingEnthalpyJkg": 223016.04680516617,
+          "coldLegEnthalpyJkg": 1274447.3344767974,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6230733723372,
+          "pressurizerVaporTemperatureC": 348.21591898335816,
+          "pressurizerLevelPercent": 54.001237198895936
+        },
+        {
+          "time": 10.0,
+          "primaryPressureMPa": 16.009283474419984,
+          "hotLegTemperatureC": 321.62132675614805,
+          "coldLegTemperatureC": 288.48534796090746,
+          "steamPressureMPa": 6.715518536099274,
+          "thermalEnergyMJ": 685840.4976180318,
+          "totalMassKg": 478037.08324720373,
+          "boundaryMassFlowKgS": 4.391609999999105,
+          "boundaryPowerMW": 326.3371876344015,
+          "energyResidualMW": -3.979039320256561e-13,
+          "massResidualKgS": 1.4210854715202004e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776192.674097287,
+          "chargingEnthalpyJkg": 223090.80742176282,
+          "coldLegEnthalpyJkg": 1275982.751597661,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.61449870662545,
+          "pressurizerVaporTemperatureC": 348.90422223312703,
+          "pressurizerLevelPercent": 54.202990800422434
+        },
+        {
+          "time": 11.0,
+          "primaryPressureMPa": 16.081977622007155,
+          "hotLegTemperatureC": 321.74808260342695,
+          "coldLegTemperatureC": 288.71156338019955,
+          "steamPressureMPa": 6.718429604702671,
+          "thermalEnergyMJ": 686015.1802395697,
+          "totalMassKg": 478007.5234561458,
+          "boundaryMassFlowKgS": -60.281890000000885,
+          "boundaryPowerMW": 37.43378447168925,
+          "energyResidualMW": 1.7053025658242404e-13,
+          "massResidualKgS": -1.4210854715202004e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776156.4160730033,
+          "chargingEnthalpyJkg": 223153.11447322482,
+          "coldLegEnthalpyJkg": 1277122.511826478,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.60831769208835,
+          "pressurizerVaporTemperatureC": 349.47598863219,
+          "pressurizerLevelPercent": 54.369473008869704
+        },
+        {
+          "time": 12.0,
+          "primaryPressureMPa": 16.136190077917192,
+          "hotLegTemperatureC": 321.86160680106286,
+          "coldLegTemperatureC": 288.85144185426736,
+          "steamPressureMPa": 6.713001776543264,
+          "thermalEnergyMJ": 685972.3558137319,
+          "totalMassKg": 477936.74964793114,
+          "boundaryMassFlowKgS": -78.03245990000016,
+          "boundaryPowerMW": -108.64773326412183,
+          "energyResidualMW": -7.034373084024992e-13,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776224.0070336373,
+          "chargingEnthalpyJkg": 223199.57947588823,
+          "coldLegEnthalpyJkg": 1277822.6162073142,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6043122393861,
+          "pressurizerVaporTemperatureC": 349.90126895360083,
+          "pressurizerLevelPercent": 54.49265607055326
+        },
+        {
+          "time": 13.0,
+          "primaryPressureMPa": 16.172833053521252,
+          "hotLegTemperatureC": 321.9563320345636,
+          "coldLegTemperatureC": 288.9193754822752,
+          "steamPressureMPa": 6.703534743264913,
+          "thermalEnergyMJ": 685790.9437121922,
+          "totalMassKg": 477850.69486457645,
+          "boundaryMassFlowKgS": -93.31340190000014,
+          "boundaryPowerMW": -247.26558804124397,
+          "energyResidualMW": -1.0796292144732433e-12,
+          "massResidualKgS": -1.0658141036401503e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776341.7535407427,
+          "chargingEnthalpyJkg": 223230.98527423962,
+          "coldLegEnthalpyJkg": 1278157.3119018283,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6019228479212,
+          "pressurizerVaporTemperatureC": 350.1881806660747,
+          "pressurizerLevelPercent": 54.57545182784338
+        },
+        {
+          "time": 14.0,
+          "primaryPressureMPa": 16.19327002196455,
+          "hotLegTemperatureC": 322.028320535288,
+          "coldLegTemperatureC": 288.9294082458408,
+          "steamPressureMPa": 6.691707607884914,
+          "thermalEnergyMJ": 685507.1072299116,
+          "totalMassKg": 477755.1657307619,
+          "boundaryMassFlowKgS": -96.98082807500009,
+          "boundaryPowerMW": -313.48362547730653,
+          "energyResidualMW": 1.2789769243681803e-13,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776488.597520955,
+          "chargingEnthalpyJkg": 223248.50110300718,
+          "coldLegEnthalpyJkg": 1278198.963738001,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.60071649280826,
+          "pressurizerVaporTemperatureC": 350.3480111284216,
+          "pressurizerLevelPercent": 54.62146785528639
+        },
+        {
+          "time": 15,
+          "primaryPressureMPa": 16.200092641798214,
+          "hotLegTemperatureC": 322.07613509985276,
+          "coldLegTemperatureC": 288.8984163060061,
+          "steamPressureMPa": 6.679206558134943,
+          "thermalEnergyMJ": 685160.8587162388,
+          "totalMassKg": 477656.58040427114,
+          "boundaryMassFlowKgS": -100.03701657499994,
+          "boundaryPowerMW": -375.90390880944733,
+          "energyResidualMW": 2.287542884005234e-13,
+          "massResidualKgS": -1.687538997430238e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776643.498613362,
+          "chargingEnthalpyJkg": 223254.3485063912,
+          "coldLegEnthalpyJkg": 1278034.1119229475,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.60033910428683,
+          "pressurizerVaporTemperatureC": 350.40133829756564,
+          "pressurizerLevelPercent": 54.63680402818838
+        }
+      ],
+      "integrals": {
+        "massKg": 1723.2037807125016,
+        "energyMJ": 6848.604589174884
+      },
+      "steps": 300,
+      "stepSeconds": 0.05,
+      "solverRelativeTolerance": 1e-11,
+      "requestedSolverRelativeTolerance": 1e-11,
+      "solverToleranceBasis": "FMU DefaultExperiment annotation, checked against the setupExperiment request; OpenModelica CVODE uses the compiled annotation.",
+      "parameters": {
+        "pumpHeatMW": 6,
+        "initialPressurePa": 15480000,
+        "initialHotTemperatureK": 594.175,
+        "initialColdTemperatureK": 559.445,
+        "geometryScale": 2,
+        "pressurizerPhaseRelaxationTimeS": 0.1
+      },
+      "runtime": {
+        "model": "OpenPWR.KrskoTransient",
+        "fmuSha256": "389a65e5f54da7a5172da95714dd808710b833761e39e3ff0070795505d399a0",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "massIntegralErrorKg": 0.0047360024764202535,
+      "energyIntegralErrorMJ": 0.018687154832150554
+    }
+  ],
+  "phaseSensitivity": [
+    {
+      "timeConstantS": 0.05,
+      "completed": true,
+      "points": [
+        {
+          "time": 0,
+          "primaryPressureMPa": 15.479999999999999,
+          "hotLegTemperatureC": 321.025,
+          "coldLegTemperatureC": 286.2950000000001,
+          "steamPressureMPa": 6.41,
+          "thermalEnergyMJ": 339156.1177199545,
+          "totalMassKg": 237966.68594377808,
+          "boundaryMassFlowKgS": -10.687167499999873,
+          "boundaryPowerMW": -38.79599136191018,
+          "energyResidualMW": -2.5979218776228663e-14,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779900.7265308313,
+          "chargingEnthalpyJkg": 222637.09817436663,
+          "coldLegEnthalpyJkg": 1264877.5961507217,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.68754665341373,
+          "pressurizerVaporTemperatureC": 344.68754665341373,
+          "pressurizerLevelPercent": 52.949999999999996
+        },
+        {
+          "time": 1.0,
+          "primaryPressureMPa": 15.47911620838428,
+          "hotLegTemperatureC": 321.0250229955126,
+          "coldLegTemperatureC": 286.2822377893773,
+          "steamPressureMPa": 6.405918120620163,
+          "thermalEnergyMJ": 339117.13017397653,
+          "totalMassKg": 237955.8094258416,
+          "boundaryMassFlowKgS": -11.065868374999923,
+          "boundaryPowerMW": -39.17641861319498,
+          "energyResidualMW": -5.613287612504791e-13,
+          "massResidualKgS": -3.12194714524594e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779948.9417589507,
+          "chargingEnthalpyJkg": 222636.34049655963,
+          "coldLegEnthalpyJkg": 1264811.9582999046,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.68324255337507,
+          "pressurizerVaporTemperatureC": 344.68274981249044,
+          "pressurizerLevelPercent": 52.937532397434225
+        },
+        {
+          "time": 2.0,
+          "primaryPressureMPa": 15.479490032267728,
+          "hotLegTemperatureC": 321.02443675613176,
+          "coldLegTemperatureC": 286.27898941862156,
+          "steamPressureMPa": 6.412100411312112,
+          "thermalEnergyMJ": 339181.61765001115,
+          "totalMassKg": 237982.46755035006,
+          "boundaryMassFlowKgS": 64.40205120000007,
+          "boundaryPowerMW": 168.2035703017491,
+          "energyResidualMW": 6.465938895416912e-13,
+          "massResidualKgS": -1.7763568394002505e-15,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779875.9025808997,
+          "chargingEnthalpyJkg": 222636.66097718387,
+          "coldLegEnthalpyJkg": 1264794.9684129038,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6795970741141,
+          "pressurizerVaporTemperatureC": 344.6876983939658,
+          "pressurizerLevelPercent": 52.92985077415563
+        },
+        {
+          "time": 3.0,
+          "primaryPressureMPa": 15.497088774045483,
+          "hotLegTemperatureC": 321.03673589000346,
+          "coldLegTemperatureC": 286.3653190272099,
+          "steamPressureMPa": 6.435081999898957,
+          "thermalEnergyMJ": 339464.5008961386,
+          "totalMassKg": 238088.58657119452,
+          "boundaryMassFlowKgS": 143.86294719999978,
+          "boundaryPowerMW": 386.6709445916388,
+          "energyResidualMW": 3.552713678800501e-14,
+          "massResidualKgS": 5.684341886080802e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779603.678005598,
+          "chargingEnthalpyJkg": 222651.74839138275,
+          "coldLegEnthalpyJkg": 1265233.4939261845,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.67656956744224,
+          "pressurizerVaporTemperatureC": 344.82934585394105,
+          "pressurizerLevelPercent": 52.97313152091374
+        },
+        {
+          "time": 4.0,
+          "primaryPressureMPa": 15.55277520374931,
+          "hotLegTemperatureC": 321.0854661878511,
+          "coldLegTemperatureC": 286.62296634867164,
+          "steamPressureMPa": 6.495813108511818,
+          "thermalEnergyMJ": 340190.40499074885,
+          "totalMassKg": 238338.36505552928,
+          "boundaryMassFlowKgS": 351.7217168749993,
+          "boundaryPowerMW": 1054.2560001652485,
+          "energyResidualMW": 5.684341886080802e-14,
+          "massResidualKgS": -7.105427357601002e-15,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2778878.9079900365,
+          "chargingEnthalpyJkg": 222699.48771857424,
+          "coldLegEnthalpyJkg": 1266541.1385447248,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6672950863598,
+          "pressurizerVaporTemperatureC": 345.2768764913875,
+          "pressurizerLevelPercent": 53.10942910533905
+        },
+        {
+          "time": 5.0,
+          "primaryPressureMPa": 15.689824368384905,
+          "hotLegTemperatureC": 321.2188697408202,
+          "coldLegTemperatureC": 287.23023301880255,
+          "steamPressureMPa": 6.611266809864349,
+          "thermalEnergyMJ": 341607.4811136208,
+          "totalMassKg": 238802.76042070898,
+          "boundaryMassFlowKgS": 566.3382693749993,
+          "boundaryPowerMW": 1745.2992593255324,
+          "energyResidualMW": 1.4779288903810084e-12,
+          "massResidualKgS": 5.684341886080802e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2777479.7443591296,
+          "chargingEnthalpyJkg": 222816.9739059746,
+          "coldLegEnthalpyJkg": 1269622.6340388753,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6464744804829,
+          "pressurizerVaporTemperatureC": 346.37393014859026,
+          "pressurizerLevelPercent": 53.44071102870364
+        },
+        {
+          "time": 6.0,
+          "primaryPressureMPa": 15.912981230702862,
+          "hotLegTemperatureC": 321.47032856020485,
+          "coldLegTemperatureC": 288.1487966406627,
+          "steamPressureMPa": 6.730006218385785,
+          "thermalEnergyMJ": 343226.60924047814,
+          "totalMassKg": 239311.27727846336,
+          "boundaryMassFlowKgS": 439.9610856250006,
+          "boundaryPowerMW": 1458.4573944379454,
+          "energyResidualMW": -1.0800249583553523e-12,
+          "massResidualKgS": -1.1368683772161603e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776012.0564532564,
+          "chargingEnthalpyJkg": 223008.26282924588,
+          "coldLegEnthalpyJkg": 1274281.5714262777,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6186790045999,
+          "pressurizerVaporTemperatureC": 348.1470361283924,
+          "pressurizerLevelPercent": 53.96786155525609
+        },
+        {
+          "time": 7.0,
+          "primaryPressureMPa": 16.159612341173762,
+          "hotLegTemperatureC": 321.80828950497914,
+          "coldLegTemperatureC": 289.0501202140208,
+          "steamPressureMPa": 6.815066736121726,
+          "thermalEnergyMJ": 344507.50270445616,
+          "totalMassKg": 239675.46910361736,
+          "boundaryMassFlowKgS": 295.63686312500045,
+          "boundaryPowerMW": 1120.2733783477515,
+          "energyResidualMW": -5.171132215764373e-13,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2774943.0538583444,
+          "chargingEnthalpyJkg": 223219.65417730543,
+          "coldLegEnthalpyJkg": 1278845.020028194,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.59682754772393,
+          "pressurizerVaporTemperatureC": 350.0876958008405,
+          "pressurizerLevelPercent": 54.53352499680065
+        },
+        {
+          "time": 8.0,
+          "primaryPressureMPa": 16.397832179213754,
+          "hotLegTemperatureC": 322.19232528343775,
+          "coldLegTemperatureC": 289.81333581715194,
+          "steamPressureMPa": 6.880589380777096,
+          "thermalEnergyMJ": 345491.94837547286,
+          "totalMassKg": 239911.02562055754,
+          "boundaryMassFlowKgS": 182.69077392500037,
+          "boundaryPowerMW": 865.5498853454644,
+          "energyResidualMW": 1.7053025658242404e-13,
+          "massResidualKgS": 4.263256414560601e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2774109.705438862,
+          "chargingEnthalpyJkg": 223423.81657463883,
+          "coldLegEnthalpyJkg": 1282697.8430885042,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.58465004934396,
+          "pressurizerVaporTemperatureC": 351.94340645973136,
+          "pressurizerLevelPercent": 55.06382890863901
+        },
+        {
+          "time": 9.0,
+          "primaryPressureMPa": 16.620090771158004,
+          "hotLegTemperatureC": 322.59239646592414,
+          "coldLegTemperatureC": 290.4455364567874,
+          "steamPressureMPa": 6.933074601095926,
+          "thermalEnergyMJ": 346226.0709101394,
+          "totalMassKg": 240035.28697183868,
+          "boundaryMassFlowKgS": 71.39616542499846,
+          "boundaryPowerMW": 615.2309192978398,
+          "energyResidualMW": 7.958078640513122e-13,
+          "massResidualKgS": -7.105427357601002e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773436.0246014595,
+          "chargingEnthalpyJkg": 223614.28235353893,
+          "coldLegEnthalpyJkg": 1285878.1837690412,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.58119138400093,
+          "pressurizerVaporTemperatureC": 353.6582988615206,
+          "pressurizerLevelPercent": 55.54503449914726
+        },
+        {
+          "time": 10.0,
+          "primaryPressureMPa": 16.817667872476353,
+          "hotLegTemperatureC": 322.9828496116952,
+          "coldLegTemperatureC": 290.94258267922703,
+          "steamPressureMPa": 6.965638132629179,
+          "thermalEnergyMJ": 346691.85725042614,
+          "totalMassKg": 240070.39933108038,
+          "boundaryMassFlowKgS": 4.391609999999105,
+          "boundaryPowerMW": 328.84376537915205,
+          "energyResidualMW": -9.081140888156369e-13,
+          "massResidualKgS": 6.394884621840902e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773015.320752286,
+          "chargingEnthalpyJkg": 223783.58317039988,
+          "coldLegEnthalpyJkg": 1288367.273024327,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.58445702988627,
+          "pressurizerVaporTemperatureC": 355.16951967426667,
+          "pressurizerLevelPercent": 55.96227760954405
+        },
+        {
+          "time": 11.0,
+          "primaryPressureMPa": 16.97246493661741,
+          "hotLegTemperatureC": 323.3334963540332,
+          "coldLegTemperatureC": 291.25865641846633,
+          "steamPressureMPa": 6.973155928101642,
+          "thermalEnergyMJ": 346869.26934381714,
+          "totalMassKg": 240040.83747384264,
+          "boundaryMassFlowKgS": -60.281890000000885,
+          "boundaryPowerMW": 40.36773162868235,
+          "energyResidualMW": -4.682678991230205e-13,
+          "massResidualKgS": -2.842170943040401e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2772917.898916993,
+          "chargingEnthalpyJkg": 223916.21720646982,
+          "coldLegEnthalpyJkg": 1289934.3375600285,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.5912159047515,
+          "pressurizerVaporTemperatureC": 356.34489953745765,
+          "pressurizerLevelPercent": 56.28251002818294
+        },
+        {
+          "time": 12.0,
+          "primaryPressureMPa": 17.07644545950021,
+          "hotLegTemperatureC": 323.619674990666,
+          "coldLegTemperatureC": 291.3940598423985,
+          "steamPressureMPa": 6.965643619951643,
+          "thermalEnergyMJ": 346829.4689667108,
+          "totalMassKg": 239970.06363582495,
+          "boundaryMassFlowKgS": -78.03245990000016,
+          "boundaryPowerMW": -105.55872871241831,
+          "energyResidualMW": -1.7053025658242404e-13,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773015.2496834225,
+          "chargingEnthalpyJkg": 224005.30579942308,
+          "coldLegEnthalpyJkg": 1290584.800313138,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.5979414620841,
+          "pressurizerVaporTemperatureC": 357.1302039497966,
+          "pressurizerLevelPercent": 56.49442199660518
+        },
+        {
+          "time": 13.0,
+          "primaryPressureMPa": 17.135812399769847,
+          "hotLegTemperatureC": 323.8289170670631,
+          "coldLegTemperatureC": 291.4040383007108,
+          "steamPressureMPa": 6.9501270194711795,
+          "thermalEnergyMJ": 346651.1982777885,
+          "totalMassKg": 239884.0087010766,
+          "boundaryMassFlowKgS": -93.31340190000014,
+          "boundaryPowerMW": -244.0890820879133,
+          "energyResidualMW": -4.263256414560601e-14,
+          "massResidualKgS": 7.460698725481052e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773215.9762006253,
+          "chargingEnthalpyJkg": 224056.16865967854,
+          "coldLegEnthalpyJkg": 1290604.1411979485,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6026540759175,
+          "pressurizerVaporTemperatureC": 357.5770540929353,
+          "pressurizerLevelPercent": 56.61428291337789
+        },
+        {
+          "time": 14.0,
+          "primaryPressureMPa": 17.154643180837446,
+          "hotLegTemperatureC": 323.9552929477229,
+          "coldLegTemperatureC": 291.32086437819544,
+          "steamPressureMPa": 6.929556875089787,
+          "thermalEnergyMJ": 346370.51868029556,
+          "totalMassKg": 239788.4795946835,
+          "boundaryMassFlowKgS": -96.98082807500009,
+          "boundaryPowerMW": -310.35839966888875,
+          "energyResidualMW": 1.6058265828178264e-12,
+          "massResidualKgS": -3.0386804183990535e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773481.3469307376,
+          "chargingEnthalpyJkg": 224072.30175684104,
+          "coldLegEnthalpyJkg": 1290159.0530532715,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6043101014528,
+          "pressurizerVaporTemperatureC": 357.71856272431614,
+          "pressurizerLevelPercent": 56.652132501908945
+        },
+        {
+          "time": 15,
+          "primaryPressureMPa": 17.140242982731706,
+          "hotLegTemperatureC": 324.00407109667026,
+          "coldLegTemperatureC": 291.1808044760787,
+          "steamPressureMPa": 6.906881232554915,
+          "thermalEnergyMJ": 346027.3592168418,
+          "totalMassKg": 239689.89427132896,
+          "boundaryMassFlowKgS": -100.03701657499994,
+          "boundaryPowerMW": -372.85929881579887,
+          "energyResidualMW": -1.3926637620897964e-12,
+          "massResidualKgS": 2.842170943040401e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773772.9137428184,
+          "chargingEnthalpyJkg": 224059.96453134977,
+          "coldLegEnthalpyJkg": 1289435.2094600098,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.591576365012,
+          "pressurizerVaporTemperatureC": 357.610358737086,
+          "pressurizerLevelPercent": 56.62319563234336
+        }
+      ],
+      "integrals": {
+        "massKg": 1723.2037807125016,
+        "energyMJ": 6871.227425969462
+      },
+      "steps": 300,
+      "stepSeconds": 0.05,
+      "solverRelativeTolerance": 1e-11,
+      "requestedSolverRelativeTolerance": 1e-11,
+      "solverToleranceBasis": "FMU DefaultExperiment annotation, checked against the setupExperiment request; OpenModelica CVODE uses the compiled annotation.",
+      "parameters": {
+        "pumpHeatMW": 6,
+        "initialPressurePa": 15480000,
+        "initialHotTemperatureK": 594.175,
+        "initialColdTemperatureK": 559.445,
+        "geometryScale": 1,
+        "pressurizerPhaseRelaxationTimeS": 0.05
+      },
+      "runtime": {
+        "model": "OpenPWR.KrskoTransient",
+        "fmuSha256": "389a65e5f54da7a5172da95714dd808710b833761e39e3ff0070795505d399a0",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "geometryScale": 1,
+      "massIntegralErrorKg": 0.004546838375972584,
+      "energyIntegralErrorMJ": 0.014070917828576057
+    },
+    {
+      "timeConstantS": 0.2,
+      "completed": true,
+      "points": [
+        {
+          "time": 0,
+          "primaryPressureMPa": 15.479999999999999,
+          "hotLegTemperatureC": 321.025,
+          "coldLegTemperatureC": 286.2950000000001,
+          "steamPressureMPa": 6.41,
+          "thermalEnergyMJ": 339156.1177199545,
+          "totalMassKg": 237966.68594377808,
+          "boundaryMassFlowKgS": -10.687167499999873,
+          "boundaryPowerMW": -38.79599136191018,
+          "energyResidualMW": -2.5979218776228663e-14,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779900.7265308313,
+          "chargingEnthalpyJkg": 222637.09817436663,
+          "coldLegEnthalpyJkg": 1264877.5961507217,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.68754665341373,
+          "pressurizerVaporTemperatureC": 344.68754665341373,
+          "pressurizerLevelPercent": 52.949999999999996
+        },
+        {
+          "time": 1.0,
+          "primaryPressureMPa": 15.478974850209802,
+          "hotLegTemperatureC": 321.02493332934205,
+          "coldLegTemperatureC": 286.2821966409615,
+          "steamPressureMPa": 6.405917051229918,
+          "thermalEnergyMJ": 339117.1301689115,
+          "totalMassKg": 237955.80942584158,
+          "boundaryMassFlowKgS": -11.065868374999923,
+          "boundaryPowerMW": -39.17643131088994,
+          "energyResidualMW": -8.08242361927114e-14,
+          "massResidualKgS": 2.0117241206207837e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779948.9543859437,
+          "chargingEnthalpyJkg": 222636.2193096516,
+          "coldLegEnthalpyJkg": 1264811.8122452793,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6833581555827,
+          "pressurizerVaporTemperatureC": 344.681440775787,
+          "pressurizerLevelPercent": 52.937942951295206
+        },
+        {
+          "time": 2.0,
+          "primaryPressureMPa": 15.479473555654994,
+          "hotLegTemperatureC": 321.02442914983146,
+          "coldLegTemperatureC": 286.27899505205664,
+          "steamPressureMPa": 6.412099287006217,
+          "thermalEnergyMJ": 339181.6176304142,
+          "totalMassKg": 237982.46755085414,
+          "boundaryMassFlowKgS": 64.40205120000007,
+          "boundaryPowerMW": 168.20355794006855,
+          "energyResidualMW": -8.08242361927114e-13,
+          "massResidualKgS": 4.440892098500626e-16,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779875.915871149,
+          "chargingEnthalpyJkg": 222636.6468517227,
+          "coldLegEnthalpyJkg": 1264795.00536933,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6796246975189,
+          "pressurizerVaporTemperatureC": 344.6875415358895,
+          "pressurizerLevelPercent": 52.92992166074556
+        },
+        {
+          "time": 3.0,
+          "primaryPressureMPa": 15.497070858566747,
+          "hotLegTemperatureC": 321.0367279868598,
+          "coldLegTemperatureC": 286.3653165979923,
+          "steamPressureMPa": 6.435081350341613,
+          "thermalEnergyMJ": 339464.5008689034,
+          "totalMassKg": 238088.5865721214,
+          "boundaryMassFlowKgS": 143.86294719999978,
+          "boundaryPowerMW": 386.6709380328857,
+          "energyResidualMW": -1.3145040611561853e-12,
+          "massResidualKgS": -3.552713678800501e-15,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2779603.6857157005,
+          "chargingEnthalpyJkg": 222651.73303248297,
+          "coldLegEnthalpyJkg": 1265233.4898584366,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.67659747536493,
+          "pressurizerVaporTemperatureC": 344.8291774774576,
+          "pressurizerLevelPercent": 52.97319886780956
+        },
+        {
+          "time": 4.0,
+          "primaryPressureMPa": 15.552756969820743,
+          "hotLegTemperatureC": 321.0854581213996,
+          "coldLegTemperatureC": 286.6229624081981,
+          "steamPressureMPa": 6.495812675497105,
+          "thermalEnergyMJ": 340190.4060956588,
+          "totalMassKg": 238338.36540958512,
+          "boundaryMassFlowKgS": 351.7217168749993,
+          "boundaryPowerMW": 1054.2559970898058,
+          "energyResidualMW": 4.263256414560601e-13,
+          "massResidualKgS": -5.684341886080802e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2778878.9131854177,
+          "chargingEnthalpyJkg": 222699.47208701135,
+          "coldLegEnthalpyJkg": 1266541.1268753828,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.66732315686227,
+          "pressurizerVaporTemperatureC": 345.27670577021047,
+          "pressurizerLevelPercent": 53.10949568375079
+        },
+        {
+          "time": 5.0,
+          "primaryPressureMPa": 15.689806006806878,
+          "hotLegTemperatureC": 321.2188615742383,
+          "coldLegTemperatureC": 287.23022879120913,
+          "steamPressureMPa": 6.611266383845982,
+          "thermalEnergyMJ": 341607.4821985561,
+          "totalMassKg": 238802.7607692837,
+          "boundaryMassFlowKgS": 566.3382693749993,
+          "boundaryPowerMW": 1745.2992576372078,
+          "energyResidualMW": 1.4779288903810084e-12,
+          "massResidualKgS": 1.4210854715202004e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2777479.7495730575,
+          "chargingEnthalpyJkg": 222816.95816583114,
+          "coldLegEnthalpyJkg": 1269622.6211084533,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6465028283096,
+          "pressurizerVaporTemperatureC": 346.37375894486786,
+          "pressurizerLevelPercent": 53.44077732652855
+        },
+        {
+          "time": 6.0,
+          "primaryPressureMPa": 15.912962751806806,
+          "hotLegTemperatureC": 321.4703203118221,
+          "coldLegTemperatureC": 288.14879231018585,
+          "steamPressureMPa": 6.730005788802823,
+          "thermalEnergyMJ": 343226.6103241714,
+          "totalMassKg": 239311.27762731025,
+          "boundaryMassFlowKgS": 439.9610856250006,
+          "boundaryPowerMW": 1458.4573922125874,
+          "energyResidualMW": -1.1368683772161603e-12,
+          "massResidualKgS": -2.842170943040401e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2776012.061815179,
+          "chargingEnthalpyJkg": 223008.24698992737,
+          "coldLegEnthalpyJkg": 1274281.5582671342,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6187077621943,
+          "pressurizerVaporTemperatureC": 348.1468648819862,
+          "pressurizerLevelPercent": 53.96792760493578
+        },
+        {
+          "time": 7.0,
+          "primaryPressureMPa": 16.15959379570355,
+          "hotLegTemperatureC": 321.808281215856,
+          "coldLegTemperatureC": 289.0501159817916,
+          "steamPressureMPa": 6.815066288666082,
+          "thermalEnergyMJ": 344507.50376342994,
+          "totalMassKg": 239675.4694429685,
+          "boundaryMassFlowKgS": 295.63686312500045,
+          "boundaryPowerMW": 1120.2733753741231,
+          "energyResidualMW": 5.739566404372453e-13,
+          "massResidualKgS": -4.263256414560601e-13,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2774943.059520038,
+          "chargingEnthalpyJkg": 223219.6382824683,
+          "coldLegEnthalpyJkg": 1278845.0076509682,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.5968567168803,
+          "pressurizerVaporTemperatureC": 350.0875250223828,
+          "pressurizerLevelPercent": 54.53359089956976
+        },
+        {
+          "time": 8.0,
+          "primaryPressureMPa": 16.39781353543723,
+          "hotLegTemperatureC": 322.1923169463795,
+          "coldLegTemperatureC": 289.81333143389406,
+          "steamPressureMPa": 6.880588934231573,
+          "thermalEnergyMJ": 345491.9494314081,
+          "totalMassKg": 239911.0259598819,
+          "boundaryMassFlowKgS": 182.69077392500037,
+          "boundaryPowerMW": 865.5498819173927,
+          "energyResidualMW": 6.252776074688882e-13,
+          "massResidualKgS": -5.684341886080802e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2774109.711147366,
+          "chargingEnthalpyJkg": 223423.80059704703,
+          "coldLegEnthalpyJkg": 1282697.8301674002,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.58467958688686,
+          "pressurizerVaporTemperatureC": 351.94323587897713,
+          "pressurizerLevelPercent": 55.06389457428145
+        },
+        {
+          "time": 9.0,
+          "primaryPressureMPa": 16.620072063790634,
+          "hotLegTemperatureC": 322.5923880958343,
+          "coldLegTemperatureC": 290.4455320176688,
+          "steamPressureMPa": 6.933074149807042,
+          "thermalEnergyMJ": 346226.0719530708,
+          "totalMassKg": 240035.2873070255,
+          "boundaryMassFlowKgS": 71.39616542499846,
+          "boundaryPowerMW": 615.2309153778638,
+          "energyResidualMW": -3.979039320256561e-13,
+          "massResidualKgS": 2.842170943040401e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773436.030417423,
+          "chargingEnthalpyJkg": 223614.26632285537,
+          "coldLegEnthalpyJkg": 1285878.170740492,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.5812212381828,
+          "pressurizerVaporTemperatureC": 353.6581286921979,
+          "pressurizerLevelPercent": 55.545099991558224
+        },
+        {
+          "time": 10.0,
+          "primaryPressureMPa": 16.8176491223126,
+          "hotLegTemperatureC": 322.98284121954214,
+          "coldLegTemperatureC": 290.94257821260305,
+          "steamPressureMPa": 6.965637676851944,
+          "thermalEnergyMJ": 346691.8582892084,
+          "totalMassKg": 240070.39966629856,
+          "boundaryMassFlowKgS": 4.391609999999105,
+          "boundaryPowerMW": 328.8437607223566,
+          "energyResidualMW": 0.0,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773015.326655274,
+          "chargingEnthalpyJkg": 223783.56710429527,
+          "coldLegEnthalpyJkg": 1288367.259984674,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.58448714667907,
+          "pressurizerVaporTemperatureC": 355.1693499795367,
+          "pressurizerLevelPercent": 55.96234296577136
+        },
+        {
+          "time": 11.0,
+          "primaryPressureMPa": 16.97244616018034,
+          "hotLegTemperatureC": 323.33348794681615,
+          "coldLegTemperatureC": 291.25865193352047,
+          "steamPressureMPa": 6.973155468911759,
+          "thermalEnergyMJ": 346869.27037752996,
+          "totalMassKg": 240040.8378090557,
+          "boundaryMassFlowKgS": -60.281890000000885,
+          "boundaryPowerMW": 40.36772623468369,
+          "energyResidualMW": 7.958078640513122e-13,
+          "massResidualKgS": -7.105427357601002e-15,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2772917.9048709357,
+          "chargingEnthalpyJkg": 223916.20111883513,
+          "coldLegEnthalpyJkg": 1289934.3244965707,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.5912462161143,
+          "pressurizerVaporTemperatureC": 356.34473027023887,
+          "pressurizerLevelPercent": 56.282575285303174
+        },
+        {
+          "time": 12.0,
+          "primaryPressureMPa": 17.07642667008222,
+          "hotLegTemperatureC": 323.6196665731743,
+          "coldLegTemperatureC": 291.39405534654463,
+          "steamPressureMPa": 6.965643159101593,
+          "thermalEnergyMJ": 346829.47000169585,
+          "totalMassKg": 239970.06397179555,
+          "boundaryMassFlowKgS": -78.03245990000016,
+          "boundaryPowerMW": -105.55873445835095,
+          "energyResidualMW": -3.694822225952521e-13,
+          "massResidualKgS": 2.1316282072803006e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773015.255652111,
+          "chargingEnthalpyJkg": 224005.28970132658,
+          "coldLegEnthalpyJkg": 1290584.7872085834,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.5979718989803,
+          "pressurizerVaporTemperatureC": 357.1300350046399,
+          "pressurizerLevelPercent": 56.49448719304464
+        },
+        {
+          "time": 13.0,
+          "primaryPressureMPa": 17.135793596963833,
+          "hotLegTemperatureC": 323.82890863354896,
+          "coldLegTemperatureC": 291.4040337660542,
+          "steamPressureMPa": 6.950126550160018,
+          "thermalEnergyMJ": 346651.19923788164,
+          "totalMassKg": 239884.0090294361,
+          "boundaryMassFlowKgS": -93.31340190000014,
+          "boundaryPowerMW": -244.08908825028743,
+          "energyResidualMW": -3.552713678800501e-15,
+          "massResidualKgS": 0.0,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773215.9822646,
+          "chargingEnthalpyJkg": 224056.15255048889,
+          "coldLegEnthalpyJkg": 1290604.1278767863,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.60268458198505,
+          "pressurizerVaporTemperatureC": 357.5768852864387,
+          "pressurizerLevelPercent": 56.614348061849384
+        },
+        {
+          "time": 14.0,
+          "primaryPressureMPa": 17.15462433231079,
+          "hotLegTemperatureC": 323.95528444310753,
+          "coldLegTemperatureC": 291.3208596931995,
+          "steamPressureMPa": 6.9295563791948664,
+          "thermalEnergyMJ": 346370.51933012437,
+          "totalMassKg": 239788.47990811267,
+          "boundaryMassFlowKgS": -96.98082807500009,
+          "boundaryPowerMW": -310.3584063068563,
+          "energyResidualMW": -1.1098272807430475e-12,
+          "massResidualKgS": -3.3861802251067274e-14,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773481.35331812,
+          "chargingEnthalpyJkg": 224072.2856086004,
+          "coldLegEnthalpyJkg": 1290159.038931537,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.6043406253424,
+          "pressurizerVaporTemperatureC": 357.71839365028563,
+          "pressurizerLevelPercent": 56.65219755175946
+        },
+        {
+          "time": 15,
+          "primaryPressureMPa": 17.140224101852546,
+          "hotLegTemperatureC": 324.00406252770233,
+          "coldLegTemperatureC": 291.18079971683494,
+          "steamPressureMPa": 6.906880740457844,
+          "thermalEnergyMJ": 346027.35985849705,
+          "totalMassKg": 239689.89458468545,
+          "boundaryMassFlowKgS": -100.03701657499994,
+          "boundaryPowerMW": -372.8593055151541,
+          "energyResidualMW": 3.979039320256561e-13,
+          "massResidualKgS": 7.105427357601002e-15,
+          "pumpHeatInputMW": 6.0,
+          "steamEnthalpyJkg": 2773772.9200592604,
+          "chargingEnthalpyJkg": 224059.94835529968,
+          "coldLegEnthalpyJkg": 1289435.1949203138,
+          "feedwaterEnthalpyJkg": 919983.7868249048,
+          "pressurizerLiquidTemperatureC": 344.59160683789366,
+          "pressurizerVaporTemperatureC": 357.61018936165976,
+          "pressurizerLevelPercent": 56.623260622222425
+        }
+      ],
+      "integrals": {
+        "massKg": 1723.2037807125016,
+        "energyMJ": 6871.227344435961
+      },
+      "steps": 300,
+      "stepSeconds": 0.05,
+      "solverRelativeTolerance": 1e-11,
+      "requestedSolverRelativeTolerance": 1e-11,
+      "solverToleranceBasis": "FMU DefaultExperiment annotation, checked against the setupExperiment request; OpenModelica CVODE uses the compiled annotation.",
+      "parameters": {
+        "pumpHeatMW": 6,
+        "initialPressurePa": 15480000,
+        "initialHotTemperatureK": 594.175,
+        "initialColdTemperatureK": 559.445,
+        "geometryScale": 1,
+        "pressurizerPhaseRelaxationTimeS": 0.2
+      },
+      "runtime": {
+        "model": "OpenPWR.KrskoTransient",
+        "fmuSha256": "389a65e5f54da7a5172da95714dd808710b833761e39e3ff0070795505d399a0",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "geometryScale": 1,
+      "massIntegralErrorKg": 0.004860194865614176,
+      "energyIntegralErrorMJ": 0.014794106565204856
+    }
+  ],
+  "trace": [
+    {
+      "time": 0,
+      "primaryPressureMPa": 15.479999999999999,
+      "hotLegTemperatureC": 321.025,
+      "coldLegTemperatureC": 286.2950000000001,
+      "steamPressureMPa": 6.41,
+      "thermalEnergyMJ": 339156.1177199545,
+      "totalMassKg": 237966.68594377808,
+      "boundaryMassFlowKgS": -10.687167499999873,
+      "boundaryPowerMW": -38.79599136191018,
+      "energyResidualMW": -2.5979218776228663e-14,
+      "massResidualKgS": 0.0,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2779900.7265308313,
+      "chargingEnthalpyJkg": 222637.09817436663,
+      "coldLegEnthalpyJkg": 1264877.5961507217,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.68754665341373,
+      "pressurizerVaporTemperatureC": 344.68754665341373,
+      "pressurizerLevelPercent": 52.949999999999996
+    },
+    {
+      "time": 1.0,
+      "primaryPressureMPa": 15.479068187891933,
+      "hotLegTemperatureC": 321.0249926098493,
+      "coldLegTemperatureC": 286.28222388847587,
+      "steamPressureMPa": 6.40591774721633,
+      "thermalEnergyMJ": 339117.130175684,
+      "totalMassKg": 237955.80942583966,
+      "boundaryMassFlowKgS": -11.065868374999923,
+      "boundaryPowerMW": -39.17642304690844,
+      "energyResidualMW": -4.877825290350302e-13,
+      "massResidualKgS": -3.9968028886505635e-15,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2779948.946167977,
+      "chargingEnthalpyJkg": 222636.29932840719,
+      "coldLegEnthalpyJkg": 1264811.9090853026,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.6832818933443,
+      "pressurizerVaporTemperatureC": 344.68230507290696,
+      "pressurizerLevelPercent": 52.93767210080479
+    },
+    {
+      "time": 2.0,
+      "primaryPressureMPa": 15.47948665794382,
+      "hotLegTemperatureC": 321.02443575503537,
+      "coldLegTemperatureC": 286.2789918482673,
+      "steamPressureMPa": 6.412100052970033,
+      "thermalEnergyMJ": 339181.61764699034,
+      "totalMassKg": 237982.4675505681,
+      "boundaryMassFlowKgS": 64.40205120000007,
+      "boundaryPowerMW": 168.20356636179235,
+      "energyResidualMW": -7.744915819785092e-13,
+      "massResidualKgS": 1.7763568394002505e-15,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2779875.906816807,
+      "chargingEnthalpyJkg": 222636.6580843635,
+      "coldLegEnthalpyJkg": 1264794.982585397,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.6796038925711,
+      "pressurizerVaporTemperatureC": 344.6876656437462,
+      "pressurizerLevelPercent": 52.92986812590901
+    },
+    {
+      "time": 3.0,
+      "primaryPressureMPa": 15.49708486891717,
+      "hotLegTemperatureC": 321.0367346557915,
+      "coldLegTemperatureC": 286.3653186564519,
+      "steamPressureMPa": 6.435081812024678,
+      "thermalEnergyMJ": 339464.5008902961,
+      "totalMassKg": 238088.5865713631,
+      "boundaryMassFlowKgS": 143.86294719999978,
+      "boundaryPowerMW": 386.67094269462655,
+      "energyResidualMW": -1.2434497875801753e-12,
+      "massResidualKgS": 2.4868995751603507e-14,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2779603.6802356252,
+      "chargingEnthalpyJkg": 222651.74504352498,
+      "coldLegEnthalpyJkg": 1265233.4938613484,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.6765764868404,
+      "pressurizerVaporTemperatureC": 344.8293088439659,
+      "pressurizerLevelPercent": 52.973147565203185
+    },
+    {
+      "time": 4.0,
+      "primaryPressureMPa": 15.552771230931006,
+      "hotLegTemperatureC": 321.08546484130693,
+      "coldLegTemperatureC": 286.62296576784524,
+      "steamPressureMPa": 6.495813066893443,
+      "thermalEnergyMJ": 340190.40613623546,
+      "totalMassKg": 238338.3654136691,
+      "boundaryMassFlowKgS": 351.7217168749993,
+      "boundaryPowerMW": 1054.255999869656,
+      "energyResidualMW": -5.115907697472721e-13,
+      "massResidualKgS": -4.831690603168681e-13,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2778878.908489382,
+      "chargingEnthalpyJkg": 222699.48431276085,
+      "coldLegEnthalpyJkg": 1266541.1374408405,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.6673020447894,
+      "pressurizerVaporTemperatureC": 345.2768389826658,
+      "pressurizerLevelPercent": 53.10944498253186
+    },
+    {
+      "time": 5.0,
+      "primaryPressureMPa": 15.689820124042061,
+      "hotLegTemperatureC": 321.21886815255175,
+      "coldLegTemperatureC": 287.23023127126305,
+      "steamPressureMPa": 6.611266473849856,
+      "thermalEnergyMJ": 341607.4790431488,
+      "totalMassKg": 238802.75977962924,
+      "boundaryMassFlowKgS": 566.3382693749993,
+      "boundaryPowerMW": 1745.2992579938978,
+      "energyResidualMW": -2.284781658090651e-12,
+      "massResidualKgS": -4.121147867408581e-13,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2777479.7484715204,
+      "chargingEnthalpyJkg": 222816.97026758554,
+      "coldLegEnthalpyJkg": 1269622.6270539374,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.64648154297254,
+      "pressurizerVaporTemperatureC": 346.3738905856801,
+      "pressurizerLevelPercent": 53.44072625153351
+    },
+    {
+      "time": 6.0,
+      "primaryPressureMPa": 15.912976780508641,
+      "hotLegTemperatureC": 321.4703266737689,
+      "coldLegTemperatureC": 288.14879426413256,
+      "steamPressureMPa": 6.73000592766384,
+      "thermalEnergyMJ": 343226.6071409148,
+      "totalMassKg": 239311.27662555547,
+      "boundaryMassFlowKgS": 439.9610856250006,
+      "boundaryPowerMW": 1458.4573929319313,
+      "energyResidualMW": 1.3073986337985843e-12,
+      "massResidualKgS": 0.0,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2776012.060081957,
+      "chargingEnthalpyJkg": 223008.25901472993,
+      "coldLegEnthalpyJkg": 1274281.5613242816,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.6186861819567,
+      "pressurizerVaporTemperatureC": 348.14699514197616,
+      "pressurizerLevelPercent": 53.96787630539455
+    },
+    {
+      "time": 7.0,
+      "primaryPressureMPa": 16.15960780780217,
+      "hotLegTemperatureC": 321.8082873925979,
+      "coldLegTemperatureC": 289.05011782128895,
+      "steamPressureMPa": 6.815066469433738,
+      "thermalEnergyMJ": 344507.50077251677,
+      "totalMassKg": 239675.468522817,
+      "boundaryMassFlowKgS": 295.63686312500045,
+      "boundaryPowerMW": 1120.2733765754804,
+      "energyResidualMW": -6.308000592980534e-13,
+      "massResidualKgS": 1.9895196601282805e-13,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2774943.0572327706,
+      "chargingEnthalpyJkg": 223219.6502918713,
+      "coldLegEnthalpyJkg": 1278845.0099282244,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.5968348182048,
+      "pressurizerVaporTemperatureC": 350.0876544065078,
+      "pressurizerLevelPercent": 54.53353957365431
+    },
+    {
+      "time": 8.0,
+      "primaryPressureMPa": 16.397827576764453,
+      "hotLegTemperatureC": 322.1923229899081,
+      "coldLegTemperatureC": 289.8133334099383,
+      "steamPressureMPa": 6.880589123399072,
+      "thermalEnergyMJ": 345491.9464664472,
+      "totalMassKg": 239911.02505033993,
+      "boundaryMassFlowKgS": 182.69077392500037,
+      "boundaryPowerMW": 865.549883369607,
+      "energyResidualMW": -3.979039320256561e-13,
+      "massResidualKgS": -2.842170943040401e-14,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2774109.7087291027,
+      "chargingEnthalpyJkg": 223423.81263037052,
+      "coldLegEnthalpyJkg": 1282697.8329857734,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.58465739672,
+      "pressurizerVaporTemperatureC": 351.94336477105617,
+      "pressurizerLevelPercent": 55.06384334610105
+    },
+    {
+      "time": 9.0,
+      "primaryPressureMPa": 16.6200861160028,
+      "hotLegTemperatureC": 322.59239402567266,
+      "coldLegTemperatureC": 290.4455340606369,
+      "steamPressureMPa": 6.93307434639018,
+      "thermalEnergyMJ": 346226.0689787192,
+      "totalMassKg": 240035.28639261355,
+      "boundaryMassFlowKgS": 71.39616542499846,
+      "boundaryPowerMW": 615.2309170854132,
+      "energyResidualMW": 3.951427061110735e-13,
+      "massResidualKgS": -1.4210854715202004e-14,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2773436.0278839692,
+      "chargingEnthalpyJkg": 223614.27836445172,
+      "coldLegEnthalpyJkg": 1285878.173781649,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.5811987936229,
+      "pressurizerVaporTemperatureC": 353.6582569970601,
+      "pressurizerLevelPercent": 55.54504883322545
+    },
+    {
+      "time": 10.0,
+      "primaryPressureMPa": 16.817663152198588,
+      "hotLegTemperatureC": 322.98284703690604,
+      "coldLegTemperatureC": 290.94258019586255,
+      "steamPressureMPa": 6.965637840386881,
+      "thermalEnergyMJ": 346691.8549442715,
+      "totalMassKg": 240070.39866842757,
+      "boundaryMassFlowKgS": 4.391609999999105,
+      "boundaryPowerMW": 328.843762393361,
+      "energyResidualMW": -7.254438969539478e-13,
+      "massResidualKgS": -2.1316282072803006e-14,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2773015.324537253,
+      "chargingEnthalpyJkg": 223783.5791258231,
+      "coldLegEnthalpyJkg": 1288367.262638586,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.5844644876696,
+      "pressurizerVaporTemperatureC": 355.16947751970963,
+      "pressurizerLevelPercent": 55.9622918139921
+    },
+    {
+      "time": 11.0,
+      "primaryPressureMPa": 16.97246015174183,
+      "hotLegTemperatureC": 323.33349364112644,
+      "coldLegTemperatureC": 291.2586538386213,
+      "steamPressureMPa": 6.973155646551447,
+      "thermalEnergyMJ": 346869.26703375333,
+      "totalMassKg": 240040.83681101835,
+      "boundaryMassFlowKgS": -60.281890000000885,
+      "boundaryPowerMW": 40.36772832151087,
+      "energyResidualMW": -1.9326762412674725e-12,
+      "massResidualKgS": 0.0,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2772917.902567629,
+      "chargingEnthalpyJkg": 223916.2131067927,
+      "coldLegEnthalpyJkg": 1289934.3267173513,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.5912233949473,
+      "pressurizerVaporTemperatureC": 356.3448570577182,
+      "pressurizerLevelPercent": 56.28252410478793
+    },
+    {
+      "time": 12.0,
+      "primaryPressureMPa": 17.076440687544064,
+      "hotLegTemperatureC": 323.6196722219893,
+      "coldLegTemperatureC": 291.39405743568125,
+      "steamPressureMPa": 6.965643391569427,
+      "thermalEnergyMJ": 346829.4671300128,
+      "totalMassKg": 239970.06302792736,
+      "boundaryMassFlowKgS": -78.03245990000016,
+      "boundaryPowerMW": -105.55873155992117,
+      "energyResidualMW": 1.2647660696529783e-12,
+      "massResidualKgS": 7.105427357601002e-15,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2773015.2526413095,
+      "chargingEnthalpyJkg": 224005.30171098298,
+      "coldLegEnthalpyJkg": 1290584.7903709603,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.59794897534084,
+      "pressurizerVaporTemperatureC": 357.1301616790706,
+      "pressurizerLevelPercent": 56.49443610276618
+    },
+    {
+      "time": 13.0,
+      "primaryPressureMPa": 17.135807645114966,
+      "hotLegTemperatureC": 323.8289142856256,
+      "coldLegTemperatureC": 291.40403601276023,
+      "steamPressureMPa": 6.950126785955931,
+      "thermalEnergyMJ": 346651.19643612416,
+      "totalMassKg": 239884.0080929596,
+      "boundaryMassFlowKgS": -93.31340190000014,
+      "boundaryPowerMW": -244.08908515413282,
+      "energyResidualMW": -1.7487445802544245e-13,
+      "massResidualKgS": 7.105427357601002e-15,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2773215.979217879,
+      "chargingEnthalpyJkg": 224056.16458615693,
+      "coldLegEnthalpyJkg": 1290604.1318633533,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.6026616028423,
+      "pressurizerVaporTemperatureC": 357.57701201555756,
+      "pressurizerLevelPercent": 56.614297055619346
+    },
+    {
+      "time": 14.0,
+      "primaryPressureMPa": 17.15463843343683,
+      "hotLegTemperatureC": 323.9552901572665,
+      "coldLegTemperatureC": 291.3208621398936,
+      "steamPressureMPa": 6.9295566448943156,
+      "thermalEnergyMJ": 346370.5168724261,
+      "totalMassKg": 239788.47898837773,
+      "boundaryMassFlowKgS": -96.98082807500009,
+      "boundaryPowerMW": -310.35840275025294,
+      "energyResidualMW": -9.947598300641403e-13,
+      "massResidualKgS": 3.6637359812630166e-15,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2773481.349895776,
+      "chargingEnthalpyJkg": 224072.29768956467,
+      "coldLegEnthalpyJkg": 1290159.0439662763,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.60431763287795,
+      "pressurizerVaporTemperatureC": 357.718520721373,
+      "pressurizerLevelPercent": 56.65214665897459
+    },
+    {
+      "time": 15,
+      "primaryPressureMPa": 17.140238238034595,
+      "hotLegTemperatureC": 324.00406829845144,
+      "coldLegTemperatureC": 291.1808022586481,
+      "steamPressureMPa": 6.906881002641202,
+      "thermalEnergyMJ": 346027.3574024012,
+      "totalMassKg": 239689.893664854,
+      "boundaryMassFlowKgS": -100.03701657499994,
+      "boundaryPowerMW": -372.85930194582306,
+      "energyResidualMW": -6.536993168992922e-13,
+      "massResidualKgS": 3.481659405224491e-13,
+      "pumpHeatInputMW": 6.0,
+      "steamEnthalpyJkg": 2773772.916693934,
+      "chargingEnthalpyJkg": 224059.96046636655,
+      "coldLegEnthalpyJkg": 1289435.200470848,
+      "feedwaterEnthalpyJkg": 919983.7868249048,
+      "pressurizerLiquidTemperatureC": 344.5915838924641,
+      "pressurizerVaporTemperatureC": 357.6103167392462,
+      "pressurizerLevelPercent": 56.62320979467219
+    }
+  ]
+}

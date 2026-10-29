@@ -17,6 +17,10 @@ model PactelPressurizer "PACTEL ATWS-10 conditional pressurizer comparison, NRC 
   parameter Real wallConductivityWMK = 15 "AISI304 manufacturer nominal at room temperature; assumed constant";
   parameter Boolean useTemperatureDependentSteel = true "NISTIR 7401 section 3.1.1, independent of PACTEL response";
   parameter Boolean resolveWallFaces = true;
+  parameter Boolean useRegimeCondensation = true "Development-selected local gravity-film closure, not fitted to measured pressure";
+  parameter Real filmReynoldsFloor = 1;
+  parameter Real filmTransitionLower = 20;
+  parameter Real filmTransitionUpper = 40;
   parameter Real externalHeatTransferWm2K = 3.44;
   parameter Real ambientTemperatureK = 298.0;
   parameter Real phaseRelaxationTimeS = .1 "Unfitted phase separation closure";
@@ -45,6 +49,10 @@ model PactelPressurizer "PACTEL ATWS-10 conditional pressurizer comparison, NRC 
     wallConductivityWMK=wallConductivityWMK,
     useTemperatureDependentSteel=useTemperatureDependentSteel,
     resolveWallFaces=resolveWallFaces,
+    useRegimeCondensation=useRegimeCondensation,
+    filmReynoldsFloor=filmReynoldsFloor,
+    filmTransitionLower=filmTransitionLower,
+    filmTransitionUpper=filmTransitionUpper,
     initialWallTemperatureK=initialWallTemperatureK,
     ambientTemperatureK=ambientTemperatureK,
     externalHeatTransferWm2K=externalHeatTransferWm2K,
@@ -62,6 +70,7 @@ model PactelPressurizer "PACTEL ATWS-10 conditional pressurizer comparison, NRC 
   output Real surgeOutflowEnthalpyJkg = vessel.liquidEnthalpyJkg;
   output Real wallHeatLossMW = vessel.wallHeatLossMW;
   output Real wallCondensationKgS = vessel.wallCondensationKgS;
+  output Real maximumFilmReynolds = vessel.maximumFilmReynolds;
   output Real bulkEvaporationKgS = vessel.bulkEvaporationKgS;
   output Real bulkCondensationKgS = vessel.bulkCondensationKgS;
   output Real massResidualKgS = vessel.massResidualKgS;

@@ -8,7 +8,7 @@
 | Browser physics runtime dependencies | None | No package installation or paid license |
 | 3D renderer and orbit controls | Locally vendored Three.js 0.186.1 | MIT; exact source, integrity and the small import patch are recorded in `src/vendor/three/README.md` |
 | 3D equipment geometry and observation mapping | Original procedural JavaScript | Apache-2.0; no external CAD, texture, font or asset service |
-| Optional native plant model | Original Modelica source in `models/OpenPWR` | Apache-2.0 |
+| Optional native plant models | Original Modelica source in `models/OpenPWR`, `models/ColdStartPlant.mo` and measured-case wrappers | Apache-2.0 |
 | Modelica water properties | Modelica Standard Library 4.0.0 | BSD-3-Clause; upstream source and notices retained by its distribution |
 | Native compiler | OpenModelica, installed separately | Upstream OSMC/GPL licenses and component notices; not relicensed by OpenPWR |
 | FMI host | FMPy 0.3.32, installed in an isolated Python environment | BSD-2-Clause plus bundled third-party notices |

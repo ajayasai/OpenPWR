@@ -63,6 +63,80 @@ try {
   if (process.argv.includes('--require-plant')) throw new Error(`Coupled plant evidence required: ${error.message}`);
   console.log('Coupled plant report omitted; build and verify the current native plant to include it.');
 }
+let includeCold = false;
+try {
+  const report = JSON.parse(await readFile(resolve(root, 'artifacts/cold-verification.json'), 'utf8'));
+  const manifest = JSON.parse(await readFile(resolve(root, 'artifacts/modelica/cold-manifest.json'), 'utf8'));
+  const compiledHash = createHash('sha256').update(await readFile(resolve(root, 'artifacts/modelica/ColdStartPlant.fmu'))).digest('hex');
+  const sources = { sourceSha256: 'models/OpenPWR/package.mo', coldSourceSha256: 'models/ColdStartPlant.mo',
+    verificationScriptSha256: 'backend/verify_cold.py', sharedRunnerSha256: 'validation/native_fmi.py',
+    hostScriptSha256: 'backend/fmi_host.py', profileScriptSha256: 'backend/profiles.py' };
+  for (const identity of [report, manifest, report.buildManifest]) {
+    if (!identity || identity.version !== pkg.version || (revision && identity.gitRevision !== revision)) throw new Error('Cold startup report belongs to a different version or commit');
+  }
+  if (manifest.model !== 'ColdStartPlant' || report.buildManifest.model !== manifest.model
+      || report.runtime?.model !== manifest.model || manifest.fmuSha256 !== compiledHash
+      || report.buildManifest.fmuSha256 !== compiledHash || report.runtime.fmuSha256 !== compiledHash) throw new Error('Cold startup evidence identifies a different executable');
+  for (const [key, path] of Object.entries(sources)) {
+    const actual = createHash('sha256').update(await readFile(resolve(root, path))).digest('hex');
+    if (manifest[key] !== actual || report.buildManifest[key] !== actual) throw new Error(`Cold startup ${key} is stale`);
+  }
+  if (report.physicalValidationPassed !== false || typeof report.operatingEnvelope !== 'string' || !report.operatingEnvelope.trim()
+      || !Array.isArray(report.checks) || !report.checks.length || report.passed !== report.checks.length || report.total !== report.checks.length
+      || report.checks.some(check => check.pass !== true || typeof check.name !== 'string' || !check.name.trim() || !Number.isFinite(check.value)
+        || !Number.isFinite(check.absoluteTolerance) || check.absoluteTolerance < 0 || Math.abs(check.value) > check.absoluteTolerance)) throw new Error('Cold startup numerical acceptance or model scope is incomplete');
+  if (!Array.isArray(report.scenarios) || !report.scenarios.length || report.scenarios.some(scenario => scenario.complete !== true
+      || typeof scenario.name !== 'string' || !scenario.name.trim()
+      || scenario.runtime?.model !== manifest.model || scenario.runtime?.fmuSha256 !== compiledHash
+      || !Number.isFinite(scenario.durationSeconds) || scenario.durationSeconds <= 0
+      || !Number.isFinite(scenario.sampleIntervalSeconds) || scenario.sampleIntervalSeconds <= 0
+      || !Number.isFinite(scenario.stepSeconds) || scenario.stepSeconds <= 0
+      || scenario.sampleIntervalSeconds < scenario.stepSeconds
+      || !Array.isArray(scenario.trace) || scenario.trace.length < 2
+      || scenario.trace.length !== Math.round(scenario.durationSeconds / scenario.sampleIntervalSeconds) + 1
+      || scenario.trace.some((point, index) => !point || typeof point !== 'object'
+        || !Number.isFinite(point.time) || Object.values(point).some(value => typeof value !== 'number' || !Number.isFinite(value)))
+      || scenario.trace.some((point, index) => Math.abs(point.time - index * scenario.sampleIntervalSeconds) > 1e-8)
+      || Math.abs(scenario.trace.at(-1).time - scenario.durationSeconds) > 1e-8)) throw new Error('Cold startup native observations are incomplete');
+  if (new Set(report.scenarios.map(scenario => scenario.name)).size !== report.scenarios.length) throw new Error('Cold startup scenario names are duplicated');
+  const scenarios = new Map(report.scenarios.map(scenario => [scenario.id, scenario]));
+  if (scenarios.size !== report.scenarios.length) throw new Error('Cold startup scenario identities are duplicated');
+  for (const id of ['cold-equilibrium', 'pump-fine', 'pump-coarse', 'initialization-50c', 'charging', 'letdown', 'startup', 'startup-refined', 'startup-cooldown']) {
+    if (!scenarios.has(id)) throw new Error(`Cold startup required scenario is missing: ${id}`);
+  }
+  const small = (value, tolerance, label) => {
+    if (!Number.isFinite(value) || Math.abs(value) > tolerance) throw new Error(`Cold startup trace check failed: ${label}`);
+  };
+  const difference = (coarse, fine, key) => {
+    const byTime = new Map(fine.trace.map(point => [point.time, point]));
+    const errors = coarse.trace.map(point => Math.abs(point[key] - byTime.get(point.time)?.[key]));
+    if (errors.some(value => !Number.isFinite(value))) throw new Error(`Cold startup refinement grid or channel is incomplete: ${key}`);
+    return Math.max(...errors);
+  };
+  const temperatures = ['hotLegTemperatureC', 'coldLegTemperatureC', 'fuelTemperatureC', 'pressurizerTemperatureC', 'secondaryTemperatureC'];
+  for (const point of scenarios.get('cold-equilibrium').trace) for (const key of temperatures) small(point[key] - 40, 1e-6, 'closed equilibrium');
+  for (const key of temperatures) small(scenarios.get('initialization-50c').trace[0][key] - 50, 1e-8, '50 C initial inventories');
+  const pumpFine = scenarios.get('pump-fine'), pumpCoarse = scenarios.get('pump-coarse');
+  if (pumpFine.stepSeconds !== .5 || pumpCoarse.stepSeconds !== 5 || pumpFine.durationSeconds !== pumpCoarse.durationSeconds) throw new Error('Cold startup pump refinement protocol is incomplete');
+  small(pumpFine.trace.find(point => point.time === 7)?.pumpSpeed - (1 - Math.exp(-1)), 2e-6, 'pump lag');
+  small(difference(pumpCoarse, pumpFine, 'coldLegTemperatureC'), .002, 'pump communication refinement');
+  if (!(scenarios.get('charging').trace.at(-1).surgeFlowKgS > 0) || !(scenarios.get('letdown').trace.at(-1).surgeFlowKgS < 0)) throw new Error('Cold startup reverse-flow evidence is missing');
+  const startup = scenarios.get('startup'), refined = scenarios.get('startup-refined'), cooldown = scenarios.get('startup-cooldown');
+  if (startup.stepSeconds !== 5 || refined.stepSeconds !== 2.5 || startup.durationSeconds !== refined.durationSeconds
+      || startup.sampleIntervalSeconds !== refined.sampleIntervalSeconds || cooldown.durationSeconds <= startup.durationSeconds) throw new Error('Cold startup heatup/refinement/cooldown protocol is incomplete');
+  for (const scenario of [startup, refined]) {
+    for (const key of temperatures) small(scenario.trace[0][key] - 40, 1e-6, 'cold heatup initial state');
+    if (scenario.trace.at(-1).hotStandbyReady !== 1) throw new Error('Cold startup does not reach the declared hot-standby envelope');
+  }
+  for (const [key, tolerance] of [['coldLegTemperatureC', .01], ['primaryPressureMPa', .002], ['secondaryPressureMPa', .002]]) small(difference(startup, refined, key), tolerance, `startup communication refinement: ${key}`);
+  const hotPoint = cooldown.trace.find(point => point.time === startup.durationSeconds);
+  small(hotPoint?.coldLegTemperatureC - startup.trace.at(-1).coldLegTemperatureC, .01, 'same-instance heatup before cooldown');
+  if (!(hotPoint?.coldLegTemperatureC - cooldown.trace.at(-1).coldLegTemperatureC > 20)) throw new Error('Cold startup shutdown-cooling reversal is missing');
+  includeCold = true;
+} catch (error) {
+  if (process.argv.includes('--require-cold')) throw new Error(`Cold startup evidence required: ${error.message}`);
+  console.log('Cold startup report omitted; build and verify the current native cold model to include it.');
+}
 // Bind every comparison to the executable, its embedded report manifest and all
 // inputs to the experiment. Physical disagreement is evidence, not a build error.
 async function checkComparisonModel(report, record, model, manifestName, sources) {
@@ -103,6 +177,18 @@ function comparisonSources(directory, model) {
     inputDataSha256: `validation/${directory}/measured.csv`, referenceMetadataSha256: `validation/${directory}/provenance.json`,
     comparisonScriptSha256: `validation/${directory}/compare.py`, sharedRunnerSha256: 'validation/native_fmi.py' };
 }
+const pressureV07Sha256 = '0fe9b928e9e60d6a180c8bc57bbd1caf0e3289afcc8365605a5b9945ce5d378e';
+function checkPressureBaseline(channel, prior) {
+  const points = channel.points, old = prior.points;
+  if (points.length !== old.length || points.some((point, i) => point.time !== old[i].time
+      || point.measured !== old[i].measured || point.baseline !== old[i].simulated)) throw new Error('Historical pressure baseline grid or values changed');
+  const oldRmse = Math.sqrt(old.reduce((sum, point) => sum + (point.simulated - point.measured) ** 2, 0) / old.length);
+  const newRmse = Math.sqrt(points.reduce((sum, point) => sum + (point.simulated - point.measured) ** 2, 0) / points.length);
+  for (const [key, expected] of Object.entries({ v07BaselineRmse: oldRmse, rmseChangeFromV07: newRmse - oldRmse,
+      rmseReductionFractionFromV07: 1 - newRmse / oldRmse })) {
+    if (!Number.isFinite(channel.metrics?.[key]) || Math.abs(channel.metrics[key] - expected) > 1e-12) throw new Error('Pressure baseline discrepancy metric is inconsistent');
+  }
+}
 let includeMeasured = false;
 try {
   const report = JSON.parse(await readFile(resolve(root, 'artifacts/measured-validation.json'), 'utf8'));
@@ -124,7 +210,8 @@ try {
   const sources = { ...comparisonSources('pactel1998', 'PactelPressurizer'),
     holdoutDataSha256: 'validation/pactel1998/holdout-measured.csv', holdoutMetadataSha256: 'validation/pactel1998/holdout-provenance.json',
     holdoutComparatorSha256: 'validation/pactel1998/holdout_compare.py', holdoutExtractorSha256: 'validation/pactel1998/holdout_extract.py',
-    holdoutProtocolSha256: 'validation/pactel1998/holdout-protocol.json', holdoutFreezeSha256: 'validation/pactel1998/holdout-freeze.json' };
+    holdoutProtocolSha256: 'validation/pactel1998/holdout-protocol.json', holdoutFreezeSha256: 'validation/pactel1998/holdout-freeze.json',
+    developmentComparatorSha256: 'validation/pactel1998/post_unblinding_compare.py', v07BaselineSha256: 'validation/baselines/pressurizer-v0.7.json' };
   await checkComparisonModel(report, report, 'PactelPressurizer', 'pactel-manifest.json', sources);
   checkComparisonResults(report);
   if (!Array.isArray(report.spatialComparisons) || report.spatialComparisons.length !== 3) throw new Error('Wall mesh evidence is incomplete');
@@ -141,12 +228,31 @@ try {
   await checkComparisonModel(report, held, 'PactelPressurizer', 'pactel-manifest.json', sources);
   checkComparisonResults(held);
   for (const [key, parent] of [['inputDataSha256', 'holdoutDataSha256'], ['referenceMetadataSha256', 'holdoutMetadataSha256'],
-      ['comparisonScriptSha256', 'holdoutComparatorSha256'], ['sourceSha256', 'sourceSha256'], ['benchmarkModelSha256', 'benchmarkModelSha256'],
+      ['comparisonScriptSha256', 'developmentComparatorSha256'], ['sourceSha256', 'sourceSha256'], ['benchmarkModelSha256', 'benchmarkModelSha256'],
       ['sharedRunnerSha256', 'sharedRunnerSha256'], ['holdoutProtocolSha256', 'holdoutProtocolSha256'],
-      ['holdoutExtractorSha256', 'holdoutExtractorSha256'], ['holdoutFreezeSha256', 'holdoutFreezeSha256']]) {
+      ['holdoutExtractorSha256', 'holdoutExtractorSha256'], ['holdoutFreezeSha256', 'holdoutFreezeSha256'],
+      ['developmentComparatorSha256', 'developmentComparatorSha256'], ['v07BaselineSha256', 'v07BaselineSha256']]) {
     if (held[key] !== report[parent]) throw new Error(`Reserved event ${key} is stale`);
   }
   const protocol = JSON.parse(await readFile(resolve(root, sources.holdoutProtocolSha256), 'utf8'));
+  const prior = JSON.parse(await readFile(resolve(root, sources.v07BaselineSha256), 'utf8'));
+  const freeze = JSON.parse(await readFile(resolve(root, sources.holdoutFreezeSha256), 'utf8'));
+  if (report.v07BaselineSha256 !== pressureV07Sha256 || prior.version !== '0.7.0'
+      || prior.gitRevision !== 'fb00e13f03c3f200e8acd8e8ff4a5b5b1316c523'
+      || prior.gitDirty !== false || prior.holdoutComparison.holdoutFreezeSha256 !== report.holdoutFreezeSha256
+      || JSON.stringify(prior.holdoutComparison.candidateFreeze) !== JSON.stringify(freeze)
+      || JSON.stringify(held.historicalCandidateFreeze) !== JSON.stringify(freeze)
+      || held.candidateFreeze !== undefined || held.heldOutFromCurrentDevelopment !== false
+      || held.comparisonRole !== 'post-unblinding-development' || held.validationPassed !== false) throw new Error('Post-unblinding comparison or historical freeze classification is invalid');
+  for (const key of ['holdoutDataSha256', 'holdoutMetadataSha256', 'holdoutProtocolSha256', 'holdoutExtractorSha256', 'holdoutComparatorSha256']) {
+    if (report[key] !== freeze.candidate[key]) throw new Error('Historical holdout source identity changed');
+  }
+  for (const result of [report, held]) {
+    if (result.releasedBaseline?.version !== prior.version || result.releasedBaseline?.gitRevision !== prior.gitRevision
+        || result.releasedBaseline?.reportSha256 !== pressureV07Sha256) throw new Error('Released v0.7 pressure baseline is missing or changed');
+  }
+  checkPressureBaseline(report.channels[0], prior.channels[0]);
+  checkPressureBaseline(held.channels[0], prior.holdoutComparison.channels[0]);
   if (JSON.stringify(held.appliedParameters) !== JSON.stringify(protocol.modelParameters)) throw new Error('Reserved event parameters differ from its protocol');
   if (held.version !== report.version || held.gitRevision !== report.gitRevision || held.caseId !== protocol.caseId
       || JSON.stringify(held.comparisonWindowS) !== JSON.stringify(protocol.comparisonWindowS)
@@ -168,11 +274,12 @@ try {
   await rm(output, { recursive: true });
 } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await mkdir(output, { recursive: true });
-for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
+for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
 if (includeNative) for (const [from, to] of nativeFiles) await cp(resolve(root, 'artifacts', from), resolve(output, to));
 if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), resolve(output, 'plant-verification.json'));
+if (includeCold) await cp(resolve(root, 'artifacts/cold-verification.json'), resolve(output, 'cold-verification.json'));
 if (includeMeasured) await cp(resolve(root, 'artifacts/measured-validation.json'), resolve(output, 'measured-validation.json'));
 if (includePressurizer) await cp(resolve(root, 'artifacts/pressurizer-validation.json'), resolve(output, 'pressurizer-validation.json'));
 for (const name of ['verification.json', 'benchmarks.json']) {

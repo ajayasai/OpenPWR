@@ -107,6 +107,10 @@ package OpenPWR "OpenPWR native engineering workbench"
     parameter Real ambientTemperatureK = 298.15;
     parameter Real externalHeatTransferWm2K = 0;
     parameter Real liquidWallHeatTransferWm2K = 500 "Unfitted liquid convection assumption; explicit sensitivity parameter";
+    parameter Boolean useRegimeCondensation = false "Local film Re closure with published laminar/wavy/turbulent correlations; structural research option";
+    parameter Real filmReynoldsFloor = 1 "Leading-edge zero-flow regularization, not a fitted transfer multiplier";
+    parameter Real filmTransitionLower = 20 "Lower edge of numerical smoothing around Re=30";
+    parameter Real filmTransitionUpper = 40 "Upper edge of numerical smoothing around Re=30";
     parameter Real vaporWallHeatTransferWm2K = 10 "Unfitted vapor sensible-convection assumption when wall is above saturation";
     input Real surgeFlowKgS(start=0) "Positive liquid injection; negative outflow uses the liquid inventory enthalpy";
     input Real surgeEnthalpyJkg(start=1.4e6) "Inlet enthalpy used only for positive surge";
@@ -140,6 +144,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     output Real energyResidualMW;
     output Real massResidualKgS;
     output Real wallCondensationKgS = sum(wallCondensation);
+    output Real maximumFilmReynolds = maximumFilmPrefix[wallSegments] "Maximum over vapor-exposed wall only; Re_delta=4 Gamma/mu before zero-flow regularization";
     output Real bulkEvaporationKgS;
     output Real bulkCondensationKgS;
     output Real wallHeatLossMW = sum(wallAmbientPowerW)/1e6;
@@ -147,6 +152,26 @@ package OpenPWR "OpenPWR native engineering workbench"
     output Real innerWallTemperatureK[wallSegments](each start=initialWallTemperatureK,each nominal=500,each min=273.15,each max=1073.15);
     output Real outerWallTemperatureK[wallSegments](each start=initialWallTemperatureK,each nominal=500,each min=273.15,each max=1073.15);
     output Boolean valid;
+    function filmNusseltNumber "Local gravity-film correlation; Chen/Gerner/Tien 1987 quiescent-vapor branch"
+      input Real reynolds "Re_delta=4 Gamma/mu; Gamma has units kg/(m s)";
+      input Real prandtl;
+      input Real minimumReynolds = 1;
+      input Real transitionLower = 20;
+      input Real transitionUpper = 40;
+      output Real nusselt "h [mu^2/(rho_l (rho_l-rho_v) g)]^(1/3) / k";
+    protected
+      Real re;
+      Real blend;
+      Real laminar;
+      Real wavyTurbulent;
+    algorithm
+      re := max(minimumReynolds,reynolds);
+      blend := min(1,max(0,(re-transitionLower)/(transitionUpper-transitionLower)));
+      blend := blend^2*(3-2*blend);
+      laminar := 1.1/re^(1/3);
+      wavyTurbulent := ((0.823/re^0.22)^6+(0.00402*re^0.4*prandtl^0.65)^6)^(1/6);
+      nusselt := (1-blend)*laminar+blend*wavyTurbulent;
+    end filmNusseltNumber;
     function solidHeatCapacity
       input Real temperatureK;
       input Boolean temperatureDependent;
@@ -224,6 +249,11 @@ package OpenPWR "OpenPWR native engineering workbench"
     Real filmDeltaT[wallSegments];
     Real filmCoefficient[wallSegments];
     Real vaporHeightM;
+    Real filmReynolds[wallSegments];
+    Real maximumFilmPrefix[wallSegments];
+    Real filmScale[wallSegments];
+    Real filmPrandtl[wallSegments];
+    Real filmMassAbove[wallSegments];
   equation
     // Direct p,T Gibbs functions avoid the approximate IF97 p,h backward map.
     // Fixed phase branches are continued at most 2 K past saturation only for
@@ -266,12 +296,23 @@ package OpenPWR "OpenPWR native engineering workbench"
       // Bound property evaluation during nonlinear trial iterates. This is inactive
       // for accepted wall temperatures inside the declared validity envelope.
       filmState[i] = PrimaryWater.setState_pT(pressurePa,noEvent(max(273.15,min(saturationTemperatureK-0.01,(saturationTemperatureK+innerWallTemperatureK[i])/2))));
-      // Nusselt gravity-film correlation, 0.943 coefficient; no multiplier is
-      // tuned to either plant or PACTEL pressure. Finite 0.1 K regularization
-      // affects only the zero-heat-flux limit. Cylindrical curvature is neglected.
-      filmCoefficient[i] = 0.943*(Modelica.Constants.g_n*PrimaryWater.density(filmState[i])*
-        (PrimaryWater.density(filmState[i])-Water.dewDensity(sat))*PrimaryWater.thermalConductivity(filmState[i])^3*latentHeat/
-        (PrimaryWater.dynamicViscosity(filmState[i])*vaporHeightM*max(0.1,filmDeltaT[i])))^0.25;
+      // The research option accumulates condensate from cells above this one.
+      // A midpoint film flow determines the local Re; wall mass/energy exchange
+      // remains conservative with immediate drainage into the liquid inventory.
+      // Pure vapor, no shear, negligible film holdup and curvature are assumed.
+      // The legacy whole-height mean Nusselt path remains available for ablation.
+      maximumFilmPrefix[i] = if i == 1 then (if noEvent(wettedFraction[i]<1) then filmReynolds[i] else 0)
+        else noEvent(max(maximumFilmPrefix[i-1],if wettedFraction[i]<1 then filmReynolds[i] else 0));
+      filmMassAbove[i] = if i < wallSegments then sum(wallCondensation[j] for j in i+1:wallSegments) else 0;
+      filmReynolds[i] = noEvent(max(0,4*(filmMassAbove[i]+0.5*wallCondensation[i])/(2*Modelica.Constants.pi*innerRadiusM*PrimaryWater.dynamicViscosity(filmState[i]))));
+      filmScale[i] = (PrimaryWater.dynamicViscosity(filmState[i])^2/(PrimaryWater.density(filmState[i])*(PrimaryWater.density(filmState[i])-Water.dewDensity(sat))*Modelica.Constants.g_n))^(1/3);
+      filmPrandtl[i] = PrimaryWater.specificHeatCapacityCp(filmState[i])*PrimaryWater.dynamicViscosity(filmState[i])/PrimaryWater.thermalConductivity(filmState[i]);
+      filmCoefficient[i] = if useRegimeCondensation then
+        PrimaryWater.thermalConductivity(filmState[i])/filmScale[i]*filmNusseltNumber(
+          filmReynolds[i],filmPrandtl[i],filmReynoldsFloor,filmTransitionLower,filmTransitionUpper)
+        else 0.943*(Modelica.Constants.g_n*PrimaryWater.density(filmState[i])*
+          (PrimaryWater.density(filmState[i])-Water.dewDensity(sat))*PrimaryWater.thermalConductivity(filmState[i])^3*latentHeat/
+          (PrimaryWater.dynamicViscosity(filmState[i])*vaporHeightM*max(0.1,filmDeltaT[i])))^0.25;
       wallFilmPowerW[i] = if includeWall then filmCoefficient[i]*2*Modelica.Constants.pi*innerRadiusM*cellHeightM*(1-wettedFraction[i])*filmDeltaT[i] else 0;
       wallCondensation[i] = wallFilmPowerW[i]/max(1e5,vaporEnthalpyJkg-liquidSatH);
       wallLiquidPowerW[i] = if includeWall then liquidWallHeatTransferWm2K*2*Modelica.Constants.pi*innerRadiusM*cellHeightM*wettedFraction[i]*(liquidTemperatureK-innerWallTemperatureK[i]) else 0;
@@ -327,6 +368,7 @@ package OpenPWR "OpenPWR native engineering workbench"
       and liquidTemperatureK>373.15 and liquidTemperatureK<623.15 and liquidTemperatureK<saturationTemperatureK+2
       and vaporTemperatureK>saturationTemperatureK-2 and vaporTemperatureK<800
       and sprayFlowKgS>=0 and phaseRelaxationTimeS>0 and min(wallCellCapacityJK)>0
+      and filmReynoldsFloor>0 and filmTransitionUpper>filmTransitionLower and filmTransitionLower>filmReynoldsFloor
       and (not includeWall or not useTemperatureDependentSteel or (min(wallTemperatureK)>=273.15 and max(wallTemperatureK)<=1073.15 and min(innerWallTemperatureK)>=273.15 and max(innerWallTemperatureK)<=1073.15 and min(outerWallTemperatureK)>=273.15 and max(outerWallTemperatureK)<=1073.15));
   end DynamicPressurizer;
 
@@ -1121,6 +1163,10 @@ package OpenPWR "OpenPWR native engineering workbench"
     input Real probePressurePa(start=15.5e6) "Property probe independent of PrimaryLoop validity envelope";
     input Real probeTemperatureK(start=598.15);
     input Real probeWallTemperatureK(start=550);
+    input Real probeFilmReynolds(start=100);
+    input Real probeFilmPrandtl(start=1);
+    input Real probeFilmMinimumReynolds(start=1);
+    output Real probeFilmNusselt = DynamicPressurizer.filmNusseltNumber(probeFilmReynolds,probeFilmPrandtl,probeFilmMinimumReynolds);
     output Real wallSteelCpJKgK = DynamicPressurizer.solidHeatCapacity(probeWallTemperatureK,true,500);
     output Real wallSteelEnthalpyJKg = DynamicPressurizer.solidEnthalpy(probeWallTemperatureK,true,500);
     output Real wallSteelConductivityPotentialWM = DynamicPressurizer.conductivityIntegral(probeWallTemperatureK,true,15);

@@ -21,7 +21,8 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'validation'))
 sys.path.insert(0, str(HERE))
 from native_fmi import COMMON, build_case, run_case, sha
-from holdout_compare import run_holdout
+from post_unblinding_compare import (run_development, historical_evidence,
+    attach_baseline, baseline_identity, BASELINE)
 
 MODEL_NAME = 'OpenPWR.PactelPressurizer'
 MODEL = ROOT / 'models/PactelPressurizer.mo'
@@ -44,9 +45,11 @@ HOLDOUT_SOURCES = {'holdoutDataSha256': HERE / 'holdout-measured.csv',
     'holdoutComparatorSha256': HERE / 'holdout_compare.py',
     'holdoutProtocolSha256': HERE / 'holdout-protocol.json',
     'holdoutExtractorSha256': HERE / 'holdout_extract.py',
-    'holdoutFreezeSha256': HERE / 'holdout-freeze.json'}
+    'holdoutFreezeSha256': HERE / 'holdout-freeze.json',
+    'developmentComparatorSha256': HERE / 'post_unblinding_compare.py',
+    'v07BaselineSha256': BASELINE}
 INPUTS = ('surgeFlowKgS', 'surgeTemperatureK', 'heaterPowerMW')
-OUTPUTS = ('pressureMPa', 'liquidLevelM', 'liquidTemperatureK', 'vaporTemperatureK',
+OUTPUTS = ('pressureMPa', 'liquidLevelM', 'liquidTemperatureK', 'vaporTemperatureK', 'maximumFilmReynolds',
            'totalMassKg', 'thermalEnergyMJ', 'boundaryMassFlowKgS', 'boundaryPowerMW',
            'surgeInletEnthalpyJkg', 'surgeOutflowEnthalpyJkg', 'wallHeatLossMW',
            'wallCondensationKgS', 'bulkEvaporationKgS', 'bulkCondensationKgS',
@@ -319,7 +322,7 @@ def add_spatial_evidence(report, metadata, nominal, current_identity):
     report['numericalEvidence'].update({'pass': report['numericalPassed'], 'spatialConvergenceAssessed': True,
         'spatialStepSeconds': STEPS[1], 'spatialComparisons': [{key: value for key, value in record.items()
             if key not in ('trace', 'buildManifest', 'runtime', 'balance')} for record in records],
-        'candidateSelection': '48×8 was selected as the finest tested mesh, with shrinking axial differences, before measured scoring. Residual spatial error remains unresolved; no asymptotic or grid-convergence-index claim.',
+        'candidateSelection': 'The 48×8 mesh selected before v0.7 measured scoring is retained in this post-unblinding development comparison. Its original selection is historical; no fresh blind selection or candidate freeze is claimed. Residual spatial error remains unresolved; no asymptotic or grid-convergence-index claim.',
         'scope': 'Independent conservation, communication-step and wall-mesh differences. Mesh differences are numerical diagnostics, not uncertainty bounds or measured-accuracy acceptance criteria.'})
 
 
@@ -341,7 +344,12 @@ def compare():
             raise RuntimeError('Native source/artifact changed during comparison; rerun from stable files.')
         report = make_report(rows, metadata, manifest, current_identity, primary, refined)
         add_spatial_evidence(report, metadata, refined, current_identity)
-        report['holdoutComparison'] = run_holdout(manifest, fmu_path=FMU)
+        baseline = historical_evidence()
+        attach_baseline(report['channels'][0], baseline['channels'][0])
+        report['releasedBaseline'] = baseline_identity(baseline)
+        report['comparisonRole'] = 'development-comparison'
+        # Keep the legacy JSON key for clients; its role is explicitly changed.
+        report['holdoutComparison'] = run_development(manifest, fmu_path=FMU)
         report['numericalPassed'] = report['numericalPassed'] and report['holdoutComparison']['numericalPassed']
         report['numericalEvidence']['pass'] = report['numericalPassed']
         if any(identity()[key] != value for key, value in current_identity.items() if key.endswith('Sha256')):

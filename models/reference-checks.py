@@ -51,6 +51,10 @@ WALL_OUTPUTS = ('wallSteelCpJKgK', 'wallSteelEnthalpyJKg', 'wallSteelConductivit
 STEEL_SOURCE = {'title': 'NISTIR 7401, section 3.1.1 and Figure 1, printed page 7',
                 'url': 'https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=860705',
                 'scope': 'Published AISI 304 material correlations; consistency checks are not independent material measurements.'}
+FILM_SOURCE = {'title': 'INL/JOU-22-66089 Revision 1, equation 10 and following definitions, printed pages 27–28',
+               'url': 'https://www.osti.gov/servlets/purl/2337434',
+               'originalCorrelation': 'Chen, Gerner and Tien (1987), doi:10.1080/08916158708946334',
+               'scope': 'Verification of a published closure and its laminar analytical limit, not measured plant or correlation validation.'}
 
 
 def sha(path):
@@ -219,6 +223,59 @@ def verify():
                            right['wallSteelConductivityPotentialWM'] - left['wallSteelConductivityPotentialWM'],
                            integrate(lambda t: 9.705 + .0176 * t - 1.60e-6 * t**2), 'W/m',
                            'Compiled Kirchhoff potential vs 200-panel Simpson quadrature of the published k correlation.')
+
+            def film_probe(reynolds, prandtl=1.0, minimum=1.0):
+                unit.setReal([refs['probeFilmReynolds'], refs['probeFilmPrandtl'], refs['probeFilmMinimumReynolds']], [reynolds, prandtl, minimum])
+                return unit.getReal([refs['probeFilmNusselt']])[0]
+
+            def film_check(name, actual, expected, tolerance, units, method):
+                error = abs(actual - expected)
+                checks.append({'name': name, 'category': 'film-correlation-verification',
+                    'measured': actual, 'reference': expected, 'absoluteError': error,
+                    'relativeError': error / max(abs(expected), 1e-12), 'tolerance': tolerance,
+                    'units': units, 'pass': error <= tolerance, 'method': method, 'source': FILM_SOURCE})
+
+            # Use the independently printed compact Eq. 10 (zero shear), rather
+            # than repeat the implementation's sixth-power coefficients. Its
+            # rounded .31 and 2.37e14 entail a small known rounding difference.
+            for reynolds, prandtl in ((100, 1), (1000, 1), (1000, 8), (5000, 8)):
+                expected = (.31 * reynolds**-1.32 + reynolds**2.4 * prandtl**3.9 / 2.37e14)**(1 / 6)
+                film_check(f'Native Chen zero-shear film correlation, Re={reynolds}, Pr={prandtl}',
+                    film_probe(reynolds, prandtl), expected, expected * .001, '1',
+                    'Compiled local Nu versus independently printed compact Eq. 10; 0.1% allows published coefficient rounding. Re=4 Gamma/mu.')
+
+            # Integrate native local h over a vertical isothermal plate and
+            # compare with the independent classical mean-Nusselt result.
+            # The substitution z/L=t^4 removes the integrable leading-edge
+            # singularity. This analytical-limit test disables only the tiny-Re
+            # numerical floor; Re never reaches the 20–40 transition.
+            rho, vapor_rho, mu, conductivity, latent, delta = 958.0, .598, .000282, .68, 2257e3, 10.0
+            gravity, reynolds_end = 9.80665, 10.0
+            film_length = (mu**2 / (rho * (rho - vapor_rho) * gravity))**(1 / 3)
+            nusselt_group = gravity * rho * (rho - vapor_rho) * conductivity**3 * latent / (mu * delta)
+            gamma_end = mu * reynolds_end / 4
+            length = (gamma_end * latent / (delta * .943 * nusselt_group**.25))**(4 / 3)
+            count = 200
+            integral = 0.0
+            for i in range(1, count + 1):
+                t = i / count
+                local_h = conductivity / film_length * film_probe(reynolds_end * t**3, minimum=1e-12)
+                integral += (1 if i == count else 4 if i % 2 else 2) * local_h * 4 * t**3
+            heat_per_perimeter = integral / (3 * count) * length * delta
+            analytical_heat = .943 * (nusselt_group / length)**.25 * length * delta
+            film_check('Integrated native laminar-film heat versus classical Nusselt plate result',
+                heat_per_perimeter, analytical_heat, analytical_heat * .002, 'W/m',
+                '200-panel transformed Simpson integral of native local h; mean coefficient 0.943. 0.2% allows rounded 1.1 versus 0.943 coefficients. Synthetic constant properties, not experimental validation.')
+            # Smooth switching should preserve both value and first derivative;
+            # these are numerical regularity checks, not extra data points.
+            for transition in (20.0, 40.0):
+                epsilon = 1e-4
+                left, center, right = [film_probe(transition + offset) for offset in (-epsilon, 0, epsilon)]
+                film_check(f'Film transition value continuity at Re={transition:g}', right - left, 0, 1e-5, '1',
+                    'Native values bracketing the numerical transition by 1e-4 Reynolds units.')
+                film_check(f'Film transition slope continuity at Re={transition:g}',
+                    (right - center) / epsilon - (center - left) / epsilon, 0, 1e-6, '1',
+                    'Difference of one-sided native finite-difference derivatives; numerical smoothness only.')
             unit.terminate()
         finally:
             unit.freeInstance()
@@ -236,16 +293,17 @@ def verify():
     passed = sum(item['pass'] for item in checks)
     report = {**metadata(), 'model': manifest['model'], 'compiler': manifest['compiler'],
               'modelicaLibrary': manifest['modelicaLibrary'], 'fmuSha256': sha(FMU),
-              'scope': 'Published pure-water property comparisons, separately labeled thermodynamic-derivative checks, and wall-material integral/derivative consistency through a compiled native FMU. These do not validate primary-loop/pressurizer transients, facility-specific steel properties or the whole plant.',
+              'scope': 'Published pure-water comparisons, thermodynamic and wall-material consistency, and separately labeled film-correlation verification through a compiled native FMU. These do not validate plant transients, facility-specific steel properties, condensation applicability or the whole plant.',
               'publishedComparisons': sum(c['category'] == 'published-water-property' for c in checks),
               'derivativeConsistencyChecks': sum(c['category'] == 'thermodynamic-derivative-consistency' for c in checks),
               'wallMaterialConsistencyChecks': sum(c['category'] == 'wall-material-consistency' for c in checks),
+              'filmCorrelationVerificationChecks': sum(c['category'] == 'film-correlation-verification' for c in checks),
               'passed': passed, 'total': len(checks), 'checks': checks}
     (OUTPUT / 'property-verification.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     for item in checks:
         print(('PASS' if item['pass'] else 'FAIL') + ' ' + item['name'] + f": {item['measured']:.9g} {item['units']}; reference {item['reference']}")
     print(f'{passed}/{len(checks)} native property/derivative checks passed; '
-          f"{report['publishedComparisons']} published water comparisons, {report['derivativeConsistencyChecks']} thermodynamic and {report['wallMaterialConsistencyChecks']} wall-material consistency checks.")
+          f"{report['publishedComparisons']} published water comparisons, {report['derivativeConsistencyChecks']} thermodynamic, {report['wallMaterialConsistencyChecks']} wall-material and {report['filmCorrelationVerificationChecks']} film-correlation checks.")
     if passed != len(checks):
         raise SystemExit(1)
 

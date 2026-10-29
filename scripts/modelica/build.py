@@ -27,8 +27,18 @@ def run(model_key='primary'):
         'primary': ('OpenPWR.PrimaryLoop', 'PrimaryLoop', 'manifest.json'),
         'plant': ('OpenPWR.CoupledPlant', 'CoupledPlant', 'plant-manifest.json'),
         'kinetics': ('OpenPWR.KineticsReference', 'KineticsReference', 'kinetics-manifest.json'),
+        'cold': ('ColdStartPlant', 'ColdStartPlant', 'cold-manifest.json'),
     }[model_key]
     source_hash = sha(SOURCE)
+    additional_source = ROOT / 'models/ColdStartPlant.mo' if model_key == 'cold' else None
+    additional_hash = sha(additional_source) if additional_source else None
+    cold_inputs = {key: ROOT / path for key, path in {
+        'verificationScriptSha256': 'backend/verify_cold.py',
+        'sharedRunnerSha256': 'validation/native_fmi.py',
+        'hostScriptSha256': 'backend/fmi_host.py',
+        'profileScriptSha256': 'backend/profiles.py',
+    }.items()} if additional_source else {}
+    cold_hashes = {key: sha(path) for key, path in cold_inputs.items()}
     os.environ['PATH'] = str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', '')
     compiler = subprocess.check_output([OMC, '--version'], text=True).strip()
     # Build in a fresh directory so a failed compilation cannot pass on an old FMU.
@@ -38,6 +48,7 @@ def run(model_key='primary'):
             'installPackage(Modelica, "4.0.0", exactMatch=true);', 'getErrorString();',
             'loadModel(Modelica, {"4.0.0"}, requireExactVersion=true);', 'getErrorString();',
             f'loadFile({json.dumps(SOURCE.as_posix())});', 'getErrorString();',
+            *([f'loadFile({json.dumps(additional_source.as_posix())});', 'getErrorString();'] if additional_source else []),
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
             f'buildModelFMU({model_name}, version="2.0", fmuType="cs", fileNamePrefix="{file_prefix}");',
             'getErrorString();',
@@ -51,6 +62,10 @@ def run(model_key='primary'):
         built = Path(work) / (file_prefix + '.fmu')
         if sha(SOURCE) != source_hash:
             raise RuntimeError('Modelica source changed during compilation. Rebuild from a stable source tree.')
+        if additional_source and sha(additional_source) != additional_hash:
+            raise RuntimeError('Cold-start source changed during compilation. Rebuild from a stable source tree.')
+        if any(sha(cold_inputs[key]) != value for key, value in cold_hashes.items()):
+            raise RuntimeError('Cold-start verification or host source changed during compilation. Rebuild.')
         if result.returncode or not built.is_file():
             print(log)
             raise RuntimeError(f'FMU compilation failed; see artifacts/modelica/{log_name}')
@@ -72,11 +87,14 @@ def run(model_key='primary'):
                     'hostPlatform': platform.platform(), 'sourceSha256': source_hash,
                     'fmuSha256': sha(target), 'gitRevision': revision, 'dirty': dirty,
                     'version': json.loads((ROOT / 'package.json').read_text())['version']}
+        if additional_source:
+            manifest['coldSourceSha256'] = additional_hash
+            manifest.update(cold_hashes)
         (OUTPUT / manifest_name).write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         print(json.dumps(manifest, indent=2))
         print('FMU built. Next: npm run engineering:verify, then npm run engineering:start')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics'), default='primary')
+    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics', 'cold'), default='primary')
     run(parser.parse_args().model)

@@ -23,6 +23,8 @@ function evidenceValue(value) {
 function card(check) {
   const article = make('article', undefined, 'native-check');
   article.append(make('span', check.pass ? 'PASS' : 'FAIL', `result ${check.pass ? 'pass' : 'fail'}`), make('h3', check.name));
+  if (check.category) article.append(make('p', ({'film-correlation-verification':'Film-correlation verification',
+    'material-consistency':'Wall-material consistency','thermodynamic-consistency':'Thermodynamic consistency'})[check.category] || readable(check.category.replaceAll('-', ' '))));
   const list = make('dl');
   const evidence = check.evidence || Object.fromEntries(Object.entries(check).filter(([key]) => !['name', 'pass', 'source', 'category'].includes(key)));
   for (const [key, value] of Object.entries(evidence)) definition(list, readable(key), evidenceValue(value));

@@ -61,9 +61,9 @@ def validate_controls(values, limits=CONTROL_LIMITS, discrete_controls=()):
 class FMIPlant:
     """One serialized session; all public operations are protected by a lock."""
 
-    def __init__(self, fmu_path: str | Path, *, description=None, slave_factory=None, extractor=None, step_size=STEP_SIZE, profile="primary"):
+    def __init__(self, fmu_path: str | Path, *, description=None, slave_factory=None, extractor=None, step_size=None, profile="primary"):
         if profile not in PROFILES:
-            raise ValueError("Choose primary or plant model profile.")
+            raise ValueError("Choose a declared native model profile.")
         self.profile = profile
         self.contract = PROFILES[profile]
         self.control_limits = self.contract["limits"]
@@ -71,9 +71,12 @@ class FMIPlant:
         self.boolean_outputs = self.contract["boolean_outputs"]
         self.discrete_controls = self.contract["discrete_controls"]
         self.path = Path(fmu_path).resolve()
-        if step_size not in (0.025, 0.05):
-            raise ValueError("Supported communication steps are 0.025 and 0.05 seconds.")
+        step_size = self.contract.get("step_size", STEP_SIZE) if step_size is None else step_size
+        supported_steps = self.contract.get("supported_steps", (0.025, 0.05))
+        if step_size not in supported_steps:
+            raise ValueError(f"Supported communication steps for {profile} are {supported_steps} seconds.")
         self.step_size = step_size
+        self.max_step_seconds = self.contract.get("max_step_seconds", 10)
         self.lock = threading.RLock()
         self.slave = None
         self.directory = None
@@ -174,6 +177,7 @@ class FMIPlant:
             return {"ok": True, "available": True, "backend": "fmi2", "model": self.description.modelName,
                 "fmiVersion": "2.0", "fmuSha256": self.sha256,
                 "compiler": getattr(self.description, "generationTool", None), "stepSize": self.step_size,
+                "maxStepSeconds": self.max_step_seconds,
                 "stateSerialization": False, "commandReplay": True, "profile": self.profile,
                 "controlLimits": dict(self.control_limits), "defaultControls": dict(self.defaults),
                 "realOutputs": list(self.real_outputs), "booleanOutputs": list(self.boolean_outputs),
@@ -226,8 +230,8 @@ class FMIPlant:
             return self._snapshot()
 
     def step(self, seconds):
-        if not finite_number(seconds) or not 0.1 <= seconds <= 10:
-            raise ServiceError(400, "invalid_step", "seconds must be between 0.1 and 10.")
+        if not finite_number(seconds) or not max(0.1, self.step_size) <= seconds <= self.max_step_seconds:
+            raise ServiceError(400, "invalid_step", f"seconds must be between {max(0.1, self.step_size):g} and {self.max_step_seconds:g}.")
         count = round(seconds / self.step_size)
         if abs(count * self.step_size - seconds) > 1e-8:
             raise ServiceError(400, "invalid_step", f"seconds must be a multiple of {self.step_size}.")
@@ -235,7 +239,7 @@ class FMIPlant:
 
     def _advance_steps(self, count):
         """Bounded internal primitive used to land exactly on scripted events."""
-        if isinstance(count, bool) or not isinstance(count, int) or not 1 <= count <= round(10 / self.step_size):
+        if isinstance(count, bool) or not isinstance(count, int) or not 1 <= count <= round(self.max_step_seconds / self.step_size):
             raise ServiceError(400, "invalid_step", "Invalid native step count.")
         with self.lock:
             if self.halted:
@@ -255,7 +259,7 @@ class FMIPlant:
                     if isinstance(error, ServiceError):
                         self.halt_reason = error.message
                     raise ServiceError(409, "solver_halted", self.halt_reason) from error
-                if self.steps % round(1 / self.step_size) == 0 or self.halted:
+                if self.steps % max(1, round(1 / self.step_size)) == 0 or self.halted:
                     self._record()
                 if self.halted:
                     break
@@ -309,7 +313,7 @@ class FMIPlant:
                 rows = [rows[i] for i in indices]
             points = [{"time": row["time"], "controls": {name: row[name] for name in self.control_limits},
                 "outputs": {name: row[name] for name in (*self.real_outputs, *self.boolean_outputs)}, "halted": row["halted"]} for row in rows]
-            return {"schema": "openpwr-fmi-history-v1", "fmuSha256": self.sha256, "samplePeriod": 1,
+            return {"schema": "openpwr-fmi-history-v1", "fmuSha256": self.sha256, "samplePeriod": max(1, self.step_size),
                 "storageIncludesCommandBoundaries": True,
                 "includesCommandBoundaries": retained <= len(points),
                 "retainedSamples": retained, "returnedSamples": len(points), "downsampled": retained > len(points),
