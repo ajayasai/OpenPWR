@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const make = (tag, text, cls) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (cls) el.className = cls; return el; };
 const format = value => typeof value === 'number' ? Number.isFinite(value) ? (value !== 0 && Math.abs(value) < .001 ? value.toExponential(3) : value.toLocaleString('en-US', { maximumSignificantDigits: 6 })) : '—' : String(value ?? '—');
 const hash = value => typeof value === 'string' && /^[a-f0-9]{64}$/i.test(value);
-const label = key => key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, char => char.toUpperCase());
+const label = key => key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, char => char.toUpperCase()).replace(/Rmse/g, 'RMSE');
 const describe = value => Array.isArray(value) ? value.map(describe).join('; ') : value && typeof value === 'object' ? Object.entries(value).map(([key, item]) => `${label(key)}: ${describe(item)}`).join('; ') : format(value);
 function definition(target, name, value) { target.append(make('dt', name), make('dd', format(value))); }
 async function read(path) {
@@ -37,7 +37,7 @@ async function nativeEvidence() {
 }
 let measured = null;
 let evidenceRequest = 0;
-const casePaths = { krsko: './measured-validation.json', pactel: './pressurizer-validation.json', 'pactel-holdout': './pressurizer-validation.json' };
+const casePaths = { continuous: './continuous-measured-validation.json', krsko: './measured-validation.json', pactel: './pressurizer-validation.json', 'pactel-holdout': './pressurizer-validation.json' };
 const NS = 'http://www.w3.org/2000/svg';
 function svg(tag, attributes, text) {
   const el = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attributes)) el.setAttribute(key, value);
@@ -77,6 +77,7 @@ function drawComparison() {
     chart.append(svg('path', { d: path, stroke: color, fill: 'none', 'stroke-width': 2, 'stroke-dasharray': key === 'baseline' ? '6 5' : 'none', 'stroke-linejoin': 'round' }));
   }
   $('measured-caption').textContent = `${channel.label || channel.name} · ${channel.unit} · ${channel.metrics?.samples ?? points.filter(point => Number.isFinite(point.measured)).length} comparison points. ${channel.description || 'Published measurements compared with the boundary-driven native model.'}${bounded.length ? ' Shading combines the documented reading, timing and instrument allowances; it is not a statistical confidence interval.' : ''}`;
+  if (measured.schema === 'openpwr-continuous-measured-v1') $('measured-caption').textContent += ' Errors use the eight acquired samples at 1–15 s; the displayed t=0 measurement is interpolated and excluded from scoring.';
   for (const [key, value] of Object.entries(channel.metrics || {})) {
     const article = make('article'); article.append(make('span', label(key)), make('strong', format(value))); $('measurement-metrics').append(article);
   }
@@ -99,7 +100,7 @@ async function measuredEvidence() {
     if (request !== evidenceRequest) return;
     if (!report) throw new Error('The ATWS-11 development comparison is not available in this build.');
     if (report.executed !== true) throw new Error(`Comparison did not complete. ${report.error || 'Read the saved report for diagnostics.'}`);
-    if (report.schema !== 'openpwr-measured-validation-v1' || !Array.isArray(report.channels) || !report.channels.length || report.channels.length > 30
+    if (!['openpwr-measured-validation-v1', 'openpwr-continuous-measured-v1'].includes(report.schema) || !Array.isArray(report.channels) || !report.channels.length || report.channels.length > 30
         || !hash(report.runtime?.fmuSha256) || !hash(report.inputDataSha256)
         || report.channels.some(channel => typeof channel.name !== 'string' || !Array.isArray(channel.points) || channel.points.length > 10000)) throw new Error('Measured report provenance or channel schema is incomplete.');
     measured = report;
@@ -110,6 +111,7 @@ async function measuredEvidence() {
     const identity = $('measured-identity');
     definition(identity, 'Source revision', report.gitRevision); definition(identity, 'Benchmark FMU', report.runtime.model);
     definition(identity, 'Benchmark FMU SHA-256', report.runtime.fmuSha256); definition(identity, 'Measured data SHA-256', report.inputDataSha256);
+    if (report.coldSourceSha256) definition(identity, 'Shared startup thermal source SHA-256', report.coldSourceSha256);
     if (report.comparisonRole) definition(identity, 'Comparison role', report.comparisonRole);
     if (report.releasedBaseline) {
       definition(identity, 'Historical baseline', `v${report.releasedBaseline.version} · ${report.releasedBaseline.gitRevision}`);
@@ -126,4 +128,6 @@ async function measuredEvidence() {
 }
 $('measured-channel').addEventListener('change', drawComparison);
 $('measured-case').addEventListener('change', measuredEvidence);
+const requestedCase = new URLSearchParams(location.search).get('case');
+if (requestedCase && Object.hasOwn(casePaths, requestedCase)) $('measured-case').value = requestedCase;
 void nativeEvidence(); void measuredEvidence();

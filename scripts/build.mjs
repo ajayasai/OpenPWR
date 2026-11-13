@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { verifyContinuousEvidence } from './continuous-evidence.mjs';
+import { verifyContinuousMeasuredEvidence } from './continuous-measured-evidence.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
@@ -137,6 +138,14 @@ try {
 } catch (error) {
   if (process.argv.includes('--require-cold')) throw new Error(`Cold startup evidence required: ${error.message}`);
   console.log('Cold startup report omitted; build and verify the current native cold model to include it.');
+}
+let includeContinuousMeasured = false;
+try {
+  await verifyContinuousMeasuredEvidence({root,version:pkg.version,revision});
+  includeContinuousMeasured = true;
+} catch (error) {
+  if (process.argv.includes('--require-continuous-measured')) throw new Error(`Continuous thermal measured evidence required: ${error.message}`);
+  console.log('Continuous thermal measured report omitted; build and run its current reference case to include it.');
 }
 let includeContinuous = false;
 try {
@@ -290,6 +299,7 @@ if (includeNative) for (const [from, to] of nativeFiles) await cp(resolve(root, 
 if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), resolve(output, 'plant-verification.json'));
 if (includeCold) await cp(resolve(root, 'artifacts/cold-verification.json'), resolve(output, 'cold-verification.json'));
 if (includeContinuous) await cp(resolve(root, 'artifacts/continuous-verification.json'), resolve(output, 'continuous-verification.json'));
+if (includeContinuousMeasured) await cp(resolve(root, 'artifacts/continuous-measured-validation.json'), resolve(output, 'continuous-measured-validation.json'));
 if (includeMeasured) await cp(resolve(root, 'artifacts/measured-validation.json'), resolve(output, 'measured-validation.json'));
 if (includePressurizer) await cp(resolve(root, 'artifacts/pressurizer-validation.json'), resolve(output, 'pressurizer-validation.json'));
 for (const name of ['verification.json', 'benchmarks.json']) {

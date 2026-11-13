@@ -4,7 +4,9 @@
 
 [Launch control room](https://ajayasai.github.io/OpenPWR/) · [Benchmark & verification evidence](https://ajayasai.github.io/OpenPWR/verification.html) · [Model equations](docs/MODEL.md) · [Validation scope](docs/VALIDATION.md)
 
-**New in v0.9:** [continuous native startup](https://ajayasai.github.io/OpenPWR/continuous.html) joins source-driven six-group kinetics, cold heatup, turbine acceleration, phase/frequency/voltage synchronization and load pickup in one FMU. There is no state handoff to a hot model. The interface animates actual native observations and exposes source, rods, turbine, excitation and breaker controls. [Equations and verification scope](docs/NATIVE_CONTINUOUS_STARTUP.md) distinguish published kinetics checks and numerical tests from measured plant validation. This remains progress toward full scope, not a qualified full-scope simulator.
+**New in v0.10:** the [measured plant comparison](https://ajayasai.github.io/OpenPWR/plant-evidence.html?case=continuous#measured-status) now executes the same thermal equations used by continuous startup. Initial states are configurable without changing the cold defaults; measured power and secondary flows drive a Krško reference case, while pressure and temperature remain predictions. Numerical checks, discrepancies and unknown plant parameters are published separately. [Measured startup coverage](docs/STARTUP_MEASURED_EVIDENCE.md) explains why this does not validate the complete startup trajectory.
+
+**Introduced in v0.9:** [continuous native startup](https://ajayasai.github.io/OpenPWR/continuous.html) joins source-driven six-group kinetics, cold heatup, turbine acceleration, phase/frequency/voltage synchronization and load pickup in one FMU. There is no state handoff to a hot model. The interface animates actual native observations and exposes source, rods, turbine, excitation and breaker controls. [Equations and verification scope](docs/NATIVE_CONTINUOUS_STARTUP.md) distinguish published kinetics checks and numerical tests from measured plant validation. This remains progress toward full scope, not a qualified full-scope simulator.
 
 The optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs compiled models through FMI and FMPy. Its [coupled hot plant](docs/NATIVE_PLANT.md) and isolated [primary-loop workbench](docs/MODELICA_MODEL.md) are distinct experiments. The browser whole-plant model below remains available, including its generic cold-start experiment. The original native cold-to-hot-standby workbench remains available as a separate prescribed-heat experiment.
 
@@ -81,6 +83,7 @@ For **continuous native cold-to-power startup**, after setup/build:
 
 ```sh
 npm run engineering:continuous:verify
+npm run engineering:continuous:measured -- --build
 npm run engineering:continuous:start
 ```
 

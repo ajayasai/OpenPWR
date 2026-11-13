@@ -1,0 +1,30 @@
+{
+  "schema": "openpwr-continuous-measured-protocol-v1",
+  "caseId": "krsko-2005-continuous-thermal-kernel",
+  "frozenBeforeFirstRun": true,
+  "purpose": "Evaluate the exact thermal kernel composed by ContinuousPlant against a previously available measured plant event. This is a development comparison, not a blind validation data set.",
+  "model": "KrskoContinuousThermal",
+  "productionKernel": "ColdStartPlant",
+  "productionComposition": "ContinuousPlant.thermal",
+  "windowSeconds": [0, 15],
+  "metricSampleTimesSeconds": [1, 3, 5, 7, 9, 11, 13, 15],
+  "initialPointPolicy": "Table 2 initializes the model; interpolated measured t=0 is displayed only to expose initialization bias and is excluded from error metrics.",
+  "forcingChannels": ["reactorPowerMW", "steamFlowKgS", "feedwaterFlowKgS"],
+  "heldOutChannels": ["primaryPressureMPa", "hotLegTemperatureC", "coldLegTemperatureC", "steamPressureMPa"],
+  "communicationStepsSeconds": [0.05, 0.025],
+  "solverRelativeTolerance": 1e-11,
+  "geometrySensitivityScales": [0.5, 1, 2],
+  "numericalLimits": {
+    "massIntegralErrorKg": 0.05,
+    "energyIntegralErrorMJ": 0.1,
+    "pressureRefinementMPa": 0.01,
+    "temperatureRefinementK": 0.05
+  },
+  "numericalLimitMeaning": "Conservation quadrature and step-refinement checks only; never physical prediction-error acceptance.",
+  "physicalAcceptanceBand": null,
+  "physicalValidationPassed": false,
+  "parameterPolicy": "Use published initial conditions and nominal pump heat, disclosed generic capacities and volumes, and initial-only balance-derived conductances and enthalpies. Do not tune parameters using any post-initialization response.",
+  "domainStopPolicy": "Preserve a failed sensitivity's finite terminal observation and mark it failed-domain. Never extrapolate it, call it a completed pass, change the parameter to avoid its failure, or report a full-window spread for an incomplete pair. Mandatory nominal/refined domain exits fail execution and block publication.",
+  "excludedClaims": ["native neutron kinetics", "turbine or generator response", "feedwater or pressurizer control validation", "cold heatup", "criticality approach", "grid synchronization", "complete cold-to-full-power startup", "full-scope qualification"],
+  "referencePolicy": "Use original acquired measured curves, not RELAP5 cal curves; preserve immutable input bytes and existing channel assignments. Missing event-era geometry, actuator histories, level-to-volume mappings and instrument uncertainty prevent physical acceptance."
+}

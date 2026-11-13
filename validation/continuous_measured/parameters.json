@@ -1,0 +1,47 @@
+{
+  "schema": "openpwr-continuous-measured-parameters-v1",
+  "caseId": "krsko-2005-continuous-thermal-kernel",
+  "sourceLedger": "validation/krsko2005/reference-plant.json",
+  "sourceProvenance": "validation/krsko2005/provenance.json",
+  "policy": "Every value is fixed before the first shared-kernel comparison. No response-data fitting. Published initial values, assumed states and balance-derived quantities remain distinct.",
+  "parameters": [
+    {"parameter": "initialCoreHeatMW", "value": 1833.2836, "unit": "MW", "status": "measured-initial-proxy", "basis": "NUREG/IA-0221 Table 2: 91.94 percent neutron power times 1994 MW core rating; pre-trip thermal proxy, not calorimetry."},
+    {"parameter": "pumpHeatMW", "value": 6, "unit": "MW", "status": "published-nominal-assumption", "basis": "NUREG/IA-0221 section 2, not a measured transient history."},
+    {"parameter": "initialPressurePa", "value": 15480000, "unit": "Pa", "status": "measured-initial", "basis": "Table 2 primary pressure."},
+    {"parameter": "initialHotTemperatureK", "value": 594.175, "unit": "K", "status": "measured-initial-aggregate", "basis": "Arithmetic mean of Table 2 hot-leg measurements."},
+    {"parameter": "initialColdTemperatureK", "value": 559.445, "unit": "K", "status": "measured-initial-aggregate", "basis": "Arithmetic mean of Table 2 cold-leg measurements."},
+    {"parameter": "initialSteamPressurePa", "value": 6410000, "unit": "Pa", "status": "measured-initial-aggregate", "basis": "Arithmetic mean of Table 2 SG pressures."},
+    {"parameter": "initialSteamFlowKgS", "value": 994.1, "unit": "kg/s", "status": "measured-initial-aggregate", "basis": "Table 2; flow discrepancy with the acquired curves remains unchanged."},
+    {"parameter": "initialFeedwaterFlowKgS", "value": 1004.6, "unit": "kg/s", "status": "measured-initial-aggregate", "basis": "Table 2; its 10.5 kg/s imbalance is used only in the initial enthalpy construction. The imposed curve values at t=0 have their own unchanged mass imbalance."},
+    {"parameter": "initialPressurizerLiquidFraction", "value": 0.5295, "unit": "volume fraction", "status": "unverified-instrument-mapping", "basis": "Table 2 indicated level 52.95 percent treated as volume fraction; actual level-to-volume map unavailable."},
+    {"parameter": "initialFuelTemperatureK", "value": 873.15, "unit": "K", "status": "generic-assumption", "basis": "Inherited generic initial fuel state from the existing Krško replay; not a measured fuel temperature."},
+    {"parameter": "initialSecondaryLiquidFraction", "value": 0.5, "unit": "volume fraction", "status": "generic-assumption", "basis": "Unknown total SG liquid inventory; not a conversion of narrow-range indicated level."},
+    {"parameter": "chargingTemperatureK", "value": 323.15, "unit": "K", "status": "generic-assumption", "basis": "Unknown inlet enthalpy. Charging is held at zero, so this does not supply an unmeasured energy input."}
+  ],
+  "genericGeometry": {
+    "referenceScale": "initialCoreHeatMW / 3000",
+    "primaryVolumeM3": "300 * referenceScale * geometryScale; production kernel allocates equal hot and cold halves",
+    "hotVolumeM3": "150 * referenceScale * geometryScale",
+    "coldVolumeM3": "150 * referenceScale * geometryScale",
+    "pressurizerVolumeM3": "50 * referenceScale * geometryScale",
+    "secondaryVolumeM3": "400 * referenceScale * geometryScale",
+    "fuelCapacityJK": "60e6 * referenceScale * geometryScale",
+    "status": "Unidentified event-era allocations; generic dimensions inherited from the existing replay. These are not Krško plant measurements. The 0.5 and 2 multipliers are uncalibrated sensitivities."
+  },
+  "initialBalanceDerived": {
+    "primaryNominalFlowKgS": "initialCoreHeatMW * 1e6 / (h(initialPressurePa,initialHotTemperatureK) - h(initialPressurePa,initialColdTemperatureK))",
+    "fuelConductanceWK": "initialCoreHeatMW * 1e6 / (initialFuelTemperatureK - initialHotTemperatureK)",
+    "steamGeneratorConductanceMWK": "(initialCoreHeatMW + pumpHeatMW) / (initialColdTemperatureK - Tsat(initialSteamPressurePa))",
+    "feedwaterEnthalpyJkg": "(initialSteamFlowKgS * saturatedSteamEnthalpy(initialSteamPressurePa) - (initialCoreHeatMW + pumpHeatMW) * 1e6) / initialFeedwaterFlowKgS",
+    "qualification": "Initial-only energy-rate constructions, not independently measured flow, material properties or conductance. The curve/table mismatch and mass imbalance prevent asserting a complete measured steady state."
+  },
+  "initialGasAssumption": "Pressurizer and secondary temperature equal the IF97 saturation temperature at the published initial pressure, with zero noncondensable cover-gas inventory. No plant nitrogen inventory was measured in this event.",
+  "fixedControls": {"heaterPowerMW": 0, "chargingFlowKgS": 0, "letdownFlowKgS": 0},
+  "omittedControls": {
+    "spray": "The shared cold-start thermal kernel has no spray port. No numeric spray history is supplied; the event report describes spray action qualitatively. This missing actuator is a pressure-prediction limitation, not a validated zero-flow observation.",
+    "chargingLetdown": "Measured L/s are retained in the original CSV but not converted without reference density, instrument location and inlet enthalpy.",
+    "ventShutdownCooling": "Closed/disabled for this hot 15 s boundary replay; native equations remain unchanged.",
+    "automaticControls": "Pressure and inventory controllers disabled; imposed external heat and secondary flows exclude production reactor/cycle controls from this comparison."
+  },
+  "scope": "The reference wrapper composes the same ColdStartPlant class used by ContinuousPlant. It does not execute the ContinuousPlant reactor, turbine, condenser or electrical subsystems, and it does not test the cold startup trajectory."
+}

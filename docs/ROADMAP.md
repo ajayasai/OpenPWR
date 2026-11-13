@@ -11,6 +11,8 @@ OpenPWR is an open, reduced-order simulation laboratory. A complete operating en
 
 ## Next engineering increments
 
+Version 0.10 adds direct measured evaluation of the continuous model's shared thermal kernel. It does not turn the older operating-plant transient into startup data. The [source audit](STARTUP_MEASURED_EVIDENCE.md) identifies why available VVER power curves and EPRI startup examples cannot supply complete independent measured startup validation.
+
 Version 0.9 adds one native cold-to-power FMU with source-driven six-group kinetics, delayed heat, rod motion, dynamic shaft energy, phase/frequency/voltage synchronization, and load pickup. Native states evolve continuously from cold initialization; the separate prescribed-heat cold and hot-operation FMUs remain independent experiments. Verification uses published point-kinetics values, independent equation/boundary calculations, synchronization acceptance/rejection and full-trajectory timestep refinement. Measured whole-plant startup fidelity is still unestablished. Pressure work retains immutable v0.7 baselines and labels ATWS-11 as post-unblinding development; the event cannot become blind again. Plant-specific geometry, detailed secondary equipment, multi-loop/spatial response, containment and emergency core cooling remain future work.
 
 | Increment | Required modeling work | Evidence needed before claiming fidelity |

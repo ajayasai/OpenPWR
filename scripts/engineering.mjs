@@ -59,11 +59,13 @@ try {
     else if (action === 'start') await run([runtime.venvPython, 'backend/server.py', ...extra]);
     else if (action === 'experiment') await run([runtime.venvPython, 'backend/experiments.py', ...extra]);
     else if (action === 'measured') await run([runtime.venvPython, 'validation/krsko2005/compare.py', ...extra]);
+    else if (action === 'continuous-measured') await run([runtime.venvPython, 'validation/continuous_measured/compare.py', ...extra]);
     else if (action === 'pressurizer') await run([runtime.venvPython, 'validation/pactel1998/compare.py', ...extra]);
     else if (action === 'profile') await run([runtime.venvPython, 'models/performance-checks.py', ...extra]);
     else if (action === 'test') {
       await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'backend', '-p', 'test_*.py'], { OPENPWR_FMU: 'artifacts/modelica/PrimaryLoop.fmu', OPENPWR_PLANT_FMU: 'artifacts/modelica/CoupledPlant.fmu', OPENPWR_COLD_FMU: 'artifacts/modelica/ColdStartPlant.fmu', OPENPWR_CONTINUOUS_FMU: 'artifacts/modelica/ContinuousPlant.fmu' });
       await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/krsko2005', '-p', 'test_*.py']);
+      await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/continuous_measured', '-p', 'test_*.py']);
       await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/pactel1998', '-p', 'test_*.py']);
       await run([runtime.venvPython, '-m', 'unittest', 'discover', '-s', 'validation/tests', '-p', 'test_*.py']);
     }
@@ -74,6 +76,6 @@ try {
     else if (action === 'verify-plant') await run([runtime.venvPython, 'backend/verify_plant.py', ...extra]);
     else if (action === 'verify-cold') await run([runtime.venvPython, 'backend/verify_cold.py', ...extra]);
     else if (action === 'verify-continuous') await run([runtime.venvPython, 'backend/verify_continuous.py', ...extra]);
-    else throw new Error('Choose setup, build, build-plant, build-cold, build-continuous, start, test, verify, verify-plant, verify-cold, verify-continuous, measured, pressurizer, experiment, or profile.');
+    else throw new Error('Choose setup, build, build-plant, build-cold, build-continuous, start, test, verify, verify-plant, verify-cold, verify-continuous, measured, continuous-measured, pressurizer, experiment, or profile.');
   }
 } catch (error) { console.error(error.message); process.exitCode = 1; }

@@ -2,7 +2,7 @@
 
 Run after downloading the successful CI artifact for this exact commit. This
 command reruns the strict publication gate, verifies source bytes against Git,
-then packages source, 12 FMUs, their manifests and seven evidence reports.
+then packages source, 13 FMUs, their manifests and eight evidence reports.
 """
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
@@ -22,6 +22,7 @@ COMPILED = (
     ('PrimaryLoop', 'manifest.json'), ('PropertyReferenceChecks', 'property-manifest.json'),
     ('CoupledPlant', 'plant-manifest.json'), ('ColdStartPlant', 'cold-manifest.json'),
     ('ContinuousPlant', 'continuous-manifest.json'),
+    ('KrskoContinuousThermal', 'continuous-measured-manifest.json'),
     ('KineticsReference', 'kinetics-manifest.json'), ('KrskoTransient', 'krsko-manifest.json'),
     ('KrskoEquilibrium', 'krsko-equilibrium-manifest.json'), ('PactelPressurizer', 'pactel-manifest.json'),
     ('PactelCoarse', 'pactel-coarse-manifest.json'), ('PactelRadialRefined', 'pactel-radial-manifest.json'),
@@ -32,6 +33,7 @@ REPORTS = (
     ('artifacts/plant-verification.json', 'CoupledPlant', 'plant-verification.json'),
     ('artifacts/cold-verification.json', 'ColdStartPlant', 'cold-verification.json'),
     ('artifacts/continuous-verification.json', 'ContinuousPlant', 'continuous-verification.json'),
+    ('artifacts/continuous-measured-validation.json', 'KrskoContinuousThermal', 'continuous-measured-validation.json'),
     ('artifacts/measured-validation.json', 'KrskoTransient', 'measured-validation.json'),
     ('artifacts/pressurizer-validation.json', 'PactelPressurizer', 'pressurizer-validation.json'))
 COLD_SOURCES = {'coldSourceSha256': 'models/ColdStartPlant.mo', 'verificationScriptSha256': 'backend/verify_cold.py',
@@ -51,6 +53,19 @@ PACTEL_SOURCES = {key: 'validation/pactel1998/' + name for key, name in (
     ('holdoutProtocolSha256', 'holdout-protocol.json'), ('holdoutFreezeSha256', 'holdout-freeze.json'),
     ('developmentComparatorSha256', 'post_unblinding_compare.py'))}
 PACTEL_SOURCES['v07BaselineSha256'] = 'validation/baselines/pressurizer-v0.7.json'
+CONTINUOUS_MEASURED_SOURCES = {
+    'coldSourceSha256': 'models/ColdStartPlant.mo', 'continuousSourceSha256': 'models/ContinuousPlant.mo',
+    'benchmarkModelSha256': 'models/KrskoContinuousThermal.mo',
+    'inputDataSha256': 'validation/krsko2005/measured.csv',
+    'referenceMetadataSha256': 'validation/krsko2005/provenance.json',
+    'sourceLedgerSha256': 'validation/krsko2005/reference-plant.json',
+    'parameterSourcesSha256': 'validation/continuous_measured/parameters.json',
+    'protocolSha256': 'validation/continuous_measured/protocol.json',
+    'sourceCoverageSha256': 'validation/continuous_measured/source-coverage.json',
+    'comparisonScriptSha256': 'validation/continuous_measured/compare.py',
+    'sharedRunnerSha256': 'validation/native_fmi.py',
+    'packagingScriptSha256': 'scripts/modelica/package_fmu.py',
+}
 
 
 def read(path):
@@ -97,14 +112,14 @@ def comparison_sources(case, model):
 
 def verify(version, revision):
     subprocess.run(['node', 'scripts/build.mjs', '--require-native', '--require-plant', '--require-cold',
-        '--require-measured', '--require-pressurizer', '--require-continuous'], cwd=ROOT, check=True)
+        '--require-measured', '--require-pressurizer', '--require-continuous', '--require-continuous-measured'], cwd=ROOT, check=True)
     manifests = {}
     for model, manifest_name in COMPILED:
         manifest = read(ROOT / 'artifacts/modelica' / manifest_name)
         check_identity(manifest, version, revision, manifest_name)
         fmu = ROOT / 'artifacts/modelica' / f'{model}.fmu'
         require(manifest.get('fmuSha256') == sha(fmu), f'{model}: binary differs from its manifest')
-        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant') else f'OpenPWR.{model}'),
+        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant', 'KrskoContinuousThermal') else f'OpenPWR.{model}'),
             f'{model}: wrong native model')
         with zipfile.ZipFile(fmu) as archive:
             require(any(name.startswith(('binaries/linux64/', 'binaries/x86_64-linux/')) and name.endswith('.so')
@@ -119,6 +134,7 @@ def verify(version, revision):
         manifests[model] = manifest
     bound_sources(manifests['ColdStartPlant'], COLD_SOURCES, 'ColdStartPlant')
     bound_sources(manifests['ContinuousPlant'], CONTINUOUS_SOURCES, 'ContinuousPlant')
+    bound_sources(manifests['KrskoContinuousThermal'], CONTINUOUS_MEASURED_SOURCES, 'KrskoContinuousThermal')
     for model in ('KrskoTransient', 'KrskoEquilibrium'):
         sources = comparison_sources('krsko2005', 'KrskoTransient')
         sources.update(parameterSourcesSha256='validation/krsko2005/reference-plant.json', baselineSha256='validation/baselines/krsko-v0.5.json')
@@ -155,8 +171,8 @@ def archive_bytes(archive, name, data, timestamp):
 def native_readme(version, revision):
     return f'''# OpenPWR {version} native Linux release
 
-Complete source at {revision}, twelve Linux x86-64 FMUs, source/binary manifests,
-seven evidence reports, measured comparison data and upstream notices.
+Complete source at {revision}, {len(COMPILED)} Linux x86-64 FMUs, source/binary manifests,
+{len(REPORTS)} evidence reports, measured comparison data and upstream notices.
 
 The continuous native model starts cold, evolves source-driven six-group
 kinetics and finite decay heat, synchronizes a dynamic turbine-generator, and
@@ -164,6 +180,12 @@ picks up load without swapping FMUs or resetting state. Verification covers
 published point-kinetics values, conservation, synchronization rejection and
 acceptance, trip response, and timestep refinement. These are mathematical
 and numerical checks, not measured whole-plant startup validation.
+
+The Krško reference configuration now evaluates the same thermal equations used
+inside continuous startup. Measured heat and secondary flows are imposed;
+pressure and temperatures remain predictions. Unknown plant parameters and
+controls leave physical validation inconclusive. Kinetics, synchronization and
+the cold-start trajectory are outside this measured replay's scope.
 
 The original cold heatup and hot coupled-plant models remain separate experiments.
 The experimental two-temperature pressurizer is used by measured reference cases.
@@ -179,6 +201,7 @@ Install the open-source toolchain in docs/ENGINEERING.md. Run:
     npm run engineering:plant:verify
     npm run engineering:cold:verify
     npm run engineering:continuous:verify
+    npm run engineering:continuous:measured
     npm run engineering:measured
     npm run engineering:pressurizer
     npm run engineering:continuous:start
@@ -188,7 +211,8 @@ plant use npm run engineering:plant:start and http://127.0.0.1:8002/plant.html.
 For the primary workbench use npm run engineering:start and port 8001.
 On Windows use Ubuntu WSL and npm run engineering:setup -- --wsl. The prebuilt
 FMUs run under Linux. To rebuild use npm run engineering:build followed by
-npm run engineering:measured -- --build and npm run engineering:pressurizer -- --build.
+npm run engineering:measured -- --build, npm run engineering:pressurizer -- --build,
+and npm run engineering:continuous:measured -- --build.
 
 Original source is Apache-2.0. Upstream notices are in models/licenses and
 inside each FMU. The web archive contains the interface and portable evidence;

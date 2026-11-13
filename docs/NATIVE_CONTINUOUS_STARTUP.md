@@ -202,3 +202,7 @@ of this continuous model. Published measured-transient work elsewhere in this
 repository does not by itself validate this new cold-to-power configuration.
 Further qualification requires independent measured cases with documented
 instrument uncertainties, boundary conditions and acceptance criteria.
+
+## Measured coverage in v0.10
+
+`KrskoContinuousThermal` now instantiates the same `ColdStartPlant` class as this model. Published initial conditions and disclosed generic parameters configure a 15 s measured-boundary reference replay. The default 40 C startup remains unchanged. This directly tests shared thermal equations; imposed reactor power and secondary flows exclude native kinetics, cycle controls and electrical response from the comparison. See [measured coverage and source audit](STARTUP_MEASURED_EVIDENCE.md) and the [reference case](https://github.com/ajayasai/OpenPWR/tree/main/validation/continuous_measured).

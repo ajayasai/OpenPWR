@@ -242,6 +242,22 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   end WaterGasVessel;
 
   parameter Real initialTemperatureK = 313.15;
+  // Independent initial states permit reference-condition evaluation of this
+  // same production kernel. Defaults retain the original 40 C cold inventory.
+  parameter Real initialHotTemperatureK = initialTemperatureK;
+  parameter Real initialColdTemperatureK = initialTemperatureK;
+  parameter Real initialFuelTemperatureK = initialTemperatureK;
+  parameter Real initialPumpSpeed = 0;
+  parameter Real initialPrimaryFlowKgS = 0;
+  parameter Real initialPrimaryPressurePa = 300000;
+  parameter Real initialPressurizerTemperatureK = initialTemperatureK;
+  parameter Real pressurizerVolumeM3 = 50;
+  parameter Real initialPressurizerLiquidVolumeM3 = 25;
+  parameter Real initialSecondaryPressurePa = 150000;
+  parameter Real initialSecondaryTemperatureK = initialTemperatureK;
+  parameter Real secondaryVolumeM3 = 300;
+  parameter Real initialSecondaryLiquidVolumeM3 = 150;
+  parameter Real chargingTemperatureK = initialTemperatureK;
   parameter Real maximumFuelHeatMW = 90 "Default preserves the cold-only operating envelope";
   parameter Real maximumFuelTemperatureK = 650;
   parameter Real maximumHotTemperatureK = 600;
@@ -249,6 +265,7 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   parameter Real steamGeneratorConductanceMWK = 20;
   parameter Real primaryVolumeM3 = 300;
   parameter Real fuelCapacityJK = 60e6;
+  parameter Real fuelConductanceWK = 10e6;
   parameter Real nominalFlowKgS = 15000;
   parameter Real pumpHeatAtFullSpeedMW = 12;
   parameter Real shutdownCoolingConductanceWK = 500000;
@@ -274,8 +291,8 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   output Real primaryPressureMPa;
   output Real pressurizerTemperatureC;
   output Real pressurizerLevelPercent;
-  output Real primaryFlowKgS(start=0,fixed=true,nominal=15000);
-  output Real pumpSpeed(start=0,fixed=true);
+  output Real primaryFlowKgS(start=initialPrimaryFlowKgS,fixed=true,nominal=15000);
+  output Real pumpSpeed(start=initialPumpSpeed,fixed=true);
   output Real pumpHeatMW;
   output Real reactorPowerMW = startupHeatMW;
   output Real heatToSteamMW;
@@ -313,13 +330,15 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   output Real secondarySteamEnthalpyJkg = secondary.vaporEnthalpy;
   output Real secondaryVaporMassKg = secondary.vaporMassKg;
 
-  WaterGasVessel pressurizer(externallyDriven=true,initialTemperatureK=initialTemperatureK);
-  WaterGasVessel secondary(volumeM3=300,initialLiquidVolumeM3=150,initialPressurePa=150000,
-    initialTemperatureK=initialTemperatureK,ventCoefficient=2);
+  WaterGasVessel pressurizer(externallyDriven=true,volumeM3=pressurizerVolumeM3,
+    initialLiquidVolumeM3=initialPressurizerLiquidVolumeM3,initialPressurePa=initialPrimaryPressurePa,
+    initialTemperatureK=initialPressurizerTemperatureK);
+  WaterGasVessel secondary(volumeM3=secondaryVolumeM3,initialLiquidVolumeM3=initialSecondaryLiquidVolumeM3,
+    initialPressurePa=initialSecondaryPressurePa,initialTemperatureK=initialSecondaryTemperatureK,ventCoefficient=2);
 protected
-  Real hotTemperatureK(start=initialTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
-  Real coldTemperatureK(start=initialTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
-  Real fuelTemperatureK(start=initialTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
+  Real hotTemperatureK(start=initialHotTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
+  Real coldTemperatureK(start=initialColdTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
+  Real fuelTemperatureK(start=initialFuelTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
   Real pressurePa;
   Real rhoH;
   Real rhoC;
@@ -365,7 +384,7 @@ equation
   der(pumpSpeed) = (pumpCommand-pumpSpeed)/7;
   der(primaryFlowKgS) = (nominalFlowKgS*pumpSpeed-primaryFlowKgS)/4;
   pumpHeatMW = pumpHeatAtFullSpeedMW*pumpSpeed^3;
-  fuelHeatW = 10e6*(fuelTemperatureK-hotTemperatureK);
+  fuelHeatW = fuelConductanceWK*(fuelTemperatureK-hotTemperatureK);
   fuelCapacityJK*der(fuelTemperatureK) = startupHeatMW*1e6-fuelHeatW;
   heatToSteamMW = (0.05+0.95*pumpSpeed)*steamGeneratorConductanceMWK*(coldTemperatureK-secondary.temperatureK);
   shutdownCoolingMW = shutdownCoolingFraction*shutdownCoolingConductanceWK*noEvent(max(0,coldTemperatureK-shutdownCoolingSinkTemperatureK))/1e6;
@@ -373,7 +392,7 @@ equation
   pressureVent = if pressureControlEnable > 0.5 then noEvent(max(0,min(1,2*(primaryPressureMPa-pressureTargetMPa)))) else 0;
   actualLetdownFlowKgS = letdownFlowKgS+(if inventoryControlEnable > 0.5 then noEvent(max(0,min(20,2*(pressurizerLevelPercent-50)))) else 0);
   actualChargingFlowKgS = chargingFlowKgS+(if inventoryControlEnable > 0.5 then noEvent(max(0,min(10,2*(50-pressurizerLevelPercent)))) else 0);
-  chargingEnthalpy = Liquid.specificEnthalpy_pT(pressurePa,initialTemperatureK);
+  chargingEnthalpy = Liquid.specificEnthalpy_pT(pressurePa,chargingTemperatureK);
   flowToCold = primaryFlowKgS+coldMassRate-actualChargingFlowKgS+actualLetdownFlowKgS;
   surgeFlowKgS = actualChargingFlowKgS-actualLetdownFlowKgS-hotMassRate-coldMassRate;
   surgeEnthalpy = noEvent(if surgeFlowKgS >= 0 then hH else pressurizer.liquidEnthalpy);

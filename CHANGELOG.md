@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.0
+
+- Evaluates the actual continuous-startup thermal kernel against Krško 2005 plant measurements using a reference configuration with published initial states and disclosed generic parameters. Adds independent initial-state parameters while preserving the existing cold-start defaults.
+- Freezes the comparison protocol before scoring; separates imposed power/flows from predicted pressure/temperatures; retains inventory closure, communication-step refinement, geometry sensitivity and all measured discrepancies.
+- Publishes comparison charts, source/parameter ledgers, executable identity and reproducible reports. Source audit distinguishes real commissioning/startup records from calculated-only power curves and incomplete startup examples. The full cold-to-grid startup remains physically unvalidated.
+
 ## 0.9.0
 
 - Added `ContinuousPlant`, a single native cold-to-power FMU with source-driven six-group kinetics, rod motion, finite decay heat, turbine shaft energy, generator phase/voltage dynamics and a latched synchronizing breaker.

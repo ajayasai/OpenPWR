@@ -162,6 +162,7 @@ test('local preview serves only public files, blocks traversal, and implements H
   for (const name of ['scripts', 'src', 'docs', 'artifacts']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/serve.mjs'), join(dir, 'scripts/serve.mjs'));
   await writeFile(join(dir, 'index.html'), '<!doctype html><title>Test plant</title>');
+  await writeFile(join(dir, 'continuous.html'), '<!doctype html><title>Continuous test</title>');
   await writeFile(join(dir, 'src/app.js'), 'export const test = true;');
   await writeFile(join(dir, 'docs/MODEL.md'), '# Public model');
   await writeFile(join(dir, 'package.json'), '{"private":"must not be exposed"}');
@@ -169,6 +170,8 @@ test('local preview serves only public files, blocks traversal, and implements H
   await writeFile(join(dir, 'artifacts/benchmarks.json'), '{"passed":20}');
   const pressurizerBytes = '{"executed":true,"status":"inconclusive","caseId":"saved-pactel"}';
   await writeFile(join(dir, 'artifacts/pressurizer-validation.json'), pressurizerBytes);
+  await writeFile(join(dir, 'artifacts/continuous-verification.json'), '{"case":"continuous"}');
+  await writeFile(join(dir, 'artifacts/continuous-measured-validation.json'), '{"case":"continuous-measured"}');
   const port = await unusedPort();
   const child = spawn(process.execPath, [join(dir, 'scripts/serve.mjs'), '--source', `--port=${port}`], { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   try {
@@ -194,6 +197,9 @@ test('local preview serves only public files, blocks traversal, and implements H
     const pressurizerHead = await fetch(origin + '/pressurizer-validation.json', { method: 'HEAD' });
     assert.equal(pressurizerHead.status, 200);
     assert.equal(await pressurizerHead.text(), '');
+    assert.match(await (await fetch(origin + '/continuous.html')).text(), /Continuous test/);
+    assert.deepEqual(await (await fetch(origin + '/continuous-verification.json')).json(), {case:'continuous'});
+    assert.deepEqual(await (await fetch(origin + '/continuous-measured-validation.json')).json(), {case:'continuous-measured'});
     for (const route of ['/package.json', '/scripts/serve.mjs', '/src/a%2f..%2f..%2fpackage.json', '/src/%5c..%5cpackage.json', '/%FF']) {
       const response = await fetch(origin + route);
       assert.equal(response.status, 404, `excluded route ${route}`);
@@ -208,6 +214,7 @@ test('release build rejects stale or failed evidence without replacing the last 
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
+  await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
   for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   const marker = join(dir, 'dist', 'previous.txt');
@@ -235,6 +242,7 @@ test('native release evidence binds both reports to the exact compiled bytes bef
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
+  await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   const version = '0.4.0';
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const sha = value => createHash('sha256').update(value).digest('hex');

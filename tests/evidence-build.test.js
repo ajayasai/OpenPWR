@@ -38,6 +38,7 @@ async function fixture(t) {
   for (const path of ['scripts', 'src', 'docs', 'backend', 'models/OpenPWR', 'validation/krsko2005', 'validation/pactel1998', 'validation/baselines', 'artifacts/modelica']) await mkdir(join(dir, path), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
+  await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const version = '0.6.0';
   await json('package.json', { name: 'openpwr-evidence-fixture', version, type: 'module' });

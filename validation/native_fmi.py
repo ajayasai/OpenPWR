@@ -31,12 +31,14 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def build_case(model_name, model_path, fmu_path, manifest_path, identity, resources=()):
+def build_case(model_name, model_path, fmu_path, manifest_path, identity, resources=(), *, extra_sources=()):
     """Compile in a fresh directory and bind the artifact to exact source bytes."""
     os.environ['PATH'] = str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', '')
     compiler = os.environ.get('OPENPWR_OMC', 'omc')
     compiler_version = subprocess.check_output([compiler, '--version'], text=True).strip()
     before = identity()
+    extra_sources = tuple(Path(path) for path in extra_sources)
+    extra_hashes = {path.relative_to(ROOT).as_posix(): sha(path) for path in extra_sources}
     fmu_path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='openpwr-reference-') as work:
         script = Path(work) / 'build.mos'
@@ -44,6 +46,7 @@ def build_case(model_name, model_path, fmu_path, manifest_path, identity, resour
             'installPackage(Modelica, "4.0.0", exactMatch=true);', 'getErrorString();',
             'loadModel(Modelica, {"4.0.0"}, requireExactVersion=true);',
             f'loadFile({json.dumps(COMMON.as_posix())});',
+            *(f'loadFile({json.dumps(path.as_posix())});' for path in extra_sources),
             f'loadFile({json.dumps(model_path.as_posix())});', 'getErrorString();',
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
             f'buildModelFMU({model_name}, version="2.0", fmuType="me_cs", fileNamePrefix={json.dumps(fmu_path.stem)});',
@@ -56,6 +59,8 @@ def build_case(model_name, model_path, fmu_path, manifest_path, identity, resour
         after = identity()
         if any(after.get(key) != value for key, value in before.items() if key.endswith('Sha256')):
             raise RuntimeError('A benchmark source changed during compilation; rebuild from stable sources.')
+        if any(sha(path) != extra_hashes[path.relative_to(ROOT).as_posix()] for path in extra_sources):
+            raise RuntimeError('A shared native model changed during compilation; rebuild from stable sources.')
         candidate = Path(work) / fmu_path.name
         if result.returncode or not candidate.is_file():
             raise RuntimeError(f'Native compilation failed; read {fmu_path.stem}-build.log.')
@@ -63,11 +68,15 @@ def build_case(model_name, model_path, fmu_path, manifest_path, identity, resour
         export_metadata = prepare_fmu(fmu_path)
         with zipfile.ZipFile(fmu_path, 'a', compression=zipfile.ZIP_DEFLATED) as archive:
             archive.write(model_path, 'sources/OpenPWR/' + model_path.name)
+            for path in extra_sources:
+                archive.write(path, 'sources/' + path.name)
             for path, target in resources:
                 archive.write(path, target)
         manifest = {**before, **export_metadata, 'model': model_name, 'compiler': compiler_version,
                     'fmuSha256': sha(fmu_path), 'fmiVersion': '2.0', 'modelicaLibrary': '4.0.0',
                     'hostPlatform': platform.platform()}
+        if extra_sources:
+            manifest['extraSourceSha256'] = extra_hashes
         manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         return manifest
 

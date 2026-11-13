@@ -207,6 +207,7 @@ class Handler(BaseHTTPRequestHandler):
             "plant-verification.json": "artifacts/plant-verification.json",
             "cold-verification.json": "artifacts/cold-verification.json",
             "continuous-verification.json": "artifacts/continuous-verification.json",
+            "continuous-measured-validation.json": "artifacts/continuous-measured-validation.json",
             "measured-validation.json": "artifacts/measured-validation.json",
             "pressurizer-validation.json": "artifacts/pressurizer-validation.json",
         }
