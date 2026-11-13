@@ -56,6 +56,7 @@ PLANT_REAL_OUTPUTS = REAL_OUTPUTS + (
     "auxPumpFluidPowerMW", "auxMotorLossMW", "auxFeedwaterEnthalpyJkg", "condenserDisplacementPowerMW",
 )
 COLD_CONTROL_LIMITS = {
+    "sprayFlowKgS": (0.0, 30.0),
     "pumpCommand": (0.0, 1.0), "startupHeatMW": (0.0, 90.0), "heaterPowerMW": (0.0, 3.0),
     "shutdownCoolingFraction": (0.0, 1.0), "chargingFlowKgS": (0.0, 10.0),
     "letdownFlowKgS": (0.0, 20.0), "ventFraction": (0.0, 1.0),
@@ -63,6 +64,7 @@ COLD_CONTROL_LIMITS = {
     "inventoryControlEnable": (0.0, 1.0),
 }
 COLD_DEFAULT_CONTROLS = {
+    "sprayFlowKgS": 0.0,
     "pumpCommand": 0.0, "startupHeatMW": 0.0, "heaterPowerMW": 0.0,
     "shutdownCoolingFraction": 1.0, "chargingFlowKgS": 0.0, "letdownFlowKgS": 0.0,
     "ventFraction": 0.0, "pressureControlEnable": 0.0, "pressureTargetMPa": 0.3,
@@ -80,6 +82,10 @@ COLD_REAL_OUTPUTS = (
     "secondaryGasMassKg", "secondarySteamVentKgS", "secondaryGasVentKgS", "surgeFlowKgS", "primaryMassKg",
     "coldLegEnthalpyJkg", "chargingEnthalpyJkg", "pressurizerSteamEnthalpyJkg",
     "secondarySteamEnthalpyJkg", "secondaryVaporMassKg",
+    "pressurizerLiquidTemperatureC", "pressurizerVaporTemperatureC", "pressurizerSteamPartialPressurePa",
+    "pressurizerSaturationTemperatureC", "pressurizerVentPowerW", "pressurizerWallEnergyMJ",
+    "pressurizerWallAmbientPowerMW", "pressurizerWallMinimumTemperatureK", "pressurizerWallMaximumTemperatureK",
+    "actualSprayFlowKgS", "sprayCondensationKgS", "sprayHeatTransferMW",
 )
 CONTINUOUS_CONTROL_LIMITS = {
     **{name: limits for name, limits in COLD_CONTROL_LIMITS.items() if name != 'startupHeatMW'},

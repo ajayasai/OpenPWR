@@ -31,7 +31,12 @@ def run(model_key='primary'):
         'continuous': ('ContinuousPlant', 'ContinuousPlant', 'continuous-manifest.json'),
     }[model_key]
     source_hash = sha(SOURCE)
-    model_sources = {'coldSourceSha256': ROOT / 'models/ColdStartPlant.mo'} if model_key in ('cold', 'continuous') else {}
+    # Load the shared pressure component before the plant that instantiates it.
+    # These sources are also hashed and included in the resulting FMU archive.
+    model_sources = {
+        'pressureSourceSha256': ROOT / 'models/FinitePhasePressurizer.mo',
+        'coldSourceSha256': ROOT / 'models/ColdStartPlant.mo',
+    } if model_key in ('cold', 'continuous') else {}
     if model_key == 'continuous':
         model_sources['continuousSourceSha256'] = ROOT / 'models/ContinuousPlant.mo'
     model_hashes = {key: sha(path) for key, path in model_sources.items()}

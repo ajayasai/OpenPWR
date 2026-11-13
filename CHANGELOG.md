@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.0
+
+- Adds an experimental finite-phase pressurizer to the shared native startup thermal kernel, with separate liquid/headspace temperatures, steam/nitrogen inventories, conservative compression work and graded radial/axial wall heat storage.
+- Freezes the Krško candidate configuration and paired improvement criteria before scoring; preserves exact released v0.10 evidence and identical measured forcing. Publishes equilibrium, candidate, no-wall and refined-wall comparisons and all adverse changes.
+- Audits published Krško controls, MIT insurge experiments and Doel-4 wall input data. Analogue wall assumptions and missing measured spray history remain explicit. The shared model's experimental option does not establish full-startup or full-scope physical validation.
+- Adds conservative native spray recirculation and a separately frozen conditional controller study. None of the tested candidates beats the released pressure error; the better-performing equilibrium default remains in place. Numerical pass counts are explicitly separate from the failed measured-accuracy guards.
+- Fixes cold-phase solver sensitivity with exact state-coordinate translations, preserving the original phase law. Rejects non-writable or silently overwritten FMI parameter overrides.
+- Extends executable/source provenance, independent vent-energy accounting, automated evidence publication and the measured-response viewer.
+
 ## 0.10.0
 
 - Evaluates the actual continuous-startup thermal kernel against Krško 2005 plant measurements using a reference configuration with published initial states and disclosed generic parameters. Adds independent initial-state parameters while preserving the existing cold-start defaults.

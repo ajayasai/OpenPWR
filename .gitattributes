@@ -1,2 +1,3 @@
 * text=auto eol=lf
 *.jpg binary
+validation/krsko_pressure/original-attempt-summary.json -text whitespace=cr-at-eol

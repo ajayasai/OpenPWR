@@ -1,0 +1,21 @@
+{
+  "schema": "openpwr-pressure-final-numerics-amendment-v1",
+  "declaredBeforeUpdatedOrSprayScoring": true,
+  "supersededC1ProposalSha256": "f7426e4f3d0fdd5eec848773869f1ebe409b4686b6f1f03b982f12c98489c60c",
+  "retainedCoordinateAmendmentSha256": "9372410b2e249c9be342f269dfd65f1d3b76b0adddef3ae614fd132f9f7a34fb",
+  "decision": "Reject the proposed C1 phase-superheat regularization and restore the original max(0,superheat) transfer law before any updated or conditional-spray measured scoring. Independent unmeasured cold-heating probes established that exact offset coordinates alone resolve the numerical Jacobian problem. The 1e-4 K C1 proposal remains archived as development history and is not active model physics.",
+  "activePhaseTransferPositivePart": "max(0,superheat)",
+  "activePhaseSuperheatSmoothing": false,
+  "activeCoordinateChange": "The five exact affine offset states described in coordinate-amendment.json remain active, with unchanged physical-state initial values and derivative equations.",
+  "activeFilmTrialContinuation": "The fourth root uses max(0,NusseltArgument) for nonlinear trial states. Native validity and the independent saved-state domain audit still require the original NusseltArgument>=0 for accepted wall states.",
+  "activeInternalSprayPort": "The separately frozen conditional controller drives a conservative cold-leg-to-pressurizer recirculation path. All four original cases retain identically zero spray.",
+  "historicalSnapshotSha256": "fe622629b2343e351467fc31b8054b0e628cd3493a38ea4e49f886168be99b42",
+  "historicalSnapshotRetained": true,
+  "reproductionPolicy": "All original zero-spray cases must reproduce the complete archived acquired-sample nominal and refined response curves within the unchanged original reproduction tolerances. All numerical, conservation and other-channel guards remain unchanged.",
+  "sourceSelectionUsedMeasuredResponse": false,
+  "solverFlagsChanged": false,
+  "solverToleranceChanged": false,
+  "acceptanceLimitsChanged": false,
+  "physicalValidationPassed": false,
+  "independentValidationPassed": false
+}

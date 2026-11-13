@@ -1,0 +1,31 @@
+{
+  "schema": "openpwr-krsko-pressure-initial-boundary-ledger-v1",
+  "purpose": "Freeze the released measured forcing and initial-condition assumptions before candidate model selection. Candidate-specific constitutive assumptions are deliberately not supplied here.",
+  "previousParameterLedger": "validation/continuous_measured/parameters.json",
+  "previousParameterLedgerSha256": "07fb3ebffcd14b300700a7bb5ac8754c40892d1435843a52b23c49ba318649fe",
+  "measurementProvenance": "validation/krsko2005/provenance.json",
+  "measurementProvenanceSha256": "e23a13b539f57507445bb215fd21a59024d75be00b9a9b4f80d2a17c2ea1b4b1",
+  "sourceLedger": "validation/krsko2005/reference-plant.json",
+  "sourceLedgerSha256": "ed3d41193e0835cc70c68303ca7797c4651a499a8f864972fbc4d2c33b458ba4",
+  "measuredForcing": ["reactorPowerMW", "steamFlowKgS", "feedwaterFlowKgS"],
+  "initialParameters": {
+    "initialCoreHeatMW": 1833.2836,
+    "pumpHeatMW": 6,
+    "initialPressurePa": 15480000,
+    "initialHotTemperatureK": 594.175,
+    "initialColdTemperatureK": 559.445,
+    "initialSteamPressurePa": 6410000,
+    "initialSteamFlowKgS": 994.1,
+    "initialFeedwaterFlowKgS": 1004.6,
+    "initialPressurizerLiquidFraction": 0.5295,
+    "initialFuelTemperatureK": 873.15,
+    "initialSecondaryLiquidFraction": 0.5,
+    "chargingTemperatureK": 323.15
+  },
+  "unquantifiedControls": {"heaterPowerMW": 0, "chargingFlowKgS": 0, "letdownFlowKgS": 0},
+  "sprayStatus": "No independently quantified event spray history is available in the reviewed report. Do not derive spray flow from the held-out pressure curve. A new spray-capable component is not evidence that a particular spray schedule occurred.",
+  "geometryAndCapacityPolicy": "Preserve the v0.10 generic primary, secondary and pressurizer volumes and fuel capacity for the initial paired physics comparison. Their event-era applicability remains unidentified; changing these assumptions cannot be hidden inside a pressure-formulation comparison.",
+  "initializationPolicy": "Use published initial values and the existing initial-only flow, conductance and feedwater-enthalpy constructions. New phase or wall states require a separately disclosed, pre-scoring initialization assumption. No transient response is an initialization input.",
+  "candidateConfigurationStatus": "Not selected in this ledger; a separate candidate configuration must identify equations, new parameters, source basis and sensitivity cases before scoring.",
+  "claimBoundary": "This is development on an already observed event. Numeric improvement cannot establish full-startup or full-scope plant validation."
+}

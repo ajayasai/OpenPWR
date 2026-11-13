@@ -1,6 +1,6 @@
 {
   "name": "openpwr",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "An open, reproducible 1000 MWe PWR system-dynamics laboratory and interactive control room",
   "type": "module",
   "private": true,
@@ -25,6 +25,8 @@
     "engineering:profile": "node scripts/engineering.mjs profile",
     "engineering:measured": "node scripts/engineering.mjs measured",
     "engineering:continuous:measured": "node scripts/engineering.mjs continuous-measured",
+    "engineering:pressure": "node scripts/engineering.mjs krsko-pressure",
+    "engineering:pressure:verify": "node scripts/engineering.mjs pressure-components",
     "engineering:pressurizer": "node scripts/engineering.mjs pressurizer",
     "check": "npm run test && npm run verify && npm run build",
     "engineering:plant:build": "node scripts/engineering.mjs build-plant",

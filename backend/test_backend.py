@@ -207,6 +207,7 @@ class HttpTest(HttpFixture, unittest.TestCase):
             "/plant-verification.json": "artifacts/plant-verification.json",
             "/measured-validation.json": "artifacts/measured-validation.json",
             "/continuous-measured-validation.json": "artifacts/continuous-measured-validation.json",
+            "/krsko-pressure-development.json": "artifacts/krsko-pressure-development.json",
             "/pressurizer-validation.json": "artifacts/pressurizer-validation.json"}
         for route, relative in reports.items():
             self.assertEqual(self.request("GET", route)[0], 404)

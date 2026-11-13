@@ -19,8 +19,10 @@ class ColdSlave(FakeSlave):
 
     def doStep(self, **kwargs):
         super().doStep(**kwargs)
-        # Accumulate the second input (prescribed heat) to expose event timing.
-        self.values[100] += self.values[1] * kwargs['communicationStepSize']
+        # Resolve fixture references by name so added controls cannot change this oracle.
+        heat_ref = list(PROFILES['cold']['defaults']).index('startupHeatMW')
+        temperature_ref = 100 + PROFILES['cold']['real_outputs'].index('hotLegTemperatureC')
+        self.values[temperature_ref] += self.values[heat_ref] * kwargs['communicationStepSize']
 
 
 def cold_description():

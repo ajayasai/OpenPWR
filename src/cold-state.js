@@ -6,6 +6,7 @@ export const controls = [
   {key:'startupHeatMW', label:'Prescribed startup heat', min:0, max:90, step:1, unit:'MW', digits:0},
   {key:'shutdownCoolingFraction', label:'Shutdown cooling', min:0, max:1, step:.05, unit:'%', scale:100, digits:0},
   {key:'heaterPowerMW', label:'Pressurizer heater', min:0, max:3, step:.1, unit:'MW', digits:1},
+  {key:'sprayFlowKgS', label:'Pressurizer spray recirculation', min:0, max:30, step:.5, unit:'kg/s', digits:1},
   {key:'ventFraction', label:'Pressurizer vent', min:0, max:1, step:.05, unit:'%', scale:100, digits:0},
   {key:'pressureTargetMPa', label:'Pressure target', min:.2, max:15.5, step:.1, unit:'MPa', digits:1},
   {key:'pressureControlEnable', label:'Automatic pressure control', min:0, max:1, discrete:true},
@@ -21,7 +22,11 @@ export const outputs = ['hotLegTemperatureC','coldLegTemperatureC','fuelTemperat
   'totalPlantStoredEnergyMJ','totalPlantMassKg','plantBoundaryPowerMW','plantBoundaryMassFlowKgS',
   'integratedPlantBoundaryEnergyMJ','integratedPlantBoundaryMassKg','plantEnergyResidualMW','plantMassResidualKgS','hotStandbyReady',
   'secondaryGasMassKg','secondarySteamVentKgS','secondaryGasVentKgS','surgeFlowKgS','primaryMassKg',
-  'coldLegEnthalpyJkg','chargingEnthalpyJkg','pressurizerSteamEnthalpyJkg','secondarySteamEnthalpyJkg','secondaryVaporMassKg'];
+  'coldLegEnthalpyJkg','chargingEnthalpyJkg','pressurizerSteamEnthalpyJkg','secondarySteamEnthalpyJkg','secondaryVaporMassKg',
+  'pressurizerLiquidTemperatureC','pressurizerVaporTemperatureC','pressurizerSteamPartialPressurePa',
+  'pressurizerSaturationTemperatureC','pressurizerVentPowerW','pressurizerWallEnergyMJ',
+  'pressurizerWallAmbientPowerMW','pressurizerWallMinimumTemperatureK','pressurizerWallMaximumTemperatureK',
+  'actualSprayFlowKgS','sprayCondensationKgS','sprayHeatTransferMW'];
 export const validHash = value => typeof value === 'string' && /^[a-f0-9]{64}$/i.test(value);
 export function validateState(state) {
   if (!state || state.backend !== 'fmi2' || state.model !== MODEL || state.profile !== 'cold'

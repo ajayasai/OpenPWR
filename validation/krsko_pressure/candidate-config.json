@@ -1,0 +1,64 @@
+{
+  "schema": "openpwr-krsko-pressure-candidate-configuration-v1",
+  "frozenBeforeFirstCandidateScoring": true,
+  "initialProtocolSha256": "1e1e4c21730c12b68b69a7628130e7365c6ff17851860612ef33c3b5347ac408",
+  "productionComponent": "FinitePhasePressurizer",
+  "productionComposition": "ColdStartPlant.finitePressurizer",
+  "interactiveDefault": "Equilibrium remains the default unless the complete promotion guards pass. The experimental component uses the same production thermal balances through a structural option.",
+  "candidateClass": "KrskoPressureCandidate",
+  "equilibriumClass": "KrskoPressureEquilibrium",
+  "noWallClass": "KrskoPressureNoWall",
+  "refinedWallClass": "KrskoPressureRefinedWall",
+  "commonParameters": {
+    "pressurizerPhaseRelaxationTimeS": 0.1,
+    "pressurizerInterfacialConductanceWK": 0,
+    "pressurizerVesselHeightM": 11.864,
+    "pressurizerWallThicknessM": 0.1152,
+    "pressurizerWallVolumetricHeatCapacityJm3K": 3877500,
+    "pressurizerWallConductivityWMK": 46.05
+  },
+  "wallMesh": {
+    "nominal": {"axialCells": 12, "radialCells": 8},
+    "refined": {"axialCells": 24, "radialCells": 16},
+    "radialGrading": 100,
+    "facePositionFraction": "(101^(j/N)-1)/100 for radial face j=0..N",
+    "basis": "Numerical grading chosen before measured-response scoring to resolve the inner thermal layer; no mesh or correlation multiplier is fitted to the pressure curve.",
+    "maximumPressureDifferenceMPa": 0.01,
+    "maximumTemperatureDifferenceK": 0.05,
+    "failurePolicy": "Report an unresolved wall-mesh difference as a failed numerical check; do not select a mesh by its measured pressure error or loosen the limits after scoring."
+  },
+  "initialization": {
+    "liquidTemperature": "IF97 saturation temperature at initialPressurePa, identical to v0.10 initial pressurizer temperature",
+    "vaporTemperature": "Equal to initial liquid temperature",
+    "wallTemperature": "Uniform and equal to the initial saturation temperature; unmeasured generic initial-wall assumption",
+    "nitrogenInventory": "Zero, constructed from initial total pressure minus the corresponding saturation pressure; no invented plant nitrogen measurement",
+    "volumesAndOtherInitialConditions": "Exactly the v0.10 initial-boundaries.json ledger and generic volumes/capacity; no pressure-response fit"
+  },
+  "sourceAnalogue": {
+    "report": "NUREG/IA-0020, Doel-4 RELAP5 input model",
+    "audit": "validation/krsko_pressure/source-audit.json",
+    "pdfSha256": "8eb83eda142ebaa52b6b05a01d09a41e82666ac88bd8a2abf59e43ede85c4c2c",
+    "heightBasis": "Six published heat-structure axial lengths 0.7+1.464+3+3+3+0.7 m",
+    "thicknessBasis": "Published model radii 1.179025-1.063825 m",
+    "materialBasis": "Composition 5: k=46.05 W/(m K), volumetric heat capacity=3.8775e6 J/(m3 K). No separate density, specific heat or alloy certification inferred.",
+    "geometryTransformation": "Preserve the existing assumed Krško pressurizer volume and use the analogue height to derive an equivalent cylindrical radius sqrt(volume/(pi*height)). This changes the analogue radius; end heads and detailed construction are omitted.",
+    "qualification": "Published model parameters from another PWR, not measured Krško construction or thermophysical properties. This is an explicit generic analogue assumption, not an identified plant replica."
+  },
+  "otherConstitutiveAssumptions": {
+    "phaseRelaxation": "0.1 s retained from the pre-existing unfitted phase-relaxation model, not identified from this transient",
+    "bulkInterfaceConductance": "Zero; insurge stratification and interfacial mixing are not resolved",
+    "liquidWallConvectionWm2K": 500,
+    "vaporWallConvectionWm2K": 10,
+    "externalWallConvectionWm2K": 0,
+    "filmCondensation": "Unfitted classical Nusselt mean gravity-film coefficient; noncondensable diffusion resistance, detailed spray condensation and entrainment are unresolved"
+  },
+  "cases": [
+    {"id": "equilibrium", "model": "KrskoPressureEquilibrium", "finitePhase": false, "wall": false, "stepsSeconds": [0.05, 0.025]},
+    {"id": "candidate", "model": "KrskoPressureCandidate", "finitePhase": true, "wall": true, "stepsSeconds": [0.05, 0.025]},
+    {"id": "no-wall", "model": "KrskoPressureNoWall", "finitePhase": true, "wall": false, "stepsSeconds": [0.05, 0.025]},
+    {"id": "refined-wall", "model": "KrskoPressureRefinedWall", "finitePhase": true, "wall": true, "stepsSeconds": [0.05, 0.025]}
+  ],
+  "interpretation": "All cases preserve the same external forcing. No-wall isolates wall storage/condensation from separate phase inventories. Refined-wall assesses numerical mesh dependence, not a different physical model. Every case and every adverse channel change remains visible.",
+  "physicalValidationPassed": false,
+  "independentValidationPassed": false
+}

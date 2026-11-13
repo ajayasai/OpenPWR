@@ -99,6 +99,7 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
         raise ValueError('Duration and step must be finite and positive.')
     if not math.isfinite(solver_tolerance) or not 0 < solver_tolerance < 1:
         raise ValueError('Solver relative tolerance must be finite and between zero and one.')
+    parameters = dict(parameters or {})
     description = read_model_description(str(fmu_path), validate=True)
     if description.modelName != model_name:
         raise ValueError('Unexpected benchmark FMU identity.')
@@ -113,6 +114,10 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
     for name in (*output_names, *input_names, *(parameters or {})):
         if name not in variables:
             raise ValueError(f'Missing native benchmark variable: {name}')
+    for name in parameters:
+        if getattr(variables[name], 'causality', None) != 'parameter':
+            raise ValueError(f'Benchmark override {name} is not a writable FMI parameter '
+                             f'(causality={getattr(variables[name], "causality", None)!r}).')
     input_refs = [variables[name].valueReference for name in input_names]
     output_refs = [variables[name].valueReference for name in output_names]
     sample_count = round(duration / sample_interval)
@@ -138,7 +143,8 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
                         type(value) not in (int, float) or not math.isfinite(value) or
                         (kind == 'Integer' and value != int(value))) for _, value in selected):
                     raise ValueError(f'Invalid {kind} benchmark parameter.')
-                setter([variables[name].valueReference for name, _ in selected], [value for _, value in selected])
+                convert = {'Real': float, 'Integer': int, 'Boolean': bool}[kind]
+                setter([variables[name].valueReference for name, _ in selected], [convert(value) for _, value in selected])
             if any(variables[name].type not in ('Real', 'Integer', 'Boolean') for name in parameters):
                 raise ValueError('Unsupported benchmark parameter type.')
 
@@ -153,6 +159,23 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
         slave.setReal(input_refs, list(applied_values))
         input_updates = 1
         slave.exitInitializationMode()
+        # FMI setters may return success even when an engine overwrites a value
+        # during initialization. Never label requested values as applied before
+        # reading each writable parameter back from the initialized instance.
+        if parameters:
+            for kind, getter, convert in [('Real', slave.getReal, float),
+                                          ('Integer', slave.getInteger, int),
+                                          ('Boolean', slave.getBoolean, bool)]:
+                selected = [(name, value) for name, value in parameters.items() if variables[name].type == kind]
+                if not selected:
+                    continue
+                actual = getter([variables[name].valueReference for name, _ in selected])
+                if len(actual) != len(selected):
+                    raise RuntimeError(f'Incomplete initialized {kind} parameter readback for {model_name}.')
+                for (name, requested), observed in zip(selected, actual):
+                    if observed != convert(requested):
+                        raise RuntimeError(f'Initialized benchmark parameter {name} differs: '
+                                           f'requested {requested!r}, observed {observed!r}.')
 
         def observation(time):
             values = list(map(float, slave.getReal(output_refs)))

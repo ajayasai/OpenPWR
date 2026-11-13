@@ -1,0 +1,49 @@
+{
+  "schema": "openpwr-krsko-conditional-spray-configuration-v1",
+  "frozenBeforeFirstSprayScoring": true,
+  "originalProtocolSha256": "1e1e4c21730c12b68b69a7628130e7365c6ff17851860612ef33c3b5347ac408",
+  "originalCandidateConfigurationSha256": "8797b3b5c10f0ae16b6b1522dadf61afd8858294c3b509f32c4df44b7c57b000",
+  "originalScoredAttempt": {
+    "reportSha256": "892ccf51a317417b40f9d279dc34d6f3b4acb8bba505aa9abde343b86ed93f87",
+    "bytes": 6634911,
+    "numericalChecksPassed": 76,
+    "numericalChecksTotal": 76,
+    "pairedGuardsPassed": 4,
+    "pairedGuardsTotal": 18,
+    "primaryPressureRmseMPa": 0.6793904775677538,
+    "retention": "The original four frozen cases remain in the main report. Exact initial report, executable, manifest and source bytes are archived under artifacts/pressure-initial-frozen-v011 before adding this extension."
+  },
+  "purpose": "Separately declared conditional development experiment for an omitted native pressure-control actuator. It is not a measured Krško spray-history replay and does not replace or conceal the failed original pressure candidate.",
+  "selectionContext": "This extension was selected after inspecting the original failed development comparison and the source's qualitative spray description. Numeric controller/capacity values are taken from separately identified reference or pre-existing generic assumptions; no optimization against the response curve is performed. This is response-informed model development, not independent predictive validation.",
+  "nominalModel": "KrskoPressureSpray",
+  "refinedWallModel": "KrskoPressureSprayRefinedWall",
+  "controller": {
+    "referencePressureMPa": 15.51,
+    "gainFractionPerMPa": 2,
+    "maximumSprayFlowKgS": 20.67,
+    "contactEfficiency": 1,
+    "fractionEquation": "min(1,max(0,gainFractionPerMPa*(nativePrimaryPressureMPa-referencePressureMPa)))",
+    "flowEquation": "maximumSprayFlowKgS * fraction",
+    "referenceBasis": "Published nominal PWR pressure reference from NUREG/IA-0227; a generic analogue, not a measured Krško controller setpoint.",
+    "gainBasis": "The pre-existing ColdStartPlant generic pressure controller uses gain 2 fraction/MPa. Reusing it for the spray fraction is an explicit generic-control assumption, not an identified plant gain.",
+    "capacityBasis": "Doel analogue nominal 102 m3/h at 732.32 kg/m3 gives approximately 20.67 kg/s. This is a published model-derived capacity, not measured Krško spray flow or construction.",
+    "contactBasis": "Nominal ideal contact efficiency 1 is a declared limiting assumption. A retained 0.5 case tests sensitivity; neither is fitted to the measured pressure.",
+    "actuatorDynamics": "Instantaneous generic modulation without measured deadband, hysteresis, valve lag, saturation history or sensor delay. These remain unresolved plant-specific inputs."
+  },
+  "nativeConservation": "Spray draws predicted cold-leg water and its enthalpy from the primary inventory and supplies the pressurizer. Direct-contact condensation and transferred heat must appear with opposite signs in the relevant phase balances. This is an internal transfer, not an external source of plant mass or energy.",
+  "unchanged": ["Original measured heat/steam/feedwater curves and acquired times", "Published initial conditions and generic plant inventories", "Original phase relaxation and wall analogue values", "Nominal 12x8 graded wall mesh and 24x16 refinement", "Zero assumptions for unidentified external heater/charging/letdown histories", "Original numerical tolerances and 18 paired-development guards", "Equilibrium interactive default"],
+  "cases": [
+    {"id": "spray-nominal", "model": "KrskoPressureSpray", "gainFractionPerMPa": 2, "contactEfficiency": 1, "stepsSeconds": [0.05, 0.025]},
+    {"id": "spray-gain-low", "model": "KrskoPressureSpray", "gainFractionPerMPa": 1, "contactEfficiency": 1, "stepsSeconds": [0.05, 0.025]},
+    {"id": "spray-gain-high", "model": "KrskoPressureSpray", "gainFractionPerMPa": 4, "contactEfficiency": 1, "stepsSeconds": [0.05, 0.025]},
+    {"id": "spray-contact-half", "model": "KrskoPressureSpray", "gainFractionPerMPa": 2, "contactEfficiency": 0.5, "stepsSeconds": [0.05, 0.025]},
+    {"id": "spray-refined-wall", "model": "KrskoPressureSprayRefinedWall", "gainFractionPerMPa": 2, "contactEfficiency": 1, "stepsSeconds": [0.05, 0.025]}
+  ],
+  "selectionPolicy": "The nominal case is fixed at gain 2 and contact efficiency 1 before any spray result. Run and retain all sensitivity cases, including adverse changes and domain failures. Do not select the lowest measured error or relabel a sensitivity as nominal after scoring.",
+  "scoringPolicy": "Score the same four held-out channels and original paired guards against the immutable v0.10 baseline and same-boundary equilibrium ablation. Conditional nominal and refined-wall meshes must satisfy the original declared wall-mesh tolerances. Every case must pass numerical verification before release; a failed physical-development guard remains an explicit reported result.",
+  "claimBoundary": "Any reduction in measured response error is conditional on an unmeasured generic spray-control assumption. It does not validate the actual Krško spray history, plant controls, complete cold startup or full-scope accuracy. This assumption-dependent result cannot silently promote the default model.",
+  "physicalValidationPassed": false,
+  "independentValidationPassed": false,
+  "actualPlantControlValidated": false,
+  "defaultPromotionRecommended": false
+}

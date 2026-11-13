@@ -18,6 +18,7 @@ from native_fmi import NativeDomainExit, build_case, run_case, sha
 
 MODEL = ROOT / 'models/KrskoContinuousThermal.mo'
 COLD = ROOT / 'models/ColdStartPlant.mo'
+PRESSURE = ROOT / 'models/FinitePhasePressurizer.mo'
 CONTINUOUS = ROOT / 'models/ContinuousPlant.mo'
 DATA = ROOT / 'validation/krsko2005/measured.csv'
 PROVENANCE = DATA.with_name('provenance.json')
@@ -70,6 +71,7 @@ def identity():
     files = {
         'sourceSha256': ROOT / 'models/OpenPWR/package.mo',
         'coldSourceSha256': COLD, 'continuousSourceSha256': CONTINUOUS,
+        'pressureSourceSha256': PRESSURE,
         'benchmarkModelSha256': MODEL, 'inputDataSha256': DATA,
         'referenceMetadataSha256': PROVENANCE, 'sourceLedgerSha256': SOURCE_LEDGER,
         'parameterSourcesSha256': PARAMETERS, 'protocolSha256': PROTOCOL,
@@ -89,7 +91,7 @@ def build():
         ('continuous-measured-', (PARAMETERS, PROTOCOL, COVERAGE)),
     ) for path in paths]
     result = build_case('KrskoContinuousThermal', MODEL, FMU, MANIFEST, identity,
-                        resources, extra_sources=(COLD, CONTINUOUS))
+                        resources, extra_sources=(PRESSURE, COLD, CONTINUOUS))
     print('Built KrskoContinuousThermal', result['fmuSha256'], flush=True)
 
 

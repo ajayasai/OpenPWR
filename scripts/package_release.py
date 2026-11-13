@@ -2,7 +2,7 @@
 
 Run after downloading the successful CI artifact for this exact commit. This
 command reruns the strict publication gate, verifies source bytes against Git,
-then packages source, 13 FMUs, their manifests and eight evidence reports.
+then packages source, 19 FMUs, their manifests and nine evidence reports.
 """
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
@@ -23,6 +23,12 @@ COMPILED = (
     ('CoupledPlant', 'plant-manifest.json'), ('ColdStartPlant', 'cold-manifest.json'),
     ('ContinuousPlant', 'continuous-manifest.json'),
     ('KrskoContinuousThermal', 'continuous-measured-manifest.json'),
+    ('KrskoPressureEquilibrium', 'krsko-pressure-equilibrium-manifest.json'),
+    ('KrskoPressureCandidate', 'krsko-pressure-candidate-manifest.json'),
+    ('KrskoPressureNoWall', 'krsko-pressure-no-wall-manifest.json'),
+    ('KrskoPressureRefinedWall', 'krsko-pressure-refined-wall-manifest.json'),
+    ('KrskoPressureSpray', 'krsko-pressure-spray-manifest.json'),
+    ('KrskoPressureSprayRefinedWall', 'krsko-pressure-spray-refined-wall-manifest.json'),
     ('KineticsReference', 'kinetics-manifest.json'), ('KrskoTransient', 'krsko-manifest.json'),
     ('KrskoEquilibrium', 'krsko-equilibrium-manifest.json'), ('PactelPressurizer', 'pactel-manifest.json'),
     ('PactelCoarse', 'pactel-coarse-manifest.json'), ('PactelRadialRefined', 'pactel-radial-manifest.json'),
@@ -34,9 +40,11 @@ REPORTS = (
     ('artifacts/cold-verification.json', 'ColdStartPlant', 'cold-verification.json'),
     ('artifacts/continuous-verification.json', 'ContinuousPlant', 'continuous-verification.json'),
     ('artifacts/continuous-measured-validation.json', 'KrskoContinuousThermal', 'continuous-measured-validation.json'),
+    ('artifacts/krsko-pressure-development.json', 'KrskoPressureCandidate', 'krsko-pressure-development.json'),
     ('artifacts/measured-validation.json', 'KrskoTransient', 'measured-validation.json'),
     ('artifacts/pressurizer-validation.json', 'PactelPressurizer', 'pressurizer-validation.json'))
 COLD_SOURCES = {'coldSourceSha256': 'models/ColdStartPlant.mo', 'verificationScriptSha256': 'backend/verify_cold.py',
+    'pressureSourceSha256': 'models/FinitePhasePressurizer.mo',
     'sharedRunnerSha256': 'validation/native_fmi.py', 'hostScriptSha256': 'backend/fmi_host.py',
     'profileScriptSha256': 'backend/profiles.py'}
 CONTINUOUS_SOURCES = {**COLD_SOURCES,
@@ -55,6 +63,7 @@ PACTEL_SOURCES = {key: 'validation/pactel1998/' + name for key, name in (
 PACTEL_SOURCES['v07BaselineSha256'] = 'validation/baselines/pressurizer-v0.7.json'
 CONTINUOUS_MEASURED_SOURCES = {
     'coldSourceSha256': 'models/ColdStartPlant.mo', 'continuousSourceSha256': 'models/ContinuousPlant.mo',
+    'pressureSourceSha256': 'models/FinitePhasePressurizer.mo',
     'benchmarkModelSha256': 'models/KrskoContinuousThermal.mo',
     'inputDataSha256': 'validation/krsko2005/measured.csv',
     'referenceMetadataSha256': 'validation/krsko2005/provenance.json',
@@ -65,6 +74,33 @@ CONTINUOUS_MEASURED_SOURCES = {
     'comparisonScriptSha256': 'validation/continuous_measured/compare.py',
     'sharedRunnerSha256': 'validation/native_fmi.py',
     'packagingScriptSha256': 'scripts/modelica/package_fmu.py',
+}
+PRESSURE_MODELS = ('KrskoPressureEquilibrium', 'KrskoPressureCandidate', 'KrskoPressureNoWall', 'KrskoPressureRefinedWall',
+    'KrskoPressureSpray', 'KrskoPressureSprayRefinedWall')
+PRESSURE_SOURCES = {
+    **{key: value for key, value in CONTINUOUS_MEASURED_SOURCES.items()
+       if key not in ('sourceCoverageSha256',)},
+    'thermalBenchmarkModelSha256': 'models/KrskoContinuousThermal.mo',
+    'benchmarkModelSha256': 'models/KrskoPressureDevelopment.mo',
+    'parameterSourcesSha256': 'validation/krsko_pressure/candidate-config.json',
+    'initialBoundariesSha256': 'validation/krsko_pressure/initial-boundaries.json',
+    'sourceAuditSha256': 'validation/krsko_pressure/source-audit.json',
+    'protocolSha256': 'validation/krsko_pressure/protocol-initial.json',
+    'baselineSha256': 'validation/baselines/continuous-measured-v0.10.json',
+    'comparisonScriptSha256': 'validation/krsko_pressure/compare.py',
+    'referenceScriptSha256': 'validation/krsko_pressure/reference.py',
+    'thermalComparisonScriptSha256': 'validation/continuous_measured/compare.py',
+    'componentModelSha256': 'models/PressureComponentChecks.mo',
+    'componentScriptSha256': 'validation/krsko_pressure/component_checks.py',
+    'conditionalSprayConfigSha256': 'validation/krsko_pressure/conditional-spray-config.json',
+    'conditionalSprayInitialConfigSha256': 'validation/krsko_pressure/conditional-spray-config-initial.json',
+    'conditionalSprayAmendmentSha256': 'validation/krsko_pressure/conditional-spray-amendment.json',
+    'originalAttemptSummarySha256': 'validation/krsko_pressure/original-attempt-summary.json',
+    'conditionalSprayScriptSha256': 'validation/krsko_pressure/conditional_spray.py',
+    'originalAttemptArchiveSha256': 'validation/baselines/krsko-pressure-initial-v011.zip',
+    'regularizationAmendmentSha256': 'validation/krsko_pressure/regularization-amendment.json',
+    'coordinateAmendmentSha256': 'validation/krsko_pressure/coordinate-amendment.json',
+    'finalNumericsAmendmentSha256': 'validation/krsko_pressure/final-numerics-amendment.json',
 }
 
 
@@ -112,14 +148,15 @@ def comparison_sources(case, model):
 
 def verify(version, revision):
     subprocess.run(['node', 'scripts/build.mjs', '--require-native', '--require-plant', '--require-cold',
-        '--require-measured', '--require-pressurizer', '--require-continuous', '--require-continuous-measured'], cwd=ROOT, check=True)
+        '--require-measured', '--require-pressurizer', '--require-continuous', '--require-continuous-measured',
+        '--require-krsko-pressure'], cwd=ROOT, check=True)
     manifests = {}
     for model, manifest_name in COMPILED:
         manifest = read(ROOT / 'artifacts/modelica' / manifest_name)
         check_identity(manifest, version, revision, manifest_name)
         fmu = ROOT / 'artifacts/modelica' / f'{model}.fmu'
         require(manifest.get('fmuSha256') == sha(fmu), f'{model}: binary differs from its manifest')
-        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant', 'KrskoContinuousThermal') else f'OpenPWR.{model}'),
+        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant', 'KrskoContinuousThermal', *PRESSURE_MODELS) else f'OpenPWR.{model}'),
             f'{model}: wrong native model')
         with zipfile.ZipFile(fmu) as archive:
             require(any(name.startswith(('binaries/linux64/', 'binaries/x86_64-linux/')) and name.endswith('.so')
@@ -128,6 +165,11 @@ def verify(version, revision):
             simulation = description.find('CoSimulation')
             require(description.find('ModelExchange') is not None and simulation is not None
                 and simulation.get('maxOutputDerivativeOrder') == '0', f'{model}: wrong native export capabilities')
+            if model in ('ColdStartPlant', 'ContinuousPlant', 'KrskoContinuousThermal', *PRESSURE_MODELS):
+                pressure_source = 'sources/FinitePhasePressurizer.mo'
+                require(pressure_source in archive.namelist(), f'{model}: shared pressure source is missing from FMU')
+                require(hashlib.sha256(archive.read(pressure_source)).hexdigest() == manifest.get('pressureSourceSha256'),
+                    f'{model}: archived pressure source differs from its manifest')
         require(manifest.get('exportInterfaces') == ['ModelExchange', 'CoSimulation']
             and manifest.get('maximumOutputDerivativeOrder') == 0, f'{model}: export provenance is missing')
         bound_sources(manifest, {'sourceSha256': 'models/OpenPWR/package.mo'}, model)
@@ -135,6 +177,8 @@ def verify(version, revision):
     bound_sources(manifests['ColdStartPlant'], COLD_SOURCES, 'ColdStartPlant')
     bound_sources(manifests['ContinuousPlant'], CONTINUOUS_SOURCES, 'ContinuousPlant')
     bound_sources(manifests['KrskoContinuousThermal'], CONTINUOUS_MEASURED_SOURCES, 'KrskoContinuousThermal')
+    for model in PRESSURE_MODELS:
+        bound_sources(manifests[model], PRESSURE_SOURCES, model)
     for model in ('KrskoTransient', 'KrskoEquilibrium'):
         sources = comparison_sources('krsko2005', 'KrskoTransient')
         sources.update(parameterSourcesSha256='validation/krsko2005/reference-plant.json', baselineSha256='validation/baselines/krsko-v0.5.json')
@@ -151,6 +195,9 @@ def verify(version, revision):
         reports[model] = report
     require(reports['CoupledPlant']['kineticsManifest']['fmuSha256'] == manifests['KineticsReference']['fmuSha256'], 'Kinetics reference differs')
     require(reports['KrskoTransient']['equilibriumComparison']['runtime']['fmuSha256'] == manifests['KrskoEquilibrium']['fmuSha256'], 'Krško equilibrium runtime differs')
+    for case in (*reports['KrskoPressureCandidate']['cases'], *reports['KrskoPressureCandidate']['conditionalSpray']['cases']):
+        for step in ('nominal', 'refined'):
+            require(case[step]['runtime']['fmuSha256'] == manifests[case['model']]['fmuSha256'], 'Pressure ablation/mesh runtime differs')
     held = reports['PactelPressurizer']['holdoutComparison']
     require(held['comparisonRole'] == 'post-unblinding-development' and held['heldOutFromCurrentDevelopment'] is False,
         'Disclosed ATWS-11 response was incorrectly presented as a renewed holdout')
@@ -187,6 +234,18 @@ pressure and temperatures remain predictions. Unknown plant parameters and
 controls leave physical validation inconclusive. Kinetics, synchronization and
 the cold-start trajectory are outside this measured replay's scope.
 
+The finite-phase pressure candidate adds separate liquid and vapor inventories,
+nitrogen headspace, and explicit wall storage/condensation. Its four-case paired
+development report retains equilibrium and no-wall ablations and refined wall
+mesh results. It embeds independent numerical component checks. A passed
+numerical report does not establish measured physical validity or promotion of
+the production equilibrium default; consult all signed improvement guards.
+The separately frozen spray extension retains its five declared conditional
+cases and the original failed attempt. The source archive includes the exact
+historical report, sources, manifests and binaries in a frozen ZIP; its original
+dirty-checkout identity remains disclosed. Spray capacity, feedback and contact
+efficiency are assumptions, not a measured Krško control history.
+
 The original cold heatup and hot coupled-plant models remain separate experiments.
 The experimental two-temperature pressurizer is used by measured reference cases.
 None is a qualified full-scope plant simulator. Measured discrepancies and the
@@ -202,6 +261,8 @@ Install the open-source toolchain in docs/ENGINEERING.md. Run:
     npm run engineering:cold:verify
     npm run engineering:continuous:verify
     npm run engineering:continuous:measured
+    npm run engineering:pressure:verify
+    npm run engineering:pressure
     npm run engineering:measured
     npm run engineering:pressurizer
     npm run engineering:continuous:start
@@ -213,6 +274,8 @@ On Windows use Ubuntu WSL and npm run engineering:setup -- --wsl. The prebuilt
 FMUs run under Linux. To rebuild use npm run engineering:build followed by
 npm run engineering:measured -- --build, npm run engineering:pressurizer -- --build,
 and npm run engineering:continuous:measured -- --build.
+Rebuild the paired pressure experiment with npm run engineering:pressure:verify
+followed by npm run engineering:pressure -- --build.
 
 Original source is Apache-2.0. Upstream notices are in models/licenses and
 inside each FMU. The web archive contains the interface and portable evidence;
@@ -237,6 +300,8 @@ def package(version, revision):
                 archive_bytes(archive, prefix + path.relative_to(ROOT).as_posix(), path.read_bytes(), timestamp)
         for path, _, _ in REPORTS:
             archive_bytes(archive, prefix + path, (ROOT / path).read_bytes(), timestamp)
+        component_path = 'artifacts/pressure-component-verification.json'
+        archive_bytes(archive, prefix + component_path, (ROOT / component_path).read_bytes(), timestamp)
         archive_bytes(archive, prefix + 'PREBUILT_NATIVE.md', native_readme(version, revision).encode(), timestamp)
     with zipfile.ZipFile(web, 'w') as archive:
         for path in sorted((ROOT / 'dist').rglob('*')):

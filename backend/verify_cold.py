@@ -57,7 +57,8 @@ def boundary_flux(controls, point):
         gas_flow=flow*gas/(gas+steam)
         steam_flow=flow-gas_flow
         enthalpy=point[prefix+'SteamEnthalpyJkg']
-        power=steam_flow*enthalpy+gas_flow*1040*(point[prefix+'TemperatureC']+273.15)
+        gas_temperature=point.get('pressurizerVaporTemperatureC',point[prefix+'TemperatureC']) if prefix=='pressurizer' else point[prefix+'TemperatureC']
+        power=steam_flow*enthalpy+gas_flow*1040*(gas_temperature+273.15)
         return flow,power
     primary_vent,primary_vent_power=mixture_vent('pressurizer',pressure*1e6,vent,.5)
     secondary_fraction=clamp((point['secondaryTemperatureC']-110)/1,1)*clamp((point['secondaryGasMassKg']-.05)/.05,1)
@@ -65,7 +66,7 @@ def boundary_flux(controls, point):
         secondary_fraction,2)
     pump_power=12*point['pumpSpeed']**3
     shutdown_cooling=controls['shutdownCoolingFraction']*.5*max(0,point['coldLegTemperatureC']-30)
-    energy=controls['startupHeatMW']+pump_power+heater-shutdown_cooling+(
+    energy=controls['startupHeatMW']+pump_power+heater-shutdown_cooling-point.get('pressurizerWallAmbientPowerMW',0)+(
         charging*point['chargingEnthalpyJkg']-letdown*point['coldLegEnthalpyJkg']-primary_vent_power-secondary_vent_power)/1e6
     return energy,charging-letdown-primary_vent-secondary_vent
 
@@ -103,6 +104,7 @@ def constant_inputs(**changes):
 def verify(fmu_path, output_path):
     manifest=read_verified_manifest(fmu_path,expected_model='ColdStartPlant',manifest_name='cold-manifest.json')
     source_bindings={'coldSourceSha256': ROOT/'models/ColdStartPlant.mo',
+                     'pressureSourceSha256': ROOT/'models/FinitePhasePressurizer.mo',
                      'verificationScriptSha256': Path(__file__),
                      'sharedRunnerSha256': ROOT/'validation/native_fmi.py',
                      'hostScriptSha256': ROOT/'backend/fmi_host.py',
@@ -121,6 +123,7 @@ def verify(fmu_path, output_path):
         result=execute(fmu_path,duration,**kwargs);runtime=result['runtime']
         ids={'closed cold equilibrium':'cold-equilibrium','pump heat and lag':'pump-fine',
              'pump 5-second communication refinement':'pump-coarse','nondefault 50 C initialization':'initialization-50c',
+             'closed spray recirculation':'spray-recirculation',
              'pumps-off charging and reverse leg flow':'charging','pumps-off letdown and reverse surge':'letdown',
              'continuous cold-to-hot standby':'startup','continuous startup 2.5-second refinement':'startup-refined',
              'same-instance startup then shutdown cooling':'startup-cooldown'}
@@ -146,6 +149,31 @@ def verify(fmu_path, output_path):
         add('Closed cold equilibrium temperature drift',max(abs(p[k]-40) for p in closed['points'] for k in
             ('hotLegTemperatureC','coldLegTemperatureC','fuelTemperatureC','pressurizerTemperatureC','secondaryTemperatureC')),1e-6,'K')
         balances('Closed cold equilibrium',closed,energy_limit=1e-5,mass_limit=1e-6,quadrature_energy=1e-5,quadrature_mass=1e-6)
+        # Prepare a real thermal difference in the same native instance. Derived
+        # initial-temperature parameters are not writable FMI parameters; their
+        # requested setter values must never stand in for achieved initial states.
+        def spray_inputs(t):
+            return constant_inputs(heaterPowerMW=3 if t<5 else 0,
+                                   sprayFlowKgS=0 if t<5 else 5)(t)
+        spray=scenario('closed spray recirculation',35,step=.25,sample_interval=1,
+                       forcing=spray_inputs,event_times=(5,))
+        prepared=next(p for p in spray['points'] if p['time']==5)
+        closed_spray=[p for p in spray['points'] if p['time']>=5]
+        add('Native spray preparation creates a pressurizer-to-cold-leg temperature difference',
+            0 if prepared['pressurizerTemperatureC']-prepared['coldLegTemperatureC']>1e-3 else 1,0,
+            achievedTemperatureDifferenceK=prepared['pressurizerTemperatureC']-prepared['coldLegTemperatureC'])
+        add('Native spray command reaches the internal recirculation path',
+            max(abs(p['actualSprayFlowKgS']-5) for p in closed_spray if p['time']>5),1e-10,'kg/s')
+        add('Closed spray interval retains stored energy',
+            max(abs(p['totalPlantStoredEnergyMJ']-prepared['totalPlantStoredEnergyMJ']) for p in closed_spray),.01,'MJ')
+        add('Closed spray interval retains stored mass',
+            max(abs(p['totalPlantMassKg']-prepared['totalPlantMassKg']) for p in closed_spray),1e-4,'kg')
+        add('Spray preparation independent boundary heat equals prescribed work',
+            spray['integrals']['externalEnergyMJ']-15,1e-9,'MJ')
+        add('Spray preparation and recirculation have no external mass flow',
+            spray['integrals']['externalMassKg'],1e-9,'kg')
+        balances('Closed spray recirculation',spray,energy_limit=.01,mass_limit=1e-4,
+                 quadrature_energy=.01,quadrature_mass=1e-4)
         pump=scenario('pump heat and lag',600,step=.5,forcing=constant_inputs(pumpCommand=1),sample_interval=1)
         at7=pump['points'][7]
         add('Pump first-order lag at one time constant',at7['pumpSpeed']-(1-math.exp(-1)),2e-6)

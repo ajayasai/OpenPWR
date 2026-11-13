@@ -17,6 +17,8 @@ model ContinuousPlant "One continuous cold-to-power native engineering experimen
   parameter Real powerControllerGainPcm = 40 "Generic log-power controller gain; no measured-response fit";
   parameter Boolean directReactivityMode = false "Isolated verification mode; bypasses rod and feedback controllers";
   parameter Real initialTemperatureK = 313.15;
+  parameter Boolean useFinitePhasePressurizer = false
+    "Experimental shared pressure closure; equilibrium remains the verified numerical default" annotation(Evaluate=true);
   parameter Real initialTurbineRpm = 0;
   parameter Real initialPhaseDifferenceDeg = 0;
   parameter Real initialGeneratorVoltagePu = 0;
@@ -71,13 +73,15 @@ model ContinuousPlant "One continuous cold-to-power native engineering experimen
   input Real pressureControlEnable(min=0,max=1,start=0);
   input Real pressureTargetMPa(min=0.2,max=15.5,start=0.3);
   input Real heaterPowerMW(min=0,max=3,start=0);
+  input Real sprayFlowKgS(min=0,max=30,start=0) "Internal cold-leg recirculation to the pressurizer";
   input Real ventFraction(min=0,max=1,start=0);
   input Real shutdownCoolingFraction(min=0,max=1,start=1);
   input Real inventoryControlEnable(min=0,max=1,start=1);
   input Real chargingFlowKgS(min=0,max=10,start=0);
   input Real letdownFlowKgS(min=0,max=20,start=0);
 
-  ColdStartPlant thermal(initialTemperatureK=initialTemperatureK,maximumFuelHeatMW=3300,
+  ColdStartPlant thermal(initialTemperatureK=initialTemperatureK,useFinitePhasePressurizer=useFinitePhasePressurizer,
+    sprayFlowKgS=sprayFlowKgS,maximumFuelHeatMW=3300,
     maximumFuelTemperatureK=1400,maximumHotTemperatureK=620,maximumColdTemperatureK=610,
     steamGeneratorConductanceMWK=150);
   output Real neutronPowerFraction(start=initialNeutronFraction,fixed=true,nominal=1e-8,stateSelect=StateSelect.always);
@@ -101,6 +105,15 @@ model ContinuousPlant "One continuous cold-to-power native engineering experimen
   output Real fuelTemperatureC=thermal.fuelTemperatureC;
   output Real primaryPressureMPa=thermal.primaryPressureMPa;
   output Real pressurizerTemperatureC=thermal.pressurizerTemperatureC;
+  output Real pressurizerLiquidTemperatureC=thermal.pressurizerLiquidTemperatureC;
+  output Real pressurizerVaporTemperatureC=thermal.pressurizerVaporTemperatureC;
+  output Real pressurizerSteamPartialPressurePa=thermal.pressurizerSteamPartialPressurePa;
+  output Real pressurizerSaturationTemperatureC=thermal.pressurizerSaturationTemperatureC;
+  output Real pressurizerVentPowerW=thermal.pressurizerVentPowerW;
+  output Real pressurizerWallEnergyMJ=thermal.pressurizerWallEnergyMJ;
+  output Real pressurizerWallAmbientPowerMW=thermal.pressurizerWallAmbientPowerMW;
+  output Real pressurizerWallMinimumTemperatureK=thermal.pressurizerWallMinimumTemperatureK;
+  output Real pressurizerWallMaximumTemperatureK=thermal.pressurizerWallMaximumTemperatureK;
   output Real pressurizerLevelPercent=thermal.pressurizerLevelPercent;
   output Real primaryFlowKgS=thermal.primaryFlowKgS;
   output Real pumpSpeed=thermal.pumpSpeed;
@@ -116,6 +129,9 @@ model ContinuousPlant "One continuous cold-to-power native engineering experimen
   output Real ventSteamFlowKgS=thermal.ventSteamFlowKgS;
   output Real ventGasFlowKgS=thermal.ventGasFlowKgS;
   output Real actualHeaterPowerMW=thermal.actualHeaterPowerMW;
+  output Real actualSprayFlowKgS=thermal.actualSprayFlowKgS;
+  output Real sprayCondensationKgS=thermal.sprayCondensationKgS;
+  output Real sprayHeatTransferMW=thermal.sprayHeatTransferMW;
   output Real actualLetdownFlowKgS=thermal.actualLetdownFlowKgS;
   output Real actualChargingFlowKgS=thermal.actualChargingFlowKgS;
   output Real primarySubcoolingK=thermal.primarySubcoolingK;

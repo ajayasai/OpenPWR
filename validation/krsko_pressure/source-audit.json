@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-11-13",
+  "scope": "Pressure-physics and parameter source audit; not a validation result or proof of complete boundary data",
+  "sources": [
+    {
+      "id": "nureg-ia-0221",
+      "title": "Reactor Trip Analysis at Krsko Nuclear Power Plant",
+      "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS122191/pdf/GOVPUB-Y3_N88-PURL-LPS122191.pdf",
+      "sha256": "0d9355cb4a04d3cfac6db671e54d1000df745606ed9af7f324ac650ece6c9665",
+      "kind": "measured-plant-transient-and-code-analysis",
+      "facts": [
+        {"locator": "Printed p27; PDF page 39", "classification": "event-narrative", "fact": "Spray action reduces the primary pressure rise before trip", "numericActuatorHistoryAvailable": false},
+        {"locator": "Table 2, printed p13; PDF page 25", "classification": "measured-initial-condition", "primaryPressureMPa": 15.48, "pressurizerIndicatedLevelPercent": 52.95, "levelIsVerifiedVolumeFraction": false},
+        {"locator": "Figures 30(a), 31(a), 32(a); PDF pages 50, 51, 52", "classification": "measured-plotted-signals", "signals": ["pressurizer indicated level", "charging volume flow", "letdown volume flow"], "volumeFlowUnit": "L/s", "meterReferenceDensityVerified": false, "injectionEnthalpyVerified": false}
+      ],
+      "limitations": ["Spray flow and numerical controller history are not supplied by the inspected event evidence", "Do not use posttrip neutron power as measured decay heat", "Do not replace observed pressure with a pressure-imposed calculation", "Existing 0-15 second pretrip comparison scope is unchanged by this audit"]
+    },
+    {
+      "id": "nureg-ia-0227",
+      "title": "IJS Animation Model for Krsko NPP",
+      "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-LPS124574/pdf/GOVPUB-Y3_N88-PURL-LPS124574.pdf",
+      "sha256": "a8164c6e0e78e3431a8648b8d6b6140480e9367825271547ff82d7887c47c8fa",
+      "kind": "published-plant-model-description",
+      "facts": [
+        {"locator": "Printed p3; PDF page 17", "classification": "model-configuration", "configuration": "2000 MWt, new steam generators, core cycle 21 after September 2004 refueling"},
+        {"locator": "Figure 16, printed p24; PDF page 38", "classification": "model-control-specification", "pressureReferencePa": 15510000, "proportionalHeaterCapacityW": 230000, "backupHeaterCapacityW": 770000, "controlTopology": "PI pressure compensation feeds proportional and backup heaters, spray valve control and one PORV", "numericPiGainsAvailable": false, "numericSprayLawAvailable": false},
+        {"locator": "Printed p25; PDF page 39", "classification": "instrument-model-description", "fact": "Level indication simulates differential pressure with temperature-dependent calibration"}
+      ],
+      "limitations": ["Diagram outputs are computed states, not April 2005 measurements", "Pressure reference and installed capacities do not identify actual actuator histories"]
+    },
+    {
+      "id": "nek-current-pressurizer",
+      "title": "NEK: Tlacnik",
+      "url": "https://www.nek.si/kako-deluje-nek/primarni-krog/tlacnik",
+      "sha256": null,
+      "kind": "current-operator-web-description",
+      "facts": [{"locator": "Pressurizer description", "classification": "current-nameplate-description", "totalHeaterCapacityW": 1000000}],
+      "limitations": ["Webpage is not frozen or hashed in this audit", "Current capacity is corroboration, not a dated 2005 heater command"]
+    },
+    {
+      "id": "nureg-ia-0020",
+      "title": "Assessment Study of RELAP5/MOD2, CYCLE 36.04 Based on Spray Start-up Test for DOEL-4",
+      "url": "https://www.govinfo.gov/content/pkg/GOVPUB-Y3_N88-PURL-gpo72991/pdf/GOVPUB-Y3_N88-PURL-gpo72991.pdf",
+      "sha256": "8eb83eda142ebaa52b6b05a01d09a41e82666ac88bd8a2abf59e43ede85c4c2c",
+      "kind": "measured-component-test-and-code-analysis",
+      "genericWallReference": {
+        "plant": "Doel-4",
+        "classification": "published-code-input-not-material-measurement",
+        "applicableToKrskoWithoutAdditionalAssumptions": false,
+        "geometryLocator": "Heat-structure geometry 4102; RELAP output listing p93; PDF page 177",
+        "geometry": "cylindrical",
+        "radialMeshCoordinatesM": [1.063825, 1.102225, 1.140625, 1.179025],
+        "derivedThicknessM": 0.1152,
+        "compositionNumber": 5,
+        "axialLocator": "Structures 4102001-4102006; listing p94; PDF page 178",
+        "axialSegmentLengthsM": [0.7, 1.464, 3, 3, 3, 0.7],
+        "derivedTotalBarrelLengthM": 11.864,
+        "materialLocator": "Composition 5; listing p97; PDF page 181",
+        "thermalConductivityWPerMK": 46.05,
+        "volumetricHeatCapacityJPerM3K": 3877500,
+        "separateDensityVerified": false,
+        "separateSpecificHeatVerified": false,
+        "alloyIdentityVerified": false,
+        "unfittedTransferRule": "Any transfer, similarity scaling, head simplification and wall initial state must be explicitly declared in the model parameter ledger; this audit selects no target geometry or Krško pressure fit"
+      },
+      "facts": [
+        {"locator": "Table 4.6; PDF page 41", "classification": "plant-description-and-model-geometry", "reportedActualVolumeM3": 46.5, "sumModeledVolumesM3": 45.12397, "barrelFlowAreaM2": 3.535, "caution": "The table flow area and the heat-structure inner radius are different model representations; do not silently force agreement"},
+        {"locator": "Printed p12; PDF page 24", "classification": "reported-test-initial-condition", "primaryAverageTemperatureC": 297.3, "pressurizerPressureBar": 158, "pressurizerIndicatedLevelPercent": 26.3, "manualHeaterFraction": 0.6, "proportionalHeaterCapacityW": 308000, "derivedManualHeaterPowerW": 184800, "nominalLetdownM3PerHour": 22.7},
+        {"locator": "Printed p19; PDF page 31", "classification": "independent-test-estimate", "approximateAmbientHeatLossW": 92000, "basis": "Reported estimate from another startup test"},
+        {"locator": "Printed p13/PDF25 versus printed p23/PDF47", "classification": "boundary-discrepancy", "reportedTestValveOpeningDurationS": 30, "codeValveOpeningDurationS": 10, "reportedValveClosingDurationS": 25},
+        {"locator": "Printed p26; PDF page 48", "classification": "measured-pressure-table", "timeS": [60, 120], "measuredPressureBar": [152.49, 147.27], "measuredDepressurizationBarPerMinute": 5.22, "reportedRecorderUncertaintyPercent": 3, "uncertaintyIsVerifiedAbsolutePressureInterval": false, "nominalDesignSprayM3PerHour": 102, "actualSprayFlowObserved": false},
+        {"locator": "Printed p26; PDF page 48", "classification": "code-calculated-spray-operating-point", "calculatedSprayMassFlowKgS": 20.67, "calculatedSprayDensityKgM3": 732.32, "reportedEquivalentSprayM3PerHour": 101.5, "nominalDesignSprayM3PerHour": 102, "measuredFlow": false, "qualification": "Adopting the calculated Doel operating flow as a generic maximum is an additional assumption. Do not claim that 102 m3/h at 732.32 kg/m3 converts to 20.67 kg/s; that conversion is 20.7491 kg/s."},
+        {"locator": "Conclusions; PDF page 84", "classification": "source-limitations", "chargingLetdownRecorded": false, "sprayEfficiencyIsMeasured": false, "structuralHeatEffectIsCodeSensitivity": true}
+      ],
+      "limitations": ["Conditional component comparison only: unresolved spray and inventory boundary histories", "Numerical material entries are not Krško material certification", "Do not use the code-generated pressure or calculated spray flow as experimental observations", "Test dates differ between abstract and body; no exact test-day resolution is asserted here"]
+    },
+    {
+      "id": "mit-kim-1984",
+      "title": "An experimental and analytical model of a PWR pressurizer during transients",
+      "author": "Sang-Nyung Kim",
+      "url": "https://dspace.mit.edu/entities/publication/724f0207-2255-4f6f-9134-cc744248b62a",
+      "pdfUrl": "https://dspace.mit.edu/server/api/core/bitstreams/e7fe98c5-b23d-4291-9a51-9d80e29b8527/content",
+      "sha256": "2c4bf98527fbd50659f88c9c0452682f3cff19a9eeeb5fd35d38c5a040e5b5c3",
+      "kind": "original-component-experiments-and-model",
+      "facts": [
+        {"locator": "Printed pp52-55; PDF pages 53-56", "classification": "mechanism-evidence", "mechanisms": ["transient wall conduction and film condensation", "stratified cold insurge below hot liquid", "small interface heat transfer for partly filled insurge"]},
+        {"locator": "Figure 3.2, printed p24; PDF page 25", "classification": "experimental-geometry", "insideDiameterIn": 7.625, "outsideDiameterIn": 8.625, "heightIn": 45, "caution": "Printed p22 rounds the inside diameter to nominal 8 inches"},
+        {"locator": "Appendix A, printed p97; PDF page 98", "classification": "reported-test-initial-condition", "initialPressurePsia": 101, "initialWaterLevelIn": 13.9, "finalWaterLevelIn": 34, "inletWaterTemperatureF": 75},
+        {"locator": "Figures A.1 and A.2, printed pp98-99; PDF pages 99-100", "classification": "independently-plotted-forcing-and-output", "measuredForcing": "insurge mass flow versus time", "measuredOutput": "pressure versus time", "digitizedInThisAudit": false}
+      ],
+      "limitations": ["Negative flow indication outside insurge requires a documented interpretation before constructing forcing", "Source flags double spikes from an uncorrected data-acquisition-system error", "Initial wall distribution, environmental losses and instrument uncertainty require a complete case ledger", "No universal bulk phase-relaxation time is validated by this source", "Copyrighted thesis is referenced, not redistributed", "No MIT validation run is claimed by this audit"]
+    }
+  ],
+  "existingReplayDiagnostic": {
+    "source": "validation/baselines/krsko-v0.6.json",
+    "classification": "existing-simulation-result-not-independent-source",
+    "timeS": [5, 15],
+    "twoTemperaturePressureMPa": [15.68982, 17.140239],
+    "measuredPressureMPa": [15.696355, 15.939636],
+    "interpretation": "Early compression agreement and later overshoot motivate examination of heat removal; the trace alone cannot identify the responsible mechanism"
+  },
+  "unresolvedKrskoInputs": [
+    "Event-era pressurizer geometry and indicated-level calibration",
+    "Spray mass-flow, inlet enthalpy and valve/control histories",
+    "Heater commands and power history",
+    "Charging and letdown reference density and enthalpy",
+    "Wall construction and initial temperature distribution"
+  ],
+  "claimPolicy": {
+    "numericalChecksProvePhysicalAccuracy": false,
+    "lowerSameEventErrorProvesIndependentValidation": false,
+    "scoreSelectedParametersMustBeDisclosedAsCalibration": true,
+    "thisAuditQualifiesColdToGridStartup": false,
+    "searchWasExhaustive": false
+  }
+}

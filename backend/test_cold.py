@@ -36,6 +36,21 @@ class ColdReferenceTests(unittest.TestCase):
             with self.subTest(temperature=temperature):
                 self.assertAlmostEqual(saturation_pressure_pa(temperature)/1e6,pressure,delta=5e-8)
 
+    def test_boundary_quadrature_uses_headspace_temperature_and_external_wall_loss(self):
+        # One kg/s vent at equal gas/steam masses: gas energy must use the
+        # separate 80 C headspace, even though the liquid remains at 40 C.
+        point={'primaryPressureMPa':.901325,'pressurizerLevelPercent':50,
+               'pressurizerGasMassKg':1,'pressurizerVaporMassKg':1,
+               'pressurizerSteamEnthalpyJkg':2_500_000,'pressurizerTemperatureC':40,
+               'pressurizerVaporTemperatureC':80,'pressurizerWallAmbientPowerMW':.2,
+               'secondaryPressureMPa':.101325,'secondaryVaporMassKg':1,
+               'secondaryGasMassKg':1,'secondaryTemperatureC':40,
+               'secondarySteamEnthalpyJkg':2_500_000,'pumpSpeed':0,
+               'coldLegTemperatureC':40,'chargingEnthalpyJkg':170_000,'coldLegEnthalpyJkg':190_000}
+        energy,mass=boundary_flux(constant_inputs(ventFraction=1)(0),point)
+        self.assertAlmostEqual(mass,-1,places=12)
+        self.assertAlmostEqual(energy,-.2-(.5*2_500_000+.5*1040*353.15)/1e6,places=12)
+
     def test_exact_pump_work_agrees_with_independent_midpoint_quadrature(self):
         seconds=60;dt=.001
         reference=sum(12*(1-math.exp(-((i+.5)*dt)/7))**3*dt for i in range(round(seconds/dt)))

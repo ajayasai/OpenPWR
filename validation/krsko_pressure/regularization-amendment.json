@@ -1,0 +1,30 @@
+{
+  "schema": "openpwr-pressure-numerical-regularization-amendment-v1",
+  "declaredBeforeUpdatedOrSprayScoring": true,
+  "originalCandidateConfigurationUnchanged": true,
+  "originalProtocolUnchanged": true,
+  "reason": "An independent unmeasured coupled cold-heating check exposed stiffness at the nonsmooth zero-superheat phase-transfer threshold. The first hot measured wall cases also required recovered nonlinear iterations when the film-correlation trial radicand became negative. Numerical robustness is repaired explicitly; no measured pressure response selects a coefficient or tolerance.",
+  "phaseRegularization": {
+    "widthK": 0.0001,
+    "function": "f(x)=0 for x<=0; f(x)=x^2*(2*w-x)/w^2 for 0<x<w; f(x)=x for x>=w, with w=0.0001 K",
+    "meaning": "C1 positive-part regularization, exact zero at equilibrium and exact original linear closure outside the narrow positive band. It changes accepted constitutive behavior inside that band and is not described as merely a trial-state guard."
+  },
+  "filmTrialContinuation": {
+    "function": "Take the fourth root of max(0,NusseltArgument) during nonlinear trials; accepted wall states still require the original argument to be nonnegative.",
+    "meaning": "A numerical continuation for inadmissible solver iterates, with an explicit accepted-state domain check. It does not authorize accepted negative-radicand states or adjust an in-domain heat-transfer coefficient."
+  },
+  "internalSprayPort": "A separately declared conservative cold-leg-to-pressurizer path is added. Original four cases keep spray identically zero. The conditional-spray configuration and its source-only correction remain separate frozen records.",
+  "reproductionPolicy": "Rerun every original zero-spray case and compare both communication-step traces at all acquired times with the frozen original attempt summary. Keep the original numerical reproduction limits unchanged and expose every discrepancy.",
+  "historicalSnapshot": {
+    "path": "validation/baselines/krsko-pressure-initial-v011.zip",
+    "sha256": "fe622629b2343e351467fc31b8054b0e628cd3493a38ea4e49f886168be99b42",
+    "bytes": 9625284,
+    "reportSha256": "892ccf51a317417b40f9d279dc34d6f3b4acb8bba505aa9abde343b86ed93f87",
+    "scope": "Historical dirty development attempt, original report and all four FMUs/manifests plus every exact hash-bound source/reference file. Archive README and snapshot-audit.json disclose provenance and the failed physical-development guards. It is not a clean current release build or plant qualification.",
+    "sourceAudit": "Every archived source was checked against the original report and executable manifests; missing copies were recovered from immutable FMU source/reference archives or independently matched current bytes. All four FMU hashes and manifest objects match the original report.",
+    "supersedesEarlierRetentionPlan": "The immutable original-attempt-summary.json recorded an earlier plan not to ship the full local snapshot. That plan is explicitly superseded here because the accepted-equation regularization requires preserving the original executable/source attempt. The summary's historical bytes and hash remain unchanged."
+  },
+  "acceptanceLimitsChanged": false,
+  "physicalValidationPassed": false,
+  "independentValidationPassed": false
+}

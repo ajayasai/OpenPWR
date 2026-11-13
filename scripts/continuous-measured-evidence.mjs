@@ -8,6 +8,7 @@ import {isDeepStrictEqual} from 'node:util';
 
 export const continuousMeasuredSources = {
   sourceSha256:'models/OpenPWR/package.mo', coldSourceSha256:'models/ColdStartPlant.mo',
+  pressureSourceSha256:'models/FinitePhasePressurizer.mo',
   continuousSourceSha256:'models/ContinuousPlant.mo', benchmarkModelSha256:'models/KrskoContinuousThermal.mo',
   inputDataSha256:'validation/krsko2005/measured.csv', referenceMetadataSha256:'validation/krsko2005/provenance.json',
   sourceLedgerSha256:'validation/krsko2005/reference-plant.json', parameterSourcesSha256:'validation/continuous_measured/parameters.json',

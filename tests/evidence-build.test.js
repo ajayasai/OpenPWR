@@ -39,6 +39,7 @@ async function fixture(t) {
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
+  await cp(join(root, 'scripts/krsko-pressure-evidence.mjs'), join(dir, 'scripts/krsko-pressure-evidence.mjs'));
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const version = '0.6.0';
   await json('package.json', { name: 'openpwr-evidence-fixture', version, type: 'module' });
@@ -62,6 +63,20 @@ async function fixture(t) {
   };
   return { dir, json, source, sourceSha256, passed, build, artifact };
 }
+
+test('strict pressure publication rejects absent or incomplete evidence before replacing dist', async t => {
+  const f = await fixture(t);
+  await f.build();
+  const marker = join(f.dir, 'dist/last-pressure-review.txt');
+  await writeFile(marker, 'previous pressure review');
+  await assert.rejects(f.build('--require-krsko-pressure'), /Krško pressure development evidence required/);
+  assert.equal(await readFile(marker, 'utf8'), 'previous pressure review');
+  await f.json('artifacts/krsko-pressure-development.json', { numericalPassed: true, caseImprovementPassed: true });
+  await assert.rejects(f.build('--require-krsko-pressure'), /Krško pressure development evidence required/);
+  assert.equal(await readFile(marker, 'utf8'), 'previous pressure review');
+  await f.build();
+  await assert.rejects(readFile(join(f.dir, 'dist/krsko-pressure-development.json')), { code: 'ENOENT' });
+});
 
 test('coupled plant publication binds both FMUs and current source before replacing prior dist', async t => {
   const f = await fixture(t);
@@ -95,6 +110,7 @@ test('coupled plant publication binds both FMUs and current source before replac
 test('cold startup publication binds its own model and host, and rejects forged verification or missing traces', async t => {
   const f = await fixture(t);
   const sources = { coldSourceSha256: ['models/ColdStartPlant.mo', 'model ColdStartPlant end ColdStartPlant;\n'],
+    pressureSourceSha256: ['models/FinitePhasePressurizer.mo', 'model FinitePhasePressurizer end FinitePhasePressurizer;\n'],
     verificationScriptSha256: ['backend/verify_cold.py', '# Cold verification fixture\n'],
     hostScriptSha256: ['backend/fmi_host.py', '# FMI host fixture\n'],
     profileScriptSha256: ['backend/profiles.py', '# Cold contract fixture\n'],
@@ -116,6 +132,12 @@ test('cold startup publication binds its own model and host, and rejects forged 
     checks: [{ name: 'Synthetic cold conservation', value: .001, absoluteTolerance: .01, pass: true }],
     scenarios: [scenario('cold-equilibrium', 600, 60, 5), scenario('pump-fine', 600, 1, .5), scenario('pump-coarse', 600, 5, 5),
       scenario('initialization-50c', 10, 1, .5, time => thermalState(time, 50)),
+      {...scenario('spray-recirculation', 35, 1, .25, time => thermalState(time, 40, {
+        pressurizerTemperatureC:40+.03*Math.min(time,5)-.0001*Math.max(0,time-5),actualSprayFlowKgS:time<=5?0:5,
+        actualHeaterPowerMW:time<5?3:0,actualChargingFlowKgS:0,actualLetdownFlowKgS:0,pumpHeatMW:0,
+        shutdownCoolingMW:0,ventSteamFlowKgS:0,ventGasFlowKgS:0,secondarySteamVentKgS:0,secondaryGasVentKgS:0,
+        totalPlantStoredEnergyMJ:10000+3*Math.min(time,5),totalPlantMassKg:100000})),
+        parameters:{},boundaryQuadrature:{externalEnergyMJ:15,externalMassKg:0}},
       scenario('charging', 120, 5, 5, time => thermalState(time, 40, { surgeFlowKgS: 1 })),
       scenario('letdown', 120, 5, 5, time => thermalState(time, 40, { surgeFlowKgS: -1 })),
       scenario('startup', 18000, 60, 5, startupPoint), scenario('startup-refined', 18000, 60, 2.5, startupPoint),
@@ -140,6 +162,10 @@ test('cold startup publication binds its own model and host, and rejects forged 
     { ...report, scenarios: [{ ...report.scenarios[0], runtime: { model: 'ColdStartPlant', fmuSha256: 'wrong' } }] },
     { ...report, scenarios: [report.scenarios[0], report.scenarios[0]] },
     { ...report, scenarios: report.scenarios.filter(item => item.id !== 'startup-refined') },
+    { ...report, scenarios: report.scenarios.filter(item => item.id !== 'spray-recirculation') },
+    { ...report, scenarios: report.scenarios.map(item => item.id === 'spray-recirculation' ? {...item, trace:item.trace.map(p=>({...p,actualSprayFlowKgS:0}))} : item) },
+    { ...report, scenarios: report.scenarios.map(item => item.id === 'spray-recirculation' ? {...item, trace:item.trace.map(p=>({...p,pressurizerTemperatureC:p.coldLegTemperatureC}))} : item) },
+    { ...report, scenarios: report.scenarios.map(item => item.id === 'spray-recirculation' ? {...item, trace:item.trace.map(p=>({...p,totalPlantMassKg:p.totalPlantMassKg+p.time}))} : item) },
     { ...report, scenarios: report.scenarios.map(item => item.id === 'startup' ? { ...item, trace: item.trace.map((point, i) => i === item.trace.length - 1 ? { ...point, hotStandbyReady: 0 } : point) } : item) },
     { ...report, scenarios: report.scenarios.map(item => item.id === 'startup-refined' ? { ...item, trace: item.trace.map((point, i) => i === 1 ? { ...point, primaryPressureMPa: point.primaryPressureMPa + .01 } : point) } : item) },
     { ...report, scenarios: report.scenarios.map(item => item.id === 'pump-coarse' ? { ...item, trace: item.trace.map((point, i) => i === 1 ? { ...point, coldLegTemperatureC: point.coldLegTemperatureC + .01 } : point) } : item) },
@@ -147,6 +173,7 @@ test('cold startup publication binds its own model and host, and rejects forged 
     { ...report, scenarios: [{ trace: [{ time: 0 }, { time: 0 }] }] },
     { ...report, scenarios: [{ trace: [{ time: 0, temperatureK: 300 }, { time: 1, temperatureK: null }] }] },
     { ...report, buildManifest: { ...compiled.manifest, hostScriptSha256: '0'.repeat(64) } },
+    { ...report, buildManifest: { ...compiled.manifest, pressureSourceSha256: undefined } },
     { ...report, runtime: { ...report.runtime, model: 'OpenPWR.CoupledPlant' } },
     { ...report, gitRevision: 'other-commit' }]) {
     await f.json('artifacts/cold-verification.json', invalid);

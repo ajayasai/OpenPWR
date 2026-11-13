@@ -1,0 +1,11 @@
+{
+  "schema": "openpwr-pressure-prescoring-source-correction-v1",
+  "beforeFirstSprayScoring": true,
+  "initialConfiguration": "conditional-spray-config-initial.json",
+  "initialConfigurationSha256": "6108ca2516d529e840995d2f89c5c9d19e2f574805b4296e43312aadd0734511",
+  "activeConfiguration": "conditional-spray-config.json",
+  "reason": "Primary-source audit distinguished the Doel report's calculated operating flow from its nominal design flow. 102 m3/h times 732.32 kg/m3 is 20.7491 kg/s, not 20.67. The report separately gives calculated 20.67 kg/s, corresponding to 101.5 m3/h.",
+  "change": "Correct only the capacityBasis prose to cite the published calculated flow and identify adopting it as a generic cap as an assumption. Preserve the originally selected 20.67 kg/s numeric cap and every other numeric parameter, scenario and acceptance criterion.",
+  "numericOrAcceptanceChange": false,
+  "responseDataUsed": false
+}

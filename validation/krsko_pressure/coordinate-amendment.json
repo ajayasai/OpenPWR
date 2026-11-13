@@ -1,0 +1,17 @@
+{
+  "schema": "openpwr-pressure-coordinate-amendment-v1",
+  "declaredBeforeUpdatedOrSprayScoring": true,
+  "regularizationAmendmentSha256": "f7426e4f3d0fdd5eec848773869f1ebe409b4686b6f1f03b982f12c98489c60c",
+  "reason": "Independent unmeasured cold-heating probes exposed poor finite-difference Jacobian behavior when phase-transfer derivatives were evaluated by perturbing large absolute pressure and temperature states. Translating state coordinates about their initial values permits the default solver to resolve small departures without introducing a new constitutive law or fitting measured response data.",
+  "transformation": "For each of pressurePa, liquidVolumeM3, liquidTemperatureK, vaporTemperatureK and gasMassKg, physicalState = publishedOrDeclaredInitialValue + offsetState; offsetState starts at zero and its derivative is exactly the former physical-state derivative.",
+  "coordinates": ["pressureOffsetPa", "liquidVolumeOffsetM3", "liquidTemperatureOffsetK", "vaporTemperatureOffsetK", "gasMassOffsetKg"],
+  "offsetNominal": 1,
+  "stateSelection": "StateSelect.always",
+  "meaning": "This affine translation preserves all physical equations and initial physical states exactly. It changes numerical perturbation and error-weight coordinates, so equivalence is additionally checked against the archived original measured traces within unchanged reproduction tolerances. It does not assert bitwise equality of numerical solutions.",
+  "solverFlagsChanged": false,
+  "solverToleranceChanged": false,
+  "physicalParametersChanged": false,
+  "acceptanceLimitsChanged": false,
+  "physicalValidationPassed": false,
+  "independentValidationPassed": false
+}

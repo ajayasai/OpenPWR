@@ -208,6 +208,7 @@ def verify(fmu_path, output_path):
                                       manifest_name='continuous-manifest.json')
     bindings = {
         'coldSourceSha256': 'models/ColdStartPlant.mo',
+        'pressureSourceSha256': 'models/FinitePhasePressurizer.mo',
         'continuousSourceSha256': 'models/ContinuousPlant.mo',
         'verificationScriptSha256': 'backend/verify_continuous.py',
         'commonVerifierSha256': 'backend/verify.py',

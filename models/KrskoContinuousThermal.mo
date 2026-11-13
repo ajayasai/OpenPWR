@@ -102,7 +102,7 @@ model KrskoContinuousThermal "Measured-boundary replay of the continuous-startup
   output Real steamEnthalpyJkg = thermal.secondarySteamEnthalpyJkg;
   output Real chargingEnthalpyJkg = thermal.chargingEnthalpyJkg;
   output Real coldLegEnthalpyJkg = thermal.coldLegEnthalpyJkg;
-  output Real pressurizerVentPowerW = thermal.pressurizer.ventPowerW;
+  output Real pressurizerVentPowerW = thermal.pressurizerVentPowerW;
   output Real secondaryVentPowerW = thermal.secondary.ventPowerW;
   output Real pressurizerSteamVentKgS = thermal.ventSteamFlowKgS;
   output Real pressurizerGasVentKgS = thermal.ventGasFlowKgS;

@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { verifyContinuousEvidence } from './continuous-evidence.mjs';
 import { verifyContinuousMeasuredEvidence } from './continuous-measured-evidence.mjs';
+import { verifyKrskoPressureEvidence } from './krsko-pressure-evidence.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
@@ -71,6 +72,7 @@ try {
   const manifest = JSON.parse(await readFile(resolve(root, 'artifacts/modelica/cold-manifest.json'), 'utf8'));
   const compiledHash = createHash('sha256').update(await readFile(resolve(root, 'artifacts/modelica/ColdStartPlant.fmu'))).digest('hex');
   const sources = { sourceSha256: 'models/OpenPWR/package.mo', coldSourceSha256: 'models/ColdStartPlant.mo',
+    pressureSourceSha256: 'models/FinitePhasePressurizer.mo',
     verificationScriptSha256: 'backend/verify_cold.py', sharedRunnerSha256: 'validation/native_fmi.py',
     hostScriptSha256: 'backend/fmi_host.py', profileScriptSha256: 'backend/profiles.py' };
   for (const identity of [report, manifest, report.buildManifest]) {
@@ -103,7 +105,7 @@ try {
   if (new Set(report.scenarios.map(scenario => scenario.name)).size !== report.scenarios.length) throw new Error('Cold startup scenario names are duplicated');
   const scenarios = new Map(report.scenarios.map(scenario => [scenario.id, scenario]));
   if (scenarios.size !== report.scenarios.length) throw new Error('Cold startup scenario identities are duplicated');
-  for (const id of ['cold-equilibrium', 'pump-fine', 'pump-coarse', 'initialization-50c', 'charging', 'letdown', 'startup', 'startup-refined', 'startup-cooldown']) {
+  for (const id of ['cold-equilibrium', 'spray-recirculation', 'pump-fine', 'pump-coarse', 'initialization-50c', 'charging', 'letdown', 'startup', 'startup-refined', 'startup-cooldown']) {
     if (!scenarios.has(id)) throw new Error(`Cold startup required scenario is missing: ${id}`);
   }
   const small = (value, tolerance, label) => {
@@ -116,6 +118,22 @@ try {
     return Math.max(...errors);
   };
   const temperatures = ['hotLegTemperatureC', 'coldLegTemperatureC', 'fuelTemperatureC', 'pressurizerTemperatureC', 'secondaryTemperatureC'];
+  const spray = scenarios.get('spray-recirculation'), sprayInitial = spray.trace[0], sprayPrepared = spray.trace.find(p=>p.time===5);
+  if (spray.durationSeconds !== 35 || spray.stepSeconds !== .25 || spray.sampleIntervalSeconds !== 1
+      || Object.keys(spray.parameters??{}).length || !sprayPrepared
+      || !(sprayPrepared.pressurizerTemperatureC-sprayPrepared.coldLegTemperatureC>1e-3)) throw new Error('Cold spray recirculation preparation is incomplete');
+  for (const key of temperatures) small(sprayInitial[key]-40,1e-8,'spray cold initial state');
+  small(spray.boundaryQuadrature?.externalEnergyMJ-15, .01, 'spray independent heater preparation');
+  small(spray.boundaryQuadrature?.externalMassKg, 1e-4, 'spray independent closed mass boundary');
+  for (const point of spray.trace) {
+    if (point.time<=5) continue; // The event endpoint can retain pre-setter algebraic controls.
+    small(point.actualSprayFlowKgS - 5, 1e-10, 'spray internal command');
+    for (const key of ['actualHeaterPowerMW','actualChargingFlowKgS','actualLetdownFlowKgS','pumpHeatMW',
+      'shutdownCoolingMW','ventSteamFlowKgS','ventGasFlowKgS','secondarySteamVentKgS','secondaryGasVentKgS']) small(point[key], 1e-10, `spray closed boundary: ${key}`);
+    small(point.totalPlantStoredEnergyMJ - sprayPrepared.totalPlantStoredEnergyMJ, .01, 'spray closed energy inventory');
+    small(point.totalPlantMassKg - sprayPrepared.totalPlantMassKg, 1e-4, 'spray closed mass inventory');
+  }
+  if (!(spray.trace.at(-1).pressurizerTemperatureC<sprayPrepared.pressurizerTemperatureC)) throw new Error('Cold spray fails to cool the prepared pressurizer');
   for (const point of scenarios.get('cold-equilibrium').trace) for (const key of temperatures) small(point[key] - 40, 1e-6, 'closed equilibrium');
   for (const key of temperatures) small(scenarios.get('initialization-50c').trace[0][key] - 50, 1e-8, '50 C initial inventories');
   const pumpFine = scenarios.get('pump-fine'), pumpCoarse = scenarios.get('pump-coarse');
@@ -146,6 +164,14 @@ try {
 } catch (error) {
   if (process.argv.includes('--require-continuous-measured')) throw new Error(`Continuous thermal measured evidence required: ${error.message}`);
   console.log('Continuous thermal measured report omitted; build and run its current reference case to include it.');
+}
+let includeKrskoPressure = false;
+try {
+  await verifyKrskoPressureEvidence({root,version:pkg.version,revision});
+  includeKrskoPressure = true;
+} catch (error) {
+  if (process.argv.includes('--require-krsko-pressure')) throw new Error(`Krško pressure development evidence required: ${error.message}`);
+  console.log('Krško pressure development evidence omitted; run the current paired native comparison to include it.');
 }
 let includeContinuous = false;
 try {
@@ -300,6 +326,7 @@ if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), r
 if (includeCold) await cp(resolve(root, 'artifacts/cold-verification.json'), resolve(output, 'cold-verification.json'));
 if (includeContinuous) await cp(resolve(root, 'artifacts/continuous-verification.json'), resolve(output, 'continuous-verification.json'));
 if (includeContinuousMeasured) await cp(resolve(root, 'artifacts/continuous-measured-validation.json'), resolve(output, 'continuous-measured-validation.json'));
+if (includeKrskoPressure) await cp(resolve(root, 'artifacts/krsko-pressure-development.json'), resolve(output, 'krsko-pressure-development.json'));
 if (includeMeasured) await cp(resolve(root, 'artifacts/measured-validation.json'), resolve(output, 'measured-validation.json'));
 if (includePressurizer) await cp(resolve(root, 'artifacts/pressurizer-validation.json'), resolve(output, 'pressurizer-validation.json'));
 for (const name of ['verification.json', 'benchmarks.json']) {

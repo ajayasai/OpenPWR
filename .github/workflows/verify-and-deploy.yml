@@ -53,6 +53,8 @@ jobs:
       - run: npm run engineering:plant:verify
       - run: npm run engineering:measured -- --build
       - run: npm run engineering:continuous:measured -- --build
+      - run: npm run engineering:pressure:verify
+      - run: npm run engineering:pressure -- --build
       - name: Verify startup trajectories and pressure comparisons concurrently
         shell: bash
         run: |
@@ -77,7 +79,7 @@ jobs:
             exit 1
           fi
       - run: npm run verify
-      - run: npm run build -- --require-native --require-plant --require-cold --require-continuous --require-measured --require-pressurizer --require-continuous-measured
+      - run: npm run build -- --require-native --require-plant --require-cold --require-continuous --require-measured --require-pressurizer --require-continuous-measured --require-krsko-pressure
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
@@ -98,6 +100,8 @@ jobs:
             artifacts/continuous-verification.log
             artifacts/measured-validation.json
             artifacts/continuous-measured-validation.json
+            artifacts/krsko-pressure-development.json
+            artifacts/pressure-component-verification.json
             artifacts/pressurizer-validation.json
             artifacts/pressurizer-verification.log
           if-no-files-found: warn

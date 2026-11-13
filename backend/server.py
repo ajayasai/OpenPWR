@@ -208,6 +208,7 @@ class Handler(BaseHTTPRequestHandler):
             "cold-verification.json": "artifacts/cold-verification.json",
             "continuous-verification.json": "artifacts/continuous-verification.json",
             "continuous-measured-validation.json": "artifacts/continuous-measured-validation.json",
+            "krsko-pressure-development.json": "artifacts/krsko-pressure-development.json",
             "measured-validation.json": "artifacts/measured-validation.json",
             "pressurizer-validation.json": "artifacts/pressurizer-validation.json",
         }

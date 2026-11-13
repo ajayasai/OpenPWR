@@ -1,0 +1,2380 @@
+{
+  "schema": "openpwr-pressure-original-attempt-summary-v1",
+  "historicalReportSha256": "892ccf51a317417b40f9d279dc34d6f3b4acb8bba505aa9abde343b86ed93f87",
+  "historicalReportBytes": 6634911,
+  "historicalGitRevision": "780d7af4c8dfb7e9fb51aeaa99244f3e32ce414d",
+  "historicalGitDirty": true,
+  "originalConfigurationSha256": "8797b3b5c10f0ae16b6b1522dadf61afd8858294c3b509f32c4df44b7c57b000",
+  "originalProtocolSha256": "1e1e4c21730c12b68b69a7628130e7365c6ff17851860612ef33c3b5347ac408",
+  "sourceIdentities": {
+    "sourceSha256": "bdae561c894c3df51b21994ee0448d800c0f411416601dcdf72d7f4998c59b69",
+    "pressureSourceSha256": "08d6c7f3b33ead642f59efd053e298fd67e136fbd9e39cedc24c640d1253887a",
+    "coldSourceSha256": "9ee82b39a6b1890db7f856ea7dd4e61b1910ab121c1097d6cf58c22120419e23",
+    "continuousSourceSha256": "7e5d792f17074ce5b09a4a4c2340b78d99681ec854cd0bd9341f5a86910b9ba9",
+    "thermalBenchmarkModelSha256": "a293d29d46ffb116f4aa4fcc05a981912b0454ec22cd929aeea18601eae4b245",
+    "benchmarkModelSha256": "b8e08815dae8eed2cb361c55d9eb5ceecf047f08408f3d7a285e982524ffb060",
+    "inputDataSha256": "f2160bb33271b1b80774df8edee13d805a2b7abe24a6a7a4de356035001b0407",
+    "referenceMetadataSha256": "e23a13b539f57507445bb215fd21a59024d75be00b9a9b4f80d2a17c2ea1b4b1",
+    "sourceLedgerSha256": "ed3d41193e0835cc70c68303ca7797c4651a499a8f864972fbc4d2c33b458ba4",
+    "parameterSourcesSha256": "8797b3b5c10f0ae16b6b1522dadf61afd8858294c3b509f32c4df44b7c57b000",
+    "initialBoundariesSha256": "47955eb4e3c8c433f557acb4f5c76f2b8d1a0a9d25c8e689770ce65f7d0a88a6",
+    "sourceAuditSha256": "90ffce8595020c0cb58ddbc002fe4697049e73dc0ebc5e21cb06b745be53dcfb",
+    "protocolSha256": "1e1e4c21730c12b68b69a7628130e7365c6ff17851860612ef33c3b5347ac408",
+    "baselineSha256": "f2b32994e9205f13c3f841684ba1ad0f628d77ab60b310edf7dbebb5ca030d5a",
+    "comparisonScriptSha256": "da541084ecb1f342e0b7a3f366eafa7724359bf79c1ac1dc2207095d67c99f99",
+    "referenceScriptSha256": "b6e113acce5bd5ae82de8b074a8efc962345c8f44a8bbc7b02fc435506fcde70",
+    "thermalComparisonScriptSha256": "90a65ddf472a45f755d1385d1c4a7fd4ff31a782d068df45acc8b47af3d147e8",
+    "sharedRunnerSha256": "0d50eff593c107a4694ec5aebf3023047cabe354a5c8589964cb2df113fa9900",
+    "packagingScriptSha256": "a5a7eea406cec5af8625da8bc3acfe92359ed28ef81322ef11bf6330a0de8586"
+  },
+  "numericalChecks": [
+    {
+      "name": "equilibrium nominal completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "equilibrium nominal massIntegralErrorKg",
+      "value": 6.70238514430821e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium nominal energyIntegralErrorMJ",
+      "value": 0.0003986618230555905,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "equilibrium nominal native totalMassKg ledger",
+      "value": 1.9526917185430648e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium nominal native thermalEnergyMJ ledger",
+      "value": 1.3794162441627122e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "equilibrium nominal observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "equilibrium refined completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "equilibrium refined massIntegralErrorKg",
+      "value": 3.967748352806666e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium refined energyIntegralErrorMJ",
+      "value": 3.113652201136574e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "equilibrium refined native totalMassKg ledger",
+      "value": 4.340635769040091e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium refined native thermalEnergyMJ ledger",
+      "value": 3.110371653747279e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "equilibrium refined observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "equilibrium Primary pressure communication refinement",
+      "value": 0.00019799810211651447,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "equilibrium Mean hot-leg temperature communication refinement",
+      "value": 0.003988750135590635,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium Mean cold-leg temperature communication refinement",
+      "value": 0.010135998183613992,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "equilibrium Mean secondary pressure communication refinement",
+      "value": 0.0017837564855982535,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "candidate nominal completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "candidate nominal massIntegralErrorKg",
+      "value": 4.5742548536509275e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "candidate nominal energyIntegralErrorMJ",
+      "value": 1.015142333926633e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "candidate nominal native totalMassKg ledger",
+      "value": 4.386336149764247e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "candidate nominal native thermalEnergyMJ ledger",
+      "value": 4.3132289647473954e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "candidate nominal observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "candidate refined completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "candidate refined massIntegralErrorKg",
+      "value": 0.00010015064481194713,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "candidate refined energyIntegralErrorMJ",
+      "value": 0.000179309389750415,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "candidate refined native totalMassKg ledger",
+      "value": 0.0014400222776203009,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "candidate refined native thermalEnergyMJ ledger",
+      "value": 0.003072620400416781,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "candidate refined observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "candidate Primary pressure communication refinement",
+      "value": 0.0030865736924177156,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "candidate Mean hot-leg temperature communication refinement",
+      "value": 0.005152135385287693,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "candidate Mean cold-leg temperature communication refinement",
+      "value": 0.010713791765169844,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "candidate Mean secondary pressure communication refinement",
+      "value": 0.0018077453549514289,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "no-wall nominal completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "no-wall nominal massIntegralErrorKg",
+      "value": 0.00026703206822276115,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "no-wall nominal energyIntegralErrorMJ",
+      "value": 0.0009943104469130049,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "no-wall nominal native totalMassKg ledger",
+      "value": 4.5009402583673364e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "no-wall nominal native thermalEnergyMJ ledger",
+      "value": 4.640097449737368e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "no-wall nominal observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "no-wall refined completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "no-wall refined massIntegralErrorKg",
+      "value": 0.0001198798695440928,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "no-wall refined energyIntegralErrorMJ",
+      "value": 0.00025251871466025477,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "no-wall refined native totalMassKg ledger",
+      "value": 9.91064662230201e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "no-wall refined native thermalEnergyMJ ledger",
+      "value": 9.873424187389901e-05,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "no-wall refined observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "no-wall Primary pressure communication refinement",
+      "value": 0.003113990109696374,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "no-wall Mean hot-leg temperature communication refinement",
+      "value": 0.0051708256919482665,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "no-wall Mean cold-leg temperature communication refinement",
+      "value": 0.010720033998836698,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "no-wall Mean secondary pressure communication refinement",
+      "value": 0.001807868397703416,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "refined-wall nominal completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "refined-wall nominal massIntegralErrorKg",
+      "value": 0.00046799384290352464,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined-wall nominal energyIntegralErrorMJ",
+      "value": 0.0018606153034852468,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "refined-wall nominal native totalMassKg ledger",
+      "value": 0.001396241770418527,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined-wall nominal native thermalEnergyMJ ledger",
+      "value": 0.0029881070094504025,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "refined-wall nominal observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "refined-wall refined completed",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "refined-wall refined massIntegralErrorKg",
+      "value": 0.00020781790817636647,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined-wall refined energyIntegralErrorMJ",
+      "value": 0.0007636613036083872,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "refined-wall refined native totalMassKg ledger",
+      "value": 0.00013699123178412265,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined-wall refined native thermalEnergyMJ ledger",
+      "value": 0.0001292049728363054,
+      "absoluteTolerance": 0.1,
+      "pass": true
+    },
+    {
+      "name": "refined-wall refined observed state domain",
+      "value": 0,
+      "absoluteTolerance": 0,
+      "pass": true
+    },
+    {
+      "name": "refined-wall Primary pressure communication refinement",
+      "value": 0.003086732066801545,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "refined-wall Mean hot-leg temperature communication refinement",
+      "value": 0.005152318103000653,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined-wall Mean cold-leg temperature communication refinement",
+      "value": 0.010713544628742966,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "refined-wall Mean secondary pressure communication refinement",
+      "value": 0.0018077480359037779,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Primary pressure equilibrium baseline reproduction",
+      "value": 0.0,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Mean hot-leg temperature equilibrium baseline reproduction",
+      "value": 0.0,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean cold-leg temperature equilibrium baseline reproduction",
+      "value": 0.0,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean secondary pressure equilibrium baseline reproduction",
+      "value": 0.0,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Primary pressure nominal wall mesh refinement",
+      "value": 3.1727771482081835e-05,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Primary pressure refined wall mesh refinement",
+      "value": 3.1790127131614554e-05,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Mean hot-leg temperature nominal wall mesh refinement",
+      "value": 1.6181832734218915e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean hot-leg temperature refined wall mesh refinement",
+      "value": 1.6292828036057472e-05,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean cold-leg temperature nominal wall mesh refinement",
+      "value": 6.908700243002386e-06,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean cold-leg temperature refined wall mesh refinement",
+      "value": 6.759571078873705e-06,
+      "absoluteTolerance": 0.05,
+      "pass": true
+    },
+    {
+      "name": "Mean secondary pressure nominal wall mesh refinement",
+      "value": 7.711403888777113e-07,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    },
+    {
+      "name": "Mean secondary pressure refined wall mesh refinement",
+      "value": 6.082901293780196e-07,
+      "absoluteTolerance": 0.01,
+      "pass": true
+    }
+  ],
+  "pairedGuards": {
+    "protocolSha256": "1e1e4c21730c12b68b69a7628130e7365c6ff17851860612ef33c3b5347ac408",
+    "baselineSha256": "f2b32994e9205f13c3f841684ba1ad0f628d77ab60b310edf7dbebb5ca030d5a",
+    "caseImprovementPassed": false,
+    "physicalValidationPassed": false,
+    "independentValidationPassed": false,
+    "checks": [
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "primaryPressureMPa",
+        "metric": "rmse",
+        "kind": "pressure-improvement",
+        "candidate": 0.6793904775677538,
+        "referenceValue": 0.35737102588903974,
+        "delta": 0.3220194516787141,
+        "communicationAllowance": 0.00328457179453423,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "primaryPressureMPa",
+        "metric": "changeRmse",
+        "kind": "pressure-improvement",
+        "candidate": 0.6766905493928315,
+        "referenceValue": 0.36047494352748743,
+        "delta": 0.31621560586534403,
+        "communicationAllowance": 0.00656914358906846,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "primaryPressureMPa",
+        "metric": "maximumAbsoluteError",
+        "kind": "pressure-improvement",
+        "candidate": 1.1709988302445602,
+        "referenceValue": 0.5219016961141048,
+        "delta": 0.6490971341304554,
+        "communicationAllowance": 0.00328457179453423,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "hotLegTemperatureC",
+        "metric": "rmse",
+        "kind": "other-channel-non-degradation",
+        "candidate": 1.3992779619824711,
+        "referenceValue": 0.9136117301895612,
+        "delta": 0.4856662317929099,
+        "communicationAllowance": 0.009140885520878328,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "hotLegTemperatureC",
+        "metric": "maximumAbsoluteError",
+        "kind": "other-channel-non-degradation",
+        "candidate": 2.216742523451842,
+        "referenceValue": 1.4860761925751262,
+        "delta": 0.7306663308767156,
+        "communicationAllowance": 0.009140885520878328,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "coldLegTemperatureC",
+        "metric": "rmse",
+        "kind": "other-channel-non-degradation",
+        "candidate": 1.3904291326725553,
+        "referenceValue": 1.244698220218595,
+        "delta": 0.1457309124539603,
+        "communicationAllowance": 0.020849789948783837,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "coldLegTemperatureC",
+        "metric": "maximumAbsoluteError",
+        "kind": "other-channel-non-degradation",
+        "candidate": 2.491865330469068,
+        "referenceValue": 2.256379328228604,
+        "delta": 0.23548600224046368,
+        "communicationAllowance": 0.020849789948783837,
+        "pass": false
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "steamPressureMPa",
+        "metric": "rmse",
+        "kind": "other-channel-non-degradation",
+        "candidate": 0.17771482162182603,
+        "referenceValue": 0.1784076251895527,
+        "delta": -0.0006928035677266631,
+        "communicationAllowance": 0.0035915018405496824,
+        "pass": true
+      },
+      {
+        "reference": "immutable-v0.10-baseline",
+        "channel": "steamPressureMPa",
+        "metric": "maximumAbsoluteError",
+        "kind": "other-channel-non-degradation",
+        "candidate": 0.3609505134747941,
+        "referenceValue": 0.36275248549339256,
+        "delta": -0.0018019720185984411,
+        "communicationAllowance": 0.0035915018405496824,
+        "pass": true
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "primaryPressureMPa",
+        "metric": "rmse",
+        "kind": "pressure-improvement",
+        "candidate": 0.6793904775677538,
+        "referenceValue": 0.35737102588903974,
+        "delta": 0.3220194516787141,
+        "communicationAllowance": 0.00328457179453423,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "primaryPressureMPa",
+        "metric": "changeRmse",
+        "kind": "pressure-improvement",
+        "candidate": 0.6766905493928315,
+        "referenceValue": 0.36047494352748743,
+        "delta": 0.31621560586534403,
+        "communicationAllowance": 0.00656914358906846,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "primaryPressureMPa",
+        "metric": "maximumAbsoluteError",
+        "kind": "pressure-improvement",
+        "candidate": 1.1709988302445602,
+        "referenceValue": 0.5219016961141048,
+        "delta": 0.6490971341304554,
+        "communicationAllowance": 0.00328457179453423,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "hotLegTemperatureC",
+        "metric": "rmse",
+        "kind": "other-channel-non-degradation",
+        "candidate": 1.3992779619824711,
+        "referenceValue": 0.9136117301895612,
+        "delta": 0.4856662317929099,
+        "communicationAllowance": 0.009140885520878328,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "hotLegTemperatureC",
+        "metric": "maximumAbsoluteError",
+        "kind": "other-channel-non-degradation",
+        "candidate": 2.216742523451842,
+        "referenceValue": 1.4860761925751262,
+        "delta": 0.7306663308767156,
+        "communicationAllowance": 0.009140885520878328,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "coldLegTemperatureC",
+        "metric": "rmse",
+        "kind": "other-channel-non-degradation",
+        "candidate": 1.3904291326725553,
+        "referenceValue": 1.244698220218595,
+        "delta": 0.1457309124539603,
+        "communicationAllowance": 0.020849789948783837,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "coldLegTemperatureC",
+        "metric": "maximumAbsoluteError",
+        "kind": "other-channel-non-degradation",
+        "candidate": 2.491865330469068,
+        "referenceValue": 2.256379328228604,
+        "delta": 0.23548600224046368,
+        "communicationAllowance": 0.020849789948783837,
+        "pass": false
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "steamPressureMPa",
+        "metric": "rmse",
+        "kind": "other-channel-non-degradation",
+        "candidate": 0.17771482162182603,
+        "referenceValue": 0.1784076251895527,
+        "delta": -0.0006928035677266631,
+        "communicationAllowance": 0.0035915018405496824,
+        "pass": true
+      },
+      {
+        "reference": "same-boundary-equilibrium-ablation",
+        "channel": "steamPressureMPa",
+        "metric": "maximumAbsoluteError",
+        "kind": "other-channel-non-degradation",
+        "candidate": 0.3609505134747941,
+        "referenceValue": 0.36275248549339256,
+        "delta": -0.0018019720185984411,
+        "communicationAllowance": 0.0035915018405496824,
+        "pass": true
+      }
+    ],
+    "meaning": "Passing these criteria supports only a development-event improvement with no hidden material degradation in the other scored channels. It is not independent predictive validation or an instrument-based acceptance band."
+  },
+  "cases": [
+    {
+      "id": "equilibrium",
+      "model": "KrskoPressureEquilibrium",
+      "runtime": {
+        "model": "KrskoPressureEquilibrium",
+        "fmuSha256": "34e596dd3c077f19e461fe93a396c4f34697c672d5cfc297b7e64466221371eb",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "channels": [
+        {
+          "key": "primaryPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.35737102588903974,
+            "changeRmse": 0.36047494352748743,
+            "maximumAbsoluteError": 0.5219016961141048,
+            "meanError": -0.30007027996764757,
+            "initialBias": 0.003689999999998861,
+            "finalError": -0.3638248399671671,
+            "maximumStepRefinementDifference": 0.00019799810211651447
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 15.47631,
+              "simulated": 15.479999999999999,
+              "refined": 15.479999999999999
+            },
+            {
+              "time": 1,
+              "measured": 15.47631,
+              "simulated": 15.479165091907568,
+              "refined": 15.47916503545624
+            },
+            {
+              "time": 3,
+              "measured": 15.500911,
+              "simulated": 15.47953962427953,
+              "refined": 15.479584371105995
+            },
+            {
+              "time": 5,
+              "measured": 15.696355,
+              "simulated": 15.490294824866599,
+              "refined": 15.490450053790351
+            },
+            {
+              "time": 7,
+              "measured": 15.836446,
+              "simulated": 15.516601547826015,
+              "refined": 15.516799545928132
+            },
+            {
+              "time": 9,
+              "measured": 16.049658,
+              "simulated": 15.54342781640743,
+              "refined": 15.543612007436604
+            },
+            {
+              "time": 11,
+              "measured": 16.087244,
+              "simulated": 15.565342303885894,
+              "refined": 15.56547249340286
+            },
+            {
+              "time": 13,
+              "measured": 16.040774,
+              "simulated": 15.57658939105295,
+              "refined": 15.5766511848849
+            },
+            {
+              "time": 15,
+              "measured": 15.939636,
+              "simulated": 15.575811160032833,
+              "refined": 15.575755777706599
+            }
+          ],
+          "pressureDiagnostics": {
+            "sampleGridSeconds": [
+              1,
+              3,
+              5,
+              7,
+              9,
+              11,
+              13,
+              15
+            ],
+            "measuredPeakMPa": 16.087244,
+            "simulatedPeakMPa": 15.57658939105295,
+            "measuredPeakTimeSeconds": 11,
+            "simulatedPeakTimeSeconds": 13,
+            "peakMagnitudeErrorMPa": -0.5106546089470481,
+            "peakTimeDifferenceSeconds": 2,
+            "measuredPeakRiseMPa": 0.6109339999999985,
+            "simulatedPeakRiseMPa": 0.09658939105295161,
+            "measuredFinalRiseMPa": 0.46332600000000035,
+            "simulatedFinalRiseMPa": 0.09581116003283441
+          },
+          "name": "Primary pressure",
+          "label": "Primary pressure",
+          "unit": "MPa"
+        },
+        {
+          "key": "hotLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.9136117301895612,
+            "changeRmse": 0.9234248567393367,
+            "maximumAbsoluteError": 1.4860761925751262,
+            "meanError": 0.6855324543671912,
+            "initialBias": -0.013024500000028638,
+            "finalError": 1.2323678938058151,
+            "maximumStepRefinementDifference": 0.003988750135590635
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 321.0380245,
+              "simulated": 321.025,
+              "refined": 321.025
+            },
+            {
+              "time": 1,
+              "measured": 321.011388,
+              "simulated": 321.0250542074243,
+              "refined": 321.0250559938265
+            },
+            {
+              "time": 3,
+              "measured": 321.011388,
+              "simulated": 321.0270382385248,
+              "refined": 321.0272130910008
+            },
+            {
+              "time": 5,
+              "measured": 321.011388,
+              "simulated": 321.1104756356723,
+              "refined": 321.11180869320947
+            },
+            {
+              "time": 7,
+              "measured": 321.133154,
+              "simulated": 321.4678429981185,
+              "refined": 321.4711153124284
+            },
+            {
+              "time": 9,
+              "measured": 321.186426,
+              "simulated": 322.0404608917264,
+              "refined": 322.044449641862
+            },
+            {
+              "time": 11,
+              "measured": 321.186426,
+              "simulated": 322.63511357709024,
+              "refined": 322.63870412595224
+            },
+            {
+              "time": 13,
+              "measured": 321.596831,
+              "simulated": 323.08290719257514,
+              "refined": 323.0851541212053
+            },
+            {
+              "time": 15,
+              "measured": 322.052931,
+              "simulated": 323.2852988938058,
+              "refined": 323.2859764376078
+            }
+          ],
+          "name": "Mean hot-leg temperature",
+          "label": "Mean hot-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "coldLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.244698220218595,
+            "changeRmse": 1.2443373242330527,
+            "maximumAbsoluteError": 2.256379328228604,
+            "meanError": 0.8477017318155049,
+            "initialBias": 0.0005300000000829641,
+            "finalError": -0.3518083007815562,
+            "maximumStepRefinementDifference": 0.010135998183613992
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 286.29447,
+              "simulated": 286.2950000000001,
+              "refined": 286.2950000000001
+            },
+            {
+              "time": 1,
+              "measured": 286.29447,
+              "simulated": 286.28225164162643,
+              "refined": 286.2822481666278
+            },
+            {
+              "time": 3,
+              "measured": 286.29447,
+              "simulated": 286.35992129955264,
+              "refined": 286.36195580488527
+            },
+            {
+              "time": 5,
+              "measured": 286.310458,
+              "simulated": 287.1760676195797,
+              "refined": 287.18599083920606
+            },
+            {
+              "time": 7,
+              "measured": 286.85546,
+              "simulated": 288.8964787931402,
+              "refined": 288.9066147913238
+            },
+            {
+              "time": 9,
+              "measured": 287.952306,
+              "simulated": 290.2086853282286,
+              "refined": 290.2156117052359
+            },
+            {
+              "time": 11,
+              "measured": 289.545031,
+              "simulated": 290.96291969710217,
+              "refined": 290.96564750468747
+            },
+            {
+              "time": 13,
+              "measured": 290.587442,
+              "simulated": 291.0867347760758,
+              "refined": 291.0864080067836
+            },
+            {
+              "time": 15,
+              "measured": 291.219044,
+              "simulated": 290.86723569921844,
+              "refined": 290.8655308577345
+            }
+          ],
+          "name": "Mean cold-leg temperature",
+          "label": "Mean cold-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "steamPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.1784076251895527,
+            "changeRmse": 0.17110755531907001,
+            "maximumAbsoluteError": 0.36275248549339256,
+            "meanError": -0.10734641512264531,
+            "initialBias": -0.012627000000000166,
+            "finalError": 0.08040771246831113,
+            "maximumStepRefinementDifference": 0.0017837564855982535
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 6.422627,
+              "simulated": 6.41,
+              "refined": 6.41
+            },
+            {
+              "time": 1,
+              "measured": 6.439787,
+              "simulated": 6.405918502408938,
+              "refined": 6.405917328382683
+            },
+            {
+              "time": 3,
+              "measured": 6.568261,
+              "simulated": 6.434978005415865,
+              "refined": 6.435394818301874
+            },
+            {
+              "time": 5,
+              "measured": 6.97221,
+              "simulated": 6.609457514506607,
+              "refined": 6.611241270992205
+            },
+            {
+              "time": 7,
+              "measured": 7.063934,
+              "simulated": 6.807036841859107,
+              "refined": 6.8079126305523
+            },
+            {
+              "time": 9,
+              "measured": 7.086105,
+              "simulated": 6.916739401581947,
+              "refined": 6.91728673959368
+            },
+            {
+              "time": 11,
+              "measured": 6.978284,
+              "simulated": 6.949075719822164,
+              "refined": 6.949000889111294
+            },
+            {
+              "time": 13,
+              "measured": 6.874715,
+              "simulated": 6.920910980955897,
+              "refined": 6.920661277632867
+            },
+            {
+              "time": 15,
+              "measured": 6.795141,
+              "simulated": 6.875548712468311,
+              "refined": 6.875267112722241
+            }
+          ],
+          "name": "Mean secondary pressure",
+          "label": "Mean secondary pressure",
+          "unit": "MPa"
+        }
+      ],
+      "numericalChecks": [
+        {
+          "name": "equilibrium nominal completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "equilibrium nominal massIntegralErrorKg",
+          "value": 6.70238514430821e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "equilibrium nominal energyIntegralErrorMJ",
+          "value": 0.0003986618230555905,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "equilibrium nominal native totalMassKg ledger",
+          "value": 1.9526917185430648e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "equilibrium nominal native thermalEnergyMJ ledger",
+          "value": 1.3794162441627122e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "equilibrium nominal observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "equilibrium refined completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "equilibrium refined massIntegralErrorKg",
+          "value": 3.967748352806666e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "equilibrium refined energyIntegralErrorMJ",
+          "value": 3.113652201136574e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "equilibrium refined native totalMassKg ledger",
+          "value": 4.340635769040091e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "equilibrium refined native thermalEnergyMJ ledger",
+          "value": 3.110371653747279e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "equilibrium refined observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "equilibrium Primary pressure communication refinement",
+          "value": 0.00019799810211651447,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        },
+        {
+          "name": "equilibrium Mean hot-leg temperature communication refinement",
+          "value": 0.003988750135590635,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "equilibrium Mean cold-leg temperature communication refinement",
+          "value": 0.010135998183613992,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "equilibrium Mean secondary pressure communication refinement",
+          "value": 0.0017837564855982535,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "id": "candidate",
+      "model": "KrskoPressureCandidate",
+      "runtime": {
+        "model": "KrskoPressureCandidate",
+        "fmuSha256": "bbcecce59134e68a446668e35d5a378d997630fe7fe9e6dc89060e7c25d7758d",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "channels": [
+        {
+          "key": "primaryPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.6793904775677538,
+            "changeRmse": 0.6766905493928315,
+            "maximumAbsoluteError": 1.1709988302445602,
+            "meanError": 0.49795900706906093,
+            "initialBias": 0.003689999999998861,
+            "finalError": 1.1709988302445602,
+            "maximumStepRefinementDifference": 0.0030865736924177156
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 15.47631,
+              "simulated": 15.479999999999999,
+              "refined": 15.479999999999999
+            },
+            {
+              "time": 1,
+              "measured": 15.47631,
+              "simulated": 15.47906826254055,
+              "refined": 15.479068199872462
+            },
+            {
+              "time": 3,
+              "measured": 15.500911,
+              "simulated": 15.497037504595825,
+              "refined": 15.497456351842983
+            },
+            {
+              "time": 5,
+              "measured": 15.696355,
+              "simulated": 15.688870254437266,
+              "refined": 15.691267110475625
+            },
+            {
+              "time": 7,
+              "measured": 15.836446,
+              "simulated": 16.15549234108309,
+              "refined": 16.158578914775507
+            },
+            {
+              "time": 9,
+              "measured": 16.049658,
+              "simulated": 16.610667242889395,
+              "refined": 16.613347920770728
+            },
+            {
+              "time": 11,
+              "measured": 16.087244,
+              "simulated": 16.956438782000035,
+              "refined": 16.95807017844086
+            },
+            {
+              "time": 13,
+              "measured": 16.040774,
+              "simulated": 17.112796838761767,
+              "refined": 17.11329711943272
+            },
+            {
+              "time": 15,
+              "measured": 15.939636,
+              "simulated": 17.11063483024456,
+              "refined": 17.110296958023206
+            }
+          ],
+          "pressureDiagnostics": {
+            "sampleGridSeconds": [
+              1,
+              3,
+              5,
+              7,
+              9,
+              11,
+              13,
+              15
+            ],
+            "measuredPeakMPa": 16.087244,
+            "simulatedPeakMPa": 17.112796838761767,
+            "measuredPeakTimeSeconds": 11,
+            "simulatedPeakTimeSeconds": 13,
+            "peakMagnitudeErrorMPa": 1.0255528387617687,
+            "peakTimeDifferenceSeconds": 2,
+            "measuredPeakRiseMPa": 0.6109339999999985,
+            "simulatedPeakRiseMPa": 1.6327968387617684,
+            "measuredFinalRiseMPa": 0.46332600000000035,
+            "simulatedFinalRiseMPa": 1.6306348302445617
+          },
+          "name": "Primary pressure",
+          "label": "Primary pressure",
+          "unit": "MPa"
+        },
+        {
+          "key": "hotLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.3992779619824711,
+            "changeRmse": 1.4093117951093146,
+            "maximumAbsoluteError": 2.216742523451842,
+            "meanError": 1.0753304673541493,
+            "initialBias": -0.013024500000028638,
+            "finalError": 1.9317016775516436,
+            "maximumStepRefinementDifference": 0.005152135385287693
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 321.0380245,
+              "simulated": 321.025,
+              "refined": 321.025
+            },
+            {
+              "time": 1,
+              "measured": 321.011388,
+              "simulated": 321.0249928398648,
+              "refined": 321.024994624868
+            },
+            {
+              "time": 3,
+              "measured": 321.011388,
+              "simulated": 321.03671255890936,
+              "refined": 321.0370926865809
+            },
+            {
+              "time": 5,
+              "measured": 321.011388,
+              "simulated": 321.2182947718844,
+              "refined": 321.2208317833482
+            },
+            {
+              "time": 7,
+              "measured": 321.133154,
+              "simulated": 321.805624169995,
+              "refined": 321.81035319363866
+            },
+            {
+              "time": 9,
+              "measured": 321.186426,
+              "simulated": 322.5860735250566,
+              "refined": 322.59122566044186
+            },
+            {
+              "time": 11,
+              "measured": 321.186426,
+              "simulated": 323.32267167211955,
+              "refined": 323.3268490796248
+            },
+            {
+              "time": 13,
+              "measured": 321.596831,
+              "simulated": 323.81357352345185,
+              "refined": 323.81584409403456
+            },
+            {
+              "time": 15,
+              "measured": 322.052931,
+              "simulated": 323.98463267755164,
+              "refined": 323.9849733668931
+            }
+          ],
+          "name": "Mean hot-leg temperature",
+          "label": "Mean hot-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "coldLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.3904291326725553,
+            "changeRmse": 1.3900410115715596,
+            "maximumAbsoluteError": 2.491865330469068,
+            "meanError": 1.0183396542456364,
+            "initialBias": 0.0005300000000829641,
+            "finalError": -0.04226911682832224,
+            "maximumStepRefinementDifference": 0.010713791765169844
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 286.29447,
+              "simulated": 286.2950000000001,
+              "refined": 286.2950000000001
+            },
+            {
+              "time": 1,
+              "measured": 286.29447,
+              "simulated": 286.2822238427199,
+              "refined": 286.2822203268637
+            },
+            {
+              "time": 3,
+              "measured": 286.29447,
+              "simulated": 286.3653003609535,
+              "refined": 286.3674405452506
+            },
+            {
+              "time": 5,
+              "measured": 286.310458,
+              "simulated": 287.2300132069058,
+              "refined": 287.24050997150357
+            },
+            {
+              "time": 7,
+              "measured": 286.85546,
+              "simulated": 289.0493965813241,
+              "refined": 289.0601103730893
+            },
+            {
+              "time": 9,
+              "measured": 287.952306,
+              "simulated": 290.4441713304691,
+              "refined": 290.4515720691727
+            },
+            {
+              "time": 11,
+              "measured": 289.545031,
+              "simulated": 291.2565152457911,
+              "refined": 291.25948508902695
+            },
+            {
+              "time": 13,
+              "measured": 290.587442,
+              "simulated": 291.4010027826299,
+              "refined": 291.40072265553147
+            },
+            {
+              "time": 15,
+              "measured": 291.219044,
+              "simulated": 291.1767748831717,
+              "refined": 291.1750021252225
+            }
+          ],
+          "name": "Mean cold-leg temperature",
+          "label": "Mean cold-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "steamPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.17771482162182603,
+            "changeRmse": 0.17140173414876636,
+            "maximumAbsoluteError": 0.3609505134747941,
+            "meanError": -0.0935869360843049,
+            "initialBias": -0.012627000000000166,
+            "finalError": 0.11141917660976652,
+            "maximumStepRefinementDifference": 0.0018077453549514289
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 6.422627,
+              "simulated": 6.41,
+              "refined": 6.41
+            },
+            {
+              "time": 1,
+              "measured": 6.439787,
+              "simulated": 6.4059177388994595,
+              "refined": 6.4059165676048
+            },
+            {
+              "time": 3,
+              "measured": 6.568261,
+              "simulated": 6.435081500587193,
+              "refined": 6.435501248264044
+            },
+            {
+              "time": 5,
+              "measured": 6.97221,
+              "simulated": 6.6112594865252055,
+              "refined": 6.613067231880157
+            },
+            {
+              "time": 7,
+              "measured": 7.063934,
+              "simulated": 6.815031211957866,
+              "refined": 6.81595675213243
+            },
+            {
+              "time": 9,
+              "measured": 7.086105,
+              "simulated": 6.932989686513308,
+              "refined": 6.933589755938867
+            },
+            {
+              "time": 11,
+              "measured": 6.978284,
+              "simulated": 6.973005024400967,
+              "refined": 6.972972312848556
+            },
+            {
+              "time": 13,
+              "measured": 6.874715,
+              "simulated": 6.949896685831795,
+              "refined": 6.9496697414842314
+            },
+            {
+              "time": 15,
+              "measured": 6.795141,
+              "simulated": 6.906560176609767,
+              "refined": 6.90628420194012
+            }
+          ],
+          "name": "Mean secondary pressure",
+          "label": "Mean secondary pressure",
+          "unit": "MPa"
+        }
+      ],
+      "numericalChecks": [
+        {
+          "name": "candidate nominal completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "candidate nominal massIntegralErrorKg",
+          "value": 4.5742548536509275e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "candidate nominal energyIntegralErrorMJ",
+          "value": 1.015142333926633e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "candidate nominal native totalMassKg ledger",
+          "value": 4.386336149764247e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "candidate nominal native thermalEnergyMJ ledger",
+          "value": 4.3132289647473954e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "candidate nominal observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "candidate refined completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "candidate refined massIntegralErrorKg",
+          "value": 0.00010015064481194713,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "candidate refined energyIntegralErrorMJ",
+          "value": 0.000179309389750415,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "candidate refined native totalMassKg ledger",
+          "value": 0.0014400222776203009,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "candidate refined native thermalEnergyMJ ledger",
+          "value": 0.003072620400416781,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "candidate refined observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "candidate Primary pressure communication refinement",
+          "value": 0.0030865736924177156,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        },
+        {
+          "name": "candidate Mean hot-leg temperature communication refinement",
+          "value": 0.005152135385287693,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "candidate Mean cold-leg temperature communication refinement",
+          "value": 0.010713791765169844,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "candidate Mean secondary pressure communication refinement",
+          "value": 0.0018077453549514289,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "id": "no-wall",
+      "model": "KrskoPressureNoWall",
+      "runtime": {
+        "model": "KrskoPressureNoWall",
+        "fmuSha256": "fa605be22b7f4a08de181c8046522d113eb4eaa9d182c17f2d5562c9102a0ac4",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "channels": [
+        {
+          "key": "primaryPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.6935523741489148,
+            "changeRmse": 0.6908542069660956,
+            "maximumAbsoluteError": 1.1995059199845564,
+            "meanError": 0.5079913963204075,
+            "initialBias": 0.003689999999998861,
+            "finalError": 1.1995059199845564,
+            "maximumStepRefinementDifference": 0.003113990109696374
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 15.47631,
+              "simulated": 15.479999999999999,
+              "refined": 15.479999999999999
+            },
+            {
+              "time": 1,
+              "measured": 15.47631,
+              "simulated": 15.479068204549364,
+              "refined": 15.479068141876303
+            },
+            {
+              "time": 3,
+              "measured": 15.500911,
+              "simulated": 15.497085471246754,
+              "refined": 15.497506147998948
+            },
+            {
+              "time": 5,
+              "measured": 15.696355,
+              "simulated": 15.689811907367938,
+              "refined": 15.692220855820722
+            },
+            {
+              "time": 7,
+              "measured": 15.836446,
+              "simulated": 16.159525167521533,
+              "refined": 16.16263915763123
+            },
+            {
+              "time": 9,
+              "measured": 16.049658,
+              "simulated": 16.619805760911426,
+              "refined": 16.62252394610233
+            },
+            {
+              "time": 11,
+              "measured": 16.087244,
+              "simulated": 16.971889053663727,
+              "refined": 16.973562994900753
+            },
+            {
+              "time": 13,
+              "measured": 16.040774,
+              "simulated": 17.13493768531796,
+              "refined": 17.135480595354952
+            },
+            {
+              "time": 15,
+              "measured": 15.939636,
+              "simulated": 17.139141919984556,
+              "refined": 17.138842903868873
+            }
+          ],
+          "pressureDiagnostics": {
+            "sampleGridSeconds": [
+              1,
+              3,
+              5,
+              7,
+              9,
+              11,
+              13,
+              15
+            ],
+            "measuredPeakMPa": 16.087244,
+            "simulatedPeakMPa": 17.139141919984556,
+            "measuredPeakTimeSeconds": 11,
+            "simulatedPeakTimeSeconds": 15,
+            "peakMagnitudeErrorMPa": 1.0518979199845582,
+            "peakTimeDifferenceSeconds": 4,
+            "measuredPeakRiseMPa": 0.6109339999999985,
+            "simulatedPeakRiseMPa": 1.6591419199845578,
+            "measuredFinalRiseMPa": 0.46332600000000035,
+            "simulatedFinalRiseMPa": 1.6591419199845578
+          },
+          "name": "Primary pressure",
+          "label": "Primary pressure",
+          "unit": "MPa"
+        },
+        {
+          "key": "hotLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.4061031908782615,
+            "changeRmse": 1.4161349755748018,
+            "maximumAbsoluteError": 2.2277084333165362,
+            "meanError": 1.080365774037503,
+            "initialBias": -0.013024500000028638,
+            "finalError": 1.9457812953471034,
+            "maximumStepRefinementDifference": 0.0051708256919482665
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 321.0380245,
+              "simulated": 321.025,
+              "refined": 321.025
+            },
+            {
+              "time": 1,
+              "measured": 321.011388,
+              "simulated": 321.0249928027721,
+              "refined": 321.0249945877737
+            },
+            {
+              "time": 3,
+              "measured": 321.011388,
+              "simulated": 321.0367391949644,
+              "refined": 321.0371203314502
+            },
+            {
+              "time": 5,
+              "measured": 321.011388,
+              "simulated": 321.21880701916893,
+              "refined": 321.2213505282439
+            },
+            {
+              "time": 7,
+              "measured": 321.133154,
+              "simulated": 321.80776750745304,
+              "refined": 321.81251076979015
+            },
+            {
+              "time": 9,
+              "measured": 321.186426,
+              "simulated": 322.5908090866816,
+              "refined": 322.59597991237354
+            },
+            {
+              "time": 11,
+              "measured": 321.186426,
+              "simulated": 323.3304908525963,
+              "refined": 323.33468862684356
+            },
+            {
+              "time": 13,
+              "measured": 321.596831,
+              "simulated": 323.82453943331655,
+              "refined": 323.82682947389765
+            },
+            {
+              "time": 15,
+              "measured": 322.052931,
+              "simulated": 323.9987122953471,
+              "refined": 323.9990728233911
+            }
+          ],
+          "name": "Mean hot-leg temperature",
+          "label": "Mean hot-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "coldLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.3919856759835956,
+            "changeRmse": 1.3915971457033565,
+            "maximumAbsoluteError": 2.4939917730073375,
+            "meanError": 1.0205538807640977,
+            "initialBias": 0.0005300000000829641,
+            "finalError": -0.03619963007685101,
+            "maximumStepRefinementDifference": 0.010720033998836698
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 286.29447,
+              "simulated": 286.2950000000001,
+              "refined": 286.2950000000001
+            },
+            {
+              "time": 1,
+              "measured": 286.29447,
+              "simulated": 286.2822238233257,
+              "refined": 286.28222030746804
+            },
+            {
+              "time": 3,
+              "measured": 286.29447,
+              "simulated": 286.3653161462248,
+              "refined": 286.367456933154
+            },
+            {
+              "time": 5,
+              "measured": 286.310458,
+              "simulated": 287.23027303893036,
+              "refined": 287.2407729625512
+            },
+            {
+              "time": 7,
+              "measured": 286.85546,
+              "simulated": 289.05040641755977,
+              "refined": 289.0611264515586
+            },
+            {
+              "time": 9,
+              "measured": 287.952306,
+              "simulated": 290.44629777300736,
+              "refined": 290.4537063761262
+            },
+            {
+              "time": 11,
+              "measured": 289.545031,
+              "simulated": 291.25995624568793,
+              "refined": 291.26293430909755
+            },
+            {
+              "time": 13,
+              "measured": 290.587442,
+              "simulated": 291.4057942314537,
+              "refined": 291.40552205520146
+            },
+            {
+              "time": 15,
+              "measured": 291.219044,
+              "simulated": 291.18284436992315,
+              "refined": 291.18107910493643
+            }
+          ],
+          "name": "Mean cold-leg temperature",
+          "label": "Mean cold-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "steamPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.17774881139265233,
+            "changeRmse": 0.1714487522729966,
+            "maximumAbsoluteError": 0.3609423517035326,
+            "meanError": -0.09342703827248378,
+            "initialBias": -0.012627000000000166,
+            "finalError": 0.11191661089700222,
+            "maximumStepRefinementDifference": 0.001807868397703416
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 6.422627,
+              "simulated": 6.41,
+              "refined": 6.41
+            },
+            {
+              "time": 1,
+              "measured": 6.439787,
+              "simulated": 6.4059177386591815,
+              "refined": 6.405916567364439
+            },
+            {
+              "time": 3,
+              "measured": 6.568261,
+              "simulated": 6.435081707026592,
+              "refined": 6.435501463004154
+            },
+            {
+              "time": 5,
+              "measured": 6.97221,
+              "simulated": 6.611267648296467,
+              "refined": 6.61307551669417
+            },
+            {
+              "time": 7,
+              "measured": 7.063934,
+              "simulated": 6.815077204362479,
+              "refined": 6.816003126378174
+            },
+            {
+              "time": 9,
+              "measured": 7.086105,
+              "simulated": 6.9331147143212855,
+              "refined": 6.933715416348845
+            },
+            {
+              "time": 11,
+              "measured": 6.978284,
+              "simulated": 6.973241715918279,
+              "refined": 6.973209712438
+            },
+            {
+              "time": 13,
+              "measured": 6.874715,
+              "simulated": 6.950262354338842,
+              "refined": 6.950036194843284
+            },
+            {
+              "time": 15,
+              "measured": 6.795141,
+              "simulated": 6.907057610897002,
+              "refined": 6.906782410989497
+            }
+          ],
+          "name": "Mean secondary pressure",
+          "label": "Mean secondary pressure",
+          "unit": "MPa"
+        }
+      ],
+      "numericalChecks": [
+        {
+          "name": "no-wall nominal completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "no-wall nominal massIntegralErrorKg",
+          "value": 0.00026703206822276115,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "no-wall nominal energyIntegralErrorMJ",
+          "value": 0.0009943104469130049,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "no-wall nominal native totalMassKg ledger",
+          "value": 4.5009402583673364e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "no-wall nominal native thermalEnergyMJ ledger",
+          "value": 4.640097449737368e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "no-wall nominal observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "no-wall refined completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "no-wall refined massIntegralErrorKg",
+          "value": 0.0001198798695440928,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "no-wall refined energyIntegralErrorMJ",
+          "value": 0.00025251871466025477,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "no-wall refined native totalMassKg ledger",
+          "value": 9.91064662230201e-05,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "no-wall refined native thermalEnergyMJ ledger",
+          "value": 9.873424187389901e-05,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "no-wall refined observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "no-wall Primary pressure communication refinement",
+          "value": 0.003113990109696374,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        },
+        {
+          "name": "no-wall Mean hot-leg temperature communication refinement",
+          "value": 0.0051708256919482665,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "no-wall Mean cold-leg temperature communication refinement",
+          "value": 0.010720033998836698,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "no-wall Mean secondary pressure communication refinement",
+          "value": 0.001807868397703416,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "id": "refined-wall",
+      "model": "KrskoPressureRefinedWall",
+      "runtime": {
+        "model": "KrskoPressureRefinedWall",
+        "fmuSha256": "58cb85ef7d9d9b27925c6b753c4e72dda84f37325e325abd6969c80b3371ac25",
+        "compiler": "OpenModelica Compiler OpenModelica 1.27.1~2-g6db4671",
+        "fmiVersion": "2.0"
+      },
+      "channels": [
+        {
+          "key": "primaryPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.6794051197941369,
+            "changeRmse": 0.6767051818484024,
+            "maximumAbsoluteError": 1.1710069952119646,
+            "meanError": 0.4979715124670949,
+            "initialBias": 0.003689999999998861,
+            "finalError": 1.1710069952119646,
+            "maximumStepRefinementDifference": 0.003086732066801545
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 15.47631,
+              "simulated": 15.479999999999999,
+              "refined": 15.479999999999999
+            },
+            {
+              "time": 1,
+              "measured": 15.47631,
+              "simulated": 15.479068268286861,
+              "refined": 15.479068200429765
+            },
+            {
+              "time": 3,
+              "measured": 15.500911,
+              "simulated": 15.497037250458929,
+              "refined": 15.497456130312242
+            },
+            {
+              "time": 5,
+              "measured": 15.696355,
+              "simulated": 15.688869510120778,
+              "refined": 15.691266407294295
+            },
+            {
+              "time": 7,
+              "measured": 15.836446,
+              "simulated": 16.15550395619867,
+              "refined": 16.158590688265473
+            },
+            {
+              "time": 9,
+              "measured": 16.049658,
+              "simulated": 16.610695579322563,
+              "refined": 16.613376385741837
+            },
+            {
+              "time": 11,
+              "measured": 16.087244,
+              "simulated": 16.95646993810475,
+              "refined": 16.958101285610287
+            },
+            {
+              "time": 13,
+              "measured": 16.040774,
+              "simulated": 17.11281860203224,
+              "refined": 17.113318533544913
+            },
+            {
+              "time": 15,
+              "measured": 15.939636,
+              "simulated": 17.110642995211965,
+              "refined": 17.110304736270937
+            }
+          ],
+          "pressureDiagnostics": {
+            "sampleGridSeconds": [
+              1,
+              3,
+              5,
+              7,
+              9,
+              11,
+              13,
+              15
+            ],
+            "measuredPeakMPa": 16.087244,
+            "simulatedPeakMPa": 17.11281860203224,
+            "measuredPeakTimeSeconds": 11,
+            "simulatedPeakTimeSeconds": 13,
+            "peakMagnitudeErrorMPa": 1.0255746020322434,
+            "peakTimeDifferenceSeconds": 2,
+            "measuredPeakRiseMPa": 0.6109339999999985,
+            "simulatedPeakRiseMPa": 1.632818602032243,
+            "measuredFinalRiseMPa": 0.46332600000000035,
+            "simulatedFinalRiseMPa": 1.630642995211966
+          },
+          "name": "Primary pressure",
+          "label": "Primary pressure",
+          "unit": "MPa"
+        },
+        {
+          "key": "hotLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.399285244538729,
+            "changeRmse": 1.4093190803160307,
+            "maximumAbsoluteError": 2.216751900751831,
+            "meanError": 1.075336364493836,
+            "initialBias": -0.013024500000028638,
+            "finalError": 1.9317031364452646,
+            "maximumStepRefinementDifference": 0.005152318103000653
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 321.0380245,
+              "simulated": 321.025,
+              "refined": 321.025
+            },
+            {
+              "time": 1,
+              "measured": 321.011388,
+              "simulated": 321.02499282534586,
+              "refined": 321.02499461535353
+            },
+            {
+              "time": 3,
+              "measured": 321.011388,
+              "simulated": 321.03671243842825,
+              "refined": 321.03709258688787
+            },
+            {
+              "time": 5,
+              "measured": 321.011388,
+              "simulated": 321.21829446723893,
+              "refined": 321.2208315505345
+            },
+            {
+              "time": 7,
+              "measured": 321.133154,
+              "simulated": 321.8056307101451,
+              "refined": 321.81035996370906
+            },
+            {
+              "time": 9,
+              "measured": 321.186426,
+              "simulated": 322.58608847956725,
+              "refined": 322.59124079767025
+            },
+            {
+              "time": 11,
+              "measured": 321.186426,
+              "simulated": 323.32268695802816,
+              "refined": 323.32686437949997
+            },
+            {
+              "time": 13,
+              "measured": 321.596831,
+              "simulated": 323.81358290075184,
+              "refined": 323.8158530766092
+            },
+            {
+              "time": 15,
+              "measured": 322.052931,
+              "simulated": 323.98463413644527,
+              "refined": 323.9849742490369
+            }
+          ],
+          "name": "Mean hot-leg temperature",
+          "label": "Mean hot-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "coldLegTemperatureC",
+          "metrics": {
+            "samples": 8,
+            "rmse": 1.3904324973745406,
+            "changeRmse": 1.3900443761550731,
+            "maximumAbsoluteError": 2.4918719226521944,
+            "meanError": 1.018342428950021,
+            "initialBias": 0.0005300000000829641,
+            "finalError": -0.04226723678726785,
+            "maximumStepRefinementDifference": 0.010713544628742966
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 286.29447,
+              "simulated": 286.2950000000001,
+              "refined": 286.2950000000001
+            },
+            {
+              "time": 1,
+              "measured": 286.29447,
+              "simulated": 286.2822239591727,
+              "refined": 286.28222035021804
+            },
+            {
+              "time": 3,
+              "measured": 286.29447,
+              "simulated": 286.3653003675839,
+              "refined": 286.36744059307057
+            },
+            {
+              "time": 5,
+              "measured": 286.310458,
+              "simulated": 287.2300129541809,
+              "refined": 287.2405096306361
+            },
+            {
+              "time": 7,
+              "measured": 286.85546,
+              "simulated": 289.0493998731316,
+              "refined": 289.06011341776036
+            },
+            {
+              "time": 9,
+              "measured": 287.952306,
+              "simulated": 290.4441779226522,
+              "refined": 290.45157856385845
+            },
+            {
+              "time": 11,
+              "measured": 289.545031,
+              "simulated": 291.25652136786334,
+              "refined": 291.2594908303099
+            },
+            {
+              "time": 13,
+              "measured": 290.587442,
+              "simulated": 291.4010072238027,
+              "refined": 291.4007260160141
+            },
+            {
+              "time": 15,
+              "measured": 291.219044,
+              "simulated": 291.17677676321273,
+              "refined": 291.17500305926535
+            }
+          ],
+          "name": "Mean cold-leg temperature",
+          "label": "Mean cold-leg temperature",
+          "unit": "°C"
+        },
+        {
+          "key": "steamPressureMPa",
+          "metrics": {
+            "samples": 8,
+            "rmse": 0.17771483851120506,
+            "changeRmse": 0.17140177312822097,
+            "maximumAbsoluteError": 0.3609505226888796,
+            "meanError": -0.09358664467274636,
+            "initialBias": -0.012627000000000166,
+            "finalError": 0.1114196337374338,
+            "maximumStepRefinementDifference": 0.0018077480359037779
+          },
+          "points": [
+            {
+              "time": 0,
+              "measured": 6.422627,
+              "simulated": 6.41,
+              "refined": 6.41
+            },
+            {
+              "time": 1,
+              "measured": 6.439787,
+              "simulated": 6.405917731786839,
+              "refined": 6.405916566742266
+            },
+            {
+              "time": 3,
+              "measured": 6.568261,
+              "simulated": 6.43508149264063,
+              "refined": 6.435501237216942
+            },
+            {
+              "time": 5,
+              "measured": 6.97221,
+              "simulated": 6.61125947731112,
+              "refined": 6.613067225347024
+            },
+            {
+              "time": 7,
+              "measured": 7.063934,
+              "simulated": 6.815031296545213,
+              "refined": 6.81595684679514
+            },
+            {
+              "time": 9,
+              "measured": 7.086105,
+              "simulated": 6.932990058022586,
+              "refined": 6.933590127760209
+            },
+            {
+              "time": 11,
+              "measured": 6.978284,
+              "simulated": 6.973005795541356,
+              "refined": 6.972972903656315
+            },
+            {
+              "time": 13,
+              "measured": 6.874715,
+              "simulated": 6.949897357032851,
+              "refined": 6.949670298095664
+            },
+            {
+              "time": 15,
+              "measured": 6.795141,
+              "simulated": 6.906560633737434,
+              "refined": 6.906284567510675
+            }
+          ],
+          "name": "Mean secondary pressure",
+          "label": "Mean secondary pressure",
+          "unit": "MPa"
+        }
+      ],
+      "numericalChecks": [
+        {
+          "name": "refined-wall nominal completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "refined-wall nominal massIntegralErrorKg",
+          "value": 0.00046799384290352464,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "refined-wall nominal energyIntegralErrorMJ",
+          "value": 0.0018606153034852468,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "refined-wall nominal native totalMassKg ledger",
+          "value": 0.001396241770418527,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "refined-wall nominal native thermalEnergyMJ ledger",
+          "value": 0.0029881070094504025,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "refined-wall nominal observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "refined-wall refined completed",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "refined-wall refined massIntegralErrorKg",
+          "value": 0.00020781790817636647,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "refined-wall refined energyIntegralErrorMJ",
+          "value": 0.0007636613036083872,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "refined-wall refined native totalMassKg ledger",
+          "value": 0.00013699123178412265,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "refined-wall refined native thermalEnergyMJ ledger",
+          "value": 0.0001292049728363054,
+          "absoluteTolerance": 0.1,
+          "pass": true
+        },
+        {
+          "name": "refined-wall refined observed state domain",
+          "value": 0,
+          "absoluteTolerance": 0,
+          "pass": true
+        },
+        {
+          "name": "refined-wall Primary pressure communication refinement",
+          "value": 0.003086732066801545,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        },
+        {
+          "name": "refined-wall Mean hot-leg temperature communication refinement",
+          "value": 0.005152318103000653,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "refined-wall Mean cold-leg temperature communication refinement",
+          "value": 0.010713544628742966,
+          "absoluteTolerance": 0.05,
+          "pass": true
+        },
+        {
+          "name": "refined-wall Mean secondary pressure communication refinement",
+          "value": 0.0018077480359037779,
+          "absoluteTolerance": 0.01,
+          "pass": true
+        }
+      ]
+    }
+  ],
+  "retention": "The full local report/source/FMU snapshot is not shipped. Its historical hash is a record, not retrievable validation evidence. The public final report reruns and retains all four unchanged zero-spray configurations with current source-bound executables. This summary preserves exact initial metrics, acquired-sample comparisons, diagnostics and checks.",
+  "reproductionPolicy": "Reproduced zero-spray acquired predictions must match these original values within the frozen pressure/temperature numerical reproduction limits; all signed differences remain visible. No source-informed or response-informed parameter change may be hidden as a numerical repair."
+}

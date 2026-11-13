@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 
 export const continuousSources = {
   sourceSha256:'models/OpenPWR/package.mo', coldSourceSha256:'models/ColdStartPlant.mo',
+  pressureSourceSha256:'models/FinitePhasePressurizer.mo',
   continuousSourceSha256:'models/ContinuousPlant.mo', verificationScriptSha256:'backend/verify_continuous.py',
   sharedRunnerSha256:'validation/native_fmi.py', hostScriptSha256:'backend/fmi_host.py',
   profileScriptSha256:'backend/profiles.py', experimentScriptSha256:'backend/experiments.py',
