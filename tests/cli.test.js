@@ -207,8 +207,9 @@ test('release build rejects stale or failed evidence without replacing the last 
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
-  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   const marker = join(dir, 'dist', 'previous.txt');
   await writeFile(marker, 'previous successful build');
   const valid = { version: '0.2.0', gitRevision: null, passed: 1, checks: [{ name: 'Fixture evidence', pass: true }] };
@@ -233,11 +234,12 @@ test('native release evidence binds both reports to the exact compiled bytes bef
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   const version = '0.4.0';
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const sha = value => createHash('sha256').update(value).digest('hex');
   await json('package.json', { name: 'openpwr-native-fixture', version, type: 'module' });
-  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   // An isolated empty commit exercises the real revision guard without touching
   // the working repository or depending on the developer's identity/signing setup.
   await exec('git', ['init', '--quiet'], { cwd: dir });

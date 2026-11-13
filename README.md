@@ -4,9 +4,9 @@
 
 [Launch control room](https://ajayasai.github.io/OpenPWR/) · [Benchmark & verification evidence](https://ajayasai.github.io/OpenPWR/verification.html) · [Model equations](docs/MODEL.md) · [Validation scope](docs/VALIDATION.md)
 
-**New in v0.8:** a separate [native cold-start workbench](https://ajayasai.github.io/OpenPWR/startup.html) integrates cold water through heatup toward hot standby, with pump heat, shutdown cooling, gas/vapor pressurizer behavior, inventory controls, animated observations and replay. Startup heat is prescribed; criticality, synchronization and transfer into the hot-plant FMU are not implemented. Pressure development is compared with the immutable v0.7 release. ATWS-11 has already been observed and is explicitly a post-unblinding development case. The [evidence page](https://ajayasai.github.io/OpenPWR/plant-evidence.html) retains discrepancies and baseline traces. This is progress toward full scope, not a validated full-scope simulator.
+**New in v0.9:** [continuous native startup](https://ajayasai.github.io/OpenPWR/continuous.html) joins source-driven six-group kinetics, cold heatup, turbine acceleration, phase/frequency/voltage synchronization and load pickup in one FMU. There is no state handoff to a hot model. The interface animates actual native observations and exposes source, rods, turbine, excitation and breaker controls. [Equations and verification scope](docs/NATIVE_CONTINUOUS_STARTUP.md) distinguish published kinetics checks and numerical tests from measured plant validation. This remains progress toward full scope, not a qualified full-scope simulator.
 
-The optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs compiled models through FMI and FMPy. Its [coupled hot plant](docs/NATIVE_PLANT.md) and isolated [primary-loop workbench](docs/MODELICA_MODEL.md) are distinct experiments. The browser whole-plant model below remains available, including its generic cold-start experiment. The new native cold-to-hot-standby model is a distinct experiment with its own states and conservation checks.
+The optional [OpenModelica engineering workbench](docs/ENGINEERING.md) runs compiled models through FMI and FMPy. Its [coupled hot plant](docs/NATIVE_PLANT.md) and isolated [primary-loop workbench](docs/MODELICA_MODEL.md) are distinct experiments. The browser whole-plant model below remains available, including its generic cold-start experiment. The original native cold-to-hot-standby workbench remains available as a separate prescribed-heat experiment.
 
 The v0.8 experimental pressurizer uses a published condensate-film correlation with local drainage. Against the same measured PACTEL pressure traces, its RMSE falls from 0.18712 to 0.16875 MPa on ATWS-10 and from 0.20196 to 0.18250 MPa on ATWS-11 (about 9.8% and 9.6%). These are development comparisons with remaining discrepancies; the generic hot plant still uses its separate equilibrium pressurizer. See [pressure-model derivation and results](docs/PRESSURE_V08.md).
 
@@ -30,7 +30,7 @@ OpenPWR's browser edition models a generic pressurized-water plant at system lev
 
 This is a **reduced-order engineering model**, not a validated replica of an operating facility. The browser edition covers cold initialization through generic startup to hot power operation and selected transients. The nominal point is 3,000 MW thermal and 1,000 MW net electrical; nominal calibration is an assumption, not validation data.
 
-The browser startup sequence is an educational, reactor-assisted heatup experiment with generic controls and permissives. It is not a named plant's startup procedure. A resolved pressurizer, multi-loop hydraulics, spatial core physics, complete water/steam property regions, emergency core cooling, containment, fuel damage, severe-accident chemistry, and plant-specific instrumentation remain outside the browser model. The native coupled plant adds an equilibrium pressurizer and native secondary/electrical balances within a hot-system envelope. A separate native cold-to-hot-standby model now covers thermal heatup and cooldown. Continuous native startup through criticality and full power, multiple loops, spatial core physics, detailed turbine/feed heaters, containment and emergency cooling remain missing. Each engine stops at its declared boundaries. Read [MODEL.md](docs/MODEL.md) and [NATIVE_PLANT.md](docs/NATIVE_PLANT.md) before interpreting results.
+The browser startup sequence is an educational, reactor-assisted heatup experiment with generic controls and permissives. It is not a named plant's startup procedure. A resolved pressurizer, multi-loop hydraulics, spatial core physics, complete water/steam property regions, emergency core cooling, containment, fuel damage, severe-accident chemistry, and plant-specific instrumentation remain outside the browser model. The native coupled plant adds an equilibrium pressurizer and native secondary/electrical balances within a hot-system envelope. A separate native cold-to-hot-standby model now covers thermal heatup and cooldown. The continuous native model now adds criticality, synchronization and load pickup. Multiple loops, spatial core physics, detailed turbine/feed heaters, containment and emergency cooling remain missing. Each engine stops at its declared boundaries. Read [MODEL.md](docs/MODEL.md) and [NATIVE_PLANT.md](docs/NATIVE_PLANT.md) before interpreting results.
 
 Tests establish numerical consistency, agreement with cited published component benchmarks, and expected generic responses. The [Krško comparison](docs/MEASURED_VALIDATION.md) uses measured boundary inputs and holds out pressure and temperature channels; missing plant configuration and instrument uncertainty prevent a validation pass. These results do not qualify the program for plant operation, safety analysis, or operator licensing. [Benchmark provenance](docs/BENCHMARKS.md) and [the development roadmap](docs/ROADMAP.md) distinguish implemented models from demonstrated fidelity.
 
@@ -76,6 +76,15 @@ npm run simulate -- --help
 ```
 
 Hot-scenario events occur at simulation time 60 seconds. The cold-start director checks the engine's permissives each simulated second and applies ordinary control actions; after connection it raises net demand by 10 MWe per simulated minute. The runner writes a CSV plus JSON metadata, action timestamps, and final state. A model-domain exit returns status 2 rather than continuing extrapolation. The browser exports snapshots that preserve all internal dynamics for continuation; CSV histories are bounded to the visible session buffer.
+
+For **continuous native cold-to-power startup**, after setup/build:
+
+```sh
+npm run engineering:continuous:verify
+npm run engineering:continuous:start
+```
+
+Open `http://127.0.0.1:8004/continuous.html`. Select **Cold to 1,000 MWe**, prepare the experiment, then run it. Its generic input schedule runs for 27,000 simulated seconds; simulation speed is explicitly displayed. Manual controls, native trends, CSV and command replay use the same FMU. [Continuous startup equations and limits](docs/NATIVE_CONTINUOUS_STARTUP.md).
 
 For the **native cold-start workbench**, after setup/build:
 

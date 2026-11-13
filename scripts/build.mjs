@@ -4,6 +4,7 @@ import { resolve, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { verifyContinuousEvidence } from './continuous-evidence.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
@@ -136,6 +137,14 @@ try {
 } catch (error) {
   if (process.argv.includes('--require-cold')) throw new Error(`Cold startup evidence required: ${error.message}`);
   console.log('Cold startup report omitted; build and verify the current native cold model to include it.');
+}
+let includeContinuous = false;
+try {
+  await verifyContinuousEvidence({root,version:pkg.version,revision});
+  includeContinuous = true;
+} catch (error) {
+  if (process.argv.includes('--require-continuous')) throw new Error(`Continuous startup evidence required: ${error.message}`);
+  console.log('Continuous startup report omitted; build and verify the current continuous native model to include it.');
 }
 // Bind every comparison to the executable, its embedded report manifest and all
 // inputs to the experiment. Physical disagreement is evidence, not a build error.
@@ -274,12 +283,13 @@ try {
   await rm(output, { recursive: true });
 } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await mkdir(output, { recursive: true });
-for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
+for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
 if (includeNative) for (const [from, to] of nativeFiles) await cp(resolve(root, 'artifacts', from), resolve(output, to));
 if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), resolve(output, 'plant-verification.json'));
 if (includeCold) await cp(resolve(root, 'artifacts/cold-verification.json'), resolve(output, 'cold-verification.json'));
+if (includeContinuous) await cp(resolve(root, 'artifacts/continuous-verification.json'), resolve(output, 'continuous-verification.json'));
 if (includeMeasured) await cp(resolve(root, 'artifacts/measured-validation.json'), resolve(output, 'measured-validation.json'));
 if (includePressurizer) await cp(resolve(root, 'artifacts/pressurizer-validation.json'), resolve(output, 'pressurizer-validation.json'));
 for (const name of ['verification.json', 'benchmarks.json']) {

@@ -1,6 +1,6 @@
 {
   "name": "openpwr",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "An open, reproducible 1000 MWe PWR system-dynamics laboratory and interactive control room",
   "type": "module",
   "private": true,
@@ -33,7 +33,11 @@
     "engineering:cold:build": "node scripts/engineering.mjs build-cold",
     "engineering:cold:start": "node scripts/engineering.mjs start --model cold",
     "engineering:cold:verify": "node scripts/engineering.mjs verify-cold",
-    "engineering:cold:experiment": "node scripts/engineering.mjs experiment --model cold"
+    "engineering:cold:experiment": "node scripts/engineering.mjs experiment --model cold",
+    "engineering:continuous:build": "node scripts/engineering.mjs build-continuous",
+    "engineering:continuous:start": "node scripts/engineering.mjs start --model continuous",
+    "engineering:continuous:verify": "node scripts/engineering.mjs verify-continuous",
+    "engineering:continuous:experiment": "node scripts/engineering.mjs experiment --model continuous"
   },
   "repository": {
     "type": "git",

@@ -160,6 +160,7 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
     input Real liquidEnthalpyJkg;
     input Real heatInputW;
     input Real ventFraction;
+    input Real steamFlowKgS(start=0) "Additional steam port; zero in the cold-only profile";
     input Real imposedRates[3];
     output Real pressurePa(start=initialPressurePa,fixed=true,nominal=1e6,stateSelect=StateSelect.always);
     output Real temperatureK(start=initialTemperatureK,fixed=true,nominal=500,stateSelect=StateSelect.always);
@@ -229,7 +230,7 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
       rates = imposedRates;
     else
       rates = vesselRates(massCoefficients,energyCoefficients,pressureCoefficients,
-        liquidFlowKgS-steamVentKgS,heatInputW+liquidFlowKgS*liquidEnthalpyJkg-ventPowerW-gasEnergyRateW,gasPressureRatePaS);
+        liquidFlowKgS-steamVentKgS-steamFlowKgS,heatInputW+liquidFlowKgS*liquidEnthalpyJkg-ventPowerW-steamFlowKgS*vaporEnthalpy-gasEnergyRateW,gasPressureRatePaS);
     end if;
     der(pressurePa) = rates[1];
     der(temperatureK) = rates[2];
@@ -241,6 +242,11 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   end WaterGasVessel;
 
   parameter Real initialTemperatureK = 313.15;
+  parameter Real maximumFuelHeatMW = 90 "Default preserves the cold-only operating envelope";
+  parameter Real maximumFuelTemperatureK = 650;
+  parameter Real maximumHotTemperatureK = 600;
+  parameter Real maximumColdTemperatureK = 590;
+  parameter Real steamGeneratorConductanceMWK = 20;
   parameter Real primaryVolumeM3 = 300;
   parameter Real fuelCapacityJK = 60e6;
   parameter Real nominalFlowKgS = 15000;
@@ -249,7 +255,7 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   parameter Real shutdownCoolingSinkTemperatureK = 303.15;
 
   input Real pumpCommand(min=0,max=1,start=0);
-  input Real startupHeatMW(min=0,max=90,start=0) "Prescribed fuel heat; no criticality or neutron startup model";
+  input Real startupHeatMW(min=0,max=maximumFuelHeatMW,start=0) "Prescribed fuel heat; no criticality or neutron startup model";
   input Real heaterPowerMW(min=0,max=3,start=0);
   input Real shutdownCoolingFraction(min=0,max=1,start=1);
   input Real chargingFlowKgS(min=0,max=10,start=0);
@@ -258,6 +264,9 @@ model ColdStartPlant "Continuous cold-to-hot-standby thermal-hydraulic laborator
   input Real pressureControlEnable(min=0,max=1,start=0);
   input Real pressureTargetMPa(min=0.2,max=15.5,start=0.3);
   input Real inventoryControlEnable(min=0,max=1,start=1);
+  input Real secondaryFeedwaterFlowKgS(min=0,start=0) "Zero in cold-only profile; internal cycle port when composed";
+  input Real secondaryFeedwaterEnthalpyJkg(start=0);
+  input Real secondarySteamFlowKgS(min=0,start=0);
 
   output Real hotLegTemperatureC;
   output Real coldLegTemperatureC;
@@ -358,7 +367,7 @@ equation
   pumpHeatMW = pumpHeatAtFullSpeedMW*pumpSpeed^3;
   fuelHeatW = 10e6*(fuelTemperatureK-hotTemperatureK);
   fuelCapacityJK*der(fuelTemperatureK) = startupHeatMW*1e6-fuelHeatW;
-  heatToSteamMW = (0.05+0.95*pumpSpeed)*20*(coldTemperatureK-secondary.temperatureK);
+  heatToSteamMW = (0.05+0.95*pumpSpeed)*steamGeneratorConductanceMWK*(coldTemperatureK-secondary.temperatureK);
   shutdownCoolingMW = shutdownCoolingFraction*shutdownCoolingConductanceWK*noEvent(max(0,coldTemperatureK-shutdownCoolingSinkTemperatureK))/1e6;
   actualHeaterPowerMW = if pressureControlEnable > 0.5 then noEvent(max(0,min(3,3*(pressureTargetMPa-primaryPressureMPa)))) else heaterPowerMW;
   pressureVent = if pressureControlEnable > 0.5 then noEvent(max(0,min(1,2*(primaryPressureMPa-pressureTargetMPa)))) else 0;
@@ -390,8 +399,10 @@ equation
   pressurizer.liquidEnthalpyJkg = surgeEnthalpy;
   pressurizer.heatInputW = actualHeaterPowerMW*1e6;
   pressurizer.ventFraction = noEvent(max(ventFraction,pressureVent));
-  secondary.liquidFlowKgS = 0;
-  secondary.liquidEnthalpyJkg = 0;
+  pressurizer.steamFlowKgS = 0;
+  secondary.liquidFlowKgS = secondaryFeedwaterFlowKgS;
+  secondary.liquidEnthalpyJkg = secondaryFeedwaterEnthalpyJkg;
+  secondary.steamFlowKgS = secondarySteamFlowKgS;
   secondary.heatInputW = heatToSteamMW*1e6;
   // Generic modulating purge: 1 K opening band and 0.05 kg gas-inventory taper.
   // Continuous flow avoids an ideal instantaneous valve event in FMI co-simulation.
@@ -413,8 +424,8 @@ equation
   totalPlantStoredEnergyMJ = (fuelCapacityJK*(fuelTemperatureK-273.15)+hotMass*uH+coldMass*uC+pressurizer.energyJ+secondary.energyJ)/1e6;
   totalPlantMassKg = primaryMassKg+pressurizer.gasMassKg+secondary.waterMassKg+secondary.gasMassKg;
   plantBoundaryPowerMW = startupHeatMW+pumpHeatMW+actualHeaterPowerMW-shutdownCoolingMW
-    +(actualChargingFlowKgS*chargingEnthalpy-actualLetdownFlowKgS*hC-pressurizer.ventPowerW-secondary.ventPowerW)/1e6;
-  plantBoundaryMassFlowKgS = actualChargingFlowKgS-actualLetdownFlowKgS-pressurizer.steamVentKgS-pressurizer.gasVentKgS-secondary.steamVentKgS-secondary.gasVentKgS;
+    +(actualChargingFlowKgS*chargingEnthalpy-actualLetdownFlowKgS*hC-pressurizer.ventPowerW-secondary.ventPowerW+secondaryFeedwaterFlowKgS*secondaryFeedwaterEnthalpyJkg-secondarySteamFlowKgS*secondary.vaporEnthalpy)/1e6;
+  plantBoundaryMassFlowKgS = actualChargingFlowKgS-actualLetdownFlowKgS-pressurizer.steamVentKgS-pressurizer.gasVentKgS-secondary.steamVentKgS-secondary.gasVentKgS+secondaryFeedwaterFlowKgS-secondarySteamFlowKgS;
   der(integratedPlantBoundaryEnergyMJ) = plantBoundaryPowerMW;
   der(integratedPlantBoundaryMassKg) = plantBoundaryMassFlowKgS;
   primaryEnergyRateW = startupHeatMW*1e6-fuelHeatW+hotEnergyRate+coldEnergyRate+pressurizer.energyRateW;
@@ -424,10 +435,13 @@ equation
     and primaryPressureMPa >= 14.5 and primaryPressureMPa <= 16.5 and primarySubcoolingK > 20
     and pumpSpeed > 0.9 and pressurizerGasMassKg < 0.1 and secondaryGasMassKg < 0.1 then 1 else 0;
   valid = pressurizer.valid and secondary.valid and primaryPressureMPa >= 0.1 and primaryPressureMPa < 17.5
-    and hotTemperatureK >= 280 and hotTemperatureK < 600 and coldTemperatureK >= 280 and coldTemperatureK < 590
-    and fuelTemperatureK >= 280 and fuelTemperatureK < 650 and primarySubcoolingK > 3
+    and hotTemperatureK >= 280 and hotTemperatureK < maximumHotTemperatureK and coldTemperatureK >= 280 and coldTemperatureK < maximumColdTemperatureK
+    and fuelTemperatureK >= 280 and fuelTemperatureK < maximumFuelTemperatureK and primarySubcoolingK > 3
     and primaryFlowKgS >= -0.1 and primaryFlowKgS <= 16000
-    and pumpCommand >= 0 and pumpCommand <= 1 and startupHeatMW >= 0 and startupHeatMW <= 90
+    and pumpCommand >= 0 and pumpCommand <= 1 and startupHeatMW >= 0 and startupHeatMW <= maximumFuelHeatMW
+    // Zero-flow actuator states can carry sub-roundoff residuals after native
+    // integration. This is a declared flow roundoff allowance, not state clipping.
+    and noEvent(secondaryFeedwaterFlowKgS >= -1e-8 and secondarySteamFlowKgS >= -1e-8)
     and heaterPowerMW >= 0 and heaterPowerMW <= 3 and shutdownCoolingFraction >= 0 and shutdownCoolingFraction <= 1
     and chargingFlowKgS >= 0 and chargingFlowKgS <= 10 and letdownFlowKgS >= 0 and letdownFlowKgS <= 20
     and ventFraction >= 0 and ventFraction <= 1 and pressureTargetMPa >= 0.2 and pressureTargetMPa <= 15.5

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "scope": "Published equation-verification values, not measured reactor transients. These are applied to the production native kinetics with explicitly changed benchmark parameters and feedback disabled.",
+  "source": {
+    "title": "B. D. Ganapol, A Precision Benchmark Suite for Nuclear Reactor Point Kinetics Equations via CATS (2024)",
+    "url": "https://arxiv.org/pdf/2406.11822",
+    "tables": "Tables 2a/b, printed p.17; Thermal Reactor I parameters in Table A.II, printed p.56",
+    "provenance": "Numerical values transcribed from the 12-place BEFD/CATS columns and cross-checked against the pre-existing browser benchmark transcription. Expected values are not computed by OpenPWR."
+  },
+  "relativeTolerance": 0.001,
+  "acceptanceEstablishedBeforeNativeCandidateScoring": true,
+  "generationTimeSeconds": 0.0005,
+  "delayedFractions": [0.000285, 0.0015975, 0.00141, 0.0030525, 0.00096, 0.000195],
+  "decayConstantsPerSecond": [0.0127, 0.0317, 0.115, 0.311, 1.4, 3.87],
+  "initialNeutronFraction": 0.0001,
+  "initialPrecursorNormalization": "All six normalized precursors equal initialNeutronFraction. Compare n(t)/n(0) with the published n(0)=1 result; linear homogeneity justifies the scale change while keeping the coupled thermal model cold.",
+  "externalSource": 0,
+  "cases": [
+    {
+      "id": "cats-negative-half-dollar",
+      "reactivityPcm": -375,
+      "samples": [[0.1,0.6989252255707],[1,0.6070535656062],[5,0.4825530299222],[10,0.3960776907155],[100,0.07158285443859],[200,0.01693479165875]]
+    },
+    {
+      "id": "cats-negative-one-dollar",
+      "reactivityPcm": -750,
+      "samples": [[0.1,0.5205642866088],[1,0.4333334453006],[5,0.3106777684278],[10,0.2361106507888],[100,0.02866764245448],[200,0.005590596793349]]
+    }
+  ]
+}

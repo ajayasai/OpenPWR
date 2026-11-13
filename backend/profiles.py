@@ -81,6 +81,47 @@ COLD_REAL_OUTPUTS = (
     "coldLegEnthalpyJkg", "chargingEnthalpyJkg", "pressurizerSteamEnthalpyJkg",
     "secondarySteamEnthalpyJkg", "secondaryVaporMassKg",
 )
+CONTINUOUS_CONTROL_LIMITS = {
+    **{name: limits for name, limits in COLD_CONTROL_LIMITS.items() if name != 'startupHeatMW'},
+    'reactorDemandPercent': (0.0, 100.0), 'automaticReactorEnable': (0.0, 1.0),
+    'rodDemandPcm': (-6000.0, 8000.0), 'reactivityBiasPcm': (-300.0, 300.0),
+    'sourceEnable': (0.0, 1.0), 'tripCommand': (0.0, 1.0),
+    'turbineEnable': (0.0, 1.0), 'turbineTripCommand': (0.0, 1.0),
+    'speedDemandRpm': (0.0, 3000.0), 'loadDemandMW': (0.0, 1000.0),
+    'gridBreakerCommand': (0.0, 1.0), 'automaticSyncEnable': (0.0, 1.0),
+    'excitationCommandPu': (0.0, 1.1), 'feedwaterFraction': (0.0, 1.2),
+    'coolingFraction': (0.0, 1.2),
+}
+CONTINUOUS_DEFAULT_CONTROLS = {
+    **{name: value for name, value in COLD_DEFAULT_CONTROLS.items() if name != 'startupHeatMW'},
+    'reactorDemandPercent': 0.0, 'automaticReactorEnable': 0.0,
+    'rodDemandPcm': -2000.0, 'reactivityBiasPcm': 0.0, 'sourceEnable': 1.0,
+    'tripCommand': 0.0, 'turbineEnable': 0.0, 'turbineTripCommand': 0.0,
+    'speedDemandRpm': 0.0, 'loadDemandMW': 0.0, 'gridBreakerCommand': 0.0,
+    'automaticSyncEnable': 0.0, 'excitationCommandPu': 0.0,
+    'feedwaterFraction': 1.0, 'coolingFraction': 1.0,
+}
+
+CONTINUOUS_REAL_OUTPUTS = COLD_REAL_OUTPUTS + (
+    'neutronPowerFraction', 'precursor1', 'precursor2',
+    'precursor3', 'precursor4', 'precursor5',
+    'precursor6', 'externalSourceFractionPerSecond', 'fissionPowerMW',
+    'decayHeatMW', 'rodReactivityPcm', 'reactivityPcm',
+    'thermalFeedbackPcm', 'turbineFlowKgS', 'bypassFlowKgS',
+    'feedwaterFlowKgS', 'turbineRpm', 'rotorEnergyMJ',
+    'turbineMechanicalPowerMW', 'shaftElectricalPowerMW', 'shaftFrictionMW',
+    'grossPowerMW', 'netPowerMW', 'generatorLossMW',
+    'auxiliaryPowerMW', 'loadReferenceMW', 'frequencyDifferenceHz',
+    'phaseDifferenceDeg', 'generatorVoltagePu', 'syncPermissive',
+    'synchronizationDwellS', 'gridConnected', 'reactorTripped',
+    'turbineTripped', 'breakerClosingTimeS', 'breakerClosingPhaseDeg',
+    'breakerClosingFrequencyHz', 'breakerClosingVoltagePu', 'breakerClosingDwellS',
+    'condenserPressureKPa', 'condenserTemperatureC', 'condenserMassKg',
+    'condenserEnergyMJ', 'condenserDisplacementPowerMW', 'coolingPowerMW',
+    'feedPumpPowerMW', 'feedwaterEnthalpyJkg', 'condenserLiquidEnthalpyJkg',
+    'turbineExhaustEnthalpyJkg', 'fullPowerReady', 'stopValveFraction', 'governorValveFraction',
+)
+
 PROFILES = {
     "primary": {"model": "OpenPWR.PrimaryLoop", "file": "PrimaryLoop.fmu", "manifest": "manifest.json",
         "port": 8001, "page": "engineering.html", "limits": CONTROL_LIMITS, "defaults": DEFAULT_CONTROLS,
@@ -95,4 +136,11 @@ PROFILES = {
         "real_outputs": COLD_REAL_OUTPUTS, "boolean_outputs": ("valid",),
         "discrete_controls": ("pressureControlEnable", "inventoryControlEnable"),
         "step_size": 5.0, "supported_steps": (0.25, 0.5, 2.5, 5.0), "max_step_seconds": 120},
+    "continuous": {"model": "ContinuousPlant", "file": "ContinuousPlant.fmu", "manifest": "continuous-manifest.json",
+        "port": 8004, "page": "continuous.html", "limits": CONTINUOUS_CONTROL_LIMITS, "defaults": CONTINUOUS_DEFAULT_CONTROLS,
+        "real_outputs": CONTINUOUS_REAL_OUTPUTS, "boolean_outputs": ("valid",),
+        "discrete_controls": ("pressureControlEnable", "inventoryControlEnable", "automaticReactorEnable",
+                              "sourceEnable", "tripCommand", "turbineEnable", "turbineTripCommand",
+                              "gridBreakerCommand", "automaticSyncEnable"),
+        "step_size": 0.5, "supported_steps": (0.05, 0.1, 0.25, 0.5), "max_step_seconds": 120},
 }

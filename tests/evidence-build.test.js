@@ -37,10 +37,11 @@ async function fixture(t) {
   t.after(async () => { assert.ok(resolve(dir).startsWith(resolve(prefix))); await rm(dir, { recursive: true, force: true }); });
   for (const path of ['scripts', 'src', 'docs', 'backend', 'models/OpenPWR', 'validation/krsko2005', 'validation/pactel1998', 'validation/baselines', 'artifacts/modelica']) await mkdir(join(dir, path), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const version = '0.6.0';
   await json('package.json', { name: 'openpwr-evidence-fixture', version, type: 'module' });
-  for (const path of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, path), path);
+  for (const path of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, path), path);
   await exec('git', ['init', '--quiet'], { cwd: dir });
   await exec('git', ['-c', 'user.name=Packaging fixture', '-c', 'user.email=fixture@example.invalid',
     '-c', 'commit.gpgsign=false', '-c', `core.hooksPath=${join(dir, '.git/empty-hooks')}`, 'commit', '--quiet', '--allow-empty', '--no-verify', '-m', 'Evidence fixture'], { cwd: dir });

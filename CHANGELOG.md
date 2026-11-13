@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0
+
+- Added `ContinuousPlant`, a single native cold-to-power FMU with source-driven six-group kinetics, rod motion, finite decay heat, turbine shaft energy, generator phase/voltage dynamics and a latched synchronizing breaker.
+- Added an animated native startup workbench with manual controls, timed experiments, source-range trends, CSV export and exact-FMU command replay.
+- Added published CATS kinetics comparisons, independent kinetics and boundary-balance checks, synchronization rejection/acceptance, full-startup refinement and a same-instance trip experiment under a retained prospective protocol.
+- Bound published evidence to model, verifier, host, profile, scenario, protocol, reference and build sources. Release packaging includes twelve FMUs and seven native reports.
+- Retained the original cold and hot models and measured pressure comparisons. Numerical verification does not establish measured whole-plant startup fidelity or simulator qualification.
+
 ## 0.8.0 — 2026-11-13
 
 Adds a native cold-to-hot-standby experiment with continuous water, steam and nitrogen inventories, pump heating, pressurizer controls, charging/letdown and shutdown cooling. Animated equipment, controls, trends, CSV export and replay use the compiled model. Fuel heat is prescribed; native criticality, synchronization and transition into the separate hot-plant model remain unimplemented.

@@ -28,17 +28,32 @@ def run(model_key='primary'):
         'plant': ('OpenPWR.CoupledPlant', 'CoupledPlant', 'plant-manifest.json'),
         'kinetics': ('OpenPWR.KineticsReference', 'KineticsReference', 'kinetics-manifest.json'),
         'cold': ('ColdStartPlant', 'ColdStartPlant', 'cold-manifest.json'),
+        'continuous': ('ContinuousPlant', 'ContinuousPlant', 'continuous-manifest.json'),
     }[model_key]
     source_hash = sha(SOURCE)
-    additional_source = ROOT / 'models/ColdStartPlant.mo' if model_key == 'cold' else None
-    additional_hash = sha(additional_source) if additional_source else None
-    cold_inputs = {key: ROOT / path for key, path in {
-        'verificationScriptSha256': 'backend/verify_cold.py',
+    model_sources = {'coldSourceSha256': ROOT / 'models/ColdStartPlant.mo'} if model_key in ('cold', 'continuous') else {}
+    if model_key == 'continuous':
+        model_sources['continuousSourceSha256'] = ROOT / 'models/ContinuousPlant.mo'
+    model_hashes = {key: sha(path) for key, path in model_sources.items()}
+    bound_inputs = {key: ROOT / path for key, path in {
+        'verificationScriptSha256': f'backend/verify_{model_key}.py',
         'sharedRunnerSha256': 'validation/native_fmi.py',
         'hostScriptSha256': 'backend/fmi_host.py',
         'profileScriptSha256': 'backend/profiles.py',
-    }.items()} if additional_source else {}
-    cold_hashes = {key: sha(path) for key, path in cold_inputs.items()}
+    }.items()} if model_sources else {}
+    if model_key == 'continuous':
+        bound_inputs.update({key: ROOT / path for key, path in {
+            'protocolSha256': 'validation/continuous/protocol.json',
+            'initialProtocolSha256': 'validation/continuous/protocol-initial.json',
+            'kineticsOracleSha256': 'backend/verify_plant.py',
+            'coldVerifierSha256': 'backend/verify_cold.py',
+            'commonVerifierSha256': 'backend/verify.py',
+            'kineticsReferenceSha256': 'validation/continuous/kinetics-reference.json',
+            'experimentScriptSha256': 'backend/experiments.py',
+            'buildScriptSha256': 'scripts/modelica/build.py',
+            'packagingScriptSha256': 'scripts/modelica/package_fmu.py',
+        }.items()})
+    input_hashes = {key: sha(path) for key, path in bound_inputs.items()}
     os.environ['PATH'] = str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', '')
     compiler = subprocess.check_output([OMC, '--version'], text=True).strip()
     # Build in a fresh directory so a failed compilation cannot pass on an old FMU.
@@ -48,7 +63,7 @@ def run(model_key='primary'):
             'installPackage(Modelica, "4.0.0", exactMatch=true);', 'getErrorString();',
             'loadModel(Modelica, {"4.0.0"}, requireExactVersion=true);', 'getErrorString();',
             f'loadFile({json.dumps(SOURCE.as_posix())});', 'getErrorString();',
-            *([f'loadFile({json.dumps(additional_source.as_posix())});', 'getErrorString();'] if additional_source else []),
+            *(line for path in model_sources.values() for line in (f'loadFile({json.dumps(path.as_posix())});', 'getErrorString();')),
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
             f'buildModelFMU({model_name}, version="2.0", fmuType="me_cs", fileNamePrefix="{file_prefix}");',
             'getErrorString();',
@@ -62,10 +77,10 @@ def run(model_key='primary'):
         built = Path(work) / (file_prefix + '.fmu')
         if sha(SOURCE) != source_hash:
             raise RuntimeError('Modelica source changed during compilation. Rebuild from a stable source tree.')
-        if additional_source and sha(additional_source) != additional_hash:
-            raise RuntimeError('Cold-start source changed during compilation. Rebuild from a stable source tree.')
-        if any(sha(cold_inputs[key]) != value for key, value in cold_hashes.items()):
-            raise RuntimeError('Cold-start verification or host source changed during compilation. Rebuild.')
+        if any(sha(model_sources[key]) != value for key, value in model_hashes.items()):
+            raise RuntimeError('Native model source changed during compilation. Rebuild from a stable source tree.')
+        if any(sha(bound_inputs[key]) != value for key, value in input_hashes.items()):
+            raise RuntimeError('Native verification, protocol or host source changed during compilation. Rebuild.')
         if result.returncode or not built.is_file():
             print(log)
             raise RuntimeError(f'FMU compilation failed; see artifacts/modelica/{log_name}')
@@ -77,6 +92,10 @@ def run(model_key='primary'):
         target = OUTPUT / (file_prefix + '.fmu')
         target.write_bytes(built.read_bytes())
         export_metadata = prepare_fmu(target)
+        if model_sources:
+            with zipfile.ZipFile(target, 'a', compression=zipfile.ZIP_DEFLATED) as archive:
+                for path in model_sources.values():
+                    archive.write(path, 'sources/' + path.name)
         try:
             revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
             dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip())
@@ -87,14 +106,13 @@ def run(model_key='primary'):
                     'hostPlatform': platform.platform(), 'sourceSha256': source_hash,
                     'fmuSha256': sha(target), 'gitRevision': revision, 'dirty': dirty,
                     'version': json.loads((ROOT / 'package.json').read_text())['version']}
-        if additional_source:
-            manifest['coldSourceSha256'] = additional_hash
-            manifest.update(cold_hashes)
+        manifest.update(model_hashes)
+        manifest.update(input_hashes)
         (OUTPUT / manifest_name).write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         print(json.dumps(manifest, indent=2))
         print('FMU built. Next: npm run engineering:verify, then npm run engineering:start')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics', 'cold'), default='primary')
+    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics', 'cold', 'continuous'), default='primary')
     run(parser.parse_args().model)

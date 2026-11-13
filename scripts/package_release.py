@@ -2,7 +2,7 @@
 
 Run after downloading the successful CI artifact for this exact commit. This
 command reruns the strict publication gate, verifies source bytes against Git,
-then packages source, 11 FMUs, their manifests and six evidence reports.
+then packages source, 12 FMUs, their manifests and seven evidence reports.
 """
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMPILED = (
     ('PrimaryLoop', 'manifest.json'), ('PropertyReferenceChecks', 'property-manifest.json'),
     ('CoupledPlant', 'plant-manifest.json'), ('ColdStartPlant', 'cold-manifest.json'),
+    ('ContinuousPlant', 'continuous-manifest.json'),
     ('KineticsReference', 'kinetics-manifest.json'), ('KrskoTransient', 'krsko-manifest.json'),
     ('KrskoEquilibrium', 'krsko-equilibrium-manifest.json'), ('PactelPressurizer', 'pactel-manifest.json'),
     ('PactelCoarse', 'pactel-coarse-manifest.json'), ('PactelRadialRefined', 'pactel-radial-manifest.json'),
@@ -30,11 +31,20 @@ REPORTS = (
     ('artifacts/modelica/property-verification.json', 'PropertyReferenceChecks', 'modelica-property-verification.json'),
     ('artifacts/plant-verification.json', 'CoupledPlant', 'plant-verification.json'),
     ('artifacts/cold-verification.json', 'ColdStartPlant', 'cold-verification.json'),
+    ('artifacts/continuous-verification.json', 'ContinuousPlant', 'continuous-verification.json'),
     ('artifacts/measured-validation.json', 'KrskoTransient', 'measured-validation.json'),
     ('artifacts/pressurizer-validation.json', 'PactelPressurizer', 'pressurizer-validation.json'))
 COLD_SOURCES = {'coldSourceSha256': 'models/ColdStartPlant.mo', 'verificationScriptSha256': 'backend/verify_cold.py',
     'sharedRunnerSha256': 'validation/native_fmi.py', 'hostScriptSha256': 'backend/fmi_host.py',
     'profileScriptSha256': 'backend/profiles.py'}
+CONTINUOUS_SOURCES = {**COLD_SOURCES,
+    'continuousSourceSha256': 'models/ContinuousPlant.mo', 'verificationScriptSha256': 'backend/verify_continuous.py',
+    'experimentScriptSha256': 'backend/experiments.py', 'protocolSha256': 'validation/continuous/protocol.json',
+    'initialProtocolSha256': 'validation/continuous/protocol-initial.json',
+    'kineticsOracleSha256': 'backend/verify_plant.py', 'coldVerifierSha256': 'backend/verify_cold.py',
+    'commonVerifierSha256': 'backend/verify.py',
+    'kineticsReferenceSha256': 'validation/continuous/kinetics-reference.json',
+    'buildScriptSha256': 'scripts/modelica/build.py', 'packagingScriptSha256': 'scripts/modelica/package_fmu.py'}
 PACTEL_SOURCES = {key: 'validation/pactel1998/' + name for key, name in (
     ('holdoutDataSha256', 'holdout-measured.csv'), ('holdoutMetadataSha256', 'holdout-provenance.json'),
     ('holdoutComparatorSha256', 'holdout_compare.py'), ('holdoutExtractorSha256', 'holdout_extract.py'),
@@ -87,14 +97,14 @@ def comparison_sources(case, model):
 
 def verify(version, revision):
     subprocess.run(['node', 'scripts/build.mjs', '--require-native', '--require-plant', '--require-cold',
-        '--require-measured', '--require-pressurizer'], cwd=ROOT, check=True)
+        '--require-measured', '--require-pressurizer', '--require-continuous'], cwd=ROOT, check=True)
     manifests = {}
     for model, manifest_name in COMPILED:
         manifest = read(ROOT / 'artifacts/modelica' / manifest_name)
         check_identity(manifest, version, revision, manifest_name)
         fmu = ROOT / 'artifacts/modelica' / f'{model}.fmu'
         require(manifest.get('fmuSha256') == sha(fmu), f'{model}: binary differs from its manifest')
-        require(manifest.get('model') == ('ColdStartPlant' if model == 'ColdStartPlant' else f'OpenPWR.{model}'),
+        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant') else f'OpenPWR.{model}'),
             f'{model}: wrong native model')
         with zipfile.ZipFile(fmu) as archive:
             require(any(name.startswith(('binaries/linux64/', 'binaries/x86_64-linux/')) and name.endswith('.so')
@@ -108,6 +118,7 @@ def verify(version, revision):
         bound_sources(manifest, {'sourceSha256': 'models/OpenPWR/package.mo'}, model)
         manifests[model] = manifest
     bound_sources(manifests['ColdStartPlant'], COLD_SOURCES, 'ColdStartPlant')
+    bound_sources(manifests['ContinuousPlant'], CONTINUOUS_SOURCES, 'ContinuousPlant')
     for model in ('KrskoTransient', 'KrskoEquilibrium'):
         sources = comparison_sources('krsko2005', 'KrskoTransient')
         sources.update(parameterSourcesSha256='validation/krsko2005/reference-plant.json', baselineSha256='validation/baselines/krsko-v0.5.json')
@@ -144,17 +155,21 @@ def archive_bytes(archive, name, data, timestamp):
 def native_readme(version, revision):
     return f'''# OpenPWR {version} native Linux release
 
-Complete source at {revision}, eleven Linux x86-64 FMUs, source/binary manifests,
-six evidence reports, measured comparison data and upstream notices.
+Complete source at {revision}, twelve Linux x86-64 FMUs, source/binary manifests,
+seven evidence reports, measured comparison data and upstream notices.
 
-The native cold model covers generic cold-to-hot-standby heatup and shutdown
-cooling. It is a separate continuous thermodynamic experiment with prescribed
-fuel heat. It does not simulate reactor criticality, synchronize a generator or
-transfer its state into the hot coupled-plant FMU. The hot plant retains its
-separate equilibrium pressurizer. The experimental two-temperature pressurizer
-is used by the measured reference cases. None is a qualified full-scope plant
-simulator. Measured discrepancies and the exact v0.7 baseline remain visible.
-ATWS-11 is now a post-unblinding development comparison, not a renewed holdout.
+The continuous native model starts cold, evolves source-driven six-group
+kinetics and finite decay heat, synchronizes a dynamic turbine-generator, and
+picks up load without swapping FMUs or resetting state. Verification covers
+published point-kinetics values, conservation, synchronization rejection and
+acceptance, trip response, and timestep refinement. These are mathematical
+and numerical checks, not measured whole-plant startup validation.
+
+The original cold heatup and hot coupled-plant models remain separate experiments.
+The experimental two-temperature pressurizer is used by measured reference cases.
+None is a qualified full-scope plant simulator. Measured discrepancies and the
+exact v0.7 baseline remain visible. ATWS-11 is a post-unblinding development
+comparison, not a renewed holdout.
 
 Install the open-source toolchain in docs/ENGINEERING.md. Run:
 
@@ -163,11 +178,12 @@ Install the open-source toolchain in docs/ENGINEERING.md. Run:
     npm run engineering:verify
     npm run engineering:plant:verify
     npm run engineering:cold:verify
+    npm run engineering:continuous:verify
     npm run engineering:measured
     npm run engineering:pressurizer
-    npm run engineering:cold:start
+    npm run engineering:continuous:start
 
-Open http://127.0.0.1:8003/startup.html for the native cold model. For the hot
+Open http://127.0.0.1:8004/continuous.html for continuous native startup. For the hot
 plant use npm run engineering:plant:start and http://127.0.0.1:8002/plant.html.
 For the primary workbench use npm run engineering:start and port 8001.
 On Windows use Ubuntu WSL and npm run engineering:setup -- --wsl. The prebuilt

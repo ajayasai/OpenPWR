@@ -14,7 +14,7 @@
   <a class="skip-link" href="#main">Skip to engineering workbench</a>
   <header class="masthead">
     <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">◈</span><span>Open<span class="brand-light">PWR</span><small>OPEN ENGINEERING / OPEN ENERGY</small></span></a>
-    <nav aria-label="Main navigation"><a href="./">Control room</a><a href="./startup.html">Cold startup</a><a href="./engineering.html">Primary workbench</a><span aria-current="page">Native plant</span><a href="./plant-evidence.html">Plant evidence ↗</a></nav>
+    <nav aria-label="Main navigation"><a href="./">Control room</a><a href="./continuous.html">Full startup</a><a href="./engineering.html">Primary workbench</a><span aria-current="page">Native plant</span><a href="./plant-evidence.html">Plant evidence ↗</a></nav>
   </header>
   <main id="main" class="workspace">
     <section class="page-heading">
@@ -31,7 +31,7 @@ npm run engineering:plant:start</code></pre><p>Then open <a href="http://127.0.0
     <div id="engineering-notice" class="notice" role="status" hidden></div>
     <div id="engineering-halt" class="halt-notice" role="alert" hidden></div>
 
-    <p class="plant-scope-banner">HOT OPERATING ENVELOPE · Reduced-order coupled model. Spatial core physics, containment and emergency cooling remain outside this version. Cold-to-hot-standby operation is available in the separate native cold-start profile. <a href="./docs/NATIVE_PLANT.md">Model scope ↗</a></p>
+    <p class="plant-scope-banner">HOT OPERATING ENVELOPE · Reduced-order coupled model. Spatial core physics, containment and emergency cooling remain outside this version. Continuous cold startup, criticality and grid synchronization are available in the <a href="./continuous.html">native full-startup model</a>. <a href="./docs/NATIVE_PLANT.md">Model scope ↗</a></p>
     <section class="metrics" aria-label="Native power and steam measurements">
     <article class="metric"><span class="metric-label">NET GENERATION</span><strong><span id="plant-net">—</span><small>MWe</small></strong><span class="metric-note" id="plant-rpm-note">Turbine — rpm</span></article>
     <article class="metric"><span class="metric-label">REACTOR THERMAL POWER</span><strong><span id="plant-thermal">—</span><small>MWth</small></strong><span class="metric-note" id="plant-decay-note">Decay heat — MW</span></article>
@@ -139,7 +139,7 @@ npm run engineering:plant:start</code></pre><p>Then open <a href="http://127.0.0
         <section class="panel session-panel"><div class="panel-heading"><h2>Engineering session</h2></div><p>Reset the native model to its documented hot initial condition. The browser control-room experiment remains separate.</p><button id="engineering-reset" class="button" disabled>Reset hot initial condition ↶</button><details><summary>Model provenance</summary><dl class="provenance"><dt>Model</dt><dd id="provenance-model">—</dd><dt>Compiler</dt><dd id="provenance-compiler">—</dd><dt>FMU SHA-256</dt><dd id="provenance-hash">—</dd></dl></details></section>
       </aside>
     </div>
-    <footer><strong>OpenPWR / ENGINEERING</strong><p>Native six-group kinetics, decay heat, primary loop, pressurizer, dynamic secondary inventory, turbine/generator and condenser/feedwater and two-train auxiliary feedwater. Generic hot-operation model; native cold startup and full-scope qualification remain future work. <a href="./docs/NATIVE_PLANT.md">Read the equations &amp; limits ↗</a></p></footer>
+    <footer><strong>OpenPWR / ENGINEERING</strong><p>Native six-group kinetics, decay heat, primary loop, pressurizer, dynamic secondary inventory, turbine/generator and condenser/feedwater and two-train auxiliary feedwater. This profile starts in the hot operating envelope. The <a href="./continuous.html">continuous native model</a> starts cold and includes criticality and synchronization. Full-scope qualification remains future work. <a href="./docs/NATIVE_PLANT.md">Read the equations &amp; limits ↗</a></p></footer>
   </main>
   <script type="module" src="./src/engineering.js"></script>
 </body>

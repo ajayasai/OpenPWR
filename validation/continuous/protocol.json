@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "continuous-native-startup-v0.9-grid-amendment-1",
+  "scope": "Prospectively specified numerical verification of a generic continuous cold-to-power model. No measured plant startup data or independent plant-validation pass is claimed.",
+  "acceptanceFrozenBeforeCandidateScoring": true,
+  "amendmentPolicy": "Retain this initial protocol. Any later acceptance change requires a separately identified amendment with the failed result and engineering reason; do not silently widen a limit.",
+  "fullTrajectory": {
+    "requiredSingleFmuInstance": true,
+    "requiredInitialPrimaryTemperatureC": 40,
+    "requiredInitialPrimaryTemperatureToleranceK": 1e-06,
+    "requiredInitialGridConnected": false,
+    "requiredInitialReactivitySign": "negative",
+    "requiredInitialTurbineRpm": 0,
+    "requiredFinalDwellSeconds": 600,
+    "finalNetPowerRangeMW": [
+      975,
+      1025
+    ],
+    "finalNeutronPowerFractionRange": [
+      0.98,
+      1.02
+    ],
+    "finalGridConnected": true,
+    "minimumPrimarySubcoolingK": 3,
+    "nativeEnergyInventoryAbsoluteToleranceMJ": 10,
+    "nativeMassInventoryAbsoluteToleranceKg": 0.5,
+    "independentBoundaryQuadratureEnergyAbsoluteToleranceMJ": 1000,
+    "independentBoundaryQuadratureMassAbsoluteToleranceKg": 10,
+    "instantaneousEnergyResidualAbsoluteToleranceMW": 1e-06,
+    "instantaneousMassResidualAbsoluteToleranceKgS": 1e-06,
+    "gasEquationAbsoluteTolerancePa": 50,
+    "communicationStepsSeconds": [
+      0.5,
+      0.25
+    ],
+    "maximumThermalRefinementDifferenceK": 0.1,
+    "maximumPressureRefinementDifferenceMPa": 0.02,
+    "maximumNetPowerRefinementDifferenceMW": 10,
+    "maximumTurbineRefinementDifferenceRpm": 5,
+    "maximumNeutronFractionRefinementDifference": 0.005,
+    "note": "The neutron fraction is normalized to the model's nominal fission power. It does not incorrectly require fission heat alone to equal total nominal reactor heat including decay heat. Scenario command timing is a declared generic design input, never a measured-data fit."
+  },
+  "kinetics": {
+    "matrixExponentialRelativeTolerance": 2e-05,
+    "equilibriumRelativeTolerance": 2e-06,
+    "minimumAllowedNeutronFraction": 0,
+    "minimumAllowedNormalizedPrecursor": 0,
+    "sourceEquilibriumReference": "n = -S Lambda / rho with each normalized precursor equal to n",
+    "transientReference": "Independent augmented 8x8 constant-coefficient matrix exponential including a constant source, with seven kinetic states and one affine coordinate.",
+    "requiredCases": [
+      "source-equilibrium",
+      "kinetics-step-negative",
+      "kinetics-step-positive",
+      "critical-equilibrium"
+    ]
+  },
+  "synchronization": {
+    "requiredCases": [
+      "sync-reject-speed",
+      "sync-reject-phase",
+      "sync-reject-voltage",
+      "sync-accept"
+    ],
+    "rotorEnergyIdentityAbsoluteToleranceMJ": 1e-05,
+    "stateResetAllowed": false,
+    "note": "Each rejected condition is isolated in an admissible initialization with other conditions satisfied. Mechanical speed, electrical phase and voltage are native states/derived observations, not forced result values. The actual model permissive thresholds are documented generic design assumptions, not licensed plant settings."
+  },
+  "continuity": {
+    "stateResetAllowed": false,
+    "alternateModelSubstitutionAllowed": false,
+    "requiresKineticsAndRotorInventories": true,
+    "eventAccounting": "Inventory changes at synchronization and trips must remain accounted for by the same integrated external fluxes. Observe primitive neutron, precursor, thermal, water and rotor states across the transition."
+  },
+  "sources": [
+    {
+      "role": "Point-kinetics equations and independently published numerical benchmark methodology",
+      "title": "Ganapol, A Precision Benchmark Suite for Nuclear Reactor Point Kinetics Equations via CATS (2024)",
+      "url": "https://arxiv.org/pdf/2406.11822"
+    },
+    {
+      "role": "Source multiplication and distinction between subcritical and self-sustaining behavior",
+      "title": "DOE-HDBK-1019/2-93, Nuclear Physics and Reactor Theory, Volume 2",
+      "url": "https://www.energy.gov/documents/doe-hdbk-1019-93vol2"
+    },
+    {
+      "role": "Independent water-property equation used for gas-vessel EOS drift checks",
+      "title": "IAPWS R7-97(2012), IF97 region 4",
+      "url": "https://iapws.org/technical-guidance/release/IF97-Rev"
+    },
+    {
+      "role": "Official example of synchronizing controls coordinating generator speed and excitation before breaker closure; not a source of model-specific numerical settings",
+      "title": "US Bureau of Reclamation, In-sync at Flaming Gorge Power Plant (2023)",
+      "url": "https://www.usbr.gov/uc/special/20230100-UCToday.html"
+    }
+  ],
+  "amendmentHistory": [
+    {
+      "date": "2026-11-13",
+      "initialProtocolSha256": "6a7fcc9d7c8d695a7732325c17a23360cc58da8e0b43a6a07a24ab18754add27",
+      "field": "fullTrajectory.communicationStepsSeconds",
+      "before": [
+        5,
+        2.5
+      ],
+      "after": [
+        0.5,
+        0.25
+      ],
+      "candidateScoringHadStarted": false,
+      "reason": "Prospective resolution choice for the new native synchronization phase/frequency dynamics and startup neutron evolution. The earlier thermal-only cold model used5/2.5s; this model adds faster dynamics. All numerical error limits remain unchanged."
+    }
+  ]
+}

@@ -90,10 +90,38 @@ COLD_SCENARIOS = (
 )
 
 
+CONTINUOUS_STARTUP_COMMANDS = [
+    {"time": 0.0, "controls": {"pumpCommand": 1.0, "reactorDemandPercent": 0.5,
+        "automaticReactorEnable": 1.0, "shutdownCoolingFraction": 0.0,
+        "pressureControlEnable": 1.0, "pressureTargetMPa": 15.5}},
+    {"time": 3600.0, "controls": {"ventFraction": 1.0}},
+    {"time": 7200.0, "controls": {"ventFraction": 0.0}},
+    {"time": 18000.0, "controls": {"reactorDemandPercent": 5.0, "sourceEnable": 0.0,
+        "turbineEnable": 1.0, "speedDemandRpm": 3000.0,
+        "excitationCommandPu": 1.0, "automaticSyncEnable": 1.0}},
+    {"time": 20000.0, "controls": {"gridBreakerCommand": 1.0}},
+    {"time": 22000.0, "controls": {"reactorDemandPercent": 100.0}},
+    {"time": 24000.0, "controls": {"loadDemandMW": 1000.0}},
+]
+CONTINUOUS_SCENARIOS = (
+    {"id": "continuous-startup", "label": "Cold to 1,000 MWe", "duration": 27000.0,
+     "description": "One native model from a cold, subcritical core through heatup, source removal, turbine synchronization and full-power load pickup. The declared generic command schedule changes controls; it never resets physical inventories or prescribes reactor heat.",
+     "commands": CONTINUOUS_STARTUP_COMMANDS},
+    {"id": "continuous-source", "label": "Subcritical source removal", "duration": 120.0,
+     "description": "Hold the cold subcritical core with shutdown cooling isolated, then remove its neutron source at 60 seconds. Observe native neutron and precursor populations without starting the turbine.",
+     "commands": [{"time": 0.0, "controls": {"shutdownCoolingFraction": 0.0}},
+                  {"time": 60.0, "controls": {"sourceEnable": 0.0}}]},
+    {"id": "continuous-trip", "label": "Full startup then reactor trip", "duration": 27600.0,
+     "description": "Complete the continuous startup, then trip the reactor at 27,000 seconds. Fission, decay heat, thermal inventories and shaft motion continue in the same native instance.",
+     "commands": [*CONTINUOUS_STARTUP_COMMANDS, {"time": 27000.0, "controls": {"tripCommand": 1.0}}]},
+)
+
+
 def scenario_catalog(profile="primary"):
     if profile not in PROFILES:
         raise ValueError("Unknown native model profile")
-    return {"plant": PLANT_SCENARIOS, "primary": SCENARIOS, "cold": COLD_SCENARIOS}[profile]
+    return {"plant": PLANT_SCENARIOS, "primary": SCENARIOS, "cold": COLD_SCENARIOS,
+            "continuous": CONTINUOUS_SCENARIOS}[profile]
 
 
 def scenarios(profile="primary"):
@@ -361,7 +389,7 @@ def main():
     parser.add_argument("--model", choices=tuple(PROFILES), default="primary")
     parser.add_argument("--fmu", type=Path)
     choice = parser.add_mutually_exclusive_group(required=True)
-    choice.add_argument("--scenario", choices=sorted({item["id"] for item in (*SCENARIOS, *PLANT_SCENARIOS, *COLD_SCENARIOS)}))
+    choice.add_argument("--scenario", choices=sorted({item["id"] for item in (*SCENARIOS, *PLANT_SCENARIOS, *COLD_SCENARIOS, *CONTINUOUS_SCENARIOS)}))
     choice.add_argument("--replay", type=Path)
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts" / "native-experiment")
     args = parser.parse_args()

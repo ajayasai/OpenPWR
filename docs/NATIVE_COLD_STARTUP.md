@@ -2,7 +2,7 @@
 
 Version 0.8 adds `ColdStartPlant`, a separate native OpenModelica/FMI 2 model. It starts at 40 °C with stopped pumps, a 0.3 MPa primary circuit and a 0.15 MPa secondary inventory. Its temperatures, pressure, inventories, gas removal and heat flows evolve continuously from conservation equations. The interface never interpolates a startup animation into engineering readings and never swaps to the hot `CoupledPlant` FMU.
 
-This is **thermal-hydraulic cold-to-hot standby**, not a full reactor startup. Fuel heating is an explicitly imposed 0–90 MW thermal boundary. There is no source-range neutron instrumentation, criticality search, boron/rod procedure, decay-heat history, turbine synchronization or transition to full electrical power in this model. The other native hot-plant profile retains its own scope. No measured plant startup has been reproduced, and numerical verification does not qualify an operating procedure or simulator.
+This is **thermal-hydraulic cold-to-hot standby**, not a full reactor startup. Fuel heating is an explicitly imposed 0–90 MW thermal boundary. There is no source-range neutron instrumentation, criticality search, boron/rod procedure, decay-heat history, turbine synchronization or transition to full electrical power in this model. The separate [continuous native startup model](NATIVE_CONTINUOUS_STARTUP.md) adds kinetics, synchronization and load pickup using an extended thermal configuration. The original cold profile described here and the hot-plant profile retain their own scopes. No measured plant startup has been reproduced, and numerical verification does not qualify an operating procedure or simulator.
 
 ## Components and assumptions
 

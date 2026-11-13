@@ -77,3 +77,5 @@ Numerical verification should include hot equilibrium, mass/energy inventory cha
 ## Relationship to the native cold-start profile
 
 The v0.8 `ColdStartPlant` is a separate thermal-hydraulic experiment with its own continuous state, initialized with cold water. It includes pump heat, shutdown cooling, charging/letdown and a gas/vapor pressurizer. It does not initialize or transfer states into `CoupledPlant`, and its prescribed startup heat does not represent a criticality approach. The coupled hot plant retains its declared hot operating envelope. See [NATIVE_COLD_STARTUP.md](NATIVE_COLD_STARTUP.md).
+
+The v0.9 [continuous native model](NATIVE_CONTINUOUS_STARTUP.md) now supplies its own cold-to-criticality, synchronization and load-pickup path in one FMU. It does not import a final state into this hot model, and it does not automatically include this profile's auxiliary-feedwater system.
