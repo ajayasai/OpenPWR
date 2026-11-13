@@ -190,13 +190,25 @@ package OpenPWR "OpenPWR native engineering workbench"
         +80.74*(temperatureK*log(temperatureK)-temperatureK-273.15*log(273.15)+273.15)
         else constantHeatCapacity*(temperatureK-273.15);
     end solidEnthalpy;
-    function conductivityIntegral "Kirchhoff potential whose derivative is NIST304 k(T)"
+    function conductivityIntegral "NIST304 Kirchhoff potential with monotone continuation for nonlinear trial iterates"
       input Real temperatureK;
       input Boolean temperatureDependent;
       input Real constantConductivity;
       output Real potential;
+    protected
+      Real boundedTemperatureK;
+      Real boundedConductivity;
     algorithm
-      potential := if temperatureDependent then 9.705*temperatureK+0.0176/2*temperatureK^2-1.60e-6/3*temperatureK^3 else constantConductivity*temperatureK;
+      // The cubic is exact on the existing 273.15-1073.15 K material domain.
+      // Outside it, endpoint tangents keep the trial potential C1 and monotone:
+      // the unbounded cubic otherwise admits spurious remote surface roots.
+      // This does not clip temperatures or extend the model's validity limits.
+      boundedTemperatureK := min(1073.15,max(273.15,temperatureK));
+      boundedConductivity := 9.705+0.0176*boundedTemperatureK-1.60e-6*boundedTemperatureK^2;
+      potential := if temperatureDependent then
+        9.705*boundedTemperatureK+0.0176/2*boundedTemperatureK^2-1.60e-6/3*boundedTemperatureK^3
+        +boundedConductivity*(temperatureK-boundedTemperatureK)
+        else constantConductivity*temperatureK;
     end conductivityIntegral;
   protected
     parameter Real crossSectionM2 = volumeM3/vesselHeightM;
@@ -1163,6 +1175,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     input Real probePressurePa(start=15.5e6) "Property probe independent of PrimaryLoop validity envelope";
     input Real probeTemperatureK(start=598.15);
     input Real probeWallTemperatureK(start=550);
+    input Real probeWallTrialTemperatureK(start=550) "Separate solver-trial probe; never used for logarithmic heat capacity";
     input Real probeFilmReynolds(start=100);
     input Real probeFilmPrandtl(start=1);
     input Real probeFilmMinimumReynolds(start=1);
@@ -1170,6 +1183,7 @@ package OpenPWR "OpenPWR native engineering workbench"
     output Real wallSteelCpJKgK = DynamicPressurizer.solidHeatCapacity(probeWallTemperatureK,true,500);
     output Real wallSteelEnthalpyJKg = DynamicPressurizer.solidEnthalpy(probeWallTemperatureK,true,500);
     output Real wallSteelConductivityPotentialWM = DynamicPressurizer.conductivityIntegral(probeWallTemperatureK,true,15);
+    output Real wallTrialConductivityPotentialWM = DynamicPressurizer.conductivityIntegral(probeWallTrialTemperatureK,true,15);
     output Real wallConstantCpJKgK = DynamicPressurizer.solidHeatCapacity(probeWallTemperatureK,false,500);
     output Real wallConstantEnthalpyJKg = DynamicPressurizer.solidEnthalpy(probeWallTemperatureK,false,500);
     output Real wallConstantConductivityPotentialWM = DynamicPressurizer.conductivityIntegral(probeWallTemperatureK,false,15);

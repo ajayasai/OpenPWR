@@ -11,7 +11,7 @@ import sys
 import tempfile
 import zipfile
 import xml.etree.ElementTree as ET
-from package_fmu import add_notices
+from package_fmu import prepare_fmu
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'models/OpenPWR/package.mo'
@@ -50,7 +50,7 @@ def run(model_key='primary'):
             f'loadFile({json.dumps(SOURCE.as_posix())});', 'getErrorString();',
             *([f'loadFile({json.dumps(additional_source.as_posix())});', 'getErrorString();'] if additional_source else []),
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
-            f'buildModelFMU({model_name}, version="2.0", fmuType="cs", fileNamePrefix="{file_prefix}");',
+            f'buildModelFMU({model_name}, version="2.0", fmuType="me_cs", fileNamePrefix="{file_prefix}");',
             'getErrorString();',
         ]), encoding='utf-8')
         result = subprocess.run([OMC, str(script)], cwd=work, text=True, capture_output=True, timeout=600)
@@ -76,13 +76,13 @@ def run(model_key='primary'):
             platforms = sorted({p.split('/')[1] for p in archive.namelist() if p.startswith('binaries/') and len(p.split('/')) > 2})
         target = OUTPUT / (file_prefix + '.fmu')
         target.write_bytes(built.read_bytes())
-        add_notices(target)
+        export_metadata = prepare_fmu(target)
         try:
             revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
             dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip())
         except (OSError, subprocess.CalledProcessError):
             revision, dirty = None, None
-        manifest = {'model': model_name, 'compiler': compiler, 'fmiVersion': '2.0',
+        manifest = {**export_metadata, 'model': model_name, 'compiler': compiler, 'fmiVersion': '2.0',
                     'solver': 'CVODE', 'modelicaLibrary': '4.0.0', 'platforms': platforms,
                     'hostPlatform': platform.platform(), 'sourceSha256': source_hash,
                     'fmuSha256': sha(target), 'gitRevision': revision, 'dirty': dirty,

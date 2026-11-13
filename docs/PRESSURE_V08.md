@@ -46,6 +46,22 @@ The low-Reynolds transition is an explicit implementation assumption. A cubic sm
 
 The generic component defaults to `useRegimeCondensation=false`, preserving the old mean-Nusselt option. PACTEL explicitly enables the new option. The old path remains available as a structural ablation. The new closure still assumes pure vapor, negligible interfacial shear, a thin film relative to vessel radius, immediate drainage and no resolved film inventory. It omits curvature, noncondensable gases, wave dynamics, entrainment and the vapor boundary layer. The PACTEL liquid remains a homogeneous pool, despite the experimental report's discussion of stratification. An improved pressure error would not validate those assumptions.
 
+## Wall-solver trial continuation
+
+The first complete release check exposed a numerical failure in the ATWS-11 refinement run, during the 137.25–137.30 s communication interval. The same compiled FMU reproduced the failure in isolation. Its wall-surface nonlinear solver had selected remote roots of the extrapolated material polynomial, with cached trial surface temperatures near 17,500 K and below zero. The subsequent fluid right-hand-side evaluation failed the IF97 minimum-pressure assertion. Those cached values are failed solver iterates, not accepted physical predictions.
+
+The original conductivity potential is
+
+```text
+K(T) = 9.705 T + (0.0176/2) T² − (1.60e−6/3) T³
+```
+
+It is increasing throughout the declared 273.15–1073.15 K wall-material domain, but its unrestricted cubic extrapolation is not monotone. For example, `K(550 K)` has additional roots near −1541.83 K and 17491.83 K. They can mislead the algebraic face-temperature solve despite the separate accepted-state domain check.
+
+The numerical repair preserves the polynomial exactly inside that existing domain and continues it along its endpoint tangents outside it. With `Tb = min(1073.15, max(273.15, T))`, the trial potential is `K(Tb) + k(Tb)(T−Tb)`. Its value and first derivative are continuous, and its slope stays positive. Temperatures and pressure are not clipped. The original accepted-state checks still reject wall-cell and surface temperatures outside the declared domain; the continuation is not a claim of material accuracy beyond that domain. The constant-conductivity option is unchanged.
+
+Thirteen compiled checks separately verify in-domain preservation, both one-sided boundary slopes, increasing remote branches, and exclusion of the two spurious roots. They are labeled `wall-solver-extension`, not measured material comparisons. The original communication steps, solver tolerance, conservation criteria, measured data and boundary schedules are unchanged. The combined FMI export described in [the engineering guide](ENGINEERING.md#native-export-and-execution-cost) reduces execution cost independently; changing the export alone reproduced the same pressure failure and did not repair the wall solve.
+
 ## Development trials and reporting
 
 An initial trial corrected only the spatial averaging of the old laminar coefficient. At the 0.1 s communication step its ATWS-10 RMSE was 0.197534 MPa and ATWS-11 RMSE was 0.216925 MPa, worse than v0.7's respective 0.187120 and 0.201964 MPa. Its independent mass and energy checks passed. The unfavorable result is retained here: correcting a numerical/spatial assumption alone did not improve measured agreement.
@@ -69,7 +85,7 @@ The final factored correlation and diagnostic, with the runner avoiding redundan
 
 ## Bounded regularization sensitivity
 
-The [development result record](../validation/pactel1998/film-regularization-v0.8.json) retains the exact candidate source, wrapper, binary, runner and script hashes, numerical balances and pressure comparison trace. It evaluates ATWS-10 through 221 s, including the compression peak; it does **not** establish sensitivity for the later outsurge or for ATWS-11. The nominal reference run retains its full 500 s conservation accounting. All 20 conservation checks passed.
+The [development result record](https://github.com/ajayasai/OpenPWR/blob/v0.8.0/validation/pactel1998/film-regularization-v0.8.json) retains the exact candidate source, wrapper, binary, runner and script hashes, numerical balances and pressure comparison trace. It evaluates ATWS-10 through 221 s, including the compression peak; it does **not** establish sensitivity for the later outsurge or for ATWS-11. The nominal reference run retains its full 500 s conservation accounting. All 20 conservation checks passed.
 
 | Numerical variation, with other inputs unchanged | Maximum pressure change from the nominal candidate over 0–221 s, MPa |
 | --- | ---: |
@@ -80,7 +96,7 @@ The [development result record](../validation/pactel1998/film-regularization-v0.
 
 These bounded changes are small compared with the remaining measured pressure discrepancy. They are not uncertainty bounds for the selected condensation correlation. The zero difference for the smaller floor is specific to the tested window and does not justify removing a numerical guard for other regimes.
 
-The recorded development binary precedes the final diagnostic correction that excludes submerged wall cells from `maximumFilmReynolds`. Only that reported maximum changed afterward; the pressure equations and film correlation did not. The record explicitly identifies this snapshot and must not be substituted for the final release manifest or canonical measured report.
+The recorded development binary precedes the diagnostic correction that excludes submerged wall cells from `maximumFilmReynolds`; that correction changed only the reported maximum. The subsequent wall-solver continuation and export changes are documented above and in the engineering guide. They preserve the in-domain material potential and physical film correlation. The record explicitly identifies its earlier snapshot and must not be substituted for the final release manifest or canonical measured report.
 
 After building the native PACTEL FMU, reproduce the study with the Python environment containing FMPy:
 

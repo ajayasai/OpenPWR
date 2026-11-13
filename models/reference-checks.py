@@ -13,7 +13,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/modelica'))
-from package_fmu import add_notices
+from package_fmu import prepare_fmu
 SOURCE = ROOT / 'models/OpenPWR/package.mo'
 OUTPUT = ROOT / 'artifacts/modelica'
 FMU = OUTPUT / 'PropertyReferenceChecks.fmu'
@@ -82,7 +82,7 @@ def build():
             'loadModel(Modelica, {"4.0.0"}, requireExactVersion=true);', 'getErrorString();',
             f'loadFile({json.dumps(SOURCE.as_posix())});', 'getErrorString();',
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
-            'buildModelFMU(OpenPWR.PropertyReferenceChecks, version="2.0", fmuType="cs", fileNamePrefix="PropertyReferenceChecks");',
+            'buildModelFMU(OpenPWR.PropertyReferenceChecks, version="2.0", fmuType="me_cs", fileNamePrefix="PropertyReferenceChecks");',
             'getErrorString();',
         ]), encoding='utf-8')
         result = subprocess.run([omc, str(script)], cwd=work, text=True, capture_output=True, timeout=600)
@@ -92,11 +92,11 @@ def build():
         if result.returncode or not built.is_file():
             raise RuntimeError('Property FMU compilation failed; see artifacts/modelica/property-build.log\n' + log)
         FMU.write_bytes(built.read_bytes())
-        add_notices(FMU)
+        export_metadata = prepare_fmu(FMU)
     with zipfile.ZipFile(FMU) as archive:
         platforms = sorted({name.split('/')[1] for name in archive.namelist()
                             if name.startswith('binaries/') and len(name.split('/')) > 2})
-    manifest = {**metadata(), 'model': 'OpenPWR.PropertyReferenceChecks',
+    manifest = {**metadata(), **export_metadata, 'model': 'OpenPWR.PropertyReferenceChecks',
                 'compiler': compiler, 'modelicaLibrary': '4.0.0', 'fmiVersion': '2.0',
                 'fmuSha256': sha(FMU), 'platforms': platforms}
     MANIFEST.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
@@ -224,6 +224,49 @@ def verify():
                            integrate(lambda t: 9.705 + .0176 * t - 1.60e-6 * t**2), 'W/m',
                            'Compiled Kirchhoff potential vs 200-panel Simpson quadrature of the published k correlation.')
 
+            # This is an extension for nonlinear trial iterates, not additional
+            # material data. A separate input avoids evaluating cp(log(T)) at
+            # deliberately inadmissible trial temperatures.
+            def trial_potential(temperature):
+                unit.setReal([refs['probeWallTrialTemperatureK']], [temperature])
+                return unit.getReal([refs['wallTrialConductivityPotentialWM']])[0]
+
+            def trial_check(label, actual, expected, tolerance, units):
+                error = abs(actual - expected)
+                checks.append({'name': label, 'category': 'wall-solver-extension',
+                               'measured': actual, 'reference': expected,
+                               'absoluteError': error, 'tolerance': tolerance,
+                               'units': units, 'pass': math.isfinite(actual) and error <= tolerance,
+                               'method': 'Compiled monotone trial extension; numerical robustness only. Accepted material-temperature limits remain unchanged.'})
+
+            def steel_potential(temperature):
+                return 9.705 * temperature + .0176 / 2 * temperature**2 - 1.60e-6 / 3 * temperature**3
+
+            def steel_conductivity(temperature):
+                return 9.705 + .0176 * temperature - 1.60e-6 * temperature**2
+
+            for temperature in (273.15, 300.0, 550.0, 1000.0, 1073.15):
+                reference = steel_potential(temperature)
+                trial_check(f'Wall trial extension preserves the material potential at {temperature:g} K',
+                            trial_potential(temperature), reference, abs(reference) * 1e-12, 'W/m')
+            for temperature in (273.15, 1073.15):
+                epsilon = 1e-4
+                center = trial_potential(temperature)
+                for direction in (-1, 1):
+                    slope = (trial_potential(temperature + direction * epsilon) - center) / (direction * epsilon)
+                    trial_check(f'Wall trial extension {"left" if direction < 0 else "right"} slope at {temperature:g} K',
+                                slope, steel_conductivity(temperature), 1e-5, 'W/(m K)')
+            for low, high, boundary in ((-4053.4, -1541.8272, 273.15), (17491.8272, 17535.7, 1073.15)):
+                slope = (trial_potential(high) - trial_potential(low)) / (high - low)
+                trial_check(f'Wall trial extension remains increasing over {low:g} to {high:g} K',
+                            slope, steel_conductivity(boundary), 1e-8, 'W/(m K)')
+            reference = trial_potential(550)
+            for temperature, direction in ((-1541.827202, -1), (17491.827202, 1)):
+                # These remote roots share H(550 K) in the unextended cubic.
+                ordered = direction * (trial_potential(temperature) - reference) > 1e4
+                trial_check(f'Wall trial extension excludes the remote cubic root at {temperature:g} K',
+                            float(ordered), 1.0, 0.0, '1')
+
             def film_probe(reynolds, prandtl=1.0, minimum=1.0):
                 unit.setReal([refs['probeFilmReynolds'], refs['probeFilmPrandtl'], refs['probeFilmMinimumReynolds']], [reynolds, prandtl, minimum])
                 return unit.getReal([refs['probeFilmNusselt']])[0]
@@ -293,17 +336,18 @@ def verify():
     passed = sum(item['pass'] for item in checks)
     report = {**metadata(), 'model': manifest['model'], 'compiler': manifest['compiler'],
               'modelicaLibrary': manifest['modelicaLibrary'], 'fmuSha256': sha(FMU),
-              'scope': 'Published pure-water comparisons, thermodynamic and wall-material consistency, and separately labeled film-correlation verification through a compiled native FMU. These do not validate plant transients, facility-specific steel properties, condensation applicability or the whole plant.',
+              'scope': 'Published pure-water comparisons, thermodynamic and wall-material consistency, a separately labeled numerical trial extension, and film-correlation verification through a compiled native FMU. These do not validate plant transients, facility-specific steel properties, condensation applicability or the whole plant.',
               'publishedComparisons': sum(c['category'] == 'published-water-property' for c in checks),
               'derivativeConsistencyChecks': sum(c['category'] == 'thermodynamic-derivative-consistency' for c in checks),
               'wallMaterialConsistencyChecks': sum(c['category'] == 'wall-material-consistency' for c in checks),
+              'wallSolverExtensionChecks': sum(c['category'] == 'wall-solver-extension' for c in checks),
               'filmCorrelationVerificationChecks': sum(c['category'] == 'film-correlation-verification' for c in checks),
               'passed': passed, 'total': len(checks), 'checks': checks}
     (OUTPUT / 'property-verification.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     for item in checks:
         print(('PASS' if item['pass'] else 'FAIL') + ' ' + item['name'] + f": {item['measured']:.9g} {item['units']}; reference {item['reference']}")
     print(f'{passed}/{len(checks)} native property/derivative checks passed; '
-          f"{report['publishedComparisons']} published water comparisons, {report['derivativeConsistencyChecks']} thermodynamic, {report['wallMaterialConsistencyChecks']} wall-material and {report['filmCorrelationVerificationChecks']} film-correlation checks.")
+          f"{report['publishedComparisons']} published water comparisons, {report['derivativeConsistencyChecks']} thermodynamic, {report['wallMaterialConsistencyChecks']} wall-material, {report['wallSolverExtensionChecks']} wall-solver and {report['filmCorrelationVerificationChecks']} film-correlation checks.")
     if passed != len(checks):
         raise SystemExit(1)
 

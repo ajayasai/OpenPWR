@@ -55,6 +55,12 @@ The service binds only to `127.0.0.1`. It serves the UI and API from one origin,
 
 FMI state serialization is not promised. Use reset plus the recorded commands for reproducible experiments; existing JavaScript save files cannot be loaded into this different model.
 
+### Native export and execution cost
+
+The build uses OpenModelica's combined `me_cs` export. The host still selects FMI co-simulation with the same CVODE integrator, equations, inputs and communication grid. With OpenModelica 1.27.1, a pure `cs` export also generates costly optional real-output derivative equations that this host never requests. Combined export omits those equations. Packaging corrects the exporter's `maxOutputDerivativeOrder` declaration to `0`; output derivatives are not offered. Native executable and source entries are otherwise preserved byte-for-byte during this metadata correction, and manifests record both interfaces and the supported derivative order.
+
+This export choice improves execution cost; it does not repair the pressure model's wall-solver failure. Cold startup, pressure comparisons, conservation, refinement and measured discrepancies are all rerun on the packaged binaries before publication. Hardware timings are not a real-time guarantee.
+
 ## Timed experiments and replay
 
 The coupled plant offers load reduction, reactor trip, turbine trip, feedwater, cooling and pump experiments; the primary workbench offers heater, spray, pump and inventory experiments. Select **Reset & prepare** to validate the schedule and initialize the model; **Run model** advances it. The host applies every event at its exact 50 ms boundary, including when a request spans several events. Completion pauses the UI. Select **Return to manual** to continue from the final state.

@@ -17,7 +17,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 COMMON = ROOT / 'models/OpenPWR/package.mo'
 sys.path.insert(0, str(ROOT / 'scripts/modelica'))
-from package_fmu import add_notices
+from package_fmu import prepare_fmu
 
 
 class NativeDomainExit(RuntimeError):
@@ -46,7 +46,7 @@ def build_case(model_name, model_path, fmu_path, manifest_path, identity, resour
             f'loadFile({json.dumps(COMMON.as_posix())});',
             f'loadFile({json.dumps(model_path.as_posix())});', 'getErrorString();',
             'setCommandLineOptions("--fmiFlags=s:cvode --fmuRuntimeDepends=modelica");',
-            f'buildModelFMU({model_name}, version="2.0", fmuType="cs", fileNamePrefix={json.dumps(fmu_path.stem)});',
+            f'buildModelFMU({model_name}, version="2.0", fmuType="me_cs", fileNamePrefix={json.dumps(fmu_path.stem)});',
             'getErrorString();']), encoding='utf-8')
         result = subprocess.run([compiler, str(script)], cwd=work, capture_output=True, text=True, timeout=600)
         log = result.stdout + '\n' + result.stderr
@@ -60,12 +60,12 @@ def build_case(model_name, model_path, fmu_path, manifest_path, identity, resour
         if result.returncode or not candidate.is_file():
             raise RuntimeError(f'Native compilation failed; read {fmu_path.stem}-build.log.')
         fmu_path.write_bytes(candidate.read_bytes())
-        add_notices(fmu_path)
+        export_metadata = prepare_fmu(fmu_path)
         with zipfile.ZipFile(fmu_path, 'a', compression=zipfile.ZIP_DEFLATED) as archive:
             archive.write(model_path, 'sources/OpenPWR/' + model_path.name)
             for path, target in resources:
                 archive.write(path, target)
-        manifest = {**before, 'model': model_name, 'compiler': compiler_version,
+        manifest = {**before, **export_metadata, 'model': model_name, 'compiler': compiler_version,
                     'fmuSha256': sha(fmu_path), 'fmiVersion': '2.0', 'modelicaLibrary': '4.0.0',
                     'hostPlatform': platform.platform()}
         manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
@@ -169,9 +169,15 @@ def run_case(fmu_path, model_name, output_names, input_names, forcing, duration,
                     slave.setReal(input_refs, list(next_values))
                     applied_values = next_values
                     input_updates += 1
-                status = slave.doStep(currentCommunicationPoint=current_time, communicationStepSize=delta)
+                context = f'{model_name} at t={current_time:.17g} s, step={delta:.17g} s'
+                try:
+                    status = slave.doStep(currentCommunicationPoint=current_time, communicationStepSize=delta)
+                except Exception as error:
+                    # Preserve the native exception and identify the attempted
+                    # interval. A failed doStep must never become a partial pass.
+                    raise RuntimeError(f'Native integration failed for {context}: {error}') from error
                 if status not in (None, 0, 1):
-                    raise RuntimeError(f'FMI step failed with status {status}.')
+                    raise RuntimeError(f'Native integration failed for {context}: FMI status {status}.')
                 next_time = current_time + delta
                 current_time = boundary if abs(next_time - boundary) < 1e-10 else next_time
                 current = observation(current_time)

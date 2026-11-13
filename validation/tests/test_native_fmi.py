@@ -5,13 +5,36 @@ import sys
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from native_fmi import run_case, NativeDomainExit
 
 
 class HeldInputQuadrature(unittest.TestCase):
+    def test_failed_step_identifies_attempted_interval_and_releases_instance(self):
+        description = SimpleNamespace(modelName='FailureFixture', guid='test', generationTool='test', fmiVersion='2.0',
+            defaultExperiment=SimpleNamespace(tolerance='1e-9'), coSimulation=SimpleNamespace(modelIdentifier='failure'),
+            modelVariables=[SimpleNamespace(name='value', valueReference=0, type='Real')])
+        for failure in (RuntimeError('native solver stopped'), 3):
+            with self.subTest(failure=failure), TemporaryDirectory() as directory:
+                fmu = Path(directory) / 'fixture.fmu'; fmu.write_bytes(b'Failure fixture')
+                extracted = Path(directory) / 'extracted'; extracted.mkdir()
+                unit = Mock()
+                unit.getReal.return_value = [42.0]
+                unit.doStep.side_effect = [0, failure]
+                with patch('fmpy.read_model_description', return_value=description), \
+                     patch('fmpy.extract', return_value=str(extracted)), patch('fmpy.fmi2.FMU2Slave', return_value=unit):
+                    with self.assertRaisesRegex(RuntimeError, r'FailureFixture at t=0\.25 s, step=0\.25 s') as caught:
+                        run_case(fmu, 'FailureFixture', ('value',), (), lambda _time: {}, 1, .25)
+                if isinstance(failure, Exception):
+                    self.assertIs(caught.exception.__cause__, failure)
+                else:
+                    self.assertIn('FMI status 3', str(caught.exception))
+                unit.terminate.assert_called_once()
+                unit.freeInstance.assert_called_once()
+                self.assertFalse(extracted.exists())
+
     def test_all_controls_are_compared_by_name_and_reversions_are_applied(self):
         class Storage:
             def __init__(self):

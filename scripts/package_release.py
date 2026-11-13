@@ -15,6 +15,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import zipfile
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPILED = (
@@ -98,6 +99,12 @@ def verify(version, revision):
         with zipfile.ZipFile(fmu) as archive:
             require(any(name.startswith(('binaries/linux64/', 'binaries/x86_64-linux/')) and name.endswith('.so')
                 for name in archive.namelist()), f'{model}: no Linux x86-64 executable in FMU')
+            description = ET.fromstring(archive.read('modelDescription.xml'))
+            simulation = description.find('CoSimulation')
+            require(description.find('ModelExchange') is not None and simulation is not None
+                and simulation.get('maxOutputDerivativeOrder') == '0', f'{model}: wrong native export capabilities')
+        require(manifest.get('exportInterfaces') == ['ModelExchange', 'CoSimulation']
+            and manifest.get('maximumOutputDerivativeOrder') == 0, f'{model}: export provenance is missing')
         bound_sources(manifest, {'sourceSha256': 'models/OpenPWR/package.mo'}, model)
         manifests[model] = manifest
     bound_sources(manifests['ColdStartPlant'], COLD_SOURCES, 'ColdStartPlant')

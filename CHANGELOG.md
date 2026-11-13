@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 — 2026-11-13
+
+Adds a native cold-to-hot-standby experiment with continuous water, steam and nitrogen inventories, pump heating, pressurizer controls, charging/letdown and shutdown cooling. Animated equipment, controls, trends, CSV export and replay use the compiled model. Fuel heat is prescribed; native criticality, synchronization and transition into the separate hot-plant model remain unimplemented.
+
+Improves the experimental PACTEL pressure model with local condensate drainage and the published Chen film-condensation correlation. Same-trace pressure RMSE is about 9.8% lower for ATWS-10 and 9.6% lower for ATWS-11 than v0.7. Remaining discrepancies and immutable baseline reports stay visible. ATWS-11 is explicitly a post-unblinding development comparison, not a renewed independent holdout.
+
+Repairs cold-purge communication-step sensitivity with continuous modulation and prevents spurious wall-solver roots using a monotone continuation outside the existing material domain. Acceptance limits are unchanged. Combined FMI exports omit unused output-derivative equations while retaining CVODE co-simulation. Release packaging binds eleven native FMUs and six evidence reports to the exact clean source revision and executable hashes.
+
 ## 0.6.0 — 2026-10-26
 
 Adds an experimental native pressurizer with separate liquid/vapor temperatures, conservative phase inventories, and optional wall conduction/condensation. The Krško reference case applies the documented 6 MW pump heat and publishes a controlled equilibrium-model ablation alongside the immutable v0.5 baseline. The generic interactive native plant retains its existing equilibrium pressurizer pending broader validation.
