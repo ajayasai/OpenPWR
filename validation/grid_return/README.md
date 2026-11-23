@@ -1,0 +1,17 @@
+# Sizewell B return to electrical generation, December 2024
+
+EDF reported that the two turbine generators at Sizewell B resumed supplying electricity on 1 and 5 December 2024 following an outage. The window covers one full calendar day before the first reported return through one full day after the second. The dates were chosen from EDF's announcement, independently of simulated output and before calculating interval statistics. The full window is 30 November 00:00 through 7 December 00:00 UTC, including the left boundary and excluding the right. Britain used GMT throughout the window. [EDF return announcement](https://www.edfenergy.com/media-centre/sizewell-b-back-delivering-reliable-zero-carbon-power) · [EDF station and generator description](https://www.edfenergy.com/energy/power-station/daily-statuses)
+
+Elexon's B1610 dataset supplies the signed settlement energy in MWh for each half hour. The Elexon Balancing Mechanism units `T_SIZB-1` and `T_SIZB-2` correspond to the two Sizewell B generators. `combinedMW` is their sum after conversion to interval mean MW. The metering boundary includes only these two units. Other settlement meters, including `T_SIZB-D`, are excluded. Negative values are retained. [Elexon metered volumes guide](https://www.elexon.co.uk/bsc/article/bsc-insight-how-to-get-more-detailed-metered-volume-data-from-our-insights-solution/) · [Elexon BM unit reference](https://data.elexon.co.uk/bmrs/api/v1/reference/bmunits/all)
+
+This record documents electrical output at settlement resolution. It provides no measurements of reactor power, pressure, coolant temperature, breaker closure time or startup control commands. A positive interval mean indicates net delivery over the interval. An interval with a negative mean can still contain a brief period of positive power. One reactor supplies two generators at Sizewell B. Comparison with OpenPWR's single generator therefore describes differences between scenarios. The data offer no basis for assigning those differences to a particular model equation or control action.
+
+## Reproduction
+
+`raw/` contains both Elexon responses exactly as received. `observation.py` checks the stored bytes against the source digests and verifies the RF settlement run, unit IDs, dates, period numbers, energy values and timestamps. Each of the 336 intervals must have exactly one entry from each generator. The output includes original MWh for each unit, MW computed as MWh divided by 0.5 hours, and the sum in MW. The API's `halfHourEndTime` labels each period's right edge. Stored UTC times for both edges follow the settlement date and period.
+
+Run `python validation/grid_return/observation.py --check` for an offline check against `sizewell-b-2024.json`. To recreate the normalized file, run the same command with `--write`. `--verify-upstream` compares fresh public API responses with the frozen measurements and reports any change in response bytes. None of these commands updates the archived raw observations. The source URLs and SHA-256 digests are included in the normalized file.
+
+## Data attribution
+
+Contains BMRS data © Elexon Limited copyright and database right 2024. The archived responses and their derived observations are reused under the [Elexon BMRS open data licence](https://www.elexon.co.uk/bsc/data/balancing-mechanism-reporting-agent/copyright-licence-bmrs-data/). Redistributors must preserve this attribution and licence link and require the same of downstream redistributors. The project's Apache-2.0 licence applies to the processing code.

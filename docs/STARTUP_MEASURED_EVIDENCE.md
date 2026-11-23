@@ -2,6 +2,8 @@
 
 **The continuous cold-to-grid startup is not physically validated.** This release compares the thermal equations shared with `ContinuousPlant` against a short operating-plant transient. That extends measured coverage to production equations; it does not establish the accuracy of criticality, synchronization, or a complete startup. The [machine-readable coverage ledger](https://github.com/ajayasai/OpenPWR/blob/main/validation/continuous_measured/source-coverage.json) separates these claims. Numerical startup checks remain verification evidence.
 
+The [electrical output explorer](https://ajayasai.github.io/OpenPWR/startup-evidence.html) adds a measured return to generation at Sizewell B in December 2024. It includes all half-hour settlement periods over seven UTC days. Generator 2 first shows positive interval energy on 1 December and generator 1 on 5 December. The two-meter sum excludes the separate site demand meter. The single-generator OpenPWR run uses its own schedule and reports both gross generation and net station power. The charts preserve their respective clocks and distinguish interval averages from instantaneous readings. [Event documentation](https://www.edfenergy.com/media-centre/sizewell-b-back-delivering-reliable-zero-carbon-power) · [Meter provenance and reproduction](https://github.com/ajayasai/OpenPWR/tree/main/validation/grid_return)
+
 The following source audit was completed on 13 November 2026. It is a bounded review of these publications, not a claim that suitable data do not exist elsewhere.
 
 | Source | Evidence available | Applicable scope and unresolved inputs |

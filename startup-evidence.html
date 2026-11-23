@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Return to power · OpenPWR</title>
+  <link rel="stylesheet" href="./src/startup-evidence.css">
+</head>
+<body>
+  <main>
+    <nav aria-label="OpenPWR navigation">
+      <a class="brand" href="./index.html">OpenPWR</a>
+      <a href="./index.html">Control room</a>
+      <a href="./continuous.html">Native startup</a>
+      <a href="./plant-evidence.html">Plant evidence</a>
+    </nav>
+    <header>
+      <h1>Return to power</h1>
+      <p>Explore the electricity recorded at Sizewell B as its two generators returned to service in December 2024, alongside a continuous startup from OpenPWR’s 1,000 MWe model.</p>
+    </header>
+    <div class="charts">
+      <section class="card plant" aria-labelledby="plant-title">
+        <div class="card-heading">
+          <p>Generator meters</p>
+          <h2 id="plant-title">Sizewell B</h2>
+        </div>
+        <label for="plant-channel">Meter selection</label>
+        <select id="plant-channel" disabled>
+          <option value="combinedMW">Both generators</option>
+          <option value="unit1MW">Generator 1 · T_SIZB-1</option>
+          <option value="unit2MW">Generator 2 · T_SIZB-2</option>
+        </select>
+        <figure>
+          <svg id="plant-plot" viewBox="0 0 470 205" role="img" aria-label="Recorded generator power across the selected week"></svg>
+          <figcaption id="plant-caption">Generator settlement periods · UTC</figcaption>
+        </figure>
+        <div class="inspection">
+          <div class="reading"><label for="plant-sample">Inspect settlement period</label><output id="plant-output" for="plant-sample"></output></div>
+          <input type="range" id="plant-sample" min="0" max="1" value="0" disabled>
+          <p id="plant-time" class="timestamp"></p>
+        </div>
+        <p id="plant-status" class="status" role="status">Loading the measured series…</p>
+        <p class="definition">Each step is the signed metered energy for one settlement period divided by its duration. Summing these two generator meters excludes the separate site demand meter.</p>
+        <p class="links"><a href="./validation/grid_return/sizewell-b-2024.json" download>Download measured data</a> <a href="https://www.edfenergy.com/media-centre/sizewell-b-back-delivering-reliable-zero-carbon-power">EDF outage report ↗</a></p>
+      </section>
+      <section class="card model" aria-labelledby="model-title">
+        <div class="card-heading">
+          <p>Native simulation</p>
+          <h2 id="model-title">OpenPWR startup</h2>
+        </div>
+        <div class="fields">
+          <div><label for="model-channel">Electrical output</label>
+          <select id="model-channel" disabled><option value="net">Net station power</option><option value="gross">Gross generator power</option></select></div>
+          <div><label for="model-basis">Sample basis</label>
+          <select id="model-basis" disabled><option value="interval">30-minute mean</option><option value="sample">Instantaneous</option></select></div>
+        </div>
+        <figure>
+          <svg id="model-plot" viewBox="0 0 470 205" role="img" aria-label="Simulated electrical power over elapsed model time"></svg>
+          <figcaption id="model-caption">Elapsed hours from the simulation clock origin</figcaption>
+        </figure>
+        <div class="inspection">
+          <div class="reading"><label for="model-sample">Inspect simulation</label><output id="model-output" for="model-sample"></output></div>
+          <input type="range" id="model-sample" min="0" max="1" value="0" disabled>
+          <p id="model-time" class="timestamp"></p>
+        </div>
+        <p id="model-status" class="status" role="status">Loading the released startup…</p>
+        <p class="definition">Simulated net power subtracts auxiliary demand from gross generator output. Negative net power before grid connection represents station load. Each interval mean integrates between recorded samples assuming linear change.</p>
+        <p class="links"><a href="./validation/startup_output/model.json" download>Download released run</a> <a href="https://github.com/ajayasai/OpenPWR/releases/tag/v0.11.0">Native release ↗</a></p>
+        <details>
+          <summary>Use a workbench recording</summary>
+          <p>Open a CSV exported from the continuous startup workbench. Its simulation times and electrical readings are processed in this browser.</p>
+          <label for="model-file">Startup recording (.csv)</label>
+          <input id="model-file" type="file" accept=".csv,text/csv">
+          <button id="restore-model" type="button" disabled>Restore released run</button>
+          <p id="file-status" class="status" role="status"></p>
+        </details>
+      </section>
+    </div>
+    <section class="context" aria-labelledby="scope-title">
+      <h2 id="scope-title">What the meters can tell us</h2>
+      <p id="threshold-result"></p>
+      <p>The station record shows when electricity returned and how output changed between half-hour readings. The native run starts at a prescribed cold state and follows the simulator’s own control schedule. The two charts use independent clocks and power scales. The meter readings alone cannot establish reactor temperature, criticality, breaker timing or pressure accuracy.</p>
+      <p id="attribution"></p>
+    </section>
+  </main>
+  <script type="module" src="./src/startup-evidence.js"></script>
+</body>
+</html>

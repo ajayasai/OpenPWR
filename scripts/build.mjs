@@ -318,8 +318,14 @@ try {
   await rm(output, { recursive: true });
 } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await mkdir(output, { recursive: true });
-for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
+for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
+}
+for (const directory of ['validation/grid_return', 'validation/startup_output']) {
+  await cp(resolve(root, directory), resolve(output, directory), {
+    recursive: true,
+    filter: entry => !entry.endsWith('__pycache__') && !entry.endsWith('.pyc'),
+  });
 }
 if (includeNative) for (const [from, to] of nativeFiles) await cp(resolve(root, 'artifacts', from), resolve(output, to));
 if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), resolve(output, 'plant-verification.json'));

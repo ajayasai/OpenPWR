@@ -1,0 +1,4523 @@
+{
+  "schema": "openpwr-startup-electrical-output-v1",
+  "source": {
+    "release": "v0.11.0",
+    "gitRevision": "01bf3b1959ae73095a7d6f3a728bf2521090444c",
+    "url": "https://github.com/ajayasai/OpenPWR/releases/download/v0.11.0/continuous-verification.json",
+    "reportSha256": "9952b17ef7718a4fcff5c219d4cee87921ebc9897e596e4767b429fd091589a2",
+    "reportBytes": 18134399,
+    "scenarioId": "full-startup",
+    "fmuSha256": "61c5c2c14dc546d3a808e445ebd01affcb7b2f6c4d26d91e487f788b16733a7c"
+  },
+  "nominalNetPowerMW": 1000,
+  "sampleIntervalSeconds": 30,
+  "durationSeconds": 27000,
+  "breakerClosingElapsedSeconds": 20000.0,
+  "points": [
+    {
+      "elapsedSeconds": 0,
+      "netPowerMW": -5.0,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 30,
+      "netPowerMW": -43.691118397148585,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 60,
+      "netPowerMW": -44.54710502605067,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 90,
+      "netPowerMW": -44.558978594675125,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 120,
+      "netPowerMW": -44.55914203336299,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 150,
+      "netPowerMW": -44.55914428284498,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 180,
+      "netPowerMW": -44.55914431380559,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 210,
+      "netPowerMW": -44.55914431423171,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 240,
+      "netPowerMW": -44.55914431423758,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 270,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 300,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 330,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 360,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 390,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 420,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 450,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 480,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 510,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 540,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 570,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 600,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 630,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 660,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 690,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 720,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 750,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 780,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 810,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 840,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 870,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 900,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 930,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 960,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 990,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1020,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1050,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1080,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1110,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1140,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1170,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1200,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1230,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1260,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1290,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1320,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1350,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1380,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1410,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1440,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1470,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1500,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1530,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1560,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1590,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1620,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1650,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1680,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1710,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1740,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1770,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1800,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1830,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1860,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1890,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1920,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1950,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 1980,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2010,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2040,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2070,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2100,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2130,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2160,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2190,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2220,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2250,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2280,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2310,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2340,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2370,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2400,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2430,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2460,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2490,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2520,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2550,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2580,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2610,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2640,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2670,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2700,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2730,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2760,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2790,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2820,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2850,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2880,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2910,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2940,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 2970,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3000,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3030,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3060,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3090,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3120,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3150,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3180,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3210,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3240,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3270,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3300,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3330,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3360,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3390,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3420,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3450,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3480,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3510,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3540,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3570,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3600,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3630,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3660,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3690,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3720,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3750,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3780,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3810,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3840,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3870,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3900,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3930,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3960,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 3990,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4020,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4050,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4080,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4110,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4140,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4170,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4200,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4230,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4260,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4290,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4320,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4350,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4380,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4410,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4440,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4470,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4500,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4530,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4560,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4590,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4620,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4650,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4680,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4710,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4740,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4770,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4800,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4830,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4860,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4890,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4920,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4950,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 4980,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5010,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5040,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5070,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5100,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5130,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5160,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5190,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5220,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5250,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5280,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5310,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5340,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5370,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5400,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5430,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5460,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5490,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5520,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5550,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5580,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5610,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5640,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5670,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5700,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5730,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5760,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5790,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5820,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5850,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5880,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5910,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5940,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 5970,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6000,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6030,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6060,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6090,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6120,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6150,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6180,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6210,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6240,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6270,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6300,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6330,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6360,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6390,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6420,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6450,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6480,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6510,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6540,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6570,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6600,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6630,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6660,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6690,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6720,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6750,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6780,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6810,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6840,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6870,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6900,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6930,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6960,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 6990,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7020,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7050,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7080,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7110,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7140,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7170,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7200,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7230,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7260,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7290,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7320,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7350,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7380,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7410,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7440,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7470,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7500,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7530,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7560,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7590,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7620,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7650,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7680,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7710,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7740,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7770,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7800,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7830,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7860,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7890,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7920,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7950,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 7980,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8010,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8040,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8070,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8100,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8130,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8160,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8190,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8220,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8250,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8280,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8310,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8340,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8370,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8400,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8430,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8460,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8490,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8520,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8550,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8580,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8610,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8640,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8670,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8700,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8730,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8760,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8790,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8820,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8850,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8880,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8910,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8940,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 8970,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9000,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9030,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9060,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9090,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9120,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9150,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9180,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9210,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9240,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9270,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9300,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9330,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9360,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9390,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9420,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9450,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9480,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9510,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9540,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9570,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9600,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9630,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9660,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9690,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9720,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9750,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9780,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9810,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9840,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9870,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9900,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9930,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9960,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 9990,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10020,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10050,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10080,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10110,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10140,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10170,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10200,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10230,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10260,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10290,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10320,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10350,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10380,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10410,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10440,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10470,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10500,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10530,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10560,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10590,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10620,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10650,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10680,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10710,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10740,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10770,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10800,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10830,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10860,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10890,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10920,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10950,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 10980,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11010,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11040,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11070,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11100,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11130,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11160,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11190,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11220,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11250,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11280,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11310,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11340,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11370,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11400,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11430,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11460,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11490,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11520,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11550,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11580,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11610,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11640,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11670,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11700,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11730,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11760,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11790,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11820,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11850,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11880,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11910,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11940,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 11970,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12000,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12030,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12060,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12090,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12120,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12150,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12180,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12210,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12240,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12270,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12300,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12330,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12360,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12390,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12420,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12450,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12480,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12510,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12540,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12570,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12600,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12630,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12660,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12690,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12720,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12750,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12780,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12810,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12840,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12870,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12900,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12930,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12960,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 12990,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13020,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13050,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13080,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13110,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13140,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13170,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13200,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13230,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13260,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13290,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13320,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13350,
+      "netPowerMW": -44.55914431423762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13380,
+      "netPowerMW": -44.42169754078242,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13410,
+      "netPowerMW": -44.101536366228906,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13440,
+      "netPowerMW": -43.816749135470424,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13470,
+      "netPowerMW": -43.56351611540239,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13500,
+      "netPowerMW": -43.338407329411645,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13530,
+      "netPowerMW": -43.138347352202565,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13560,
+      "netPowerMW": -42.96058375155816,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13590,
+      "netPowerMW": -42.80265690400727,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13620,
+      "netPowerMW": -42.6623715490667,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13650,
+      "netPowerMW": -42.53777032697021,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13680,
+      "netPowerMW": -42.42710940451675,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13710,
+      "netPowerMW": -42.32883619538123,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13740,
+      "netPowerMW": -42.24156911595633,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13770,
+      "netPowerMW": -42.16407927663164,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13800,
+      "netPowerMW": -42.0952739845264,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13830,
+      "netPowerMW": -42.03418192190816,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13860,
+      "netPowerMW": -41.979939861053545,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13890,
+      "netPowerMW": -41.931780778352135,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13920,
+      "netPowerMW": -41.8890232360231,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13950,
+      "netPowerMW": -41.85106190749232,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 13980,
+      "netPowerMW": -41.817359131274145,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14010,
+      "netPowerMW": -41.78743738744464,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14040,
+      "netPowerMW": -41.76087260003182,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14070,
+      "netPowerMW": -41.73728817759488,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14100,
+      "netPowerMW": -41.71634971273879,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14130,
+      "netPowerMW": -41.69776026922138,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14160,
+      "netPowerMW": -41.68125619260543,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14190,
+      "netPowerMW": -41.66660338708559,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14220,
+      "netPowerMW": -41.65359671303991,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14250,
+      "netPowerMW": -41.64232787618117,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14280,
+      "netPowerMW": -41.63272537969397,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14310,
+      "netPowerMW": -41.6245394962062,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14340,
+      "netPowerMW": -41.6175588620578,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14370,
+      "netPowerMW": -41.61160389226363,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14400,
+      "netPowerMW": -41.60652196635539,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14430,
+      "netPowerMW": -41.60218335732663,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14460,
+      "netPowerMW": -41.59847777635276,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14490,
+      "netPowerMW": -41.59531144035984,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14520,
+      "netPowerMW": -41.59260458362275,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14550,
+      "netPowerMW": -41.59028934627845,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14580,
+      "netPowerMW": -41.58830798266243,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14610,
+      "netPowerMW": -41.58661134095038,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14640,
+      "netPowerMW": -41.58515757290776,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14670,
+      "netPowerMW": -41.583911038782205,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14700,
+      "netPowerMW": -41.58284137768109,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14730,
+      "netPowerMW": -41.5819227182869,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14760,
+      "netPowerMW": -41.58113300858928,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14790,
+      "netPowerMW": -41.58045344656167,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14820,
+      "netPowerMW": -41.579867996471194,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14850,
+      "netPowerMW": -41.57936297783414,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14880,
+      "netPowerMW": -41.57892671602251,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14910,
+      "netPowerMW": -41.57854924519216,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14940,
+      "netPowerMW": -41.57822205563063,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 14970,
+      "netPowerMW": -41.5779378788215,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15000,
+      "netPowerMW": -41.57769050454482,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15030,
+      "netPowerMW": -41.57747462519185,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15060,
+      "netPowerMW": -41.577285703208126,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15090,
+      "netPowerMW": -41.57711985819496,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15120,
+      "netPowerMW": -41.57697377072651,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15150,
+      "netPowerMW": -41.57684460038308,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15180,
+      "netPowerMW": -41.57672991587766,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15210,
+      "netPowerMW": -41.57662763547658,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15240,
+      "netPowerMW": -41.57653597618035,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15270,
+      "netPowerMW": -41.57645341036509,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15300,
+      "netPowerMW": -41.5763786287767,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15330,
+      "netPowerMW": -41.57631050894191,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15360,
+      "netPowerMW": -41.576248088189075,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15390,
+      "netPowerMW": -41.576190540604905,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15420,
+      "netPowerMW": -41.57613715734675,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15450,
+      "netPowerMW": -41.576087329810605,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15480,
+      "netPowerMW": -41.57604053524644,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15510,
+      "netPowerMW": -41.57599632445387,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15540,
+      "netPowerMW": -41.575954311256815,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15570,
+      "netPowerMW": -41.575914163497096,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15600,
+      "netPowerMW": -41.57587559532841,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15630,
+      "netPowerMW": -41.57583836061639,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15660,
+      "netPowerMW": -41.57580224728649,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15690,
+      "netPowerMW": -41.57576707248265,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15720,
+      "netPowerMW": -41.57573267842159,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15750,
+      "netPowerMW": -41.57569892883575,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15780,
+      "netPowerMW": -41.575665705925786,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15810,
+      "netPowerMW": -41.57563290774564,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15840,
+      "netPowerMW": -41.575600445962195,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15870,
+      "netPowerMW": -41.57556824393063,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15900,
+      "netPowerMW": -41.57553623504289,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15930,
+      "netPowerMW": -41.57550436131042,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15960,
+      "netPowerMW": -41.57547257214576,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 15990,
+      "netPowerMW": -41.57544082331888,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16020,
+      "netPowerMW": -41.575409076056594,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16050,
+      "netPowerMW": -41.57537729627131,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16080,
+      "netPowerMW": -41.57534545389487,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16110,
+      "netPowerMW": -41.575313522309564,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16140,
+      "netPowerMW": -41.575281477855924,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16170,
+      "netPowerMW": -41.57524929940885,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16200,
+      "netPowerMW": -41.575216968014,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16230,
+      "netPowerMW": -41.575184466572594,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16260,
+      "netPowerMW": -41.5751517795735,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16290,
+      "netPowerMW": -41.57511889285764,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16320,
+      "netPowerMW": -41.57508579341763,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16350,
+      "netPowerMW": -41.575052469223024,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16380,
+      "netPowerMW": -41.575018909072384,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16410,
+      "netPowerMW": -41.57498510246168,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16440,
+      "netPowerMW": -41.574951039472694,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16470,
+      "netPowerMW": -41.57491671067483,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16500,
+      "netPowerMW": -41.57488210704263,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16530,
+      "netPowerMW": -41.57484721988137,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16560,
+      "netPowerMW": -41.57481204076338,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16590,
+      "netPowerMW": -41.57477656147262,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16620,
+      "netPowerMW": -41.5747407739577,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16650,
+      "netPowerMW": -41.5747046702886,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16680,
+      "netPowerMW": -41.57466824261792,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16710,
+      "netPowerMW": -41.574631483152444,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16740,
+      "netPowerMW": -41.57459438412183,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16770,
+      "netPowerMW": -41.57455693775317,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16800,
+      "netPowerMW": -41.57451913624939,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16830,
+      "netPowerMW": -41.57448097177017,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16860,
+      "netPowerMW": -41.57444243641207,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16890,
+      "netPowerMW": -41.574403522193464,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16920,
+      "netPowerMW": -41.574364221041016,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16950,
+      "netPowerMW": -41.57432452477489,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 16980,
+      "netPowerMW": -41.57428442509692,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17010,
+      "netPowerMW": -41.574243913580986,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17040,
+      "netPowerMW": -41.57420298166112,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17070,
+      "netPowerMW": -41.57416162062178,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17100,
+      "netPowerMW": -41.5741198215907,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17130,
+      "netPowerMW": -41.57407757552815,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17160,
+      "netPowerMW": -41.57403487322025,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17190,
+      "netPowerMW": -41.57399170527127,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17220,
+      "netPowerMW": -41.57394806209404,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17250,
+      "netPowerMW": -41.573903933905505,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17280,
+      "netPowerMW": -41.57385931071764,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17310,
+      "netPowerMW": -41.57381418233051,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17340,
+      "netPowerMW": -41.57376853832721,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17370,
+      "netPowerMW": -41.57372236799658,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17400,
+      "netPowerMW": -41.5736756604498,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17430,
+      "netPowerMW": -41.607914240677005,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17460,
+      "netPowerMW": -41.7079886827552,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17490,
+      "netPowerMW": -41.79102079713883,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17520,
+      "netPowerMW": -41.846929039428595,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17550,
+      "netPowerMW": -41.87992854979025,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17580,
+      "netPowerMW": -41.89552554608092,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17610,
+      "netPowerMW": -41.89838653884176,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17640,
+      "netPowerMW": -41.89217480723085,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17670,
+      "netPowerMW": -41.87970489406001,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17700,
+      "netPowerMW": -41.8631164104339,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17730,
+      "netPowerMW": -41.844020200131105,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17760,
+      "netPowerMW": -41.823615034147295,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17790,
+      "netPowerMW": -41.80277979236351,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17820,
+      "netPowerMW": -41.782146121166576,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17850,
+      "netPowerMW": -41.762155644712564,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17880,
+      "netPowerMW": -41.74310494968745,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17910,
+      "netPowerMW": -41.725180879947146,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17940,
+      "netPowerMW": -41.7084881462335,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 17970,
+      "netPowerMW": -41.69307084219125,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18000,
+      "netPowerMW": -41.67892913290537,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18030,
+      "netPowerMW": -42.18628957137019,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18060,
+      "netPowerMW": -42.652430162727725,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18090,
+      "netPowerMW": -42.842973447630555,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18120,
+      "netPowerMW": -43.111790564759076,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18150,
+      "netPowerMW": -43.55344323680387,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18180,
+      "netPowerMW": -43.881449593021294,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18210,
+      "netPowerMW": -44.09069637808126,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18240,
+      "netPowerMW": -44.19669633938463,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18270,
+      "netPowerMW": -44.13130560866927,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18300,
+      "netPowerMW": -43.941079547495505,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18330,
+      "netPowerMW": -43.823996227991636,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18360,
+      "netPowerMW": -43.777799596160236,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18390,
+      "netPowerMW": -43.704990918448104,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18420,
+      "netPowerMW": -43.61420508717205,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18450,
+      "netPowerMW": -43.51269936899762,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18480,
+      "netPowerMW": -43.405971626297486,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18510,
+      "netPowerMW": -43.298044092711265,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18540,
+      "netPowerMW": -43.19178597498533,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18570,
+      "netPowerMW": -43.08918336923328,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18600,
+      "netPowerMW": -42.99155266543128,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18630,
+      "netPowerMW": -42.8997069516681,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18660,
+      "netPowerMW": -42.814085125381986,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18690,
+      "netPowerMW": -42.73485170650095,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18720,
+      "netPowerMW": -42.661973684562795,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18750,
+      "netPowerMW": -42.59527938252943,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18780,
+      "netPowerMW": -42.534503258561486,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18810,
+      "netPowerMW": -42.47931973425322,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18840,
+      "netPowerMW": -42.42936848278478,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18870,
+      "netPowerMW": -42.38427309378018,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18900,
+      "netPowerMW": -42.34365462331394,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18930,
+      "netPowerMW": -42.30714121439509,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18960,
+      "netPowerMW": -42.27437471746623,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 18990,
+      "netPowerMW": -42.24501503799479,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19020,
+      "netPowerMW": -42.2187427781009,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19050,
+      "netPowerMW": -42.195260612682624,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19080,
+      "netPowerMW": -42.174293740751295,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19110,
+      "netPowerMW": -42.155589674185336,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19140,
+      "netPowerMW": -42.13891756448859,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19170,
+      "netPowerMW": -42.12406721988753,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19200,
+      "netPowerMW": -42.11084792745897,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19230,
+      "netPowerMW": -42.09908716570927,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19260,
+      "netPowerMW": -42.08862927036151,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19290,
+      "netPowerMW": -42.0793340986615,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19320,
+      "netPowerMW": -42.07107572412651,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19350,
+      "netPowerMW": -42.06374118349757,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19380,
+      "netPowerMW": -42.05722928997005,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19410,
+      "netPowerMW": -42.05144952104206,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19440,
+      "netPowerMW": -42.04632098507946,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19470,
+      "netPowerMW": -42.04177146762558,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19500,
+      "netPowerMW": -42.037736556287314,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19530,
+      "netPowerMW": -42.034158841524146,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19560,
+      "netPowerMW": -42.03098718966342,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19590,
+      "netPowerMW": -42.02817608384897,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19620,
+      "netPowerMW": -42.02568502830265,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19650,
+      "netPowerMW": -42.02347801115305,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19680,
+      "netPowerMW": -42.021523021106724,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19710,
+      "netPowerMW": -42.0197916133788,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19740,
+      "netPowerMW": -42.01825852048821,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19770,
+      "netPowerMW": -42.01690130377222,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19800,
+      "netPowerMW": -42.015700041745205,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19830,
+      "netPowerMW": -42.014637051709016,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19860,
+      "netPowerMW": -42.01369664129821,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19890,
+      "netPowerMW": -42.01286488693186,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19920,
+      "netPowerMW": -42.01212943640121,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19950,
+      "netPowerMW": -42.0114793330756,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 19980,
+      "netPowerMW": -42.01090485945181,
+      "grossPowerMW": 0.0
+    },
+    {
+      "elapsedSeconds": 20010,
+      "netPowerMW": -0.27187699346071525,
+      "grossPowerMW": 41.749982360377864
+    },
+    {
+      "elapsedSeconds": 20040,
+      "netPowerMW": 0.0006725078384732797,
+      "grossPowerMW": 42.022014176884284
+    },
+    {
+      "elapsedSeconds": 20070,
+      "netPowerMW": 1.4560559407073015e-05,
+      "grossPowerMW": 42.0206112319221
+    },
+    {
+      "elapsedSeconds": 20100,
+      "netPowerMW": -2.4990291656479258e-05,
+      "grossPowerMW": 42.02101586428414
+    },
+    {
+      "elapsedSeconds": 20130,
+      "netPowerMW": 1.214417488881736e-05,
+      "grossPowerMW": 42.021085474684135
+    },
+    {
+      "elapsedSeconds": 20160,
+      "netPowerMW": 3.530965623355087e-05,
+      "grossPowerMW": 42.02070184264033
+    },
+    {
+      "elapsedSeconds": 20190,
+      "netPowerMW": 5.03354337553219e-05,
+      "grossPowerMW": 42.019993671739726
+    },
+    {
+      "elapsedSeconds": 20220,
+      "netPowerMW": 7.055793320631665e-05,
+      "grossPowerMW": 42.019093153577664
+    },
+    {
+      "elapsedSeconds": 20250,
+      "netPowerMW": 7.019645594397161e-05,
+      "grossPowerMW": 42.018095782881566
+    },
+    {
+      "elapsedSeconds": 20280,
+      "netPowerMW": 6.85527890240678e-05,
+      "grossPowerMW": 42.01706392193529
+    },
+    {
+      "elapsedSeconds": 20310,
+      "netPowerMW": 6.933608807457858e-05,
+      "grossPowerMW": 42.016043154631724
+    },
+    {
+      "elapsedSeconds": 20340,
+      "netPowerMW": 5.958634994840395e-05,
+      "grossPowerMW": 42.01506411804174
+    },
+    {
+      "elapsedSeconds": 20370,
+      "netPowerMW": 6.358254361060744e-05,
+      "grossPowerMW": 42.0141429859535
+    },
+    {
+      "elapsedSeconds": 20400,
+      "netPowerMW": 5.6274169232040094e-05,
+      "grossPowerMW": 42.013289460557814
+    },
+    {
+      "elapsedSeconds": 20430,
+      "netPowerMW": 4.219064094712621e-05,
+      "grossPowerMW": 42.012506342092735
+    },
+    {
+      "elapsedSeconds": 20460,
+      "netPowerMW": 4.238124184752223e-05,
+      "grossPowerMW": 42.01179592329174
+    },
+    {
+      "elapsedSeconds": 20490,
+      "netPowerMW": 3.880060064176405e-05,
+      "grossPowerMW": 42.01115545752271
+    },
+    {
+      "elapsedSeconds": 20520,
+      "netPowerMW": 4.225162543036731e-05,
+      "grossPowerMW": 42.010580335855494
+    },
+    {
+      "elapsedSeconds": 20550,
+      "netPowerMW": 3.1707311194395515e-05,
+      "grossPowerMW": 42.010066212015595
+    },
+    {
+      "elapsedSeconds": 20580,
+      "netPowerMW": 2.1768324572235542e-05,
+      "grossPowerMW": 42.009607147085774
+    },
+    {
+      "elapsedSeconds": 20610,
+      "netPowerMW": 2.392756374547389e-05,
+      "grossPowerMW": 42.00920265088211
+    },
+    {
+      "elapsedSeconds": 20640,
+      "netPowerMW": 2.2057673874087413e-05,
+      "grossPowerMW": 42.008844695185424
+    },
+    {
+      "elapsedSeconds": 20670,
+      "netPowerMW": 1.9064819696268387e-05,
+      "grossPowerMW": 42.00852826304807
+    },
+    {
+      "elapsedSeconds": 20700,
+      "netPowerMW": 1.291863140551186e-05,
+      "grossPowerMW": 42.008250863967675
+    },
+    {
+      "elapsedSeconds": 20730,
+      "netPowerMW": 9.675666646558057e-06,
+      "grossPowerMW": 42.00800566890235
+    },
+    {
+      "elapsedSeconds": 20760,
+      "netPowerMW": 1.0679795835244477e-05,
+      "grossPowerMW": 42.00779196709925
+    },
+    {
+      "elapsedSeconds": 20790,
+      "netPowerMW": 1.7806297286426798e-05,
+      "grossPowerMW": 42.00760245847885
+    },
+    {
+      "elapsedSeconds": 20820,
+      "netPowerMW": 1.2482701613691916e-05,
+      "grossPowerMW": 42.007439862371754
+    },
+    {
+      "elapsedSeconds": 20850,
+      "netPowerMW": 8.639312831348889e-06,
+      "grossPowerMW": 42.00729606043242
+    },
+    {
+      "elapsedSeconds": 20880,
+      "netPowerMW": 6.4156900307921205e-06,
+      "grossPowerMW": 42.007172408097134
+    },
+    {
+      "elapsedSeconds": 20910,
+      "netPowerMW": 8.679793147337023e-06,
+      "grossPowerMW": 42.00706562535767
+    },
+    {
+      "elapsedSeconds": 20940,
+      "netPowerMW": 6.949505625186703e-06,
+      "grossPowerMW": 42.00697169641066
+    },
+    {
+      "elapsedSeconds": 20970,
+      "netPowerMW": 9.352079999302987e-06,
+      "grossPowerMW": 42.006892116195345
+    },
+    {
+      "elapsedSeconds": 21000,
+      "netPowerMW": 7.084339706864284e-06,
+      "grossPowerMW": 42.00682416685201
+    },
+    {
+      "elapsedSeconds": 21030,
+      "netPowerMW": 8.109865589744913e-06,
+      "grossPowerMW": 42.00676560820428
+    },
+    {
+      "elapsedSeconds": 21060,
+      "netPowerMW": 1.2145081178971395e-05,
+      "grossPowerMW": 42.00671419537264
+    },
+    {
+      "elapsedSeconds": 21090,
+      "netPowerMW": 6.689761029576857e-06,
+      "grossPowerMW": 42.00667224409776
+    },
+    {
+      "elapsedSeconds": 21120,
+      "netPowerMW": 8.160070734675173e-07,
+      "grossPowerMW": 42.00663368676579
+    },
+    {
+      "elapsedSeconds": 21150,
+      "netPowerMW": -5.923643300320691e-07,
+      "grossPowerMW": 42.00660419915219
+    },
+    {
+      "elapsedSeconds": 21180,
+      "netPowerMW": 7.655405248385705e-06,
+      "grossPowerMW": 42.00657834049565
+    },
+    {
+      "elapsedSeconds": 21210,
+      "netPowerMW": 4.902811895135528e-06,
+      "grossPowerMW": 42.00655438986365
+    },
+    {
+      "elapsedSeconds": 21240,
+      "netPowerMW": 4.146621925826821e-06,
+      "grossPowerMW": 42.00653742052894
+    },
+    {
+      "elapsedSeconds": 21270,
+      "netPowerMW": -1.8784138404726036e-06,
+      "grossPowerMW": 42.00652179495597
+    },
+    {
+      "elapsedSeconds": 21300,
+      "netPowerMW": 5.27325290988756e-07,
+      "grossPowerMW": 42.006510256797036
+    },
+    {
+      "elapsedSeconds": 21330,
+      "netPowerMW": 1.4921421183089478e-06,
+      "grossPowerMW": 42.00649923320878
+    },
+    {
+      "elapsedSeconds": 21360,
+      "netPowerMW": 1.6699623017757403e-07,
+      "grossPowerMW": 42.0064912891532
+    },
+    {
+      "elapsedSeconds": 21390,
+      "netPowerMW": 6.639159479959744e-06,
+      "grossPowerMW": 42.006485069075836
+    },
+    {
+      "elapsedSeconds": 21420,
+      "netPowerMW": -3.226349818419294e-06,
+      "grossPowerMW": 42.00648034932189
+    },
+    {
+      "elapsedSeconds": 21450,
+      "netPowerMW": 8.961301745102901e-08,
+      "grossPowerMW": 42.00647754194018
+    },
+    {
+      "elapsedSeconds": 21480,
+      "netPowerMW": -5.304293779317959e-06,
+      "grossPowerMW": 42.00647682787879
+    },
+    {
+      "elapsedSeconds": 21510,
+      "netPowerMW": -5.461278512086665e-06,
+      "grossPowerMW": 42.00647453227062
+    },
+    {
+      "elapsedSeconds": 21540,
+      "netPowerMW": -3.243911635308905e-06,
+      "grossPowerMW": 42.0064742997788
+    },
+    {
+      "elapsedSeconds": 21570,
+      "netPowerMW": 2.5632270848063854e-06,
+      "grossPowerMW": 42.006474299004005
+    },
+    {
+      "elapsedSeconds": 21600,
+      "netPowerMW": -2.8478792444275314e-06,
+      "grossPowerMW": 42.00647664932076
+    },
+    {
+      "elapsedSeconds": 21630,
+      "netPowerMW": -2.8925257069545296e-06,
+      "grossPowerMW": 42.00647758806033
+    },
+    {
+      "elapsedSeconds": 21660,
+      "netPowerMW": 7.706709716615023e-06,
+      "grossPowerMW": 42.0064797385581
+    },
+    {
+      "elapsedSeconds": 21690,
+      "netPowerMW": 5.718716522551404e-06,
+      "grossPowerMW": 42.00648299977424
+    },
+    {
+      "elapsedSeconds": 21720,
+      "netPowerMW": -5.307453115221961e-06,
+      "grossPowerMW": 42.0064859461205
+    },
+    {
+      "elapsedSeconds": 21750,
+      "netPowerMW": -6.770030502423197e-06,
+      "grossPowerMW": 42.006490932903866
+    },
+    {
+      "elapsedSeconds": 21780,
+      "netPowerMW": 4.664551610744638e-06,
+      "grossPowerMW": 42.00649340524469
+    },
+    {
+      "elapsedSeconds": 21810,
+      "netPowerMW": -3.321241358378302e-06,
+      "grossPowerMW": 42.00649645973432
+    },
+    {
+      "elapsedSeconds": 21840,
+      "netPowerMW": 5.024716685397834e-06,
+      "grossPowerMW": 42.00650156000584
+    },
+    {
+      "elapsedSeconds": 21870,
+      "netPowerMW": -8.496421344261762e-09,
+      "grossPowerMW": 42.00650514058307
+    },
+    {
+      "elapsedSeconds": 21900,
+      "netPowerMW": 2.654723424200256e-06,
+      "grossPowerMW": 42.00651031660091
+    },
+    {
+      "elapsedSeconds": 21930,
+      "netPowerMW": 1.571335005223773e-06,
+      "grossPowerMW": 42.006515562192945
+    },
+    {
+      "elapsedSeconds": 21960,
+      "netPowerMW": 5.937250556087292e-06,
+      "grossPowerMW": 42.00651860193516
+    },
+    {
+      "elapsedSeconds": 21990,
+      "netPowerMW": 4.639930658356661e-06,
+      "grossPowerMW": 42.00652394861858
+    },
+    {
+      "elapsedSeconds": 22020,
+      "netPowerMW": -0.027217965345528228,
+      "grossPowerMW": 42.092852262131125
+    },
+    {
+      "elapsedSeconds": 22050,
+      "netPowerMW": -0.055770348806923664,
+      "grossPowerMW": 42.757611925042085
+    },
+    {
+      "elapsedSeconds": 22080,
+      "netPowerMW": -0.06013305922885337,
+      "grossPowerMW": 43.54081366261833
+    },
+    {
+      "elapsedSeconds": 22110,
+      "netPowerMW": -0.05209604795805234,
+      "grossPowerMW": 44.25888833736881
+    },
+    {
+      "elapsedSeconds": 22140,
+      "netPowerMW": -0.04523680384253481,
+      "grossPowerMW": 44.847087838114504
+    },
+    {
+      "elapsedSeconds": 22170,
+      "netPowerMW": -0.04318480014300263,
+      "grossPowerMW": 45.36489768658875
+    },
+    {
+      "elapsedSeconds": 22200,
+      "netPowerMW": -0.0405217807258893,
+      "grossPowerMW": 45.84602911602632
+    },
+    {
+      "elapsedSeconds": 22230,
+      "netPowerMW": -0.03728068616089786,
+      "grossPowerMW": 46.28183610401117
+    },
+    {
+      "elapsedSeconds": 22260,
+      "netPowerMW": -0.03386848134782383,
+      "grossPowerMW": 46.669243313004706
+    },
+    {
+      "elapsedSeconds": 22290,
+      "netPowerMW": -0.030537637874921586,
+      "grossPowerMW": 47.00974970635161
+    },
+    {
+      "elapsedSeconds": 22320,
+      "netPowerMW": -0.02747144408288449,
+      "grossPowerMW": 47.30749821774123
+    },
+    {
+      "elapsedSeconds": 22350,
+      "netPowerMW": -0.02472083043905826,
+      "grossPowerMW": 47.5678548122395
+    },
+    {
+      "elapsedSeconds": 22380,
+      "netPowerMW": -0.02231473962850572,
+      "grossPowerMW": 47.79650732520507
+    },
+    {
+      "elapsedSeconds": 22410,
+      "netPowerMW": -0.02023757654816194,
+      "grossPowerMW": 47.998921756801494
+    },
+    {
+      "elapsedSeconds": 22440,
+      "netPowerMW": -0.018460976667071805,
+      "grossPowerMW": 48.1800478026702
+    },
+    {
+      "elapsedSeconds": 22470,
+      "netPowerMW": -0.016962367446765825,
+      "grossPowerMW": 48.34422131199005
+    },
+    {
+      "elapsedSeconds": 22500,
+      "netPowerMW": -0.015702255859743275,
+      "grossPowerMW": 48.49510150875574
+    },
+    {
+      "elapsedSeconds": 22530,
+      "netPowerMW": -0.014645446965602105,
+      "grossPowerMW": 48.63571946515507
+    },
+    {
+      "elapsedSeconds": 22560,
+      "netPowerMW": -0.014709868773508106,
+      "grossPowerMW": 48.77289797645481
+    },
+    {
+      "elapsedSeconds": 22590,
+      "netPowerMW": -0.015350579152730859,
+      "grossPowerMW": 48.925064235747584
+    },
+    {
+      "elapsedSeconds": 22620,
+      "netPowerMW": -0.015787716664299012,
+      "grossPowerMW": 49.09125006680668
+    },
+    {
+      "elapsedSeconds": 22650,
+      "netPowerMW": -0.016050838267041456,
+      "grossPowerMW": 49.268245953392515
+    },
+    {
+      "elapsedSeconds": 22680,
+      "netPowerMW": -0.016154109207548117,
+      "grossPowerMW": 49.45318829104196
+    },
+    {
+      "elapsedSeconds": 22710,
+      "netPowerMW": -0.016129685584381548,
+      "grossPowerMW": 49.64353488868635
+    },
+    {
+      "elapsedSeconds": 22740,
+      "netPowerMW": -0.01598875072950534,
+      "grossPowerMW": 49.83707116591178
+    },
+    {
+      "elapsedSeconds": 22770,
+      "netPowerMW": -0.015747588000849078,
+      "grossPowerMW": 50.031862745907986
+    },
+    {
+      "elapsedSeconds": 22800,
+      "netPowerMW": -0.01542804121437058,
+      "grossPowerMW": 50.22624754928222
+    },
+    {
+      "elapsedSeconds": 22830,
+      "netPowerMW": -0.015041662345922191,
+      "grossPowerMW": 50.41880957535993
+    },
+    {
+      "elapsedSeconds": 22860,
+      "netPowerMW": -0.014601048723932308,
+      "grossPowerMW": 50.608352989581554
+    },
+    {
+      "elapsedSeconds": 22890,
+      "netPowerMW": -0.01415034356954692,
+      "grossPowerMW": 50.79388088301324
+    },
+    {
+      "elapsedSeconds": 22920,
+      "netPowerMW": -0.01359434472283283,
+      "grossPowerMW": 50.974576992364256
+    },
+    {
+      "elapsedSeconds": 22950,
+      "netPowerMW": -0.013051901884288952,
+      "grossPowerMW": 51.14977490867638
+    },
+    {
+      "elapsedSeconds": 22980,
+      "netPowerMW": -0.012490212910421405,
+      "grossPowerMW": 51.31895481573371
+    },
+    {
+      "elapsedSeconds": 23010,
+      "netPowerMW": -0.011923679276115706,
+      "grossPowerMW": 51.481722301053374
+    },
+    {
+      "elapsedSeconds": 23040,
+      "netPowerMW": -0.011166666698514405,
+      "grossPowerMW": 51.63767437053614
+    },
+    {
+      "elapsedSeconds": 23070,
+      "netPowerMW": -0.0066780664880568,
+      "grossPowerMW": 51.753939466177606
+    },
+    {
+      "elapsedSeconds": 23100,
+      "netPowerMW": -0.003184924355373653,
+      "grossPowerMW": 51.81199682040916
+    },
+    {
+      "elapsedSeconds": 23130,
+      "netPowerMW": -0.0005246186914931172,
+      "grossPowerMW": 51.8255655860647
+    },
+    {
+      "elapsedSeconds": 23160,
+      "netPowerMW": 0.0014615537004516455,
+      "grossPowerMW": 51.80575907975127
+    },
+    {
+      "elapsedSeconds": 23190,
+      "netPowerMW": 0.002919094015680912,
+      "grossPowerMW": 51.76141607022918
+    },
+    {
+      "elapsedSeconds": 23220,
+      "netPowerMW": 0.0039482794878864524,
+      "grossPowerMW": 51.6995637862553
+    },
+    {
+      "elapsedSeconds": 23250,
+      "netPowerMW": 0.004648881311773323,
+      "grossPowerMW": 51.625754115043684
+    },
+    {
+      "elapsedSeconds": 23280,
+      "netPowerMW": 0.005083100221348502,
+      "grossPowerMW": 51.54435237264765
+    },
+    {
+      "elapsedSeconds": 23310,
+      "netPowerMW": 0.005317381213508554,
+      "grossPowerMW": 51.45877339493262
+    },
+    {
+      "elapsedSeconds": 23340,
+      "netPowerMW": 0.005389925251854777,
+      "grossPowerMW": 51.37164298737474
+    },
+    {
+      "elapsedSeconds": 23370,
+      "netPowerMW": 0.005345296207202921,
+      "grossPowerMW": 51.284963838187714
+    },
+    {
+      "elapsedSeconds": 23400,
+      "netPowerMW": 0.005209466687119857,
+      "grossPowerMW": 51.2002302042888
+    },
+    {
+      "elapsedSeconds": 23430,
+      "netPowerMW": 0.005016998351059954,
+      "grossPowerMW": 51.11852587168546
+    },
+    {
+      "elapsedSeconds": 23460,
+      "netPowerMW": 0.004771338703811523,
+      "grossPowerMW": 51.040605145680225
+    },
+    {
+      "elapsedSeconds": 23490,
+      "netPowerMW": 0.004500816179465517,
+      "grossPowerMW": 50.96697085051046
+    },
+    {
+      "elapsedSeconds": 23520,
+      "netPowerMW": 0.004215084690635251,
+      "grossPowerMW": 50.89791344725504
+    },
+    {
+      "elapsedSeconds": 23550,
+      "netPowerMW": 0.003921014918773835,
+      "grossPowerMW": 50.833567151585676
+    },
+    {
+      "elapsedSeconds": 23580,
+      "netPowerMW": 0.0036247055946247997,
+      "grossPowerMW": 50.7739448623604
+    },
+    {
+      "elapsedSeconds": 23610,
+      "netPowerMW": 0.0033392750430039086,
+      "grossPowerMW": 50.71896972953684
+    },
+    {
+      "elapsedSeconds": 23640,
+      "netPowerMW": 0.0030615267106242072,
+      "grossPowerMW": 50.668492638289955
+    },
+    {
+      "elapsedSeconds": 23670,
+      "netPowerMW": 0.0027927497490622955,
+      "grossPowerMW": 50.62232200290831
+    },
+    {
+      "elapsedSeconds": 23700,
+      "netPowerMW": 0.0025399272621413616,
+      "grossPowerMW": 50.580229999358345
+    },
+    {
+      "elapsedSeconds": 23730,
+      "netPowerMW": 0.0023057243807684813,
+      "grossPowerMW": 50.54196987853754
+    },
+    {
+      "elapsedSeconds": 23760,
+      "netPowerMW": 0.0020933988016906824,
+      "grossPowerMW": 50.50729203724681
+    },
+    {
+      "elapsedSeconds": 23790,
+      "netPowerMW": 0.001886943850855971,
+      "grossPowerMW": 50.47593403835307
+    },
+    {
+      "elapsedSeconds": 23820,
+      "netPowerMW": 0.0016981336723986828,
+      "grossPowerMW": 50.44763988164567
+    },
+    {
+      "elapsedSeconds": 23850,
+      "netPowerMW": 0.0015275015158806582,
+      "grossPowerMW": 50.422162726873054
+    },
+    {
+      "elapsedSeconds": 23880,
+      "netPowerMW": 0.00136955061809374,
+      "grossPowerMW": 50.399263317050554
+    },
+    {
+      "elapsedSeconds": 23910,
+      "netPowerMW": 0.0012304085070056203,
+      "grossPowerMW": 50.378717388490195
+    },
+    {
+      "elapsedSeconds": 23940,
+      "netPowerMW": 0.0010945378058835331,
+      "grossPowerMW": 50.3603127619153
+    },
+    {
+      "elapsedSeconds": 23970,
+      "netPowerMW": 0.0009744090113557036,
+      "grossPowerMW": 50.343846367812
+    },
+    {
+      "elapsedSeconds": 24000,
+      "netPowerMW": 0.0008744844055286194,
+      "grossPowerMW": 50.329137036166884
+    },
+    {
+      "elapsedSeconds": 24030,
+      "netPowerMW": 140.0141339372321,
+      "grossPowerMW": 190.3700128644407
+    },
+    {
+      "elapsedSeconds": 24060,
+      "netPowerMW": 290.03765895458145,
+      "grossPowerMW": 340.4003538038099
+    },
+    {
+      "elapsedSeconds": 24090,
+      "netPowerMW": 440.0567808376952,
+      "grossPowerMW": 490.4124075876181
+    },
+    {
+      "elapsedSeconds": 24120,
+      "netPowerMW": 590.0747352468459,
+      "grossPowerMW": 640.4118383454162
+    },
+    {
+      "elapsedSeconds": 24150,
+      "netPowerMW": 740.0925136244407,
+      "grossPowerMW": 790.4021244915074
+    },
+    {
+      "elapsedSeconds": 24180,
+      "netPowerMW": 884.9838894643665,
+      "grossPowerMW": 935.2560400308438
+    },
+    {
+      "elapsedSeconds": 24210,
+      "netPowerMW": 957.7261386274454,
+      "grossPowerMW": 1007.9406294723796
+    },
+    {
+      "elapsedSeconds": 24240,
+      "netPowerMW": 984.4529900183845,
+      "grossPowerMW": 1034.6179430968284
+    },
+    {
+      "elapsedSeconds": 24270,
+      "netPowerMW": 994.2815937849633,
+      "grossPowerMW": 1044.4072960256078
+    },
+    {
+      "elapsedSeconds": 24300,
+      "netPowerMW": 997.8967630489974,
+      "grossPowerMW": 1047.9916773842206
+    },
+    {
+      "elapsedSeconds": 24330,
+      "netPowerMW": 999.2265390608678,
+      "grossPowerMW": 1049.2974089620795
+    },
+    {
+      "elapsedSeconds": 24360,
+      "netPowerMW": 999.7156239951307,
+      "grossPowerMW": 1049.7678378805497
+    },
+    {
+      "elapsedSeconds": 24390,
+      "netPowerMW": 999.8954652420006,
+      "grossPowerMW": 1049.9332531396412
+    },
+    {
+      "elapsedSeconds": 24420,
+      "netPowerMW": 999.9615604100925,
+      "grossPowerMW": 1049.9882596123048
+    },
+    {
+      "elapsedSeconds": 24450,
+      "netPowerMW": 999.9858340667355,
+      "grossPowerMW": 1050.0040554809034
+    },
+    {
+      "elapsedSeconds": 24480,
+      "netPowerMW": 999.9947295561254,
+      "grossPowerMW": 1050.0065199912185
+    },
+    {
+      "elapsedSeconds": 24510,
+      "netPowerMW": 999.9979788335578,
+      "grossPowerMW": 1050.0049341387696
+    },
+    {
+      "elapsedSeconds": 24540,
+      "netPowerMW": 999.9991624893278,
+      "grossPowerMW": 1050.0025213297995
+    },
+    {
+      "elapsedSeconds": 24570,
+      "netPowerMW": 999.9995838443647,
+      "grossPowerMW": 1050.0003129788788
+    },
+    {
+      "elapsedSeconds": 24600,
+      "netPowerMW": 999.9997320845796,
+      "grossPowerMW": 1049.9985761730418
+    },
+    {
+      "elapsedSeconds": 24630,
+      "netPowerMW": 999.9997819318312,
+      "grossPowerMW": 1049.9973126864413
+    },
+    {
+      "elapsedSeconds": 24660,
+      "netPowerMW": 999.999795600256,
+      "grossPowerMW": 1049.9964548520322
+    },
+    {
+      "elapsedSeconds": 24690,
+      "netPowerMW": 999.9998068957532,
+      "grossPowerMW": 1049.9959216632649
+    },
+    {
+      "elapsedSeconds": 24720,
+      "netPowerMW": 999.9998061326884,
+      "grossPowerMW": 1049.9956343565573
+    },
+    {
+      "elapsedSeconds": 24750,
+      "netPowerMW": 999.9997813138189,
+      "grossPowerMW": 1049.9957245829178
+    },
+    {
+      "elapsedSeconds": 24780,
+      "netPowerMW": 999.9998055569818,
+      "grossPowerMW": 1049.9960842495302
+    },
+    {
+      "elapsedSeconds": 24810,
+      "netPowerMW": 999.999815691882,
+      "grossPowerMW": 1049.9964085534189
+    },
+    {
+      "elapsedSeconds": 24840,
+      "netPowerMW": 999.9998221421116,
+      "grossPowerMW": 1049.9967169382821
+    },
+    {
+      "elapsedSeconds": 24870,
+      "netPowerMW": 999.9998296306114,
+      "grossPowerMW": 1049.9970179451204
+    },
+    {
+      "elapsedSeconds": 24900,
+      "netPowerMW": 999.9998297984282,
+      "grossPowerMW": 1049.9973090812073
+    },
+    {
+      "elapsedSeconds": 24930,
+      "netPowerMW": 999.9998349928459,
+      "grossPowerMW": 1049.9975917223906
+    },
+    {
+      "elapsedSeconds": 24960,
+      "netPowerMW": 999.9998415563973,
+      "grossPowerMW": 1049.9978694847425
+    },
+    {
+      "elapsedSeconds": 24990,
+      "netPowerMW": 999.9998416282738,
+      "grossPowerMW": 1049.9981397829001
+    },
+    {
+      "elapsedSeconds": 25020,
+      "netPowerMW": 999.9998507096731,
+      "grossPowerMW": 1049.998401571572
+    },
+    {
+      "elapsedSeconds": 25050,
+      "netPowerMW": 999.9998474457045,
+      "grossPowerMW": 1049.9986589864848
+    },
+    {
+      "elapsedSeconds": 25080,
+      "netPowerMW": 999.9998553752783,
+      "grossPowerMW": 1049.9989085103218
+    },
+    {
+      "elapsedSeconds": 25110,
+      "netPowerMW": 999.9998635662178,
+      "grossPowerMW": 1049.999152907097
+    },
+    {
+      "elapsedSeconds": 25140,
+      "netPowerMW": 999.9998625405026,
+      "grossPowerMW": 1049.999391867967
+    },
+    {
+      "elapsedSeconds": 25170,
+      "netPowerMW": 999.9998632366378,
+      "grossPowerMW": 1049.9996262023585
+    },
+    {
+      "elapsedSeconds": 25200,
+      "netPowerMW": 999.9998736518857,
+      "grossPowerMW": 1049.9998780071694
+    },
+    {
+      "elapsedSeconds": 25230,
+      "netPowerMW": 999.9998696555045,
+      "grossPowerMW": 1050.0001281746693
+    },
+    {
+      "elapsedSeconds": 25260,
+      "netPowerMW": 999.999867926612,
+      "grossPowerMW": 1050.000374747112
+    },
+    {
+      "elapsedSeconds": 25290,
+      "netPowerMW": 999.9998800627816,
+      "grossPowerMW": 1050.0006163405849
+    },
+    {
+      "elapsedSeconds": 25320,
+      "netPowerMW": 999.9998800531243,
+      "grossPowerMW": 1050.0008511931492
+    },
+    {
+      "elapsedSeconds": 25350,
+      "netPowerMW": 999.9998827520808,
+      "grossPowerMW": 1050.0010799777783
+    },
+    {
+      "elapsedSeconds": 25380,
+      "netPowerMW": 999.999885848432,
+      "grossPowerMW": 1050.0013006587888
+    },
+    {
+      "elapsedSeconds": 25410,
+      "netPowerMW": 999.9998929884993,
+      "grossPowerMW": 1050.0015189510566
+    },
+    {
+      "elapsedSeconds": 25440,
+      "netPowerMW": 999.9998863646955,
+      "grossPowerMW": 1050.00172797876
+    },
+    {
+      "elapsedSeconds": 25470,
+      "netPowerMW": 999.9998903932906,
+      "grossPowerMW": 1050.0019287059524
+    },
+    {
+      "elapsedSeconds": 25500,
+      "netPowerMW": 999.9998886146537,
+      "grossPowerMW": 1050.0021263396352
+    },
+    {
+      "elapsedSeconds": 25530,
+      "netPowerMW": 999.9998950798528,
+      "grossPowerMW": 1050.0023170374157
+    },
+    {
+      "elapsedSeconds": 25560,
+      "netPowerMW": 999.9998951205592,
+      "grossPowerMW": 1050.0025022001953
+    },
+    {
+      "elapsedSeconds": 25590,
+      "netPowerMW": 999.9999000245699,
+      "grossPowerMW": 1050.0026843664305
+    },
+    {
+      "elapsedSeconds": 25620,
+      "netPowerMW": 999.9999035926693,
+      "grossPowerMW": 1050.002859642923
+    },
+    {
+      "elapsedSeconds": 25650,
+      "netPowerMW": 999.9999015538082,
+      "grossPowerMW": 1050.003029338899
+    },
+    {
+      "elapsedSeconds": 25680,
+      "netPowerMW": 999.9999100885193,
+      "grossPowerMW": 1050.0031961305674
+    },
+    {
+      "elapsedSeconds": 25710,
+      "netPowerMW": 999.9999054682683,
+      "grossPowerMW": 1050.0033581848827
+    },
+    {
+      "elapsedSeconds": 25740,
+      "netPowerMW": 999.9999069688331,
+      "grossPowerMW": 1050.0035157744942
+    },
+    {
+      "elapsedSeconds": 25770,
+      "netPowerMW": 999.9999084729816,
+      "grossPowerMW": 1050.0036723264493
+    },
+    {
+      "elapsedSeconds": 25800,
+      "netPowerMW": 999.999912378322,
+      "grossPowerMW": 1050.0038218852355
+    },
+    {
+      "elapsedSeconds": 25830,
+      "netPowerMW": 999.9999114035502,
+      "grossPowerMW": 1050.003970870753
+    },
+    {
+      "elapsedSeconds": 25860,
+      "netPowerMW": 999.9999154992612,
+      "grossPowerMW": 1050.004114805053
+    },
+    {
+      "elapsedSeconds": 25890,
+      "netPowerMW": 999.9999169596598,
+      "grossPowerMW": 1050.0042561822495
+    },
+    {
+      "elapsedSeconds": 25920,
+      "netPowerMW": 999.9999182885525,
+      "grossPowerMW": 1050.0043953690447
+    },
+    {
+      "elapsedSeconds": 25950,
+      "netPowerMW": 999.9999197033745,
+      "grossPowerMW": 1050.0045317408062
+    },
+    {
+      "elapsedSeconds": 25980,
+      "netPowerMW": 999.99991808873,
+      "grossPowerMW": 1050.0046655465692
+    },
+    {
+      "elapsedSeconds": 26010,
+      "netPowerMW": 999.9999201469885,
+      "grossPowerMW": 1050.004795795721
+    },
+    {
+      "elapsedSeconds": 26040,
+      "netPowerMW": 999.9999212246843,
+      "grossPowerMW": 1050.0049247451293
+    },
+    {
+      "elapsedSeconds": 26070,
+      "netPowerMW": 999.9999294587907,
+      "grossPowerMW": 1050.0050533014687
+    },
+    {
+      "elapsedSeconds": 26100,
+      "netPowerMW": 999.9999256146439,
+      "grossPowerMW": 1050.0051773717103
+    },
+    {
+      "elapsedSeconds": 26130,
+      "netPowerMW": 999.9999249592285,
+      "grossPowerMW": 1050.0052999187667
+    },
+    {
+      "elapsedSeconds": 26160,
+      "netPowerMW": 999.999926272288,
+      "grossPowerMW": 1050.0054211477288
+    },
+    {
+      "elapsedSeconds": 26190,
+      "netPowerMW": 999.999929666462,
+      "grossPowerMW": 1050.0055419014961
+    },
+    {
+      "elapsedSeconds": 26220,
+      "netPowerMW": 999.9999280157016,
+      "grossPowerMW": 1050.0056574626217
+    },
+    {
+      "elapsedSeconds": 26250,
+      "netPowerMW": 999.9999312697818,
+      "grossPowerMW": 1050.0057738232615
+    },
+    {
+      "elapsedSeconds": 26280,
+      "netPowerMW": 999.9999344757422,
+      "grossPowerMW": 1050.005889690516
+    },
+    {
+      "elapsedSeconds": 26310,
+      "netPowerMW": 999.9999291381289,
+      "grossPowerMW": 1050.005999759021
+    },
+    {
+      "elapsedSeconds": 26340,
+      "netPowerMW": 999.9999300625906,
+      "grossPowerMW": 1050.0061107797528
+    },
+    {
+      "elapsedSeconds": 26370,
+      "netPowerMW": 999.9999349603736,
+      "grossPowerMW": 1050.0062214423285
+    },
+    {
+      "elapsedSeconds": 26400,
+      "netPowerMW": 999.9999359861838,
+      "grossPowerMW": 1050.0063294350516
+    },
+    {
+      "elapsedSeconds": 26430,
+      "netPowerMW": 999.9999372400835,
+      "grossPowerMW": 1050.006437439366
+    },
+    {
+      "elapsedSeconds": 26460,
+      "netPowerMW": 999.9999424382725,
+      "grossPowerMW": 1050.0065425991852
+    },
+    {
+      "elapsedSeconds": 26490,
+      "netPowerMW": 999.9999384629925,
+      "grossPowerMW": 1050.0066461077058
+    },
+    {
+      "elapsedSeconds": 26520,
+      "netPowerMW": 999.999937114191,
+      "grossPowerMW": 1050.006748177331
+    },
+    {
+      "elapsedSeconds": 26550,
+      "netPowerMW": 999.9999449098104,
+      "grossPowerMW": 1050.0068513970925
+    },
+    {
+      "elapsedSeconds": 26580,
+      "netPowerMW": 999.9999410014116,
+      "grossPowerMW": 1050.0069518237524
+    },
+    {
+      "elapsedSeconds": 26610,
+      "netPowerMW": 999.9999394669037,
+      "grossPowerMW": 1050.0070497082168
+    },
+    {
+      "elapsedSeconds": 26640,
+      "netPowerMW": 999.9999426164989,
+      "grossPowerMW": 1050.0071495918196
+    },
+    {
+      "elapsedSeconds": 26670,
+      "netPowerMW": 999.9999407762327,
+      "grossPowerMW": 1050.0072449175257
+    },
+    {
+      "elapsedSeconds": 26700,
+      "netPowerMW": 999.9999438504362,
+      "grossPowerMW": 1050.0073425265055
+    },
+    {
+      "elapsedSeconds": 26730,
+      "netPowerMW": 999.9999466544172,
+      "grossPowerMW": 1050.0074354421586
+    },
+    {
+      "elapsedSeconds": 26760,
+      "netPowerMW": 999.9999429729227,
+      "grossPowerMW": 1050.0075302216278
+    },
+    {
+      "elapsedSeconds": 26790,
+      "netPowerMW": 999.9999436366495,
+      "grossPowerMW": 1050.0076235275137
+    },
+    {
+      "elapsedSeconds": 26820,
+      "netPowerMW": 999.9999462000197,
+      "grossPowerMW": 1050.0077159150144
+    },
+    {
+      "elapsedSeconds": 26850,
+      "netPowerMW": 999.9999488581552,
+      "grossPowerMW": 1050.0078056106797
+    },
+    {
+      "elapsedSeconds": 26880,
+      "netPowerMW": 999.9999450274752,
+      "grossPowerMW": 1050.0078960086012
+    },
+    {
+      "elapsedSeconds": 26910,
+      "netPowerMW": 999.9999478370213,
+      "grossPowerMW": 1050.0079862881605
+    },
+    {
+      "elapsedSeconds": 26940,
+      "netPowerMW": 999.9999509460242,
+      "grossPowerMW": 1050.0080735136708
+    },
+    {
+      "elapsedSeconds": 26970,
+      "netPowerMW": 999.9999494105721,
+      "grossPowerMW": 1050.0081632317692
+    },
+    {
+      "elapsedSeconds": 27000,
+      "netPowerMW": 999.9999537049885,
+      "grossPowerMW": 1050.0082485286302
+    }
+  ]
+}

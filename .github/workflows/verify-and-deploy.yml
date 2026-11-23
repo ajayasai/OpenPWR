@@ -34,6 +34,10 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
+      - name: Reproduce electrical evidence from its archived sources
+        run: |
+          python3 validation/grid_return/observation.py --check
+          python3 validation/startup_output/extract.py --download --check
       - name: Install open-source native compiler
         run: |
           sudo apt-get update -qq

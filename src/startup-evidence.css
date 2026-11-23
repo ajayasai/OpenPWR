@@ -1,0 +1,78 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #0b1422;
+  color: #e5edf7;
+  --muted: #acbec9;
+  --edge: #314756;
+  --mono: "SFMono-Regular", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1240px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 58px) 48px; }
+a { color: #a1e5dd; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+nav {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;
+  padding: 20px 0; border-bottom: 1px solid var(--edge); font-size: .86rem;
+}
+nav a { color: var(--muted); text-decoration: none; }
+nav .brand { margin-right: auto; color: #eef6fa; font-weight: 730; font-size: 1.06rem; }
+nav a:hover, summary:hover { text-decoration: underline; }
+header { padding: clamp(28px, 4vw, 54px) 0 26px; }
+h1, h2, p, figure { margin: 0; }
+h1 { font-size: clamp(2.3rem, 5vw, 4rem); font-weight: 580; letter-spacing: -.05em; line-height: 1.02; }
+header p { margin-top: 14px; max-width: 74ch; color: var(--muted); line-height: 1.6; }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.card {
+  min-width: 0; padding: clamp(14px, 2vw, 25px); background: #101d2a;
+  border: 1px solid var(--edge); border-top: 3px solid var(--series); border-radius: 9px;
+}
+.plant { --series: #e9b5d8; }
+.model { --series: #81decb; }
+.card-heading { margin-bottom: 17px; }
+.card-heading p { font-size: .83rem; color: var(--series); }
+.card-heading h2 { margin-top: 4px; font-size: clamp(1.4rem, 2.4vw, 1.85rem); font-weight: 600; letter-spacing: -.035em; }
+label { display: block; margin-bottom: 5px; color: var(--muted); font-size: .82rem; }
+select, button, input { font: inherit; }
+select, button { min-height: 38px; padding: 6px 9px; color: inherit; background: #172939; border: 1px solid #4a6472; border-radius: 5px; }
+select { width: 100%; font-size: .9rem; }
+select:disabled, button:disabled { opacity: .65; }
+.fields { display: grid; grid-template-columns: 1.15fr 1fr; gap: 8px; }
+figure { margin-top: 16px; }
+figure svg { display: block; width: 100%; height: auto; background: #0c1722; border-radius: 5px; }
+svg text { font-size: 12px; font-family: var(--mono); fill: #b2c2ce; }
+.grid-line { stroke: #2d414e; }
+.zero-line { stroke: #6c858c; }
+.trace { fill: none; stroke: var(--series); stroke-width: 2; stroke-linejoin: round; }
+.marker { stroke: #c8dce4; stroke-dasharray: 3 4; }
+.point { fill: var(--series); stroke: #0b1422; stroke-width: 2; }
+figcaption, .definition, .status, .links, details p, .context p { font-size: .87rem; line-height: 1.6; color: var(--muted); }
+figcaption { margin-top: 5px; font-size: .76rem; }
+.inspection { margin: 15px 0 9px; }
+.reading { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.reading output { font: 600 1.1rem var(--mono); color: var(--series); white-space: nowrap; }
+.inspection input { width: 100%; height: 24px; margin: 0; accent-color: var(--series); cursor: pointer; }
+.timestamp { min-height: 1.2em; font: .8rem/1.4 var(--mono); }
+.definition { margin: 12px 0 8px; }
+.status { color: #bfd5df; }
+.status.error { color: #ffc18f; }
+.links { display: flex; flex-wrap: wrap; gap: 5px 18px; }
+details { margin-top: 13px; border-top: 1px solid var(--edge); padding-top: 12px; }
+summary { color: #b7dfdf; font-size: .88rem; cursor: pointer; width: fit-content; }
+details p { margin: 8px 0; }
+input[type=file] { display: block; width: 100%; margin: 5px 0 12px; font-size: .85rem; }
+button { font-size: .82rem; cursor: pointer; }
+.context { margin-top: 22px; padding-top: 19px; border-top: 1px solid var(--edge); max-width: 920px; }
+.context h2 { font-weight: 600; font-size: 1.18rem; }
+.context p { margin-top: 8px; }
+:focus-visible { outline: 2px solid #a2e5dd; outline-offset: 3px; }
+@media (max-width: 780px) {
+  .charts { grid-template-columns: 1fr; }
+  main { max-width: 660px; }
+}
+@media (max-width: 420px) {
+  nav { gap: 8px 13px; }
+  nav .brand { width: 100%; }
+  select { font-size: .8rem; }
+}

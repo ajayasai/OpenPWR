@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import {controls, outputs, validateState, validateHealth, validateEvidence, motion, operatingState, synchronization, formatReading} from './continuous-state.js';
+import {replayPath, decodeRecording, sampleIndex} from './continuous-replay.js';
 const $ = id => document.getElementById(id);
 const fmt = formatReading;
 const clock = seconds => [Math.floor(seconds/3600),Math.floor(seconds/60)%60,Math.floor(seconds)%60].map(n=>String(n).padStart(2,'0')).join(':');
@@ -7,6 +8,8 @@ let state=null, health=null, connected=false, running=false, busy=false, pending
 let history=[], scenarios=[], evidence=null, nextStep=0, lastFrame=performance.now(), rotor=0, turbineRotor=0;
 const flowPhases={primary:0,steam:0,exhaust:0,feed:0,cooling:0,electrical:0};
 let historyQueued=false;
+let recording=null, recordedView=null, openingRecording=false;
+let playingRecording=false, replayStart=0, replayOffset=0, replayIndex=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const planned=()=>['ready','running'].includes(state?.experiment?.status);
 const halted=()=>state && (state.halted || !state.outputs.valid);
@@ -31,13 +34,16 @@ for(const c of controls){
   label.append(input);if(c.help){const hint=document.createElement('small');hint.textContent=c.help;label.append(hint);}controlGroups.get(c.group).append(label);
 }
 function availability(){
-  const disabled=!connected || !state || halted() || Boolean(pendingAction);
+  const viewingRecording=openingRecording || Boolean(recordedView);
+  const live=connected && !viewingRecording;
+  const disabled=!live || !state || halted() || Boolean(pendingAction);
   controls.forEach(c=>{$(c.key).disabled=disabled || planned();});
-  for(const id of ['continuous-reset','continuous-csv','continuous-save','continuous-replay','continuous-prepare','continuous-scenario']) $(id).disabled=!connected || Boolean(pendingAction);
-  $('continuous-manual').disabled=!connected || !state?.experiment || Boolean(pendingAction);
+  for(const id of ['continuous-reset','continuous-csv','continuous-save','continuous-replay','continuous-prepare','continuous-scenario']) $(id).disabled=!live || Boolean(pendingAction);
+  $('continuous-manual').disabled=!live || !state?.experiment || Boolean(pendingAction);
   $('continuous-run').disabled=disabled || state?.experiment?.status==='complete';
   $('continuous-speed').disabled=disabled;
-  $('continuous-connect').disabled=busy;
+  $('continuous-connect').disabled=busy || viewingRecording;
+  $('recording-load').disabled=busy || viewingRecording || Boolean(pendingAction) || Object.keys(pendingControls).length>0;
   $('continuous-run').textContent=running?'Pause':'Run model';$('continuous-run').setAttribute('aria-pressed',String(running));
 }
 function connection(ok,detail){
@@ -71,11 +77,12 @@ function accept(next,reset=false){
   render();
 }
 function render(){
-  if(!state){availability();return;}
-  for(const el of document.querySelectorAll('[data-reading]'))el.textContent=fmt(state.outputs[el.dataset.reading]*Number(el.dataset.scale??1),Number(el.dataset.digits??1),el.dataset.format);
-  for(const c of controls){if(!(c.key in pendingControls) && document.activeElement!==$(c.key)){$(c.key).value=state.controls[c.key];$(`${c.key}-value`).textContent=controlLabel(c,state.controls[c.key]);}}
-  const phase=operatingState(state), sync=synchronization(state), o=state.outputs;
-  $('continuous-clock').textContent=clock(state.time);$('continuous-stage').textContent=phase.label;
+  const snapshot=recordedView || state;
+  if(!snapshot){availability();return;}
+  for(const el of document.querySelectorAll('[data-reading]'))el.textContent=fmt(snapshot.outputs[el.dataset.reading]*Number(el.dataset.scale??1),Number(el.dataset.digits??1),el.dataset.format);
+  if(!recordedView) for(const c of controls){if(!(c.key in pendingControls) && document.activeElement!==$(c.key)){$(c.key).value=state.controls[c.key];$(`${c.key}-value`).textContent=controlLabel(c,state.controls[c.key]);}}
+  const phase=operatingState(snapshot), sync=synchronization(snapshot), o=snapshot.outputs;
+  $('continuous-clock').textContent=clock(snapshot.time);$('continuous-stage').textContent=phase.label;
   $('continuous-stage').className=`status-pill ${phase.tone}`;
   for(const el of document.querySelectorAll('[data-stage]')){if(Number(el.dataset.stage)===phase.stage)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');}
   $('sync-status').textContent=sync.label;$('sync-status').className=`status-pill ${sync.tone}`;
@@ -91,13 +98,16 @@ function render(){
   for(const [id,value,bottom,height] of [['pzr-water',o.pressurizerLevelPercent,186,136],['secondary-water',o.secondaryLevelPercent,324,190]]){
     const h=Math.max(0,Math.min(100,value))/100*height;$(id).setAttribute('height',h);$(id).setAttribute('y',bottom-h);
   }
-  const e=state.experiment;
-  $('continuous-progress').textContent=e?`${e.label} · ${e.status} · ${clock(state.time)} / ${clock(e.duration)} · ${e.appliedEvents}/${e.eventCount} events${e.comparison?` · replay ${e.comparison.pass===true?'matched':'mismatch'}`:''}`:'Manual experiment · continuous native state';
-  $('continuous-progress-bar').max=e?.duration||1;$('continuous-progress-bar').value=e?Math.min(state.time,e.duration):0;
-  if(halted())message(state.haltReason||'Declared model domain reached. Reset the model to continue.');
-  drawCharts();availability();
+  if(!recordedView){
+    const e=state.experiment;
+    $('continuous-progress').textContent=e?`${e.label} · ${e.status} · ${clock(state.time)} / ${clock(e.duration)} · ${e.appliedEvents}/${e.eventCount} events${e.comparison?` · replay ${e.comparison.pass===true?'matched':'mismatch'}`:''}`:'Manual experiment · continuous native state';
+    $('continuous-progress-bar').max=e?.duration||1;$('continuous-progress-bar').value=e?Math.min(state.time,e.duration):0;
+    if(halted())message(state.haltReason||'Declared model domain reached. Reset the model to continue.');
+  }
+  drawCharts(recordedView ? recording.points.slice(0,replayIndex+1) : history);
+  availability();
 }
-function draw(id,keys,unit,logarithmic=false){
+function draw(history,id,keys,unit,logarithmic=false){
   const svg=$(id), ns='http://www.w3.org/2000/svg', w=560,h=190, pad={l:49,r:12,t:15,b:32};
   svg.replaceChildren();svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
   if(!history.length)return;
@@ -112,9 +122,9 @@ function draw(id,keys,unit,logarithmic=false){
   [0,.5,1].forEach(f=>add('text',{x:x(t0+(t1-t0)*f),y:h-10,'text-anchor':'middle',fill:'#8ca7b7','font-size':10},clock(t0+(t1-t0)*f)));
   keys.forEach((key,i)=>{let segment=false;const path=data.map(r=>{const v=value(r[key]);if(v===null){segment=false;return '';}const point=`${segment?'L':'M'}${x(r.time).toFixed(2)} ${y(v).toFixed(2)}`;segment=true;return point;}).join(' ');add('path',{d:path,fill:'none',stroke:i?'#83bdf4':logarithmic?'#93d9cb':'#e9b47a','stroke-width':2});});
 }
-function drawCharts(){
-  draw('neutron-chart',['neutronPowerFraction'],'fraction',true);draw('power-chart',['reactorPowerMW','netPowerMW'],'MW');
-  draw('temperature-chart',['hotLegTemperatureC','secondaryTemperatureC'],'C');draw('pressure-chart',['primaryPressureMPa','secondaryPressureMPa'],'MPa');
+function drawCharts(history){
+  draw(history,'neutron-chart',['neutronPowerFraction'],'fraction',true);draw(history,'power-chart',['reactorPowerMW','netPowerMW'],'MW');
+  draw(history,'temperature-chart',['hotLegTemperatureC','secondaryTemperatureC'],'C');draw(history,'pressure-chart',['primaryPressureMPa','secondaryPressureMPa'],'MPa');
   $('continuous-samples').textContent=`${history.length} retained native observations · ${clock(history[0]?.time||0)}–${clock(history.at(-1)?.time||0)} simulated · zero neutron power is omitted from the logarithmic axis`;
 }
 async function loadEvidence(){
@@ -124,7 +134,13 @@ async function loadEvidence(){
     $('continuous-checks').replaceChildren();for(const c of r.checks){const li=document.createElement('li');li.textContent=`${c.pass?'✓':'✕'} ${c.name}`;$('continuous-checks').append(li);}
   }catch{$('continuous-evidence').textContent='No current numerical report is available. Run npm run engineering:continuous:verify to generate it.';}
 }
-function showEvidence(){if(evidence)$('continuous-evidence').textContent=`${evidence.passed}/${evidence.total} native continuous-start checks passed${health?(health.fmuSha256===evidence.runtime.fmuSha256?' for this running FMU':' in the published report; this running FMU differs'):' in the published report'}. This is numerical verification, not measured plant validation.`;}
+function showEvidence(){
+  if(!evidence)return;
+  let result=`${evidence.passed}/${evidence.total} numerical checks passed in the published continuous-startup report.`;
+  if(recordedView && evidence.runtime.fmuSha256===recording.source.fmuSha256)result+=' The recording uses this executable.';
+  if(!recordedView && connected && health?.fmuSha256===evidence.runtime.fmuSha256)result+=' The connected service uses this executable.';
+  $('continuous-evidence').textContent=result;
+}
 async function restoreHistory(){
   const saved=await request('/api/history?maxPoints=1500');
   if(saved.fmuSha256!==health.fmuSha256 || !Array.isArray(saved.points) || saved.points.some(p=>!Number.isFinite(p.time)||outputs.some(k=>!Number.isFinite(p.outputs?.[k]))))throw new Error('Native history identity or observations are invalid.');
@@ -132,7 +148,7 @@ async function restoreHistory(){
   accept(saved.current);
 }
 async function connect(){
-  if(busy)return;busy=true;running=false;pendingControls={};availability();
+  if(busy||recordedView||openingRecording)return;busy=true;running=false;pendingControls={};availability();
   try{
     health=validateHealth(await request('/api/health'));
     const current=validateState(await request('/api/state'));
@@ -150,12 +166,12 @@ function describe(){$('scenario-description').textContent=scenarios.find(s=>s.id
 function queue(path,body,reset=false){running=false;pendingControls={};pendingAction={path,body,reset};availability();}
 function save(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
 async function work(){
-  if(!connected||busy)return;let action;
+  if(!connected||busy||recordedView||openingRecording)return;let action;
   if(pendingAction){action=pendingAction;pendingAction=null;}
   else if(historyQueued){historyQueued=false;action={history:true};}
   else if(Object.keys(pendingControls).length){action={path:'/api/control',body:pendingControls};pendingControls={};}
   else if(running&&!halted()&&performance.now()>=nextStep){const speed=Number($('continuous-speed').value),seconds=Math.min(health.maxStepSeconds,Math.max(health.stepSize,Math.round(speed*.25/health.stepSize)*health.stepSize));action={path:'/api/step',body:{seconds},speed};}
-  if(!action)return;busy=true;
+  if(!action)return;busy=true;availability();
   try{
     const began=performance.now();
     if(action.history){await restoreHistory();}
@@ -174,13 +190,120 @@ $('continuous-csv').addEventListener('click',()=>{pendingAction={path:'/api/expo
 $('continuous-save').addEventListener('click',()=>{pendingAction={path:'/api/commands',download:`openpwr-continuous-${Math.floor(state.time)}s.commands.json`};availability();});
 $('continuous-replay').addEventListener('click',()=>$('continuous-file').click());
 $('continuous-file').addEventListener('change',async()=>{const f=$('continuous-file').files[0];$('continuous-file').value='';if(!f)return;try{if(f.size>4*1024*1024)throw new Error('Command files must be at most 4 MiB.');queue('/api/replay',JSON.parse(await f.text()),true);}catch(e){message(e.message);}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){running=false;availability();}});
+function recordedSnapshot(point) {
+  // This projection contains the samples from the completed, verified nominal run.
+  return {time:point.time, halted:false, outputs:{...point, valid:true}};
+}
+function showRecordedTime(seconds) {
+  replayIndex=sampleIndex(recording, seconds);
+  recordedView=recordedSnapshot(recording.points[replayIndex]);
+  const time=recordedView.time;
+  $('recording-time').value=time;
+  $('recording-time').setAttribute('aria-valuetext',clock(time));
+  $('recording-position').textContent=clock(time);
+  render();
+}
+function updatePlaybackButton() {
+  const ended=replayIndex===recording.points.length-1;
+  $('recording-play').textContent=playingRecording?'Pause recording':ended?'Replay from start':'Play recording';
+  $('recording-play').setAttribute('aria-pressed',String(playingRecording));
+}
+function stopPlayback() {
+  playingRecording=false;
+  if(recordedView) updatePlaybackButton();
+}
+function seekRecording(seconds) {
+  stopPlayback();
+  showRecordedTime(seconds);
+  updatePlaybackButton();
+}
+function startPlayback() {
+  $('recording-jump').value='';
+  if(replayIndex===recording.points.length-1) showRecordedTime(0);
+  replayOffset=recordedView.time;
+  replayStart=performance.now();
+  playingRecording=true;
+  updatePlaybackButton();
+}
+function tickRecording(now) {
+  if(!playingRecording)return;
+  const seconds=replayOffset+(now-replayStart)*Number($('recording-speed').value)/1000;
+  if(sampleIndex(recording,seconds)!==replayIndex)showRecordedTime(seconds);
+  if(seconds>=recording.durationSeconds)stopPlayback();
+}
+async function openRecording() {
+  if(busy||openingRecording||recordedView||pendingAction||Object.keys(pendingControls).length)return;
+  openingRecording=true;
+  running=false;
+  availability();
+  const status=$('recording-status');
+  status.hidden=false;
+  status.textContent='Loading the recorded startup…';
+  try {
+    const response=await fetch(replayPath,{signal:AbortSignal.timeout(20000)});
+    if(!response.ok)throw new Error(`Recording download returned HTTP ${response.status}.`);
+    recording=await decodeRecording(await response.arrayBuffer());
+    const jump=$('recording-jump');
+    const stages=new Set();
+    for(const point of recording.points) {
+      const {stage,label}=operatingState(recordedSnapshot(point));
+      if(stages.has(stage))continue;
+      stages.add(stage);
+      jump.add(new Option(`${label} · ${clock(point.time)}`,String(point.time)));
+    }
+    document.body.classList.add('recording-active');
+    for(const id of ['recording-load','continuous-connection','local-instructions','continuous-run','continuous-speed'])$(id).hidden=true;
+    for(const el of document.querySelectorAll('[data-live-only]'))el.hidden=true;
+    $('recording-description').textContent='Playing back the v0.11 native simulation. Every reading comes from a recorded 30-second sample.';
+    $('recording-player').hidden=false;
+    $('recording-exit').hidden=false;
+    $('recording-time').max=recording.durationSeconds;
+    $('recording-time').step=recording.sampleIntervalSeconds;
+    $('continuous-identity').textContent=`Recorded ContinuousPlant · v0.11.0\nFMU SHA-256: ${recording.source.fmuSha256}`;
+    $('continuous-performance').textContent='30 s between recorded samples';
+    $('continuous-timing').textContent='Recorded FMI output · v0.11.0';
+    message('');
+    showRecordedTime(0);
+    showEvidence();
+    updatePlaybackButton();
+    status.textContent='Recording ready. Playback paused.';
+    $('recording-play').focus();
+  } catch(error) {
+    status.textContent=`Could not open the startup recording. ${error.message}`;
+  } finally {
+    openingRecording=false;
+    availability();
+  }
+}
+$('recording-load').addEventListener('click',openRecording);
+// A fresh live connection restores the service's actual state and history, including other clients' changes.
+$('recording-exit').addEventListener('click',()=>window.location.reload());
+$('recording-play').addEventListener('click',()=>{
+  $('recording-status').hidden=true;
+  if(playingRecording)stopPlayback();else startPlayback();
+});
+$('recording-time').addEventListener('input',event=>{
+  $('recording-status').hidden=true;
+  $('recording-jump').value='';
+  seekRecording(Number(event.target.value));
+});
+$('recording-jump').addEventListener('change',event=>{
+  if(event.target.value!==''){
+    $('recording-status').hidden=true;
+    seekRecording(Number(event.target.value));
+  }
+});
+$('recording-speed').addEventListener('change',()=>{if(playingRecording)startPlayback();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){running=false;stopPlayback();availability();}});
 function animate(now){
   const dt=Math.min(.1,(now-lastFrame)/1000);lastFrame=now;
-  const rates=motion(state,running&&connected&&!document.hidden,reducedMotion.matches);
+  tickRecording(now);
+  const snapshot=recordedView || state;
+  const moving=recordedView?playingRecording:running&&connected;
+  const rates=motion(snapshot,moving&&!document.hidden,reducedMotion.matches);
   rotor=(rotor+dt*rates.pump*150)%360;turbineRotor=(turbineRotor+dt*rates.turbine*190)%360;
   $('primary-rotor').setAttribute('transform',`rotate(${rotor} 291 365)`);$('turbine-rotor').setAttribute('transform',`rotate(${turbineRotor} 675 195)`);
-  const observed=state?motion(state,true,false):{};
+  const observed=snapshot?motion(snapshot,true,false):{};
   for(const key of Object.keys(flowPhases)){
     const field=key==='exhaust'?'steam':key,rate=rates[field];flowPhases[key]=(flowPhases[key]+dt*rate*42)%28;
     const path=$(key==='electrical'?'electric-motion':`${key}-motion`);path.style.strokeDashoffset=String(-flowPhases[key]);
@@ -189,4 +312,11 @@ function animate(now){
   }
   requestAnimationFrame(animate);
 }
-setInterval(work,100);requestAnimationFrame(animate);loadEvidence();connect();
+let loadingEvidence=false;
+$('evidence-disclosure').addEventListener('toggle',async event=>{
+  if(!event.target.open || evidence || loadingEvidence)return;
+  loadingEvidence=true;
+  $('continuous-evidence').textContent='Loading published numerical evidence…';
+  try{await loadEvidence();}finally{loadingEvidence=false;}
+});
+setInterval(work,100);requestAnimationFrame(animate);connect();

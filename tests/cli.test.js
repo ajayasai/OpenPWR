@@ -212,12 +212,13 @@ test('local preview serves only public files, blocks traversal, and implements H
 test('release build rejects stale or failed evidence without replacing the last build', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
+  for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   await cp(join(root, 'scripts/krsko-pressure-evidence.mjs'), join(dir, 'scripts/krsko-pressure-evidence.mjs'));
   await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
-  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   const marker = join(dir, 'dist', 'previous.txt');
   await writeFile(marker, 'previous successful build');
   const valid = { version: '0.2.0', gitRevision: null, passed: 1, checks: [{ name: 'Fixture evidence', pass: true }] };
@@ -241,6 +242,7 @@ test('release build rejects stale or failed evidence without replacing the last 
 test('native release evidence binds both reports to the exact compiled bytes before replacing dist', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
@@ -249,7 +251,7 @@ test('native release evidence binds both reports to the exact compiled bytes bef
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const sha = value => createHash('sha256').update(value).digest('hex');
   await json('package.json', { name: 'openpwr-native-fixture', version, type: 'module' });
-  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   // An isolated empty commit exercises the real revision guard without touching
   // the working repository or depending on the developer's identity/signing setup.
   await exec('git', ['init', '--quiet'], { cwd: dir });

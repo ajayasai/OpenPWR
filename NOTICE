@@ -12,6 +12,9 @@ OpenPWR's Apache license does not replace upstream licenses.
 Scientific references describe equations and data; their inclusion is not an endorsement.
 The Krško 2005 numeric comparison data is extracted from NRC NUREG/IA-0221.
 Its source, figure mapping and transformations are recorded in validation/krsko2005.
+Contains BMRS data © Elexon Limited copyright and database right 2024.
+The Sizewell B meter records in validation/grid_return use Elexon's BMRS licence:
+https://www.elexon.co.uk/bsc/data/balancing-mechanism-reporting-agent/copyright-licence-bmrs-data/
 No publisher PDF, report artwork or third-party simulator source is bundled.
 Node.js is optional development tooling, available under its own open-source license.
 GitHub Pages is optional hosting; the built files work on any static HTTP server.

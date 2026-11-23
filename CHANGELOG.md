@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.0
+
+- The public continuous-startup workbench can play the archived native run and seek directly to a recorded observation. The named recording comes from the v0.11.0 release.
+- Added an electrical output explorer with the two Sizewell B generator meters, complete half-hour observations around the December 2024 return, and separate simulated gross and net output. Users can inspect their own native CSV in the browser.
+- Preserved signed energy, exact data sources and reproducible extraction. Model interval means use piecewise linear integration of recorded samples. These observations describe the electrical return to service. Reactor conditions and plant control histories are unavailable for validating the cold-to-power trajectory.
+
 ## 0.11.0
 
 - Adds an experimental finite-phase pressurizer to the shared native startup thermal kernel, with separate liquid/headspace temperatures, steam/nitrogen inventories, conservative compression work and graded radial/axial wall heat storage.

@@ -1,0 +1,3059 @@
+{
+  "schema": "openpwr-grid-return-observation-v1",
+  "title": "Sizewell B return to generation, December 2024",
+  "startUtc": "2024-11-30T00:00:00Z",
+  "endUtc": "2024-12-07T00:00:00Z",
+  "intervalMinutes": 30,
+  "attribution": "Contains BMRS data © Elexon Limited copyright and database right 2024.",
+  "licenceUrl": "https://www.elexon.co.uk/bsc/data/balancing-mechanism-reporting-agent/copyright-licence-bmrs-data/",
+  "sources": {
+    "provider": "Elexon Insights Solution",
+    "dataset": "B1610",
+    "retrievedUtcDate": "2026-11-23",
+    "meterGuideUrl": "https://www.elexon.co.uk/bsc/article/bsc-insight-how-to-get-more-detailed-metered-volume-data-from-our-insights-solution/",
+    "unitReferenceUrl": "https://data.elexon.co.uk/bmrs/api/v1/reference/bmunits/all",
+    "eventUrl": "https://www.edfenergy.com/media-centre/sizewell-b-back-delivering-reliable-zero-carbon-power",
+    "meterResponses": [
+      {
+        "bmUnit": "T_SIZB-1",
+        "url": "https://data.elexon.co.uk/bmrs/api/v1/datasets/B1610/stream?settlementDateFrom=2024-11-30&settlementPeriodFrom=1&settlementDateTo=2024-12-06&settlementPeriodTo=48&bmUnit=T_SIZB-1",
+        "path": "raw/T_SIZB-1.json",
+        "sha256": "db85d752ede723f32c10806bee10c779460f7b72c034afff17a170899f2678e1"
+      },
+      {
+        "bmUnit": "T_SIZB-2",
+        "url": "https://data.elexon.co.uk/bmrs/api/v1/datasets/B1610/stream?settlementDateFrom=2024-11-30&settlementPeriodFrom=1&settlementDateTo=2024-12-06&settlementPeriodTo=48&bmUnit=T_SIZB-2",
+        "path": "raw/T_SIZB-2.json",
+        "sha256": "2a99a92d2c766fc2be1bdce2dccd9e6b9459b6e0f2ab69401e1004563c979bc2"
+      }
+    ]
+  },
+  "measurement": "Signed generator-meter settlement energy per half hour, converted to interval mean MW.",
+  "boundary": "Sum of the two Sizewell B turbine generator meters. Other settlement meters are excluded.",
+  "points": [
+    {
+      "startUtc": "2024-11-30T00:00:00Z",
+      "endUtc": "2024-11-30T00:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.7,
+      "unit1MW": 0.0,
+      "unit2MW": -13.4,
+      "combinedMW": -13.4
+    },
+    {
+      "startUtc": "2024-11-30T00:30:00Z",
+      "endUtc": "2024-11-30T01:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.69,
+      "unit1MW": 0.0,
+      "unit2MW": -13.38,
+      "combinedMW": -13.38
+    },
+    {
+      "startUtc": "2024-11-30T01:00:00Z",
+      "endUtc": "2024-11-30T01:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.72,
+      "unit1MW": 0.0,
+      "unit2MW": -13.44,
+      "combinedMW": -13.44
+    },
+    {
+      "startUtc": "2024-11-30T01:30:00Z",
+      "endUtc": "2024-11-30T02:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.74,
+      "unit1MW": 0.0,
+      "unit2MW": -13.48,
+      "combinedMW": -13.48
+    },
+    {
+      "startUtc": "2024-11-30T02:00:00Z",
+      "endUtc": "2024-11-30T02:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.74,
+      "unit1MW": 0.0,
+      "unit2MW": -13.48,
+      "combinedMW": -13.48
+    },
+    {
+      "startUtc": "2024-11-30T02:30:00Z",
+      "endUtc": "2024-11-30T03:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.72,
+      "unit1MW": 0.0,
+      "unit2MW": -13.44,
+      "combinedMW": -13.44
+    },
+    {
+      "startUtc": "2024-11-30T03:00:00Z",
+      "endUtc": "2024-11-30T03:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.72,
+      "unit1MW": 0.0,
+      "unit2MW": -13.44,
+      "combinedMW": -13.44
+    },
+    {
+      "startUtc": "2024-11-30T03:30:00Z",
+      "endUtc": "2024-11-30T04:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.71,
+      "unit1MW": 0.0,
+      "unit2MW": -13.42,
+      "combinedMW": -13.42
+    },
+    {
+      "startUtc": "2024-11-30T04:00:00Z",
+      "endUtc": "2024-11-30T04:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.71,
+      "unit1MW": 0.0,
+      "unit2MW": -13.42,
+      "combinedMW": -13.42
+    },
+    {
+      "startUtc": "2024-11-30T04:30:00Z",
+      "endUtc": "2024-11-30T05:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.67,
+      "unit1MW": 0.0,
+      "unit2MW": -13.34,
+      "combinedMW": -13.34
+    },
+    {
+      "startUtc": "2024-11-30T05:00:00Z",
+      "endUtc": "2024-11-30T05:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.71,
+      "unit1MW": 0.0,
+      "unit2MW": -13.42,
+      "combinedMW": -13.42
+    },
+    {
+      "startUtc": "2024-11-30T05:30:00Z",
+      "endUtc": "2024-11-30T06:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.68,
+      "unit1MW": 0.0,
+      "unit2MW": -13.36,
+      "combinedMW": -13.36
+    },
+    {
+      "startUtc": "2024-11-30T06:00:00Z",
+      "endUtc": "2024-11-30T06:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.71,
+      "unit1MW": 0.0,
+      "unit2MW": -13.42,
+      "combinedMW": -13.42
+    },
+    {
+      "startUtc": "2024-11-30T06:30:00Z",
+      "endUtc": "2024-11-30T07:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.71,
+      "unit1MW": 0.0,
+      "unit2MW": -13.42,
+      "combinedMW": -13.42
+    },
+    {
+      "startUtc": "2024-11-30T07:00:00Z",
+      "endUtc": "2024-11-30T07:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.74,
+      "unit1MW": 0.0,
+      "unit2MW": -13.48,
+      "combinedMW": -13.48
+    },
+    {
+      "startUtc": "2024-11-30T07:30:00Z",
+      "endUtc": "2024-11-30T08:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.74,
+      "unit1MW": 0.0,
+      "unit2MW": -13.48,
+      "combinedMW": -13.48
+    },
+    {
+      "startUtc": "2024-11-30T08:00:00Z",
+      "endUtc": "2024-11-30T08:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.74,
+      "unit1MW": 0.0,
+      "unit2MW": -13.48,
+      "combinedMW": -13.48
+    },
+    {
+      "startUtc": "2024-11-30T08:30:00Z",
+      "endUtc": "2024-11-30T09:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.73,
+      "unit1MW": 0.0,
+      "unit2MW": -13.46,
+      "combinedMW": -13.46
+    },
+    {
+      "startUtc": "2024-11-30T09:00:00Z",
+      "endUtc": "2024-11-30T09:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.77,
+      "unit1MW": 0.0,
+      "unit2MW": -13.54,
+      "combinedMW": -13.54
+    },
+    {
+      "startUtc": "2024-11-30T09:30:00Z",
+      "endUtc": "2024-11-30T10:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.73,
+      "unit1MW": 0.0,
+      "unit2MW": -13.46,
+      "combinedMW": -13.46
+    },
+    {
+      "startUtc": "2024-11-30T10:00:00Z",
+      "endUtc": "2024-11-30T10:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.72,
+      "unit1MW": 0.0,
+      "unit2MW": -13.44,
+      "combinedMW": -13.44
+    },
+    {
+      "startUtc": "2024-11-30T10:30:00Z",
+      "endUtc": "2024-11-30T11:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": -6.75,
+      "unit1MW": 0.0,
+      "unit2MW": -13.5,
+      "combinedMW": -13.5
+    },
+    {
+      "startUtc": "2024-11-30T11:00:00Z",
+      "endUtc": "2024-11-30T11:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.79,
+      "unit1MW": -0.02,
+      "unit2MW": -13.58,
+      "combinedMW": -13.6
+    },
+    {
+      "startUtc": "2024-11-30T11:30:00Z",
+      "endUtc": "2024-11-30T12:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.77,
+      "unit1MW": -0.02,
+      "unit2MW": -13.54,
+      "combinedMW": -13.56
+    },
+    {
+      "startUtc": "2024-11-30T12:00:00Z",
+      "endUtc": "2024-11-30T12:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.75,
+      "unit1MW": -0.02,
+      "unit2MW": -13.5,
+      "combinedMW": -13.52
+    },
+    {
+      "startUtc": "2024-11-30T12:30:00Z",
+      "endUtc": "2024-11-30T13:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.81,
+      "unit1MW": -0.02,
+      "unit2MW": -13.62,
+      "combinedMW": -13.64
+    },
+    {
+      "startUtc": "2024-11-30T13:00:00Z",
+      "endUtc": "2024-11-30T13:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.77,
+      "unit1MW": -0.02,
+      "unit2MW": -13.54,
+      "combinedMW": -13.56
+    },
+    {
+      "startUtc": "2024-11-30T13:30:00Z",
+      "endUtc": "2024-11-30T14:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.78,
+      "unit1MW": -0.02,
+      "unit2MW": -13.56,
+      "combinedMW": -13.58
+    },
+    {
+      "startUtc": "2024-11-30T14:00:00Z",
+      "endUtc": "2024-11-30T14:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.8,
+      "unit1MW": -0.02,
+      "unit2MW": -13.6,
+      "combinedMW": -13.62
+    },
+    {
+      "startUtc": "2024-11-30T14:30:00Z",
+      "endUtc": "2024-11-30T15:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.78,
+      "unit1MW": -0.02,
+      "unit2MW": -13.56,
+      "combinedMW": -13.58
+    },
+    {
+      "startUtc": "2024-11-30T15:00:00Z",
+      "endUtc": "2024-11-30T15:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.76,
+      "unit1MW": -0.02,
+      "unit2MW": -13.52,
+      "combinedMW": -13.54
+    },
+    {
+      "startUtc": "2024-11-30T15:30:00Z",
+      "endUtc": "2024-11-30T16:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -6.97,
+      "unit1MW": -0.02,
+      "unit2MW": -13.94,
+      "combinedMW": -13.96
+    },
+    {
+      "startUtc": "2024-11-30T16:00:00Z",
+      "endUtc": "2024-11-30T16:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -7.36,
+      "unit1MW": -0.02,
+      "unit2MW": -14.72,
+      "combinedMW": -14.74
+    },
+    {
+      "startUtc": "2024-11-30T16:30:00Z",
+      "endUtc": "2024-11-30T17:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -7.41,
+      "unit1MW": -0.02,
+      "unit2MW": -14.82,
+      "combinedMW": -14.84
+    },
+    {
+      "startUtc": "2024-11-30T17:00:00Z",
+      "endUtc": "2024-11-30T17:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -7.42,
+      "unit1MW": -0.02,
+      "unit2MW": -14.84,
+      "combinedMW": -14.86
+    },
+    {
+      "startUtc": "2024-11-30T17:30:00Z",
+      "endUtc": "2024-11-30T18:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -7.67,
+      "unit1MW": -0.02,
+      "unit2MW": -15.34,
+      "combinedMW": -15.36
+    },
+    {
+      "startUtc": "2024-11-30T18:00:00Z",
+      "endUtc": "2024-11-30T18:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -7.8,
+      "unit1MW": -0.02,
+      "unit2MW": -15.6,
+      "combinedMW": -15.62
+    },
+    {
+      "startUtc": "2024-11-30T18:30:00Z",
+      "endUtc": "2024-11-30T19:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -7.95,
+      "unit1MW": -0.02,
+      "unit2MW": -15.9,
+      "combinedMW": -15.92
+    },
+    {
+      "startUtc": "2024-11-30T19:00:00Z",
+      "endUtc": "2024-11-30T19:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.2,
+      "unit1MW": -0.02,
+      "unit2MW": -16.4,
+      "combinedMW": -16.42
+    },
+    {
+      "startUtc": "2024-11-30T19:30:00Z",
+      "endUtc": "2024-11-30T20:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.26,
+      "unit1MW": -0.02,
+      "unit2MW": -16.52,
+      "combinedMW": -16.54
+    },
+    {
+      "startUtc": "2024-11-30T20:00:00Z",
+      "endUtc": "2024-11-30T20:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.24,
+      "unit1MW": -0.02,
+      "unit2MW": -16.48,
+      "combinedMW": -16.5
+    },
+    {
+      "startUtc": "2024-11-30T20:30:00Z",
+      "endUtc": "2024-11-30T21:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.24,
+      "unit1MW": -0.02,
+      "unit2MW": -16.48,
+      "combinedMW": -16.5
+    },
+    {
+      "startUtc": "2024-11-30T21:00:00Z",
+      "endUtc": "2024-11-30T21:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.25,
+      "unit1MW": -0.02,
+      "unit2MW": -16.5,
+      "combinedMW": -16.52
+    },
+    {
+      "startUtc": "2024-11-30T21:30:00Z",
+      "endUtc": "2024-11-30T22:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.24,
+      "unit1MW": -0.02,
+      "unit2MW": -16.48,
+      "combinedMW": -16.5
+    },
+    {
+      "startUtc": "2024-11-30T22:00:00Z",
+      "endUtc": "2024-11-30T22:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.25,
+      "unit1MW": -0.02,
+      "unit2MW": -16.5,
+      "combinedMW": -16.52
+    },
+    {
+      "startUtc": "2024-11-30T22:30:00Z",
+      "endUtc": "2024-11-30T23:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.36,
+      "unit1MW": -0.02,
+      "unit2MW": -16.72,
+      "combinedMW": -16.74
+    },
+    {
+      "startUtc": "2024-11-30T23:00:00Z",
+      "endUtc": "2024-11-30T23:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.31,
+      "unit1MW": -0.02,
+      "unit2MW": -16.62,
+      "combinedMW": -16.64
+    },
+    {
+      "startUtc": "2024-11-30T23:30:00Z",
+      "endUtc": "2024-12-01T00:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.45,
+      "unit1MW": -0.02,
+      "unit2MW": -16.9,
+      "combinedMW": -16.92
+    },
+    {
+      "startUtc": "2024-12-01T00:00:00Z",
+      "endUtc": "2024-12-01T00:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.4,
+      "unit1MW": -0.02,
+      "unit2MW": -16.8,
+      "combinedMW": -16.82
+    },
+    {
+      "startUtc": "2024-12-01T00:30:00Z",
+      "endUtc": "2024-12-01T01:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.46,
+      "unit1MW": -0.02,
+      "unit2MW": -16.92,
+      "combinedMW": -16.94
+    },
+    {
+      "startUtc": "2024-12-01T01:00:00Z",
+      "endUtc": "2024-12-01T01:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.43,
+      "unit1MW": -0.02,
+      "unit2MW": -16.86,
+      "combinedMW": -16.88
+    },
+    {
+      "startUtc": "2024-12-01T01:30:00Z",
+      "endUtc": "2024-12-01T02:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.43,
+      "unit1MW": -0.02,
+      "unit2MW": -16.86,
+      "combinedMW": -16.88
+    },
+    {
+      "startUtc": "2024-12-01T02:00:00Z",
+      "endUtc": "2024-12-01T02:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.2,
+      "unit1MW": -0.02,
+      "unit2MW": -16.4,
+      "combinedMW": -16.42
+    },
+    {
+      "startUtc": "2024-12-01T02:30:00Z",
+      "endUtc": "2024-12-01T03:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.28,
+      "unit1MW": -0.02,
+      "unit2MW": -16.56,
+      "combinedMW": -16.58
+    },
+    {
+      "startUtc": "2024-12-01T03:00:00Z",
+      "endUtc": "2024-12-01T03:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.43,
+      "unit1MW": -0.02,
+      "unit2MW": -16.86,
+      "combinedMW": -16.88
+    },
+    {
+      "startUtc": "2024-12-01T03:30:00Z",
+      "endUtc": "2024-12-01T04:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.45,
+      "unit1MW": -0.02,
+      "unit2MW": -16.9,
+      "combinedMW": -16.92
+    },
+    {
+      "startUtc": "2024-12-01T04:00:00Z",
+      "endUtc": "2024-12-01T04:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.45,
+      "unit1MW": -0.02,
+      "unit2MW": -16.9,
+      "combinedMW": -16.92
+    },
+    {
+      "startUtc": "2024-12-01T04:30:00Z",
+      "endUtc": "2024-12-01T05:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.4,
+      "unit1MW": -0.02,
+      "unit2MW": -16.8,
+      "combinedMW": -16.82
+    },
+    {
+      "startUtc": "2024-12-01T05:00:00Z",
+      "endUtc": "2024-12-01T05:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -8.48,
+      "unit1MW": -0.02,
+      "unit2MW": -16.96,
+      "combinedMW": -16.98
+    },
+    {
+      "startUtc": "2024-12-01T05:30:00Z",
+      "endUtc": "2024-12-01T06:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": -0.59,
+      "unit1MW": -0.02,
+      "unit2MW": -1.18,
+      "combinedMW": -1.2
+    },
+    {
+      "startUtc": "2024-12-01T06:00:00Z",
+      "endUtc": "2024-12-01T06:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 7.79,
+      "unit1MW": -0.02,
+      "unit2MW": 15.58,
+      "combinedMW": 15.56
+    },
+    {
+      "startUtc": "2024-12-01T06:30:00Z",
+      "endUtc": "2024-12-01T07:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 7.8,
+      "unit1MW": -0.02,
+      "unit2MW": 15.6,
+      "combinedMW": 15.58
+    },
+    {
+      "startUtc": "2024-12-01T07:00:00Z",
+      "endUtc": "2024-12-01T07:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 7.81,
+      "unit1MW": -0.02,
+      "unit2MW": 15.62,
+      "combinedMW": 15.6
+    },
+    {
+      "startUtc": "2024-12-01T07:30:00Z",
+      "endUtc": "2024-12-01T08:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 10.23,
+      "unit1MW": -0.02,
+      "unit2MW": 20.46,
+      "combinedMW": 20.44
+    },
+    {
+      "startUtc": "2024-12-01T08:00:00Z",
+      "endUtc": "2024-12-01T08:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 24.87,
+      "unit1MW": -0.02,
+      "unit2MW": 49.74,
+      "combinedMW": 49.72
+    },
+    {
+      "startUtc": "2024-12-01T08:30:00Z",
+      "endUtc": "2024-12-01T09:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 41.04,
+      "unit1MW": -0.02,
+      "unit2MW": 82.08,
+      "combinedMW": 82.06
+    },
+    {
+      "startUtc": "2024-12-01T09:00:00Z",
+      "endUtc": "2024-12-01T09:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 55.67,
+      "unit1MW": -0.02,
+      "unit2MW": 111.34,
+      "combinedMW": 111.32
+    },
+    {
+      "startUtc": "2024-12-01T09:30:00Z",
+      "endUtc": "2024-12-01T10:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 66.59,
+      "unit1MW": -0.02,
+      "unit2MW": 133.18,
+      "combinedMW": 133.16
+    },
+    {
+      "startUtc": "2024-12-01T10:00:00Z",
+      "endUtc": "2024-12-01T10:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 77.77,
+      "unit1MW": -0.02,
+      "unit2MW": 155.54,
+      "combinedMW": 155.52
+    },
+    {
+      "startUtc": "2024-12-01T10:30:00Z",
+      "endUtc": "2024-12-01T11:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 92.38,
+      "unit1MW": -0.02,
+      "unit2MW": 184.76,
+      "combinedMW": 184.74
+    },
+    {
+      "startUtc": "2024-12-01T11:00:00Z",
+      "endUtc": "2024-12-01T11:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 107.17,
+      "unit1MW": -0.02,
+      "unit2MW": 214.34,
+      "combinedMW": 214.32
+    },
+    {
+      "startUtc": "2024-12-01T11:30:00Z",
+      "endUtc": "2024-12-01T12:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 123.37,
+      "unit1MW": -0.02,
+      "unit2MW": 246.74,
+      "combinedMW": 246.72
+    },
+    {
+      "startUtc": "2024-12-01T12:00:00Z",
+      "endUtc": "2024-12-01T12:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 136.77,
+      "unit1MW": -0.02,
+      "unit2MW": 273.54,
+      "combinedMW": 273.52
+    },
+    {
+      "startUtc": "2024-12-01T12:30:00Z",
+      "endUtc": "2024-12-01T13:00:00Z",
+      "unit1MWh": -5.55,
+      "unit2MWh": 149.22,
+      "unit1MW": -11.1,
+      "unit2MW": 298.44,
+      "combinedMW": 287.34
+    },
+    {
+      "startUtc": "2024-12-01T13:00:00Z",
+      "endUtc": "2024-12-01T13:30:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 161.55,
+      "unit1MW": -11.56,
+      "unit2MW": 323.1,
+      "combinedMW": 311.54
+    },
+    {
+      "startUtc": "2024-12-01T13:30:00Z",
+      "endUtc": "2024-12-01T14:00:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 173.09,
+      "unit1MW": -11.58,
+      "unit2MW": 346.18,
+      "combinedMW": 334.6
+    },
+    {
+      "startUtc": "2024-12-01T14:00:00Z",
+      "endUtc": "2024-12-01T14:30:00Z",
+      "unit1MWh": -5.75,
+      "unit2MWh": 189.49,
+      "unit1MW": -11.5,
+      "unit2MW": 378.98,
+      "combinedMW": 367.48
+    },
+    {
+      "startUtc": "2024-12-01T14:30:00Z",
+      "endUtc": "2024-12-01T15:00:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 205.52,
+      "unit1MW": -11.58,
+      "unit2MW": 411.04,
+      "combinedMW": 399.46
+    },
+    {
+      "startUtc": "2024-12-01T15:00:00Z",
+      "endUtc": "2024-12-01T15:30:00Z",
+      "unit1MWh": -5.75,
+      "unit2MWh": 221.91,
+      "unit1MW": -11.5,
+      "unit2MW": 443.82,
+      "combinedMW": 432.32
+    },
+    {
+      "startUtc": "2024-12-01T15:30:00Z",
+      "endUtc": "2024-12-01T16:00:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 238.0,
+      "unit1MW": -11.56,
+      "unit2MW": 476.0,
+      "combinedMW": 464.44
+    },
+    {
+      "startUtc": "2024-12-01T16:00:00Z",
+      "endUtc": "2024-12-01T16:30:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 249.58,
+      "unit1MW": -11.58,
+      "unit2MW": 499.16,
+      "combinedMW": 487.58
+    },
+    {
+      "startUtc": "2024-12-01T16:30:00Z",
+      "endUtc": "2024-12-01T17:00:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 250.27,
+      "unit1MW": -11.56,
+      "unit2MW": 500.54,
+      "combinedMW": 488.98
+    },
+    {
+      "startUtc": "2024-12-01T17:00:00Z",
+      "endUtc": "2024-12-01T17:30:00Z",
+      "unit1MWh": -5.81,
+      "unit2MWh": 250.14,
+      "unit1MW": -11.62,
+      "unit2MW": 500.28,
+      "combinedMW": 488.66
+    },
+    {
+      "startUtc": "2024-12-01T17:30:00Z",
+      "endUtc": "2024-12-01T18:00:00Z",
+      "unit1MWh": -5.82,
+      "unit2MWh": 250.16,
+      "unit1MW": -11.64,
+      "unit2MW": 500.32,
+      "combinedMW": 488.68
+    },
+    {
+      "startUtc": "2024-12-01T18:00:00Z",
+      "endUtc": "2024-12-01T18:30:00Z",
+      "unit1MWh": -5.81,
+      "unit2MWh": 250.13,
+      "unit1MW": -11.62,
+      "unit2MW": 500.26,
+      "combinedMW": 488.64
+    },
+    {
+      "startUtc": "2024-12-01T18:30:00Z",
+      "endUtc": "2024-12-01T19:00:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 250.13,
+      "unit1MW": -11.6,
+      "unit2MW": 500.26,
+      "combinedMW": 488.66
+    },
+    {
+      "startUtc": "2024-12-01T19:00:00Z",
+      "endUtc": "2024-12-01T19:30:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 250.12,
+      "unit1MW": -11.58,
+      "unit2MW": 500.24,
+      "combinedMW": 488.66
+    },
+    {
+      "startUtc": "2024-12-01T19:30:00Z",
+      "endUtc": "2024-12-01T20:00:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 250.12,
+      "unit1MW": -11.56,
+      "unit2MW": 500.24,
+      "combinedMW": 488.68
+    },
+    {
+      "startUtc": "2024-12-01T20:00:00Z",
+      "endUtc": "2024-12-01T20:30:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 250.1,
+      "unit1MW": -11.58,
+      "unit2MW": 500.2,
+      "combinedMW": 488.62
+    },
+    {
+      "startUtc": "2024-12-01T20:30:00Z",
+      "endUtc": "2024-12-01T21:00:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 250.12,
+      "unit1MW": -11.56,
+      "unit2MW": 500.24,
+      "combinedMW": 488.68
+    },
+    {
+      "startUtc": "2024-12-01T21:00:00Z",
+      "endUtc": "2024-12-01T21:30:00Z",
+      "unit1MWh": -5.77,
+      "unit2MWh": 249.33,
+      "unit1MW": -11.54,
+      "unit2MW": 498.66,
+      "combinedMW": 487.12
+    },
+    {
+      "startUtc": "2024-12-01T21:30:00Z",
+      "endUtc": "2024-12-01T22:00:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 249.52,
+      "unit1MW": -11.6,
+      "unit2MW": 499.04,
+      "combinedMW": 487.44
+    },
+    {
+      "startUtc": "2024-12-01T22:00:00Z",
+      "endUtc": "2024-12-01T22:30:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 249.54,
+      "unit1MW": -11.6,
+      "unit2MW": 499.08,
+      "combinedMW": 487.48
+    },
+    {
+      "startUtc": "2024-12-01T22:30:00Z",
+      "endUtc": "2024-12-01T23:00:00Z",
+      "unit1MWh": -5.76,
+      "unit2MWh": 249.39,
+      "unit1MW": -11.52,
+      "unit2MW": 498.78,
+      "combinedMW": 487.26
+    },
+    {
+      "startUtc": "2024-12-01T23:00:00Z",
+      "endUtc": "2024-12-01T23:30:00Z",
+      "unit1MWh": -5.57,
+      "unit2MWh": 249.74,
+      "unit1MW": -11.14,
+      "unit2MW": 499.48,
+      "combinedMW": 488.34
+    },
+    {
+      "startUtc": "2024-12-01T23:30:00Z",
+      "endUtc": "2024-12-02T00:00:00Z",
+      "unit1MWh": -5.54,
+      "unit2MWh": 249.62,
+      "unit1MW": -11.08,
+      "unit2MW": 499.24,
+      "combinedMW": 488.16
+    },
+    {
+      "startUtc": "2024-12-02T00:00:00Z",
+      "endUtc": "2024-12-02T00:30:00Z",
+      "unit1MWh": -5.56,
+      "unit2MWh": 249.56,
+      "unit1MW": -11.12,
+      "unit2MW": 499.12,
+      "combinedMW": 488.0
+    },
+    {
+      "startUtc": "2024-12-02T00:30:00Z",
+      "endUtc": "2024-12-02T01:00:00Z",
+      "unit1MWh": -5.56,
+      "unit2MWh": 249.65,
+      "unit1MW": -11.12,
+      "unit2MW": 499.3,
+      "combinedMW": 488.18
+    },
+    {
+      "startUtc": "2024-12-02T01:00:00Z",
+      "endUtc": "2024-12-02T01:30:00Z",
+      "unit1MWh": -5.52,
+      "unit2MWh": 249.69,
+      "unit1MW": -11.04,
+      "unit2MW": 499.38,
+      "combinedMW": 488.34
+    },
+    {
+      "startUtc": "2024-12-02T01:30:00Z",
+      "endUtc": "2024-12-02T02:00:00Z",
+      "unit1MWh": -5.55,
+      "unit2MWh": 249.7,
+      "unit1MW": -11.1,
+      "unit2MW": 499.4,
+      "combinedMW": 488.3
+    },
+    {
+      "startUtc": "2024-12-02T02:00:00Z",
+      "endUtc": "2024-12-02T02:30:00Z",
+      "unit1MWh": -5.55,
+      "unit2MWh": 249.74,
+      "unit1MW": -11.1,
+      "unit2MW": 499.48,
+      "combinedMW": 488.38
+    },
+    {
+      "startUtc": "2024-12-02T02:30:00Z",
+      "endUtc": "2024-12-02T03:00:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 249.59,
+      "unit1MW": -11.58,
+      "unit2MW": 499.18,
+      "combinedMW": 487.6
+    },
+    {
+      "startUtc": "2024-12-02T03:00:00Z",
+      "endUtc": "2024-12-02T03:30:00Z",
+      "unit1MWh": -5.9,
+      "unit2MWh": 249.67,
+      "unit1MW": -11.8,
+      "unit2MW": 499.34,
+      "combinedMW": 487.54
+    },
+    {
+      "startUtc": "2024-12-02T03:30:00Z",
+      "endUtc": "2024-12-02T04:00:00Z",
+      "unit1MWh": -5.88,
+      "unit2MWh": 249.64,
+      "unit1MW": -11.76,
+      "unit2MW": 499.28,
+      "combinedMW": 487.52
+    },
+    {
+      "startUtc": "2024-12-02T04:00:00Z",
+      "endUtc": "2024-12-02T04:30:00Z",
+      "unit1MWh": -5.89,
+      "unit2MWh": 249.63,
+      "unit1MW": -11.78,
+      "unit2MW": 499.26,
+      "combinedMW": 487.48
+    },
+    {
+      "startUtc": "2024-12-02T04:30:00Z",
+      "endUtc": "2024-12-02T05:00:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 249.7,
+      "unit1MW": -11.7,
+      "unit2MW": 499.4,
+      "combinedMW": 487.7
+    },
+    {
+      "startUtc": "2024-12-02T05:00:00Z",
+      "endUtc": "2024-12-02T05:30:00Z",
+      "unit1MWh": -5.86,
+      "unit2MWh": 249.64,
+      "unit1MW": -11.72,
+      "unit2MW": 499.28,
+      "combinedMW": 487.56
+    },
+    {
+      "startUtc": "2024-12-02T05:30:00Z",
+      "endUtc": "2024-12-02T06:00:00Z",
+      "unit1MWh": -5.84,
+      "unit2MWh": 249.75,
+      "unit1MW": -11.68,
+      "unit2MW": 499.5,
+      "combinedMW": 487.82
+    },
+    {
+      "startUtc": "2024-12-02T06:00:00Z",
+      "endUtc": "2024-12-02T06:30:00Z",
+      "unit1MWh": -5.73,
+      "unit2MWh": 249.65,
+      "unit1MW": -11.46,
+      "unit2MW": 499.3,
+      "combinedMW": 487.84
+    },
+    {
+      "startUtc": "2024-12-02T06:30:00Z",
+      "endUtc": "2024-12-02T07:00:00Z",
+      "unit1MWh": -5.74,
+      "unit2MWh": 249.52,
+      "unit1MW": -11.48,
+      "unit2MW": 499.04,
+      "combinedMW": 487.56
+    },
+    {
+      "startUtc": "2024-12-02T07:00:00Z",
+      "endUtc": "2024-12-02T07:30:00Z",
+      "unit1MWh": -5.74,
+      "unit2MWh": 249.52,
+      "unit1MW": -11.48,
+      "unit2MW": 499.04,
+      "combinedMW": 487.56
+    },
+    {
+      "startUtc": "2024-12-02T07:30:00Z",
+      "endUtc": "2024-12-02T08:00:00Z",
+      "unit1MWh": -5.76,
+      "unit2MWh": 249.57,
+      "unit1MW": -11.52,
+      "unit2MW": 499.14,
+      "combinedMW": 487.62
+    },
+    {
+      "startUtc": "2024-12-02T08:00:00Z",
+      "endUtc": "2024-12-02T08:30:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 249.32,
+      "unit1MW": -11.58,
+      "unit2MW": 498.64,
+      "combinedMW": 487.06
+    },
+    {
+      "startUtc": "2024-12-02T08:30:00Z",
+      "endUtc": "2024-12-02T09:00:00Z",
+      "unit1MWh": -5.76,
+      "unit2MWh": 249.68,
+      "unit1MW": -11.52,
+      "unit2MW": 499.36,
+      "combinedMW": 487.84
+    },
+    {
+      "startUtc": "2024-12-02T09:00:00Z",
+      "endUtc": "2024-12-02T09:30:00Z",
+      "unit1MWh": -5.81,
+      "unit2MWh": 249.33,
+      "unit1MW": -11.62,
+      "unit2MW": 498.66,
+      "combinedMW": 487.04
+    },
+    {
+      "startUtc": "2024-12-02T09:30:00Z",
+      "endUtc": "2024-12-02T10:00:00Z",
+      "unit1MWh": -5.82,
+      "unit2MWh": 249.55,
+      "unit1MW": -11.64,
+      "unit2MW": 499.1,
+      "combinedMW": 487.46
+    },
+    {
+      "startUtc": "2024-12-02T10:00:00Z",
+      "endUtc": "2024-12-02T10:30:00Z",
+      "unit1MWh": -5.83,
+      "unit2MWh": 249.51,
+      "unit1MW": -11.66,
+      "unit2MW": 499.02,
+      "combinedMW": 487.36
+    },
+    {
+      "startUtc": "2024-12-02T10:30:00Z",
+      "endUtc": "2024-12-02T11:00:00Z",
+      "unit1MWh": -5.61,
+      "unit2MWh": 249.5,
+      "unit1MW": -11.22,
+      "unit2MW": 499.0,
+      "combinedMW": 487.78
+    },
+    {
+      "startUtc": "2024-12-02T11:00:00Z",
+      "endUtc": "2024-12-02T11:30:00Z",
+      "unit1MWh": -5.63,
+      "unit2MWh": 249.66,
+      "unit1MW": -11.26,
+      "unit2MW": 499.32,
+      "combinedMW": 488.06
+    },
+    {
+      "startUtc": "2024-12-02T11:30:00Z",
+      "endUtc": "2024-12-02T12:00:00Z",
+      "unit1MWh": -5.74,
+      "unit2MWh": 249.45,
+      "unit1MW": -11.48,
+      "unit2MW": 498.9,
+      "combinedMW": 487.42
+    },
+    {
+      "startUtc": "2024-12-02T12:00:00Z",
+      "endUtc": "2024-12-02T12:30:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 249.59,
+      "unit1MW": -11.56,
+      "unit2MW": 499.18,
+      "combinedMW": 487.62
+    },
+    {
+      "startUtc": "2024-12-02T12:30:00Z",
+      "endUtc": "2024-12-02T13:00:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 249.58,
+      "unit1MW": -11.6,
+      "unit2MW": 499.16,
+      "combinedMW": 487.56
+    },
+    {
+      "startUtc": "2024-12-02T13:00:00Z",
+      "endUtc": "2024-12-02T13:30:00Z",
+      "unit1MWh": -5.76,
+      "unit2MWh": 249.42,
+      "unit1MW": -11.52,
+      "unit2MW": 498.84,
+      "combinedMW": 487.32
+    },
+    {
+      "startUtc": "2024-12-02T13:30:00Z",
+      "endUtc": "2024-12-02T14:00:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 249.77,
+      "unit1MW": -11.6,
+      "unit2MW": 499.54,
+      "combinedMW": 487.94
+    },
+    {
+      "startUtc": "2024-12-02T14:00:00Z",
+      "endUtc": "2024-12-02T14:30:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 249.54,
+      "unit1MW": -11.7,
+      "unit2MW": 499.08,
+      "combinedMW": 487.38
+    },
+    {
+      "startUtc": "2024-12-02T14:30:00Z",
+      "endUtc": "2024-12-02T15:00:00Z",
+      "unit1MWh": -5.83,
+      "unit2MWh": 249.46,
+      "unit1MW": -11.66,
+      "unit2MW": 498.92,
+      "combinedMW": 487.26
+    },
+    {
+      "startUtc": "2024-12-02T15:00:00Z",
+      "endUtc": "2024-12-02T15:30:00Z",
+      "unit1MWh": -5.87,
+      "unit2MWh": 249.42,
+      "unit1MW": -11.74,
+      "unit2MW": 498.84,
+      "combinedMW": 487.1
+    },
+    {
+      "startUtc": "2024-12-02T15:30:00Z",
+      "endUtc": "2024-12-02T16:00:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 249.63,
+      "unit1MW": -11.7,
+      "unit2MW": 499.26,
+      "combinedMW": 487.56
+    },
+    {
+      "startUtc": "2024-12-02T16:00:00Z",
+      "endUtc": "2024-12-02T16:30:00Z",
+      "unit1MWh": -5.84,
+      "unit2MWh": 249.75,
+      "unit1MW": -11.68,
+      "unit2MW": 499.5,
+      "combinedMW": 487.82
+    },
+    {
+      "startUtc": "2024-12-02T16:30:00Z",
+      "endUtc": "2024-12-02T17:00:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 249.53,
+      "unit1MW": -11.7,
+      "unit2MW": 499.06,
+      "combinedMW": 487.36
+    },
+    {
+      "startUtc": "2024-12-02T17:00:00Z",
+      "endUtc": "2024-12-02T17:30:00Z",
+      "unit1MWh": -5.88,
+      "unit2MWh": 249.52,
+      "unit1MW": -11.76,
+      "unit2MW": 499.04,
+      "combinedMW": 487.28
+    },
+    {
+      "startUtc": "2024-12-02T17:30:00Z",
+      "endUtc": "2024-12-02T18:00:00Z",
+      "unit1MWh": -5.87,
+      "unit2MWh": 249.65,
+      "unit1MW": -11.74,
+      "unit2MW": 499.3,
+      "combinedMW": 487.56
+    },
+    {
+      "startUtc": "2024-12-02T18:00:00Z",
+      "endUtc": "2024-12-02T18:30:00Z",
+      "unit1MWh": -5.84,
+      "unit2MWh": 256.85,
+      "unit1MW": -11.68,
+      "unit2MW": 513.7,
+      "combinedMW": 502.02
+    },
+    {
+      "startUtc": "2024-12-02T18:30:00Z",
+      "endUtc": "2024-12-02T19:00:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 271.44,
+      "unit1MW": -11.7,
+      "unit2MW": 542.88,
+      "combinedMW": 531.18
+    },
+    {
+      "startUtc": "2024-12-02T19:00:00Z",
+      "endUtc": "2024-12-02T19:30:00Z",
+      "unit1MWh": -5.83,
+      "unit2MWh": 280.58,
+      "unit1MW": -11.66,
+      "unit2MW": 561.16,
+      "combinedMW": 549.5
+    },
+    {
+      "startUtc": "2024-12-02T19:30:00Z",
+      "endUtc": "2024-12-02T20:00:00Z",
+      "unit1MWh": -5.84,
+      "unit2MWh": 280.36,
+      "unit1MW": -11.68,
+      "unit2MW": 560.72,
+      "combinedMW": 549.04
+    },
+    {
+      "startUtc": "2024-12-02T20:00:00Z",
+      "endUtc": "2024-12-02T20:30:00Z",
+      "unit1MWh": -5.86,
+      "unit2MWh": 280.57,
+      "unit1MW": -11.72,
+      "unit2MW": 561.14,
+      "combinedMW": 549.42
+    },
+    {
+      "startUtc": "2024-12-02T20:30:00Z",
+      "endUtc": "2024-12-02T21:00:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 280.56,
+      "unit1MW": -11.6,
+      "unit2MW": 561.12,
+      "combinedMW": 549.52
+    },
+    {
+      "startUtc": "2024-12-02T21:00:00Z",
+      "endUtc": "2024-12-02T21:30:00Z",
+      "unit1MWh": -5.8,
+      "unit2MWh": 280.7,
+      "unit1MW": -11.6,
+      "unit2MW": 561.4,
+      "combinedMW": 549.8
+    },
+    {
+      "startUtc": "2024-12-02T21:30:00Z",
+      "endUtc": "2024-12-02T22:00:00Z",
+      "unit1MWh": -5.91,
+      "unit2MWh": 280.68,
+      "unit1MW": -11.82,
+      "unit2MW": 561.36,
+      "combinedMW": 549.54
+    },
+    {
+      "startUtc": "2024-12-02T22:00:00Z",
+      "endUtc": "2024-12-02T22:30:00Z",
+      "unit1MWh": -5.95,
+      "unit2MWh": 280.7,
+      "unit1MW": -11.9,
+      "unit2MW": 561.4,
+      "combinedMW": 549.5
+    },
+    {
+      "startUtc": "2024-12-02T22:30:00Z",
+      "endUtc": "2024-12-02T23:00:00Z",
+      "unit1MWh": -5.94,
+      "unit2MWh": 280.51,
+      "unit1MW": -11.88,
+      "unit2MW": 561.02,
+      "combinedMW": 549.14
+    },
+    {
+      "startUtc": "2024-12-02T23:00:00Z",
+      "endUtc": "2024-12-02T23:30:00Z",
+      "unit1MWh": -5.89,
+      "unit2MWh": 280.81,
+      "unit1MW": -11.78,
+      "unit2MW": 561.62,
+      "combinedMW": 549.84
+    },
+    {
+      "startUtc": "2024-12-02T23:30:00Z",
+      "endUtc": "2024-12-03T00:00:00Z",
+      "unit1MWh": -5.86,
+      "unit2MWh": 282.16,
+      "unit1MW": -11.72,
+      "unit2MW": 564.32,
+      "combinedMW": 552.6
+    },
+    {
+      "startUtc": "2024-12-03T00:00:00Z",
+      "endUtc": "2024-12-03T00:30:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 283.83,
+      "unit1MW": -11.7,
+      "unit2MW": 567.66,
+      "combinedMW": 555.96
+    },
+    {
+      "startUtc": "2024-12-03T00:30:00Z",
+      "endUtc": "2024-12-03T01:00:00Z",
+      "unit1MWh": -5.85,
+      "unit2MWh": 286.03,
+      "unit1MW": -11.7,
+      "unit2MW": 572.06,
+      "combinedMW": 560.36
+    },
+    {
+      "startUtc": "2024-12-03T01:00:00Z",
+      "endUtc": "2024-12-03T01:30:00Z",
+      "unit1MWh": -5.82,
+      "unit2MWh": 293.35,
+      "unit1MW": -11.64,
+      "unit2MW": 586.7,
+      "combinedMW": 575.06
+    },
+    {
+      "startUtc": "2024-12-03T01:30:00Z",
+      "endUtc": "2024-12-03T02:00:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 301.18,
+      "unit1MW": -11.56,
+      "unit2MW": 602.36,
+      "combinedMW": 590.8
+    },
+    {
+      "startUtc": "2024-12-03T02:00:00Z",
+      "endUtc": "2024-12-03T02:30:00Z",
+      "unit1MWh": -5.77,
+      "unit2MWh": 302.07,
+      "unit1MW": -11.54,
+      "unit2MW": 604.14,
+      "combinedMW": 592.6
+    },
+    {
+      "startUtc": "2024-12-03T02:30:00Z",
+      "endUtc": "2024-12-03T03:00:00Z",
+      "unit1MWh": -5.86,
+      "unit2MWh": 302.08,
+      "unit1MW": -11.72,
+      "unit2MW": 604.16,
+      "combinedMW": 592.44
+    },
+    {
+      "startUtc": "2024-12-03T03:00:00Z",
+      "endUtc": "2024-12-03T03:30:00Z",
+      "unit1MWh": -5.86,
+      "unit2MWh": 302.2,
+      "unit1MW": -11.72,
+      "unit2MW": 604.4,
+      "combinedMW": 592.68
+    },
+    {
+      "startUtc": "2024-12-03T03:30:00Z",
+      "endUtc": "2024-12-03T04:00:00Z",
+      "unit1MWh": -5.84,
+      "unit2MWh": 302.25,
+      "unit1MW": -11.68,
+      "unit2MW": 604.5,
+      "combinedMW": 592.82
+    },
+    {
+      "startUtc": "2024-12-03T04:00:00Z",
+      "endUtc": "2024-12-03T04:30:00Z",
+      "unit1MWh": -5.83,
+      "unit2MWh": 302.13,
+      "unit1MW": -11.66,
+      "unit2MW": 604.26,
+      "combinedMW": 592.6
+    },
+    {
+      "startUtc": "2024-12-03T04:30:00Z",
+      "endUtc": "2024-12-03T05:00:00Z",
+      "unit1MWh": -6.51,
+      "unit2MWh": 302.0,
+      "unit1MW": -13.02,
+      "unit2MW": 604.0,
+      "combinedMW": 590.98
+    },
+    {
+      "startUtc": "2024-12-03T05:00:00Z",
+      "endUtc": "2024-12-03T05:30:00Z",
+      "unit1MWh": -6.83,
+      "unit2MWh": 302.98,
+      "unit1MW": -13.66,
+      "unit2MW": 605.96,
+      "combinedMW": 592.3
+    },
+    {
+      "startUtc": "2024-12-03T05:30:00Z",
+      "endUtc": "2024-12-03T06:00:00Z",
+      "unit1MWh": -6.55,
+      "unit2MWh": 303.74,
+      "unit1MW": -13.1,
+      "unit2MW": 607.48,
+      "combinedMW": 594.38
+    },
+    {
+      "startUtc": "2024-12-03T06:00:00Z",
+      "endUtc": "2024-12-03T06:30:00Z",
+      "unit1MWh": -6.51,
+      "unit2MWh": 303.5,
+      "unit1MW": -13.02,
+      "unit2MW": 607.0,
+      "combinedMW": 593.98
+    },
+    {
+      "startUtc": "2024-12-03T06:30:00Z",
+      "endUtc": "2024-12-03T07:00:00Z",
+      "unit1MWh": -6.5,
+      "unit2MWh": 303.37,
+      "unit1MW": -13.0,
+      "unit2MW": 606.74,
+      "combinedMW": 593.74
+    },
+    {
+      "startUtc": "2024-12-03T07:00:00Z",
+      "endUtc": "2024-12-03T07:30:00Z",
+      "unit1MWh": -6.48,
+      "unit2MWh": 303.61,
+      "unit1MW": -12.96,
+      "unit2MW": 607.22,
+      "combinedMW": 594.26
+    },
+    {
+      "startUtc": "2024-12-03T07:30:00Z",
+      "endUtc": "2024-12-03T08:00:00Z",
+      "unit1MWh": -6.51,
+      "unit2MWh": 303.34,
+      "unit1MW": -13.02,
+      "unit2MW": 606.68,
+      "combinedMW": 593.66
+    },
+    {
+      "startUtc": "2024-12-03T08:00:00Z",
+      "endUtc": "2024-12-03T08:30:00Z",
+      "unit1MWh": -6.57,
+      "unit2MWh": 303.45,
+      "unit1MW": -13.14,
+      "unit2MW": 606.9,
+      "combinedMW": 593.76
+    },
+    {
+      "startUtc": "2024-12-03T08:30:00Z",
+      "endUtc": "2024-12-03T09:00:00Z",
+      "unit1MWh": -6.55,
+      "unit2MWh": 303.4,
+      "unit1MW": -13.1,
+      "unit2MW": 606.8,
+      "combinedMW": 593.7
+    },
+    {
+      "startUtc": "2024-12-03T09:00:00Z",
+      "endUtc": "2024-12-03T09:30:00Z",
+      "unit1MWh": -6.54,
+      "unit2MWh": 303.59,
+      "unit1MW": -13.08,
+      "unit2MW": 607.18,
+      "combinedMW": 594.1
+    },
+    {
+      "startUtc": "2024-12-03T09:30:00Z",
+      "endUtc": "2024-12-03T10:00:00Z",
+      "unit1MWh": -6.59,
+      "unit2MWh": 303.27,
+      "unit1MW": -13.18,
+      "unit2MW": 606.54,
+      "combinedMW": 593.36
+    },
+    {
+      "startUtc": "2024-12-03T10:00:00Z",
+      "endUtc": "2024-12-03T10:30:00Z",
+      "unit1MWh": -6.63,
+      "unit2MWh": 303.46,
+      "unit1MW": -13.26,
+      "unit2MW": 606.92,
+      "combinedMW": 593.66
+    },
+    {
+      "startUtc": "2024-12-03T10:30:00Z",
+      "endUtc": "2024-12-03T11:00:00Z",
+      "unit1MWh": -6.62,
+      "unit2MWh": 303.51,
+      "unit1MW": -13.24,
+      "unit2MW": 607.02,
+      "combinedMW": 593.78
+    },
+    {
+      "startUtc": "2024-12-03T11:00:00Z",
+      "endUtc": "2024-12-03T11:30:00Z",
+      "unit1MWh": -1.98,
+      "unit2MWh": 303.35,
+      "unit1MW": -3.96,
+      "unit2MW": 606.7,
+      "combinedMW": 602.74
+    },
+    {
+      "startUtc": "2024-12-03T11:30:00Z",
+      "endUtc": "2024-12-03T12:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 303.37,
+      "unit1MW": -0.02,
+      "unit2MW": 606.74,
+      "combinedMW": 606.72
+    },
+    {
+      "startUtc": "2024-12-03T12:00:00Z",
+      "endUtc": "2024-12-03T12:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 303.57,
+      "unit1MW": -0.02,
+      "unit2MW": 607.14,
+      "combinedMW": 607.12
+    },
+    {
+      "startUtc": "2024-12-03T12:30:00Z",
+      "endUtc": "2024-12-03T13:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 303.4,
+      "unit1MW": -0.02,
+      "unit2MW": 606.8,
+      "combinedMW": 606.78
+    },
+    {
+      "startUtc": "2024-12-03T13:00:00Z",
+      "endUtc": "2024-12-03T13:30:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 303.59,
+      "unit1MW": -0.02,
+      "unit2MW": 607.18,
+      "combinedMW": 607.16
+    },
+    {
+      "startUtc": "2024-12-03T13:30:00Z",
+      "endUtc": "2024-12-03T14:00:00Z",
+      "unit1MWh": -0.01,
+      "unit2MWh": 303.48,
+      "unit1MW": -0.02,
+      "unit2MW": 606.96,
+      "combinedMW": 606.94
+    },
+    {
+      "startUtc": "2024-12-03T14:00:00Z",
+      "endUtc": "2024-12-03T14:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.29,
+      "unit1MW": 0.0,
+      "unit2MW": 606.58,
+      "combinedMW": 606.58
+    },
+    {
+      "startUtc": "2024-12-03T14:30:00Z",
+      "endUtc": "2024-12-03T15:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.55,
+      "unit1MW": 0.0,
+      "unit2MW": 607.1,
+      "combinedMW": 607.1
+    },
+    {
+      "startUtc": "2024-12-03T15:00:00Z",
+      "endUtc": "2024-12-03T15:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.51,
+      "unit1MW": 0.0,
+      "unit2MW": 607.02,
+      "combinedMW": 607.02
+    },
+    {
+      "startUtc": "2024-12-03T15:30:00Z",
+      "endUtc": "2024-12-03T16:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.53,
+      "unit1MW": 0.0,
+      "unit2MW": 607.06,
+      "combinedMW": 607.06
+    },
+    {
+      "startUtc": "2024-12-03T16:00:00Z",
+      "endUtc": "2024-12-03T16:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.5,
+      "unit1MW": 0.0,
+      "unit2MW": 607.0,
+      "combinedMW": 607.0
+    },
+    {
+      "startUtc": "2024-12-03T16:30:00Z",
+      "endUtc": "2024-12-03T17:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.38,
+      "unit1MW": 0.0,
+      "unit2MW": 606.76,
+      "combinedMW": 606.76
+    },
+    {
+      "startUtc": "2024-12-03T17:00:00Z",
+      "endUtc": "2024-12-03T17:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.33,
+      "unit1MW": 0.0,
+      "unit2MW": 606.66,
+      "combinedMW": 606.66
+    },
+    {
+      "startUtc": "2024-12-03T17:30:00Z",
+      "endUtc": "2024-12-03T18:00:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.79,
+      "unit1MW": 0.0,
+      "unit2MW": 607.58,
+      "combinedMW": 607.58
+    },
+    {
+      "startUtc": "2024-12-03T18:00:00Z",
+      "endUtc": "2024-12-03T18:30:00Z",
+      "unit1MWh": 0.0,
+      "unit2MWh": 303.36,
+      "unit1MW": 0.0,
+      "unit2MW": 606.72,
+      "combinedMW": 606.72
+    },
+    {
+      "startUtc": "2024-12-03T18:30:00Z",
+      "endUtc": "2024-12-03T19:00:00Z",
+      "unit1MWh": -0.85,
+      "unit2MWh": 303.49,
+      "unit1MW": -1.7,
+      "unit2MW": 606.98,
+      "combinedMW": 605.28
+    },
+    {
+      "startUtc": "2024-12-03T19:00:00Z",
+      "endUtc": "2024-12-03T19:30:00Z",
+      "unit1MWh": -5.78,
+      "unit2MWh": 303.47,
+      "unit1MW": -11.56,
+      "unit2MW": 606.94,
+      "combinedMW": 595.38
+    },
+    {
+      "startUtc": "2024-12-03T19:30:00Z",
+      "endUtc": "2024-12-03T20:00:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 303.59,
+      "unit1MW": -11.58,
+      "unit2MW": 607.18,
+      "combinedMW": 595.6
+    },
+    {
+      "startUtc": "2024-12-03T20:00:00Z",
+      "endUtc": "2024-12-03T20:30:00Z",
+      "unit1MWh": -5.79,
+      "unit2MWh": 303.49,
+      "unit1MW": -11.58,
+      "unit2MW": 606.98,
+      "combinedMW": 595.4
+    },
+    {
+      "startUtc": "2024-12-03T20:30:00Z",
+      "endUtc": "2024-12-03T21:00:00Z",
+      "unit1MWh": -5.81,
+      "unit2MWh": 303.67,
+      "unit1MW": -11.62,
+      "unit2MW": 607.34,
+      "combinedMW": 595.72
+    },
+    {
+      "startUtc": "2024-12-03T21:00:00Z",
+      "endUtc": "2024-12-03T21:30:00Z",
+      "unit1MWh": -5.81,
+      "unit2MWh": 303.18,
+      "unit1MW": -11.62,
+      "unit2MW": 606.36,
+      "combinedMW": 594.74
+    },
+    {
+      "startUtc": "2024-12-03T21:30:00Z",
+      "endUtc": "2024-12-03T22:00:00Z",
+      "unit1MWh": -5.82,
+      "unit2MWh": 303.68,
+      "unit1MW": -11.64,
+      "unit2MW": 607.36,
+      "combinedMW": 595.72
+    },
+    {
+      "startUtc": "2024-12-03T22:00:00Z",
+      "endUtc": "2024-12-03T22:30:00Z",
+      "unit1MWh": -5.86,
+      "unit2MWh": 303.47,
+      "unit1MW": -11.72,
+      "unit2MW": 606.94,
+      "combinedMW": 595.22
+    },
+    {
+      "startUtc": "2024-12-03T22:30:00Z",
+      "endUtc": "2024-12-03T23:00:00Z",
+      "unit1MWh": -5.89,
+      "unit2MWh": 303.59,
+      "unit1MW": -11.78,
+      "unit2MW": 607.18,
+      "combinedMW": 595.4
+    },
+    {
+      "startUtc": "2024-12-03T23:00:00Z",
+      "endUtc": "2024-12-03T23:30:00Z",
+      "unit1MWh": -5.88,
+      "unit2MWh": 303.39,
+      "unit1MW": -11.76,
+      "unit2MW": 606.78,
+      "combinedMW": 595.02
+    },
+    {
+      "startUtc": "2024-12-03T23:30:00Z",
+      "endUtc": "2024-12-04T00:00:00Z",
+      "unit1MWh": -5.83,
+      "unit2MWh": 303.87,
+      "unit1MW": -11.66,
+      "unit2MW": 607.74,
+      "combinedMW": 596.08
+    },
+    {
+      "startUtc": "2024-12-04T00:00:00Z",
+      "endUtc": "2024-12-04T00:30:00Z",
+      "unit1MWh": -5.87,
+      "unit2MWh": 304.53,
+      "unit1MW": -11.74,
+      "unit2MW": 609.06,
+      "combinedMW": 597.32
+    },
+    {
+      "startUtc": "2024-12-04T00:30:00Z",
+      "endUtc": "2024-12-04T01:00:00Z",
+      "unit1MWh": -5.88,
+      "unit2MWh": 305.98,
+      "unit1MW": -11.76,
+      "unit2MW": 611.96,
+      "combinedMW": 600.2
+    },
+    {
+      "startUtc": "2024-12-04T01:00:00Z",
+      "endUtc": "2024-12-04T01:30:00Z",
+      "unit1MWh": -6.34,
+      "unit2MWh": 306.52,
+      "unit1MW": -12.68,
+      "unit2MW": 613.04,
+      "combinedMW": 600.36
+    },
+    {
+      "startUtc": "2024-12-04T01:30:00Z",
+      "endUtc": "2024-12-04T02:00:00Z",
+      "unit1MWh": -6.58,
+      "unit2MWh": 306.7,
+      "unit1MW": -13.16,
+      "unit2MW": 613.4,
+      "combinedMW": 600.24
+    },
+    {
+      "startUtc": "2024-12-04T02:00:00Z",
+      "endUtc": "2024-12-04T02:30:00Z",
+      "unit1MWh": -6.54,
+      "unit2MWh": 306.66,
+      "unit1MW": -13.08,
+      "unit2MW": 613.32,
+      "combinedMW": 600.24
+    },
+    {
+      "startUtc": "2024-12-04T02:30:00Z",
+      "endUtc": "2024-12-04T03:00:00Z",
+      "unit1MWh": -6.5,
+      "unit2MWh": 306.73,
+      "unit1MW": -13.0,
+      "unit2MW": 613.46,
+      "combinedMW": 600.46
+    },
+    {
+      "startUtc": "2024-12-04T03:00:00Z",
+      "endUtc": "2024-12-04T03:30:00Z",
+      "unit1MWh": -6.49,
+      "unit2MWh": 307.22,
+      "unit1MW": -12.98,
+      "unit2MW": 614.44,
+      "combinedMW": 601.46
+    },
+    {
+      "startUtc": "2024-12-04T03:30:00Z",
+      "endUtc": "2024-12-04T04:00:00Z",
+      "unit1MWh": -6.5,
+      "unit2MWh": 307.13,
+      "unit1MW": -13.0,
+      "unit2MW": 614.26,
+      "combinedMW": 601.26
+    },
+    {
+      "startUtc": "2024-12-04T04:00:00Z",
+      "endUtc": "2024-12-04T04:30:00Z",
+      "unit1MWh": -6.47,
+      "unit2MWh": 307.13,
+      "unit1MW": -12.94,
+      "unit2MW": 614.26,
+      "combinedMW": 601.32
+    },
+    {
+      "startUtc": "2024-12-04T04:30:00Z",
+      "endUtc": "2024-12-04T05:00:00Z",
+      "unit1MWh": -6.47,
+      "unit2MWh": 307.34,
+      "unit1MW": -12.94,
+      "unit2MW": 614.68,
+      "combinedMW": 601.74
+    },
+    {
+      "startUtc": "2024-12-04T05:00:00Z",
+      "endUtc": "2024-12-04T05:30:00Z",
+      "unit1MWh": -6.52,
+      "unit2MWh": 307.1,
+      "unit1MW": -13.04,
+      "unit2MW": 614.2,
+      "combinedMW": 601.16
+    },
+    {
+      "startUtc": "2024-12-04T05:30:00Z",
+      "endUtc": "2024-12-04T06:00:00Z",
+      "unit1MWh": -6.52,
+      "unit2MWh": 307.2,
+      "unit1MW": -13.04,
+      "unit2MW": 614.4,
+      "combinedMW": 601.36
+    },
+    {
+      "startUtc": "2024-12-04T06:00:00Z",
+      "endUtc": "2024-12-04T06:30:00Z",
+      "unit1MWh": -6.55,
+      "unit2MWh": 307.06,
+      "unit1MW": -13.1,
+      "unit2MW": 614.12,
+      "combinedMW": 601.02
+    },
+    {
+      "startUtc": "2024-12-04T06:30:00Z",
+      "endUtc": "2024-12-04T07:00:00Z",
+      "unit1MWh": -6.53,
+      "unit2MWh": 307.15,
+      "unit1MW": -13.06,
+      "unit2MW": 614.3,
+      "combinedMW": 601.24
+    },
+    {
+      "startUtc": "2024-12-04T07:00:00Z",
+      "endUtc": "2024-12-04T07:30:00Z",
+      "unit1MWh": -6.55,
+      "unit2MWh": 306.91,
+      "unit1MW": -13.1,
+      "unit2MW": 613.82,
+      "combinedMW": 600.72
+    },
+    {
+      "startUtc": "2024-12-04T07:30:00Z",
+      "endUtc": "2024-12-04T08:00:00Z",
+      "unit1MWh": -6.55,
+      "unit2MWh": 306.8,
+      "unit1MW": -13.1,
+      "unit2MW": 613.6,
+      "combinedMW": 600.5
+    },
+    {
+      "startUtc": "2024-12-04T08:00:00Z",
+      "endUtc": "2024-12-04T08:30:00Z",
+      "unit1MWh": -6.53,
+      "unit2MWh": 307.01,
+      "unit1MW": -13.06,
+      "unit2MW": 614.02,
+      "combinedMW": 600.96
+    },
+    {
+      "startUtc": "2024-12-04T08:30:00Z",
+      "endUtc": "2024-12-04T09:00:00Z",
+      "unit1MWh": -6.55,
+      "unit2MWh": 306.8,
+      "unit1MW": -13.1,
+      "unit2MW": 613.6,
+      "combinedMW": 600.5
+    },
+    {
+      "startUtc": "2024-12-04T09:00:00Z",
+      "endUtc": "2024-12-04T09:30:00Z",
+      "unit1MWh": -6.5,
+      "unit2MWh": 307.16,
+      "unit1MW": -13.0,
+      "unit2MW": 614.32,
+      "combinedMW": 601.32
+    },
+    {
+      "startUtc": "2024-12-04T09:30:00Z",
+      "endUtc": "2024-12-04T10:00:00Z",
+      "unit1MWh": -6.64,
+      "unit2MWh": 306.73,
+      "unit1MW": -13.28,
+      "unit2MW": 613.46,
+      "combinedMW": 600.18
+    },
+    {
+      "startUtc": "2024-12-04T10:00:00Z",
+      "endUtc": "2024-12-04T10:30:00Z",
+      "unit1MWh": -6.81,
+      "unit2MWh": 306.95,
+      "unit1MW": -13.62,
+      "unit2MW": 613.9,
+      "combinedMW": 600.28
+    },
+    {
+      "startUtc": "2024-12-04T10:30:00Z",
+      "endUtc": "2024-12-04T11:00:00Z",
+      "unit1MWh": -6.89,
+      "unit2MWh": 306.99,
+      "unit1MW": -13.78,
+      "unit2MW": 613.98,
+      "combinedMW": 600.2
+    },
+    {
+      "startUtc": "2024-12-04T11:00:00Z",
+      "endUtc": "2024-12-04T11:30:00Z",
+      "unit1MWh": -6.94,
+      "unit2MWh": 306.98,
+      "unit1MW": -13.88,
+      "unit2MW": 613.96,
+      "combinedMW": 600.08
+    },
+    {
+      "startUtc": "2024-12-04T11:30:00Z",
+      "endUtc": "2024-12-04T12:00:00Z",
+      "unit1MWh": -6.93,
+      "unit2MWh": 306.94,
+      "unit1MW": -13.86,
+      "unit2MW": 613.88,
+      "combinedMW": 600.02
+    },
+    {
+      "startUtc": "2024-12-04T12:00:00Z",
+      "endUtc": "2024-12-04T12:30:00Z",
+      "unit1MWh": -6.93,
+      "unit2MWh": 306.96,
+      "unit1MW": -13.86,
+      "unit2MW": 613.92,
+      "combinedMW": 600.06
+    },
+    {
+      "startUtc": "2024-12-04T12:30:00Z",
+      "endUtc": "2024-12-04T13:00:00Z",
+      "unit1MWh": -6.88,
+      "unit2MWh": 306.59,
+      "unit1MW": -13.76,
+      "unit2MW": 613.18,
+      "combinedMW": 599.42
+    },
+    {
+      "startUtc": "2024-12-04T13:00:00Z",
+      "endUtc": "2024-12-04T13:30:00Z",
+      "unit1MWh": -6.87,
+      "unit2MWh": 300.63,
+      "unit1MW": -13.74,
+      "unit2MW": 601.26,
+      "combinedMW": 587.52
+    },
+    {
+      "startUtc": "2024-12-04T13:30:00Z",
+      "endUtc": "2024-12-04T14:00:00Z",
+      "unit1MWh": -7.03,
+      "unit2MWh": 296.24,
+      "unit1MW": -14.06,
+      "unit2MW": 592.48,
+      "combinedMW": 578.42
+    },
+    {
+      "startUtc": "2024-12-04T14:00:00Z",
+      "endUtc": "2024-12-04T14:30:00Z",
+      "unit1MWh": -7.02,
+      "unit2MWh": 296.03,
+      "unit1MW": -14.04,
+      "unit2MW": 592.06,
+      "combinedMW": 578.02
+    },
+    {
+      "startUtc": "2024-12-04T14:30:00Z",
+      "endUtc": "2024-12-04T15:00:00Z",
+      "unit1MWh": -7.07,
+      "unit2MWh": 296.02,
+      "unit1MW": -14.14,
+      "unit2MW": 592.04,
+      "combinedMW": 577.9
+    },
+    {
+      "startUtc": "2024-12-04T15:00:00Z",
+      "endUtc": "2024-12-04T15:30:00Z",
+      "unit1MWh": -7.06,
+      "unit2MWh": 296.14,
+      "unit1MW": -14.12,
+      "unit2MW": 592.28,
+      "combinedMW": 578.16
+    },
+    {
+      "startUtc": "2024-12-04T15:30:00Z",
+      "endUtc": "2024-12-04T16:00:00Z",
+      "unit1MWh": -6.93,
+      "unit2MWh": 296.18,
+      "unit1MW": -13.86,
+      "unit2MW": 592.36,
+      "combinedMW": 578.5
+    },
+    {
+      "startUtc": "2024-12-04T16:00:00Z",
+      "endUtc": "2024-12-04T16:30:00Z",
+      "unit1MWh": -7.0,
+      "unit2MWh": 295.9,
+      "unit1MW": -14.0,
+      "unit2MW": 591.8,
+      "combinedMW": 577.8
+    },
+    {
+      "startUtc": "2024-12-04T16:30:00Z",
+      "endUtc": "2024-12-04T17:00:00Z",
+      "unit1MWh": -6.86,
+      "unit2MWh": 296.29,
+      "unit1MW": -13.72,
+      "unit2MW": 592.58,
+      "combinedMW": 578.86
+    },
+    {
+      "startUtc": "2024-12-04T17:00:00Z",
+      "endUtc": "2024-12-04T17:30:00Z",
+      "unit1MWh": -6.82,
+      "unit2MWh": 296.92,
+      "unit1MW": -13.64,
+      "unit2MW": 593.84,
+      "combinedMW": 580.2
+    },
+    {
+      "startUtc": "2024-12-04T17:30:00Z",
+      "endUtc": "2024-12-04T18:00:00Z",
+      "unit1MWh": -6.96,
+      "unit2MWh": 296.16,
+      "unit1MW": -13.92,
+      "unit2MW": 592.32,
+      "combinedMW": 578.4
+    },
+    {
+      "startUtc": "2024-12-04T18:00:00Z",
+      "endUtc": "2024-12-04T18:30:00Z",
+      "unit1MWh": -6.88,
+      "unit2MWh": 295.26,
+      "unit1MW": -13.76,
+      "unit2MW": 590.52,
+      "combinedMW": 576.76
+    },
+    {
+      "startUtc": "2024-12-04T18:30:00Z",
+      "endUtc": "2024-12-04T19:00:00Z",
+      "unit1MWh": -6.96,
+      "unit2MWh": 295.16,
+      "unit1MW": -13.92,
+      "unit2MW": 590.32,
+      "combinedMW": 576.4
+    },
+    {
+      "startUtc": "2024-12-04T19:00:00Z",
+      "endUtc": "2024-12-04T19:30:00Z",
+      "unit1MWh": -6.97,
+      "unit2MWh": 294.93,
+      "unit1MW": -13.94,
+      "unit2MW": 589.86,
+      "combinedMW": 575.92
+    },
+    {
+      "startUtc": "2024-12-04T19:30:00Z",
+      "endUtc": "2024-12-04T20:00:00Z",
+      "unit1MWh": -6.96,
+      "unit2MWh": 294.73,
+      "unit1MW": -13.92,
+      "unit2MW": 589.46,
+      "combinedMW": 575.54
+    },
+    {
+      "startUtc": "2024-12-04T20:00:00Z",
+      "endUtc": "2024-12-04T20:30:00Z",
+      "unit1MWh": -7.0,
+      "unit2MWh": 294.89,
+      "unit1MW": -14.0,
+      "unit2MW": 589.78,
+      "combinedMW": 575.78
+    },
+    {
+      "startUtc": "2024-12-04T20:30:00Z",
+      "endUtc": "2024-12-04T21:00:00Z",
+      "unit1MWh": -7.0,
+      "unit2MWh": 295.08,
+      "unit1MW": -14.0,
+      "unit2MW": 590.16,
+      "combinedMW": 576.16
+    },
+    {
+      "startUtc": "2024-12-04T21:00:00Z",
+      "endUtc": "2024-12-04T21:30:00Z",
+      "unit1MWh": -6.93,
+      "unit2MWh": 294.66,
+      "unit1MW": -13.86,
+      "unit2MW": 589.32,
+      "combinedMW": 575.46
+    },
+    {
+      "startUtc": "2024-12-04T21:30:00Z",
+      "endUtc": "2024-12-04T22:00:00Z",
+      "unit1MWh": -6.95,
+      "unit2MWh": 295.28,
+      "unit1MW": -13.9,
+      "unit2MW": 590.56,
+      "combinedMW": 576.66
+    },
+    {
+      "startUtc": "2024-12-04T22:00:00Z",
+      "endUtc": "2024-12-04T22:30:00Z",
+      "unit1MWh": -6.88,
+      "unit2MWh": 295.21,
+      "unit1MW": -13.76,
+      "unit2MW": 590.42,
+      "combinedMW": 576.66
+    },
+    {
+      "startUtc": "2024-12-04T22:30:00Z",
+      "endUtc": "2024-12-04T23:00:00Z",
+      "unit1MWh": -6.96,
+      "unit2MWh": 295.28,
+      "unit1MW": -13.92,
+      "unit2MW": 590.56,
+      "combinedMW": 576.64
+    },
+    {
+      "startUtc": "2024-12-04T23:00:00Z",
+      "endUtc": "2024-12-04T23:30:00Z",
+      "unit1MWh": -6.98,
+      "unit2MWh": 295.43,
+      "unit1MW": -13.96,
+      "unit2MW": 590.86,
+      "combinedMW": 576.9
+    },
+    {
+      "startUtc": "2024-12-04T23:30:00Z",
+      "endUtc": "2024-12-05T00:00:00Z",
+      "unit1MWh": -6.9,
+      "unit2MWh": 295.07,
+      "unit1MW": -13.8,
+      "unit2MW": 590.14,
+      "combinedMW": 576.34
+    },
+    {
+      "startUtc": "2024-12-05T00:00:00Z",
+      "endUtc": "2024-12-05T00:30:00Z",
+      "unit1MWh": -6.94,
+      "unit2MWh": 295.37,
+      "unit1MW": -13.88,
+      "unit2MW": 590.74,
+      "combinedMW": 576.86
+    },
+    {
+      "startUtc": "2024-12-05T00:30:00Z",
+      "endUtc": "2024-12-05T01:00:00Z",
+      "unit1MWh": -6.95,
+      "unit2MWh": 295.34,
+      "unit1MW": -13.9,
+      "unit2MW": 590.68,
+      "combinedMW": 576.78
+    },
+    {
+      "startUtc": "2024-12-05T01:00:00Z",
+      "endUtc": "2024-12-05T01:30:00Z",
+      "unit1MWh": -0.18,
+      "unit2MWh": 282.38,
+      "unit1MW": -0.36,
+      "unit2MW": 564.76,
+      "combinedMW": 564.4
+    },
+    {
+      "startUtc": "2024-12-05T01:30:00Z",
+      "endUtc": "2024-12-05T02:00:00Z",
+      "unit1MWh": 5.01,
+      "unit2MWh": 270.87,
+      "unit1MW": 10.02,
+      "unit2MW": 541.74,
+      "combinedMW": 551.76
+    },
+    {
+      "startUtc": "2024-12-05T02:00:00Z",
+      "endUtc": "2024-12-05T02:30:00Z",
+      "unit1MWh": 5.29,
+      "unit2MWh": 271.11,
+      "unit1MW": 10.58,
+      "unit2MW": 542.22,
+      "combinedMW": 552.8
+    },
+    {
+      "startUtc": "2024-12-05T02:30:00Z",
+      "endUtc": "2024-12-05T03:00:00Z",
+      "unit1MWh": 5.07,
+      "unit2MWh": 270.87,
+      "unit1MW": 10.14,
+      "unit2MW": 541.74,
+      "combinedMW": 551.88
+    },
+    {
+      "startUtc": "2024-12-05T03:00:00Z",
+      "endUtc": "2024-12-05T03:30:00Z",
+      "unit1MWh": 5.24,
+      "unit2MWh": 270.98,
+      "unit1MW": 10.48,
+      "unit2MW": 541.96,
+      "combinedMW": 552.44
+    },
+    {
+      "startUtc": "2024-12-05T03:30:00Z",
+      "endUtc": "2024-12-05T04:00:00Z",
+      "unit1MWh": 5.01,
+      "unit2MWh": 270.76,
+      "unit1MW": 10.02,
+      "unit2MW": 541.52,
+      "combinedMW": 551.54
+    },
+    {
+      "startUtc": "2024-12-05T04:00:00Z",
+      "endUtc": "2024-12-05T04:30:00Z",
+      "unit1MWh": 4.91,
+      "unit2MWh": 270.94,
+      "unit1MW": 9.82,
+      "unit2MW": 541.88,
+      "combinedMW": 551.7
+    },
+    {
+      "startUtc": "2024-12-05T04:30:00Z",
+      "endUtc": "2024-12-05T05:00:00Z",
+      "unit1MWh": 4.68,
+      "unit2MWh": 274.65,
+      "unit1MW": 9.36,
+      "unit2MW": 549.3,
+      "combinedMW": 558.66
+    },
+    {
+      "startUtc": "2024-12-05T05:00:00Z",
+      "endUtc": "2024-12-05T05:30:00Z",
+      "unit1MWh": 8.89,
+      "unit2MWh": 277.24,
+      "unit1MW": 17.78,
+      "unit2MW": 554.48,
+      "combinedMW": 572.26
+    },
+    {
+      "startUtc": "2024-12-05T05:30:00Z",
+      "endUtc": "2024-12-05T06:00:00Z",
+      "unit1MWh": 16.07,
+      "unit2MWh": 277.06,
+      "unit1MW": 32.14,
+      "unit2MW": 554.12,
+      "combinedMW": 586.26
+    },
+    {
+      "startUtc": "2024-12-05T06:00:00Z",
+      "endUtc": "2024-12-05T06:30:00Z",
+      "unit1MWh": 21.5,
+      "unit2MWh": 277.25,
+      "unit1MW": 43.0,
+      "unit2MW": 554.5,
+      "combinedMW": 597.5
+    },
+    {
+      "startUtc": "2024-12-05T06:30:00Z",
+      "endUtc": "2024-12-05T07:00:00Z",
+      "unit1MWh": 27.99,
+      "unit2MWh": 277.07,
+      "unit1MW": 55.98,
+      "unit2MW": 554.14,
+      "combinedMW": 610.12
+    },
+    {
+      "startUtc": "2024-12-05T07:00:00Z",
+      "endUtc": "2024-12-05T07:30:00Z",
+      "unit1MWh": 34.09,
+      "unit2MWh": 277.62,
+      "unit1MW": 68.18,
+      "unit2MW": 555.24,
+      "combinedMW": 623.42
+    },
+    {
+      "startUtc": "2024-12-05T07:30:00Z",
+      "endUtc": "2024-12-05T08:00:00Z",
+      "unit1MWh": 41.12,
+      "unit2MWh": 277.13,
+      "unit1MW": 82.24,
+      "unit2MW": 554.26,
+      "combinedMW": 636.5
+    },
+    {
+      "startUtc": "2024-12-05T08:00:00Z",
+      "endUtc": "2024-12-05T08:30:00Z",
+      "unit1MWh": 48.71,
+      "unit2MWh": 277.26,
+      "unit1MW": 97.42,
+      "unit2MW": 554.52,
+      "combinedMW": 651.94
+    },
+    {
+      "startUtc": "2024-12-05T08:30:00Z",
+      "endUtc": "2024-12-05T09:00:00Z",
+      "unit1MWh": 56.16,
+      "unit2MWh": 277.0,
+      "unit1MW": 112.32,
+      "unit2MW": 554.0,
+      "combinedMW": 666.32
+    },
+    {
+      "startUtc": "2024-12-05T09:00:00Z",
+      "endUtc": "2024-12-05T09:30:00Z",
+      "unit1MWh": 59.68,
+      "unit2MWh": 277.2,
+      "unit1MW": 119.36,
+      "unit2MW": 554.4,
+      "combinedMW": 673.76
+    },
+    {
+      "startUtc": "2024-12-05T09:30:00Z",
+      "endUtc": "2024-12-05T10:00:00Z",
+      "unit1MWh": 67.35,
+      "unit2MWh": 277.32,
+      "unit1MW": 134.7,
+      "unit2MW": 554.64,
+      "combinedMW": 689.34
+    },
+    {
+      "startUtc": "2024-12-05T10:00:00Z",
+      "endUtc": "2024-12-05T10:30:00Z",
+      "unit1MWh": 71.06,
+      "unit2MWh": 277.32,
+      "unit1MW": 142.12,
+      "unit2MW": 554.64,
+      "combinedMW": 696.76
+    },
+    {
+      "startUtc": "2024-12-05T10:30:00Z",
+      "endUtc": "2024-12-05T11:00:00Z",
+      "unit1MWh": 78.32,
+      "unit2MWh": 277.42,
+      "unit1MW": 156.64,
+      "unit2MW": 554.84,
+      "combinedMW": 711.48
+    },
+    {
+      "startUtc": "2024-12-05T11:00:00Z",
+      "endUtc": "2024-12-05T11:30:00Z",
+      "unit1MWh": 85.86,
+      "unit2MWh": 277.32,
+      "unit1MW": 171.72,
+      "unit2MW": 554.64,
+      "combinedMW": 726.36
+    },
+    {
+      "startUtc": "2024-12-05T11:30:00Z",
+      "endUtc": "2024-12-05T12:00:00Z",
+      "unit1MWh": 93.07,
+      "unit2MWh": 277.32,
+      "unit1MW": 186.14,
+      "unit2MW": 554.64,
+      "combinedMW": 740.78
+    },
+    {
+      "startUtc": "2024-12-05T12:00:00Z",
+      "endUtc": "2024-12-05T12:30:00Z",
+      "unit1MWh": 99.68,
+      "unit2MWh": 277.16,
+      "unit1MW": 199.36,
+      "unit2MW": 554.32,
+      "combinedMW": 753.68
+    },
+    {
+      "startUtc": "2024-12-05T12:30:00Z",
+      "endUtc": "2024-12-05T13:00:00Z",
+      "unit1MWh": 107.06,
+      "unit2MWh": 277.21,
+      "unit1MW": 214.12,
+      "unit2MW": 554.42,
+      "combinedMW": 768.54
+    },
+    {
+      "startUtc": "2024-12-05T13:00:00Z",
+      "endUtc": "2024-12-05T13:30:00Z",
+      "unit1MWh": 114.32,
+      "unit2MWh": 277.44,
+      "unit1MW": 228.64,
+      "unit2MW": 554.88,
+      "combinedMW": 783.52
+    },
+    {
+      "startUtc": "2024-12-05T13:30:00Z",
+      "endUtc": "2024-12-05T14:00:00Z",
+      "unit1MWh": 121.99,
+      "unit2MWh": 277.3,
+      "unit1MW": 243.98,
+      "unit2MW": 554.6,
+      "combinedMW": 798.58
+    },
+    {
+      "startUtc": "2024-12-05T14:00:00Z",
+      "endUtc": "2024-12-05T14:30:00Z",
+      "unit1MWh": 127.6,
+      "unit2MWh": 277.26,
+      "unit1MW": 255.2,
+      "unit2MW": 554.52,
+      "combinedMW": 809.72
+    },
+    {
+      "startUtc": "2024-12-05T14:30:00Z",
+      "endUtc": "2024-12-05T15:00:00Z",
+      "unit1MWh": 132.54,
+      "unit2MWh": 277.29,
+      "unit1MW": 265.08,
+      "unit2MW": 554.58,
+      "combinedMW": 819.66
+    },
+    {
+      "startUtc": "2024-12-05T15:00:00Z",
+      "endUtc": "2024-12-05T15:30:00Z",
+      "unit1MWh": 132.85,
+      "unit2MWh": 277.34,
+      "unit1MW": 265.7,
+      "unit2MW": 554.68,
+      "combinedMW": 820.38
+    },
+    {
+      "startUtc": "2024-12-05T15:30:00Z",
+      "endUtc": "2024-12-05T16:00:00Z",
+      "unit1MWh": 132.43,
+      "unit2MWh": 277.33,
+      "unit1MW": 264.86,
+      "unit2MW": 554.66,
+      "combinedMW": 819.52
+    },
+    {
+      "startUtc": "2024-12-05T16:00:00Z",
+      "endUtc": "2024-12-05T16:30:00Z",
+      "unit1MWh": 132.42,
+      "unit2MWh": 277.22,
+      "unit1MW": 264.84,
+      "unit2MW": 554.44,
+      "combinedMW": 819.28
+    },
+    {
+      "startUtc": "2024-12-05T16:30:00Z",
+      "endUtc": "2024-12-05T17:00:00Z",
+      "unit1MWh": 132.46,
+      "unit2MWh": 277.56,
+      "unit1MW": 264.92,
+      "unit2MW": 555.12,
+      "combinedMW": 820.04
+    },
+    {
+      "startUtc": "2024-12-05T17:00:00Z",
+      "endUtc": "2024-12-05T17:30:00Z",
+      "unit1MWh": 132.58,
+      "unit2MWh": 277.41,
+      "unit1MW": 265.16,
+      "unit2MW": 554.82,
+      "combinedMW": 819.98
+    },
+    {
+      "startUtc": "2024-12-05T17:30:00Z",
+      "endUtc": "2024-12-05T18:00:00Z",
+      "unit1MWh": 132.37,
+      "unit2MWh": 277.49,
+      "unit1MW": 264.74,
+      "unit2MW": 554.98,
+      "combinedMW": 819.72
+    },
+    {
+      "startUtc": "2024-12-05T18:00:00Z",
+      "endUtc": "2024-12-05T18:30:00Z",
+      "unit1MWh": 132.27,
+      "unit2MWh": 277.38,
+      "unit1MW": 264.54,
+      "unit2MW": 554.76,
+      "combinedMW": 819.3
+    },
+    {
+      "startUtc": "2024-12-05T18:30:00Z",
+      "endUtc": "2024-12-05T19:00:00Z",
+      "unit1MWh": 132.42,
+      "unit2MWh": 277.5,
+      "unit1MW": 264.84,
+      "unit2MW": 555.0,
+      "combinedMW": 819.84
+    },
+    {
+      "startUtc": "2024-12-05T19:00:00Z",
+      "endUtc": "2024-12-05T19:30:00Z",
+      "unit1MWh": 132.5,
+      "unit2MWh": 277.38,
+      "unit1MW": 265.0,
+      "unit2MW": 554.76,
+      "combinedMW": 819.76
+    },
+    {
+      "startUtc": "2024-12-05T19:30:00Z",
+      "endUtc": "2024-12-05T20:00:00Z",
+      "unit1MWh": 132.47,
+      "unit2MWh": 277.46,
+      "unit1MW": 264.94,
+      "unit2MW": 554.92,
+      "combinedMW": 819.86
+    },
+    {
+      "startUtc": "2024-12-05T20:00:00Z",
+      "endUtc": "2024-12-05T20:30:00Z",
+      "unit1MWh": 132.58,
+      "unit2MWh": 277.58,
+      "unit1MW": 265.16,
+      "unit2MW": 555.16,
+      "combinedMW": 820.32
+    },
+    {
+      "startUtc": "2024-12-05T20:30:00Z",
+      "endUtc": "2024-12-05T21:00:00Z",
+      "unit1MWh": 134.43,
+      "unit2MWh": 277.39,
+      "unit1MW": 268.86,
+      "unit2MW": 554.78,
+      "combinedMW": 823.64
+    },
+    {
+      "startUtc": "2024-12-05T21:00:00Z",
+      "endUtc": "2024-12-05T21:30:00Z",
+      "unit1MWh": 141.13,
+      "unit2MWh": 277.37,
+      "unit1MW": 282.26,
+      "unit2MW": 554.74,
+      "combinedMW": 837.0
+    },
+    {
+      "startUtc": "2024-12-05T21:30:00Z",
+      "endUtc": "2024-12-05T22:00:00Z",
+      "unit1MWh": 148.41,
+      "unit2MWh": 277.58,
+      "unit1MW": 296.82,
+      "unit2MW": 555.16,
+      "combinedMW": 851.98
+    },
+    {
+      "startUtc": "2024-12-05T22:00:00Z",
+      "endUtc": "2024-12-05T22:30:00Z",
+      "unit1MWh": 155.98,
+      "unit2MWh": 277.26,
+      "unit1MW": 311.96,
+      "unit2MW": 554.52,
+      "combinedMW": 866.48
+    },
+    {
+      "startUtc": "2024-12-05T22:30:00Z",
+      "endUtc": "2024-12-05T23:00:00Z",
+      "unit1MWh": 163.26,
+      "unit2MWh": 277.26,
+      "unit1MW": 326.52,
+      "unit2MW": 554.52,
+      "combinedMW": 881.04
+    },
+    {
+      "startUtc": "2024-12-05T23:00:00Z",
+      "endUtc": "2024-12-05T23:30:00Z",
+      "unit1MWh": 171.8,
+      "unit2MWh": 277.54,
+      "unit1MW": 343.6,
+      "unit2MW": 555.08,
+      "combinedMW": 898.68
+    },
+    {
+      "startUtc": "2024-12-05T23:30:00Z",
+      "endUtc": "2024-12-06T00:00:00Z",
+      "unit1MWh": 179.08,
+      "unit2MWh": 277.37,
+      "unit1MW": 358.16,
+      "unit2MW": 554.74,
+      "combinedMW": 912.9
+    },
+    {
+      "startUtc": "2024-12-06T00:00:00Z",
+      "endUtc": "2024-12-06T00:30:00Z",
+      "unit1MWh": 180.47,
+      "unit2MWh": 277.45,
+      "unit1MW": 360.94,
+      "unit2MW": 554.9,
+      "combinedMW": 915.84
+    },
+    {
+      "startUtc": "2024-12-06T00:30:00Z",
+      "endUtc": "2024-12-06T01:00:00Z",
+      "unit1MWh": 185.8,
+      "unit2MWh": 277.6,
+      "unit1MW": 371.6,
+      "unit2MW": 555.2,
+      "combinedMW": 926.8
+    },
+    {
+      "startUtc": "2024-12-06T01:00:00Z",
+      "endUtc": "2024-12-06T01:30:00Z",
+      "unit1MWh": 193.18,
+      "unit2MWh": 277.3,
+      "unit1MW": 386.36,
+      "unit2MW": 554.6,
+      "combinedMW": 940.96
+    },
+    {
+      "startUtc": "2024-12-06T01:30:00Z",
+      "endUtc": "2024-12-06T02:00:00Z",
+      "unit1MWh": 200.57,
+      "unit2MWh": 277.71,
+      "unit1MW": 401.14,
+      "unit2MW": 555.42,
+      "combinedMW": 956.56
+    },
+    {
+      "startUtc": "2024-12-06T02:00:00Z",
+      "endUtc": "2024-12-06T02:30:00Z",
+      "unit1MWh": 207.91,
+      "unit2MWh": 277.54,
+      "unit1MW": 415.82,
+      "unit2MW": 555.08,
+      "combinedMW": 970.9
+    },
+    {
+      "startUtc": "2024-12-06T02:30:00Z",
+      "endUtc": "2024-12-06T03:00:00Z",
+      "unit1MWh": 215.29,
+      "unit2MWh": 277.48,
+      "unit1MW": 430.58,
+      "unit2MW": 554.96,
+      "combinedMW": 985.54
+    },
+    {
+      "startUtc": "2024-12-06T03:00:00Z",
+      "endUtc": "2024-12-06T03:30:00Z",
+      "unit1MWh": 221.41,
+      "unit2MWh": 277.58,
+      "unit1MW": 442.82,
+      "unit2MW": 555.16,
+      "combinedMW": 997.98
+    },
+    {
+      "startUtc": "2024-12-06T03:30:00Z",
+      "endUtc": "2024-12-06T04:00:00Z",
+      "unit1MWh": 228.87,
+      "unit2MWh": 277.53,
+      "unit1MW": 457.74,
+      "unit2MW": 555.06,
+      "combinedMW": 1012.8
+    },
+    {
+      "startUtc": "2024-12-06T04:00:00Z",
+      "endUtc": "2024-12-06T04:30:00Z",
+      "unit1MWh": 236.14,
+      "unit2MWh": 277.62,
+      "unit1MW": 472.28,
+      "unit2MW": 555.24,
+      "combinedMW": 1027.52
+    },
+    {
+      "startUtc": "2024-12-06T04:30:00Z",
+      "endUtc": "2024-12-06T05:00:00Z",
+      "unit1MWh": 242.85,
+      "unit2MWh": 277.68,
+      "unit1MW": 485.7,
+      "unit2MW": 555.36,
+      "combinedMW": 1041.06
+    },
+    {
+      "startUtc": "2024-12-06T05:00:00Z",
+      "endUtc": "2024-12-06T05:30:00Z",
+      "unit1MWh": 248.91,
+      "unit2MWh": 277.45,
+      "unit1MW": 497.82,
+      "unit2MW": 554.9,
+      "combinedMW": 1052.72
+    },
+    {
+      "startUtc": "2024-12-06T05:30:00Z",
+      "endUtc": "2024-12-06T06:00:00Z",
+      "unit1MWh": 256.52,
+      "unit2MWh": 277.68,
+      "unit1MW": 513.04,
+      "unit2MW": 555.36,
+      "combinedMW": 1068.4
+    },
+    {
+      "startUtc": "2024-12-06T06:00:00Z",
+      "endUtc": "2024-12-06T06:30:00Z",
+      "unit1MWh": 263.62,
+      "unit2MWh": 277.36,
+      "unit1MW": 527.24,
+      "unit2MW": 554.72,
+      "combinedMW": 1081.96
+    },
+    {
+      "startUtc": "2024-12-06T06:30:00Z",
+      "endUtc": "2024-12-06T07:00:00Z",
+      "unit1MWh": 270.8,
+      "unit2MWh": 277.47,
+      "unit1MW": 541.6,
+      "unit2MW": 554.94,
+      "combinedMW": 1096.54
+    },
+    {
+      "startUtc": "2024-12-06T07:00:00Z",
+      "endUtc": "2024-12-06T07:30:00Z",
+      "unit1MWh": 277.3,
+      "unit2MWh": 277.26,
+      "unit1MW": 554.6,
+      "unit2MW": 554.52,
+      "combinedMW": 1109.12
+    },
+    {
+      "startUtc": "2024-12-06T07:30:00Z",
+      "endUtc": "2024-12-06T08:00:00Z",
+      "unit1MWh": 284.73,
+      "unit2MWh": 277.72,
+      "unit1MW": 569.46,
+      "unit2MW": 555.44,
+      "combinedMW": 1124.9
+    },
+    {
+      "startUtc": "2024-12-06T08:00:00Z",
+      "endUtc": "2024-12-06T08:30:00Z",
+      "unit1MWh": 291.62,
+      "unit2MWh": 277.44,
+      "unit1MW": 583.24,
+      "unit2MW": 554.88,
+      "combinedMW": 1138.12
+    },
+    {
+      "startUtc": "2024-12-06T08:30:00Z",
+      "endUtc": "2024-12-06T09:00:00Z",
+      "unit1MWh": 296.55,
+      "unit2MWh": 276.79,
+      "unit1MW": 593.1,
+      "unit2MW": 553.58,
+      "combinedMW": 1146.68
+    },
+    {
+      "startUtc": "2024-12-06T09:00:00Z",
+      "endUtc": "2024-12-06T09:30:00Z",
+      "unit1MWh": 297.81,
+      "unit2MWh": 277.21,
+      "unit1MW": 595.62,
+      "unit2MW": 554.42,
+      "combinedMW": 1150.04
+    },
+    {
+      "startUtc": "2024-12-06T09:30:00Z",
+      "endUtc": "2024-12-06T10:00:00Z",
+      "unit1MWh": 296.86,
+      "unit2MWh": 280.21,
+      "unit1MW": 593.72,
+      "unit2MW": 560.42,
+      "combinedMW": 1154.14
+    },
+    {
+      "startUtc": "2024-12-06T10:00:00Z",
+      "endUtc": "2024-12-06T10:30:00Z",
+      "unit1MWh": 297.06,
+      "unit2MWh": 280.84,
+      "unit1MW": 594.12,
+      "unit2MW": 561.68,
+      "combinedMW": 1155.8
+    },
+    {
+      "startUtc": "2024-12-06T10:30:00Z",
+      "endUtc": "2024-12-06T11:00:00Z",
+      "unit1MWh": 296.64,
+      "unit2MWh": 280.87,
+      "unit1MW": 593.28,
+      "unit2MW": 561.74,
+      "combinedMW": 1155.02
+    },
+    {
+      "startUtc": "2024-12-06T11:00:00Z",
+      "endUtc": "2024-12-06T11:30:00Z",
+      "unit1MWh": 292.21,
+      "unit2MWh": 282.8,
+      "unit1MW": 584.42,
+      "unit2MW": 565.6,
+      "combinedMW": 1150.02
+    },
+    {
+      "startUtc": "2024-12-06T11:30:00Z",
+      "endUtc": "2024-12-06T12:00:00Z",
+      "unit1MWh": 286.91,
+      "unit2MWh": 289.39,
+      "unit1MW": 573.82,
+      "unit2MW": 578.78,
+      "combinedMW": 1152.6
+    },
+    {
+      "startUtc": "2024-12-06T12:00:00Z",
+      "endUtc": "2024-12-06T12:30:00Z",
+      "unit1MWh": 282.95,
+      "unit2MWh": 292.45,
+      "unit1MW": 565.9,
+      "unit2MW": 584.9,
+      "combinedMW": 1150.8
+    },
+    {
+      "startUtc": "2024-12-06T12:30:00Z",
+      "endUtc": "2024-12-06T13:00:00Z",
+      "unit1MWh": 280.62,
+      "unit2MWh": 293.42,
+      "unit1MW": 561.24,
+      "unit2MW": 586.84,
+      "combinedMW": 1148.08
+    },
+    {
+      "startUtc": "2024-12-06T13:00:00Z",
+      "endUtc": "2024-12-06T13:30:00Z",
+      "unit1MWh": 280.72,
+      "unit2MWh": 295.87,
+      "unit1MW": 561.44,
+      "unit2MW": 591.74,
+      "combinedMW": 1153.18
+    },
+    {
+      "startUtc": "2024-12-06T13:30:00Z",
+      "endUtc": "2024-12-06T14:00:00Z",
+      "unit1MWh": 280.85,
+      "unit2MWh": 298.43,
+      "unit1MW": 561.7,
+      "unit2MW": 596.86,
+      "combinedMW": 1158.56
+    },
+    {
+      "startUtc": "2024-12-06T14:00:00Z",
+      "endUtc": "2024-12-06T14:30:00Z",
+      "unit1MWh": 280.74,
+      "unit2MWh": 299.27,
+      "unit1MW": 561.48,
+      "unit2MW": 598.54,
+      "combinedMW": 1160.02
+    },
+    {
+      "startUtc": "2024-12-06T14:30:00Z",
+      "endUtc": "2024-12-06T15:00:00Z",
+      "unit1MWh": 280.94,
+      "unit2MWh": 299.79,
+      "unit1MW": 561.88,
+      "unit2MW": 599.58,
+      "combinedMW": 1161.46
+    },
+    {
+      "startUtc": "2024-12-06T15:00:00Z",
+      "endUtc": "2024-12-06T15:30:00Z",
+      "unit1MWh": 280.87,
+      "unit2MWh": 299.28,
+      "unit1MW": 561.74,
+      "unit2MW": 598.56,
+      "combinedMW": 1160.3
+    },
+    {
+      "startUtc": "2024-12-06T15:30:00Z",
+      "endUtc": "2024-12-06T16:00:00Z",
+      "unit1MWh": 280.75,
+      "unit2MWh": 299.58,
+      "unit1MW": 561.5,
+      "unit2MW": 599.16,
+      "combinedMW": 1160.66
+    },
+    {
+      "startUtc": "2024-12-06T16:00:00Z",
+      "endUtc": "2024-12-06T16:30:00Z",
+      "unit1MWh": 280.72,
+      "unit2MWh": 299.45,
+      "unit1MW": 561.44,
+      "unit2MW": 598.9,
+      "combinedMW": 1160.34
+    },
+    {
+      "startUtc": "2024-12-06T16:30:00Z",
+      "endUtc": "2024-12-06T17:00:00Z",
+      "unit1MWh": 280.85,
+      "unit2MWh": 299.18,
+      "unit1MW": 561.7,
+      "unit2MW": 598.36,
+      "combinedMW": 1160.06
+    },
+    {
+      "startUtc": "2024-12-06T17:00:00Z",
+      "endUtc": "2024-12-06T17:30:00Z",
+      "unit1MWh": 280.58,
+      "unit2MWh": 299.44,
+      "unit1MW": 561.16,
+      "unit2MW": 598.88,
+      "combinedMW": 1160.04
+    },
+    {
+      "startUtc": "2024-12-06T17:30:00Z",
+      "endUtc": "2024-12-06T18:00:00Z",
+      "unit1MWh": 281.22,
+      "unit2MWh": 299.69,
+      "unit1MW": 562.44,
+      "unit2MW": 599.38,
+      "combinedMW": 1161.82
+    },
+    {
+      "startUtc": "2024-12-06T18:00:00Z",
+      "endUtc": "2024-12-06T18:30:00Z",
+      "unit1MWh": 282.04,
+      "unit2MWh": 298.82,
+      "unit1MW": 564.08,
+      "unit2MW": 597.64,
+      "combinedMW": 1161.72
+    },
+    {
+      "startUtc": "2024-12-06T18:30:00Z",
+      "endUtc": "2024-12-06T19:00:00Z",
+      "unit1MWh": 281.42,
+      "unit2MWh": 298.62,
+      "unit1MW": 562.84,
+      "unit2MW": 597.24,
+      "combinedMW": 1160.08
+    },
+    {
+      "startUtc": "2024-12-06T19:00:00Z",
+      "endUtc": "2024-12-06T19:30:00Z",
+      "unit1MWh": 281.74,
+      "unit2MWh": 298.51,
+      "unit1MW": 563.48,
+      "unit2MW": 597.02,
+      "combinedMW": 1160.5
+    },
+    {
+      "startUtc": "2024-12-06T19:30:00Z",
+      "endUtc": "2024-12-06T20:00:00Z",
+      "unit1MWh": 281.92,
+      "unit2MWh": 298.62,
+      "unit1MW": 563.84,
+      "unit2MW": 597.24,
+      "combinedMW": 1161.08
+    },
+    {
+      "startUtc": "2024-12-06T20:00:00Z",
+      "endUtc": "2024-12-06T20:30:00Z",
+      "unit1MWh": 281.16,
+      "unit2MWh": 298.5,
+      "unit1MW": 562.32,
+      "unit2MW": 597.0,
+      "combinedMW": 1159.32
+    },
+    {
+      "startUtc": "2024-12-06T20:30:00Z",
+      "endUtc": "2024-12-06T21:00:00Z",
+      "unit1MWh": 282.15,
+      "unit2MWh": 298.65,
+      "unit1MW": 564.3,
+      "unit2MW": 597.3,
+      "combinedMW": 1161.6
+    },
+    {
+      "startUtc": "2024-12-06T21:00:00Z",
+      "endUtc": "2024-12-06T21:30:00Z",
+      "unit1MWh": 281.95,
+      "unit2MWh": 298.52,
+      "unit1MW": 563.9,
+      "unit2MW": 597.04,
+      "combinedMW": 1160.94
+    },
+    {
+      "startUtc": "2024-12-06T21:30:00Z",
+      "endUtc": "2024-12-06T22:00:00Z",
+      "unit1MWh": 281.86,
+      "unit2MWh": 298.72,
+      "unit1MW": 563.72,
+      "unit2MW": 597.44,
+      "combinedMW": 1161.16
+    },
+    {
+      "startUtc": "2024-12-06T22:00:00Z",
+      "endUtc": "2024-12-06T22:30:00Z",
+      "unit1MWh": 281.7,
+      "unit2MWh": 298.59,
+      "unit1MW": 563.4,
+      "unit2MW": 597.18,
+      "combinedMW": 1160.58
+    },
+    {
+      "startUtc": "2024-12-06T22:30:00Z",
+      "endUtc": "2024-12-06T23:00:00Z",
+      "unit1MWh": 281.96,
+      "unit2MWh": 298.63,
+      "unit1MW": 563.92,
+      "unit2MW": 597.26,
+      "combinedMW": 1161.18
+    },
+    {
+      "startUtc": "2024-12-06T23:00:00Z",
+      "endUtc": "2024-12-06T23:30:00Z",
+      "unit1MWh": 281.74,
+      "unit2MWh": 298.64,
+      "unit1MW": 563.48,
+      "unit2MW": 597.28,
+      "combinedMW": 1160.76
+    },
+    {
+      "startUtc": "2024-12-06T23:30:00Z",
+      "endUtc": "2024-12-07T00:00:00Z",
+      "unit1MWh": 282.03,
+      "unit2MWh": 298.64,
+      "unit1MW": 564.06,
+      "unit2MW": 597.28,
+      "combinedMW": 1161.34
+    }
+  ]
+}
