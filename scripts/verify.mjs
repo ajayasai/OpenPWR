@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { PWRPlant } from '../src/engine.js';
 import { createColdStartDirector } from '../src/scenarios.js';
+import { pairedRunCsv, runPairedExperiment, validatePairedRecipe } from '../src/paired-run.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
@@ -36,6 +37,16 @@ add('Thermal storage energy accounting', steady.maxResidual < 1e-5,
   `Maximum absolute discrete energy-balance residual ${steady.maxResidual.toExponential(3)} MW. Acceptance < 1e-5 MW; applies only to the documented fuel/primary/SG thermal boundary.`);
 
 const follow = new PWRPlant();
+const capture = follow.exportState();
+const paired = await runPairedExperiment(capture, { demand: 0.75, durationS: 30 });
+const recipe = validatePairedRecipe(JSON.parse(JSON.stringify(paired.recipe)));
+const repeated = await runPairedExperiment(recipe.model, recipe);
+const terminal = paired.rows.at(-1);
+const zeroInitialDifference = Object.values(paired.rows[0].delta).every(x => x === 0);
+add('Paired load experiment and recipe replay', paired.complete && paired.elapsedS === 30 && zeroInitialDifference
+  && Math.abs(terminal.baseline.electricPower - 1000) < 1 && Math.abs(terminal.alternative.electricPower - 750) < 2
+  && pairedRunCsv(paired) === pairedRunCsv(repeated),
+  `Starting from the same full-load state, held demand gives ${f(terminal.baseline.electricPower)} MWe at 30 s. A 75% demand gives ${f(terminal.alternative.electricPower)} MWe. The recipe must reproduce every CSV observation exactly. These values describe the browser model.`);
 follow.setControl('demand', 0.75);
 const load = run(follow, 900);
 add('Load following · 100% → 75%', !load.tripped && !load.domainExceeded && Math.abs(load.electricPower - 750) < 2,

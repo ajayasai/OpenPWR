@@ -219,7 +219,7 @@ class Handler(BaseHTTPRequestHandler):
               and (len(parts) == 3 or parts[2] == "raw")
               and Path(parts[-1]).suffix in {".json", ".md"}):
             path = self.server.root / name
-        elif name in {"startup-evidence.html", "index.html", "engineering.html", "engineering-evidence.html", "plant.html", "plant-evidence.html", "startup.html", "continuous.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
+        elif name in {"startup-evidence.html", "experiments.html", "index.html", "engineering.html", "engineering-evidence.html", "plant.html", "plant-evidence.html", "startup.html", "continuous.html", "verification.html", "LICENSE", "NOTICE"} or parts[0] in {"src", "docs"}:
             path = self.server.root / name
         else:
             raise ServiceError(404, "not_found", "Not found.")

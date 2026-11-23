@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
 import { createHash } from 'node:crypto';
 import { PWRPlant } from '../src/engine.js';
+import { pairedRunCsv, runPairedExperiment } from '../src/paired-run.js';
 
 const exec = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,6 +33,25 @@ function parseCsv(text) {
   const keys = header.trim().split(',');
   return rows.map(line => Object.fromEntries(line.trim().split(',').map((value, i) => [keys[i], value === 'true' ? true : value === 'false' ? false : value !== '' && Number.isFinite(Number(value)) ? Number(value) : value])));
 }
+
+test('CLI replays a downloaded pair and preserves the browser CSV bytes', async (t) => {
+  const dir = await fixture(t);
+  const plant = new PWRPlant({ initialPower: 0.5 });
+  plant.step(0.15);
+  const pair = await runPairedExperiment(plant.exportState(), { demand: 0.62, durationS: 12 });
+  const recipe = join(dir, 'run.json');
+  const output = join(dir, 'comparison.csv');
+  const script = resolve(root, 'scripts/replay-pair.mjs');
+  await writeFile(recipe, JSON.stringify(pair.recipe));
+  const replay = await exec(process.execPath, [script, recipe]);
+  assert.equal(replay.stdout, pairedRunCsv(pair));
+  await exec(process.execPath, [script, recipe, output]);
+  assert.equal(await readFile(output, 'utf8'), replay.stdout);
+  await assert.rejects(exec(process.execPath, [script, recipe, recipe]));
+  assert.deepEqual(JSON.parse(await readFile(recipe, 'utf8')), pair.recipe);
+  await writeFile(recipe, JSON.stringify({ ...pair.recipe, version: 999 }));
+  await assert.rejects(exec(process.execPath, [script, recipe]));
+});
 
 test('headless runner lands on exact 1 s sample boundaries with a nondividing step', async (t) => {
   const dir = await fixture(t);
@@ -162,6 +182,7 @@ test('local preview serves only public files, blocks traversal, and implements H
   for (const name of ['scripts', 'src', 'docs', 'artifacts']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/serve.mjs'), join(dir, 'scripts/serve.mjs'));
   await writeFile(join(dir, 'index.html'), '<!doctype html><title>Test plant</title>');
+  await writeFile(join(dir, 'experiments.html'), '<!doctype html><title>Load comparison test</title>');
   await writeFile(join(dir, 'continuous.html'), '<!doctype html><title>Continuous test</title>');
   await writeFile(join(dir, 'src/app.js'), 'export const test = true;');
   await writeFile(join(dir, 'docs/MODEL.md'), '# Public model');
@@ -197,6 +218,7 @@ test('local preview serves only public files, blocks traversal, and implements H
     const pressurizerHead = await fetch(origin + '/pressurizer-validation.json', { method: 'HEAD' });
     assert.equal(pressurizerHead.status, 200);
     assert.equal(await pressurizerHead.text(), '');
+    assert.match(await (await fetch(origin + '/experiments.html')).text(), /Load comparison test/);
     assert.match(await (await fetch(origin + '/continuous.html')).text(), /Continuous test/);
     assert.deepEqual(await (await fetch(origin + '/continuous-verification.json')).json(), {case:'continuous'});
     assert.deepEqual(await (await fetch(origin + '/continuous-measured-validation.json')).json(), {case:'continuous-measured'});
@@ -218,7 +240,7 @@ test('release build rejects stale or failed evidence without replacing the last 
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   await cp(join(root, 'scripts/krsko-pressure-evidence.mjs'), join(dir, 'scripts/krsko-pressure-evidence.mjs'));
   await writeFile(join(dir, 'package.json'), JSON.stringify({ name: 'openpwr-fixture', version: '0.2.0', type: 'module' }));
-  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'experiments.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   const marker = join(dir, 'dist', 'previous.txt');
   await writeFile(marker, 'previous successful build');
   const valid = { version: '0.2.0', gitRevision: null, passed: 1, checks: [{ name: 'Fixture evidence', pass: true }] };
@@ -251,7 +273,7 @@ test('native release evidence binds both reports to the exact compiled bytes bef
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const sha = value => createHash('sha256').update(value).digest('hex');
   await json('package.json', { name: 'openpwr-native-fixture', version, type: 'module' });
-  for (const name of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
+  for (const name of ['index.html', 'experiments.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, name), name);
   // An isolated empty commit exercises the real revision guard without touching
   // the working repository or depending on the developer's identity/signing setup.
   await exec('git', ['init', '--quiet'], { cwd: dir });

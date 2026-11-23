@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Paired load experiment · OpenPWR</title>
+  <link rel="stylesheet" href="./src/engineering.css">
+  <link rel="stylesheet" href="./src/experiments.css">
+</head>
+<body>
+<a class="skip-link" href="#workspace">Skip to experiment</a>
+<header class="masthead">
+  <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">◇</span><span>OpenPWR<small>OPEN ENGINEERING / OPEN ENERGY</small></span></a>
+  <nav aria-label="Main navigation"><a href="./">Control room</a><span aria-current="page">Paired experiment</span><a href="./verification.html">Verification ↗</a></nav>
+</header>
+<main id="workspace" class="lab">
+  <header class="lab-title">
+    <h1>Paired load experiment</h1>
+    <p>Start two copies of the plant from the same instant. Change the grid demand in one and follow the difference.</p>
+  </header>
+  <div class="lab-grid">
+    <div class="setup-column">
+      <section class="setup-panel" aria-labelledby="start-title">
+        <h2 id="start-title">Starting state</h2>
+        <strong id="start-source">Loading starting state…</strong>
+        <dl class="start-data">
+          <div><dt>Plant clock</dt><dd id="start-clock">—</dd></div>
+          <div><dt>Net output</dt><dd id="start-output">—</dd></div>
+          <div><dt>Original demand</dt><dd id="start-demand">—</dd></div>
+        </dl>
+        <details class="mode-details"><summary>Inherited control settings</summary><dl class="start-data">
+          <div><dt>Reactor control</dt><dd id="reactor-mode">—</dd></div>
+          <div><dt>Turbine control</dt><dd id="turbine-mode">—</dd></div>
+          <div><dt>Feedwater control</dt><dd id="feedwater-mode">—</dd></div>
+        </dl></details>
+        <a id="reset-start" class="inline-link" href="./experiments.html" hidden>Use the full-power equilibrium ↗</a>
+      </section>
+      <form id="settings" class="setup-panel" aria-labelledby="settings-title">
+        <h2 id="settings-title">Change in the second run</h2>
+        <fieldset id="settings-fields" disabled>
+          <label for="demand">New grid demand</label>
+          <div class="unit-field"><input id="demand" type="number" min="25" max="100" step="any" value="90" required><span>%</span></div>
+          <p class="field-note">25–100% of rated net output</p>
+          <label for="duration">Observation time</label>
+          <div class="unit-field"><input id="duration" type="number" min="1" max="1800" step="1" value="300" required><span>s</span></div>
+          <p class="field-note">1–1,800 simulated seconds</p>
+          <button class="button button-primary" type="submit" id="run-pair">Run comparison <span aria-hidden="true">→</span></button>
+        </fieldset>
+        <button class="button" id="cancel-pair" type="button" hidden>Cancel run</button>
+        <progress id="run-progress" aria-label="Simulation progress" max="1" value="0" hidden></progress>
+        <p id="run-status" role="status" aria-live="polite">Preparing the model…</p>
+      </form>
+      <div class="recipe-pick">
+        <button id="open-recipe" class="button" type="button">Open a saved recipe</button>
+        <input id="import-recipe" type="file" accept="application/json,.json" hidden>
+        <p id="recipe-error" role="alert" hidden></p>
+      </div>
+    </div>
+    <section class="trace-panel" aria-labelledby="response-title">
+      <header class="trace-heading">
+        <div><h2 id="response-title">Plant response</h2><p id="run-summary">Awaiting a paired run</p></div>
+        <div class="metric-picker"><label for="metric">Signal</label><select id="metric" disabled></select></div>
+      </header>
+      <div class="plot-area">
+        <div class="trace-legend"><span><i class="line-key baseline"></i>Original demand</span><span><i class="line-key changed"></i>Changed demand</span></div>
+        <svg id="trace" role="img" aria-label="Response curves over elapsed time"></svg>
+      </div>
+      <div class="time-control">
+        <label for="cursor">Inspect elapsed time</label><output id="cursor-label" for="cursor">—</output>
+        <input id="cursor" type="range" min="0" max="1" value="0" step="1" disabled>
+      </div>
+      <div class="readings" aria-label="Signal readings at the selected time">
+        <div class="baseline-reading"><span>Original demand</span><strong data-reading="baseline">—</strong></div>
+        <div class="changed-reading"><span>Changed demand</span><strong data-reading="alternative">—</strong></div>
+        <div class="difference-reading"><span>Difference <small>(changed − original)</small></span><strong data-reading="delta">—</strong></div>
+      </div>
+      <p id="run-event" class="event-note" hidden></p>
+      <div class="trace-footer">
+        <button class="button" id="export-csv" type="button" disabled>Download trace CSV</button>
+        <button class="button" id="export-recipe" type="button" disabled>Save run recipe</button>
+      </div>
+    </section>
+  </div>
+  <footer class="model-note"><h2>Model and evidence</h2><p>These are predictions from OpenPWR’s reduced-order JavaScript control-room model. Both runs inherit the same physical state, controller settings and equipment conditions. Only the second run receives a new demand after the initial reading. A model boundary ends the comparison at the last shared valid time.</p><div><a href="./docs/MODEL.md">Read the model equations ↗</a><a href="./verification.html">Inspect verification results ↗</a><a href="./plant-evidence.html?case=pressure-spray#measured-channel">Inspect measured Krško pressure ↗</a><a href="./startup-evidence.html">Explore measured startup evidence ↗</a></div></footer>
+</main>
+<script type="module" src="./src/experiments.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import { compareAcquiredPressure } from './acquired-pressure.js';
 const $ = id => document.getElementById(id);
 const make = (tag, text, cls) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (cls) el.className = cls; return el; };
 const format = value => typeof value === 'number' ? Number.isFinite(value) ? (value !== 0 && Math.abs(value) < .001 ? value.toExponential(3) : value.toLocaleString('en-US', { maximumSignificantDigits: 6 })) : '—' : String(value ?? '—');
@@ -51,9 +52,40 @@ function svg(tag, attributes, text) {
   const el = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attributes)) el.setAttribute(key, value);
   if (text !== undefined) el.textContent = text; return el;
 }
+const pressureSchemas = ['openpwr-krsko-pressure-development-v1', 'openpwr-krsko-pressure-spray-development-v1'];
+function pressureReadings(channel) {
+  const panel = $('acquired-pressure');
+  panel.hidden = !pressureSchemas.includes(measured?.schema) || channel?.key !== 'primaryPressureMPa';
+  const body = $('pressure-rows');
+  body.replaceChildren();
+  if (panel.hidden) return false;
+  const scroller = panel.querySelector('.pressure-table-scroll');
+  scroller.hidden = $('pressure-note').hidden = true;
+  try {
+    const { rows, baseline, candidate } = compareAcquiredPressure(channel, measured.protocol?.reference?.metricSampleTimesSeconds);
+    const candidateName = measured.schema === pressureSchemas[1] ? 'conditional spray' : 'finite-phase model with wall';
+    $('pressure-series').textContent = `Digitized Krško observations, released v${measured.releasedBaseline.version} equilibrium model and ${candidateName} candidate.`;
+    const signed = value => (value > 0 ? '+' : '') + value.toFixed(6);
+    for (const row of rows) {
+      const tr = make('tr'), time = make('th', row.time);
+      time.scope = 'row';
+      tr.append(time, make('td', row.measured.toFixed(6)), make('td', row.baseline.toFixed(6)),
+        make('td', row.simulated.toFixed(6)), make('td', signed(row.baselineError)),
+        make('td', signed(row.candidateError)), make('td', row.closer));
+      body.append(tr);
+    }
+    $('pressure-score').textContent = `${rows.length} acquired samples. RMSE was ${baseline.rmse.toFixed(6)} MPa for the released model and ${candidate.rmse.toFixed(6)} MPa for the candidate. Mean signed errors were ${signed(baseline.bias)} MPa and ${signed(candidate.bias)} MPa, respectively.`;
+    scroller.hidden = $('pressure-note').hidden = false;
+    return true;
+  } catch (error) {
+    $('pressure-score').textContent = 'Sample comparison unavailable. ' + error.message;
+    return false;
+  }
+}
 function drawComparison() {
   const chart = $('measured-chart'); chart.replaceChildren(); $('measurement-metrics').replaceChildren();
   const channel = measured?.channels.find(item => item.name === $('measured-channel').value);
+  const hasPressureTable = pressureReadings(channel);
   const points = channel?.points?.filter(item => Number.isFinite(item.time)) || [];
   if (!points.length) { chart.append(svg('text', { x: 450, y: 165, fill: '#91acb8', 'text-anchor': 'middle' }, 'No measured comparison available')); return; }
   const contrastKey = measured.schema === 'openpwr-krsko-pressure-spray-development-v1' ? 'originalNoSpray' : 'noWall';
@@ -84,13 +116,16 @@ function drawComparison() {
     for (const point of points) {
       if (!Number.isFinite(point[key])) { previous = false; continue; }
       path += `${previous ? ' L' : ' M'}${x(point.time)} ${y(point[key])}`; previous = true;
-      if (key === 'measured' && (points.length < 100 || points.indexOf(point) % 10 === 0)) chart.append(svg('circle', { cx: x(point.time), cy: y(point[key]), r: 2.8, fill: color }));
+      const acquiredTimes = measured.protocol?.reference?.metricSampleTimesSeconds;
+      if (key === 'measured' && (!Array.isArray(acquiredTimes) || acquiredTimes.includes(point.time))
+          && (points.length < 100 || points.indexOf(point) % 10 === 0)) chart.append(svg('circle', { cx: x(point.time), cy: y(point[key]), r: 2.8, fill: color }));
     }
     chart.append(svg('path', { d: path, stroke: color, fill: 'none', 'stroke-width': 2, 'stroke-dasharray': key === 'baseline' ? '6 5' : key === contrastKey ? '2 4' : 'none', 'stroke-linejoin': 'round' }));
   }
   $('measured-caption').textContent = `${channel.label || channel.name} · ${channel.unit} · ${channel.metrics?.samples ?? points.filter(point => Number.isFinite(point.measured)).length} comparison points. ${channel.description || 'Published measurements compared with the boundary-driven native model.'}${bounded.length ? ' Shading combines the documented reading, timing and instrument allowances; it is not a statistical confidence interval.' : ''}`;
   if (['openpwr-continuous-measured-v1','openpwr-krsko-pressure-development-v1','openpwr-krsko-pressure-spray-development-v1'].includes(measured.schema)) $('measured-caption').textContent += ' Errors use the eight acquired samples at 1–15 s; the displayed t=0 measurement is interpolated and excluded from scoring.';
   for (const [key, value] of Object.entries(channel.metrics || {})) {
+    if (hasPressureTable && ['samples', 'rmse', 'releasedBaselineRmse', 'meanError'].includes(key)) continue;
     const article = make('article'); article.append(make('span', label(key)), make('strong', format(value))); $('measurement-metrics').append(article);
   }
 }
@@ -132,7 +167,7 @@ async function measuredEvidence() {
     if (report.comparisonRole) definition(identity, 'Comparison role', report.comparisonRole);
     if (report.releasedBaseline) {
       definition(identity, 'Historical baseline', `v${report.releasedBaseline.version} · ${report.releasedBaseline.gitRevision}`);
-      definition(identity, 'Baseline report SHA-256', report.releasedBaseline.reportSha256);
+      definition(identity, 'Baseline report SHA-256', report.releasedBaseline.reportSha256 ?? report.releasedBaseline.sha256);
     }
     if (report.source?.title) definition(identity, 'Measurement source', report.source.title);
     if (report.source?.url && /^https:\/\//.test(report.source.url)) { const link = make('a', 'Original published report ↗'); link.href = report.source.url; $('measurement-links').append(link); }

@@ -44,7 +44,7 @@ async function fixture(t) {
   const json = (path, value) => writeFile(join(dir, path), JSON.stringify(value));
   const version = '0.6.0';
   await json('package.json', { name: 'openpwr-evidence-fixture', version, type: 'module' });
-  for (const path of ['index.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, path), path);
+  for (const path of ['index.html', 'experiments.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'LICENSE', 'NOTICE']) await writeFile(join(dir, path), path);
   await exec('git', ['init', '--quiet'], { cwd: dir });
   await exec('git', ['-c', 'user.name=Packaging fixture', '-c', 'user.email=fixture@example.invalid',
     '-c', 'commit.gpgsign=false', '-c', `core.hooksPath=${join(dir, '.git/empty-hooks')}`, 'commit', '--quiet', '--allow-empty', '--no-verify', '-m', 'Evidence fixture'], { cwd: dir });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0
+
+- Run a matched load comparison in the public simulator. Both branches inherit the complete browser plant state, including controller settings and thermal history. Change demand in one branch and inspect the difference in generation, reactor heat, primary pressure and steam pressure at each sampled time.
+- Capture a running control-room session in a separate comparison tab. Export the paired readings as CSV or download a versioned JSON recipe for replay in the browser or with Node.js.
+- Published verification includes identical initial observations and deterministic replay. These experiments use the generic browser equations. Measured pressure and native startup evidence are available in their respective workbenches.
+- The Krško pressure explorer shows both predictions, signed errors and overall scores at the eight acquired timestamps. The interpolated starting value is excluded. The released equilibrium model retains the lower overall pressure RMSE.
+
 ## 0.12.0
 
 - The public continuous-startup workbench can play the archived native run and seek directly to a recorded observation. The named recording comes from the v0.11.0 release.

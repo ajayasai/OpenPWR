@@ -423,6 +423,27 @@ $('restore-faults').addEventListener('click', () => mutate(() => {
 }, 'Injected equipment faults cleared. Reactor trip status is unchanged.'));
 $('initialize').addEventListener('click', initialize);
 $('history-window').addEventListener('change', renderCharts);
+$('compare-state').addEventListener('click', () => {
+  const snapshot = plant.snapshot();
+  if (snapshot.domainExceeded || snapshot.tripped || !snapshot.gridConnected || snapshot.startupStage !== 'power') {
+    notify('Capture the plant in grid-connected power mode, before a reactor trip or model validity limit.', true);
+    return;
+  }
+  const comparison = window.open('about:blank', '_blank');
+  if (!comparison) {
+    notify('The comparison tab could not open. Allow pop-ups for this site and try again.', true);
+    return;
+  }
+  try {
+    // Write directly into the new tab. Each fork keeps its own exact capture on reload.
+    comparison.sessionStorage.setItem('openpwr-paired-start-v1', JSON.stringify(plant.exportState()));
+    comparison.opener = null;
+    comparison.location.replace(new URL('./experiments.html?from=control-room', location.href).href);
+  } catch {
+    comparison.close();
+    notify('The comparison tab could not store the captured state. Check browser storage permissions and try again.', true);
+  }
+});
 $('save-state').addEventListener('click', () => {
   const state = { format: 'openpwr-session', version: 1, model: plant.exportState(), simulationSpeed: speed, paused };
   download(`openpwr-state-${Math.floor(lastSnapshot.time)}s.json`, JSON.stringify(state, null, 2), 'application/json');

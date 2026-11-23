@@ -3,3 +3,15 @@
 .baseline-key{background:#81929d}.measurement-legend [hidden]{display:none}.measurement-legend{flex-wrap:wrap}.numerical-evidence{margin:22px 0}.numerical-evidence summary{cursor:pointer;padding:14px;background:#13252d;border-radius:5px}.numerical-evidence dl{padding:14px}
 
 .no-wall-key{background:#e5b46f}#measured-status[data-status=development-no-improvement]{color:#ebc283}
+
+#acquired-pressure{margin:24px 0 32px}
+.pressure-score{color:#c7d9df;line-height:1.65}
+.pressure-table-scroll{max-width:100%;overflow-x:auto;border:1px solid #29414d;border-radius:6px}
+.pressure-table-scroll:focus-visible{outline:2px solid #86dfd0;outline-offset:3px}
+.pressure-table{width:100%;border-collapse:collapse;color:#d4e9ea;font-size:.85rem;font-variant-numeric:tabular-nums}
+.pressure-table caption{text-align:left;padding:12px 14px;color:#b7cbd4;background:#11202a}
+.pressure-table :is(th,td){padding:9px 12px;text-align:right;border-top:1px solid #29414d}
+.pressure-table thead th{background:#172a35;vertical-align:bottom;text-transform:none;letter-spacing:normal}
+.pressure-table tbody th{font-weight:500}
+.pressure-table :is(th,td):last-child{text-align:left}
+.pressure-table tbody tr:nth-child(even){background:#11202a}
