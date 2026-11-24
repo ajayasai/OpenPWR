@@ -4,7 +4,11 @@
 
 [Launch control room](https://ajayasai.github.io/OpenPWR/) · [Benchmark & verification evidence](https://ajayasai.github.io/OpenPWR/verification.html) · [Model equations](docs/MODEL.md) · [Validation scope](docs/VALIDATION.md)
 
-**New in v0.13.** Compare two load commands from the same instant in the browser simulator. Open the [load comparison](https://ajayasai.github.io/OpenPWR/experiments.html) at full-load equilibrium, or choose **Compare from this state** in the control room’s Experiment session panel. The baseline continues with the captured controls. The second run changes electrical demand. Inspect the two power and pressure traces, download their differences, or save the starting state and commands as a recipe. To reproduce the CSV in this release, run `node scripts/replay-pair.mjs recipe.json results.csv` with a new output filename.
+**New in v0.14.** Inspect and download every scored response from the published Krško and PACTEL comparisons. The table gives the reported observation, each model prediction and their signed errors at the same time. Its CSV includes every scored row for that channel, even when the table spans several pages. Compact files retain the source values and identify the full evidence reports by SHA-256. [Open the measured-response explorer](https://ajayasai.github.io/OpenPWR/plant-evidence.html?case=pressure-spray#measured-channel).
+
+The startup player now offers the current release’s native run alongside the archived v0.11 run. Each recording includes 901 observations over 7½ simulated hours. Open its source details to see the executable and report used to produce it. [Play a native startup](https://ajayasai.github.io/OpenPWR/continuous.html).
+
+**Introduced in v0.13.** Compare two load commands from the same instant in the browser simulator. Open the [load comparison](https://ajayasai.github.io/OpenPWR/experiments.html) at full-load equilibrium, or choose **Compare from this state** in the control room’s Experiment session panel. The baseline continues with the captured controls. The second run changes electrical demand. Inspect the two power and pressure traces, download their differences, or save the starting state and commands as a recipe. To reproduce the CSV in this release, run `node scripts/replay-pair.mjs recipe.json results.csv` with a new output filename.
 
 The measured-evidence workbench also shows where the pressure models miss the Krško observations. The conditional-spray model is closer at five of eight acquired times. Its errors at 11, 13 and 15 seconds bring its overall RMSE to 0.426 MPa, compared with 0.357 MPa for the released model. [Inspect the measured pressure comparison](https://ajayasai.github.io/OpenPWR/plant-evidence.html?case=pressure-spray#measured-channel).
 
@@ -60,6 +64,8 @@ npm start
 Open `http://127.0.0.1:4173`. There are **no npm dependencies to install**. For development, `npm run dev` serves the source directly. The `dist/` directory is a portable static site; any HTTP server can host it. Native ES modules require HTTP, so opening `index.html` directly as a file is not supported.
 
 ## Reproducible experiments
+
+To run the same end-to-end checks as release CI, unpack the portable web release into `dist/` or build it with its native evidence. In `tests/browser/`, run `npm ci`, `npx playwright install firefox` and `npm test`. Linux hosts can install Firefox’s system libraries with `npx playwright install --with-deps firefox`. These test dependencies are separate from the simulator.
 
 For the native coupled plant, install the open-source tools in [ENGINEERING.md](docs/ENGINEERING.md), then run:
 

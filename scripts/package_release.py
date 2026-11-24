@@ -302,6 +302,12 @@ def package(version, revision):
             archive_bytes(archive, prefix + path, (ROOT / path).read_bytes(), timestamp)
         component_path = 'artifacts/pressure-component-verification.json'
         archive_bytes(archive, prefix + component_path, (ROOT / component_path).read_bytes(), timestamp)
+        # The local FMI host serves these same release-built views beside the full reports.
+        views = ('plant-verification.view.json', 'krsko-pressure-development.view.json',
+                 'continuous-measured-validation.view.json', 'measured-validation.view.json',
+                 'pressurizer-validation.view.json', 'continuous-index.json', 'continuous-recording.json')
+        for name in views:
+            archive_bytes(archive, prefix + 'artifacts/' + name, (ROOT / 'dist' / name).read_bytes(), timestamp)
         archive_bytes(archive, prefix + 'PREBUILT_NATIVE.md', native_readme(version, revision).encode(), timestamp)
     with zipfile.ZipFile(web, 'w') as archive:
         for path in sorted((ROOT / 'dist').rglob('*')):

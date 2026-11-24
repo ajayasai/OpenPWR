@@ -4,7 +4,7 @@
 
 .no-wall-key{background:#e5b46f}#measured-status[data-status=development-no-improvement]{color:#ebc283}
 
-#acquired-pressure{margin:24px 0 32px}
+#aligned-observations{margin:24px 0 32px}
 .pressure-score{color:#c7d9df;line-height:1.65}
 .pressure-table-scroll{max-width:100%;overflow-x:auto;border:1px solid #29414d;border-radius:6px}
 .pressure-table-scroll:focus-visible{outline:2px solid #86dfd0;outline-offset:3px}
@@ -15,3 +15,13 @@
 .pressure-table tbody th{font-weight:500}
 .pressure-table :is(th,td):last-child{text-align:left}
 .pressure-table tbody tr:nth-child(even){background:#11202a}
+
+.observation-header,.observation-pagination{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px}
+.observation-header{justify-content:space-between}
+.observation-header h3{margin:0}
+.observation-header button,.observation-pagination button{font:inherit;font-size:.85rem;color:#bcf0e5;background:#162c32;border:1px solid #35606a;border-radius:5px;padding:8px 12px;cursor:pointer}
+.observation-header button:focus-visible,.observation-pagination button:focus-visible{outline:2px solid #86dfd0;outline-offset:2px}
+.observation-header button:disabled,.observation-pagination button:disabled{opacity:.5;cursor:default}
+.observation-pagination{margin-top:12px;color:#b7cbd4;font-size:.83rem}
+.observation-pagination select{color:#daebe9;background:#15262d;border:1px solid #35606a;padding:6px;border-radius:4px}
+.observation-pagination[hidden]{display:none}

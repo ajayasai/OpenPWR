@@ -38,6 +38,7 @@ async function fixture(t) {
   for (const path of ['scripts', 'src', 'docs', 'backend', 'models/OpenPWR', 'validation/krsko2005', 'validation/pactel1998', 'validation/baselines', 'artifacts/modelica']) await mkdir(join(dir, path), { recursive: true });
   for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   await cp(join(root, 'scripts/krsko-pressure-evidence.mjs'), join(dir, 'scripts/krsko-pressure-evidence.mjs'));
@@ -73,10 +74,12 @@ test('strict pressure publication rejects absent or incomplete evidence before r
   await assert.rejects(f.build('--require-krsko-pressure'), /Krško pressure development evidence required/);
   assert.equal(await readFile(marker, 'utf8'), 'previous pressure review');
   await f.json('artifacts/krsko-pressure-development.json', { numericalPassed: true, caseImprovementPassed: true });
+  await f.json('artifacts/krsko-pressure-development.view.json', { report: { status: 'passed' } });
   await assert.rejects(f.build('--require-krsko-pressure'), /Krško pressure development evidence required/);
   assert.equal(await readFile(marker, 'utf8'), 'previous pressure review');
   await f.build();
   await assert.rejects(readFile(join(f.dir, 'dist/krsko-pressure-development.json')), { code: 'ENOENT' });
+  await assert.rejects(readFile(join(f.dir, 'dist/krsko-pressure-development.view.json')), { code: 'ENOENT' });
 });
 
 test('coupled plant publication binds both FMUs and current source before replacing prior dist', async t => {
@@ -89,6 +92,10 @@ test('coupled plant publication binds both FMUs and current source before replac
   await f.build('--require-plant');
   const saved = await readFile(join(f.dir, 'dist/plant-verification.json'), 'utf8');
   assert.deepEqual(JSON.parse(saved), report);
+  const view = JSON.parse(await readFile(join(f.dir, 'dist/plant-verification.view.json'), 'utf8'));
+  assert.equal(view.source.sha256, sha(saved));
+  assert.equal(view.source.bytes, Buffer.byteLength(saved));
+  assert.deepEqual(view.report.checks, report.checks);
   const marker = join(f.dir, 'dist/last-good.txt'); await writeFile(marker, 'previous successful evidence');
   const corruptions = [
     ['plant binary', 'artifacts/modelica/CoupledPlant.fmu', Buffer.concat([plant.bytes, Buffer.from('changed')]), plant.bytes],
@@ -211,6 +218,9 @@ test('measured publication preserves executed unfavorable results while binding 
   }
   report.status = 'failed'; await f.json('artifacts/measured-validation.json', report); await f.build('--require-measured');
   const saved = await readFile(join(f.dir, 'dist/measured-validation.json'), 'utf8');
+  const view = JSON.parse(await readFile(join(f.dir, 'dist/measured-validation.view.json'), 'utf8'));
+  assert.equal(view.source.sha256, sha(saved));
+  assert.equal(view.report.status, 'failed');
   const marker = join(f.dir, 'dist/last-good.txt'); await writeFile(marker, 'previous measured assessment');
   const alteredFiles = [['artifacts/modelica/KrskoTransient.fmu', compiled.bytes], ['artifacts/modelica/KrskoEquilibrium.fmu', equilibrium.bytes], ['models/OpenPWR/package.mo', f.source], ...Object.values(sources)];
   for (const [path, original] of alteredFiles) {

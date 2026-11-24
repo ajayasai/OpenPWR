@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { compareAcquiredPressure } from './acquired-pressure.js';
+import { alignedObservations, observationsCsv, pressureSchemas } from './aligned-observations.js';
 const $ = id => document.getElementById(id);
 const make = (tag, text, cls) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (cls) el.className = cls; return el; };
 const format = value => typeof value === 'number' ? Number.isFinite(value) ? (value !== 0 && Math.abs(value) < .001 ? value.toExponential(3) : value.toLocaleString('en-US', { maximumSignificantDigits: 6 })) : '—' : String(value ?? '—');
@@ -7,14 +7,24 @@ const hash = value => typeof value === 'string' && /^[a-f0-9]{64}$/i.test(value)
 const label = key => key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, char => char.toUpperCase()).replace(/Rmse/g, 'RMSE');
 const describe = value => Array.isArray(value) ? value.map(describe).join('; ') : value && typeof value === 'object' ? Object.entries(value).map(([key, item]) => `${label(key)}: ${describe(item)}`).join('; ') : format(value);
 function definition(target, name, value) { target.append(make('dt', name), make('dd', format(value))); }
-async function read(path) {
-  const response = await fetch(path, { cache: 'no-store' });
-  if (!response.ok) throw new Error(`Evidence unavailable (HTTP ${response.status}). Generate the current native reports before publishing.`);
-  return response.json();
+async function readView(path) {
+  const file = path.slice(2);
+  const response = await fetch(path.replace(/\.json$/, '.view.json'), { cache: 'no-store' });
+  if (response.status === 404) {
+    const raw = await fetch(path, { cache: 'no-store' });
+    if (!raw.ok) throw new Error(`Evidence unavailable (HTTP ${raw.status}). Generate the current native reports before publishing.`);
+    return { report: await raw.json() };
+  }
+  if (!response.ok) throw new Error(`Evidence view unavailable (HTTP ${response.status}).`);
+  const view = await response.json();
+  if (view?.schema !== 'openpwr-evidence-view-v1' || view.source?.file !== file
+      || !Number.isSafeInteger(view.source.bytes) || view.source.bytes <= 0 || !hash(view.source.sha256)
+      || !view.report || typeof view.report !== 'object') throw new Error('The evidence view has an incomplete source identity.');
+  return view;
 }
 async function nativeEvidence() {
   try {
-    const report = await read('./plant-verification.json');
+    const { report } = await readView('./plant-verification.json');
     if (report.runtime?.model !== 'OpenPWR.CoupledPlant' || !hash(report.runtime.fmuSha256)
         || !hash(report.buildManifest?.sourceSha256) || !Array.isArray(report.checks) || !report.checks.length
         || report.total !== report.checks.length || report.passed !== report.checks.filter(item => item.pass === true).length
@@ -41,7 +51,7 @@ let evidenceRequest = 0;
 // Cases can share a large immutable evidence file; reuse it while this page is open.
 const measuredReports = new Map();
 function readMeasured(path) {
-  if (!measuredReports.has(path)) measuredReports.set(path, read(path).catch(error => {
+  if (!measuredReports.has(path)) measuredReports.set(path, readView(path).catch(error => {
     measuredReports.delete(path); throw error;
   }));
   return measuredReports.get(path);
@@ -52,40 +62,98 @@ function svg(tag, attributes, text) {
   const el = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attributes)) el.setAttribute(key, value);
   if (text !== undefined) el.textContent = text; return el;
 }
-const pressureSchemas = ['openpwr-krsko-pressure-development-v1', 'openpwr-krsko-pressure-spray-development-v1'];
-function pressureReadings(channel) {
-  const panel = $('acquired-pressure');
-  panel.hidden = !pressureSchemas.includes(measured?.schema) || channel?.key !== 'primaryPressureMPa';
-  const body = $('pressure-rows');
-  body.replaceChildren();
-  if (panel.hidden) return false;
-  const scroller = panel.querySelector('.pressure-table-scroll');
-  scroller.hidden = $('pressure-note').hidden = true;
-  try {
-    const { rows, baseline, candidate } = compareAcquiredPressure(channel, measured.protocol?.reference?.metricSampleTimesSeconds);
-    const candidateName = measured.schema === pressureSchemas[1] ? 'conditional spray' : 'finite-phase model with wall';
-    $('pressure-series').textContent = `Digitized Krško observations, released v${measured.releasedBaseline.version} equilibrium model and ${candidateName} candidate.`;
-    const signed = value => (value > 0 ? '+' : '') + value.toFixed(6);
-    for (const row of rows) {
-      const tr = make('tr'), time = make('th', row.time);
-      time.scope = 'row';
-      tr.append(time, make('td', row.measured.toFixed(6)), make('td', row.baseline.toFixed(6)),
-        make('td', row.simulated.toFixed(6)), make('td', signed(row.baselineError)),
-        make('td', signed(row.candidateError)), make('td', row.closer));
-      body.append(tr);
+let observations;
+let observationPage = 0;
+const pageSize = 12;
+const signed = value => (value > 0 ? '+' : '') + value.toFixed(6);
+
+function renderObservationPage() {
+  const view = observations;
+  const first = observationPage * pageSize, end = Math.min(first + pageSize, view.rows.length);
+  const head = $('observations-head'), body = $('observations-rows');
+  head.replaceChildren(); body.replaceChildren();
+  const cols = [{ key: 'time', title: 'Time (s)' }, { key: 'measured', title: 'Measured' }];
+  for (const { key, label: title } of view.series) {
+    cols.push({ key, title }, { key: key + 'Error', title: title + ' error', signed: true });
+  }
+  if (view.graphical) cols.push({ key: 'lowerAllowance', title: 'Lower allowance' }, { key: 'upperAllowance', title: 'Upper allowance' });
+  if (view.special) cols.push({ key: 'closer', title: 'Closer of candidate / released' });
+  for (const col of cols) {
+    const th = make('th', col.title); th.scope = 'col'; head.append(th);
+  }
+  for (const row of view.rows.slice(first, end)) {
+    const tr = make('tr');
+    for (const col of cols) {
+      const value = row[col.key];
+      if (col.key === 'time') {
+        const th = make('th', value); th.scope = 'row'; tr.append(th);
+      } else tr.append(make('td', typeof value === 'number' ? (col.signed ? signed(value) : value.toFixed(6)) : value));
     }
-    $('pressure-score').textContent = `${rows.length} acquired samples. RMSE was ${baseline.rmse.toFixed(6)} MPa for the released model and ${candidate.rmse.toFixed(6)} MPa for the candidate. Mean signed errors were ${signed(baseline.bias)} MPa and ${signed(candidate.bias)} MPa, respectively.`;
-    scroller.hidden = $('pressure-note').hidden = false;
-    return true;
+    body.append(tr);
+  }
+  $('observations-pages').hidden = view.rows.length <= pageSize;
+  $('observations-jump').value = String(observationPage);
+  $('observations-page').textContent = `Rows ${first + 1}–${end} of ${view.rows.length}`;
+  $('observations-prev').disabled = first === 0;
+  $('observations-next').disabled = end === view.rows.length;
+}
+function inspectObservations(channel) {
+  observations = null;
+  observationPage = 0;
+  $('aligned-observations').hidden = !channel;
+  $('observations-csv').disabled = true;
+  $('observations-scroll').hidden = $('observations-note').hidden = $('observations-pages').hidden = true;
+  $('observations-rows').replaceChildren();
+  if (!channel) return;
+  $('observations-title').textContent = channel.name + ' at scored times';
+  try {
+    observations = alignedObservations(measured, channel);
+    const v = observations;
+    $('observations-title').textContent = channel.name + (v.graphical ? ' on the graphical grid' : ' at acquired times');
+    const score = (key, name) => `${name} RMSE ${v.scores[key].rmse.toFixed(6)} ${v.unit}, mean signed error ${signed(v.scores[key].bias)} ${v.unit}.`;
+    const scores = v.series.filter(s => ['baseline', 'simulated'].includes(s.key)).map(s => score(s.key, s.label));
+    $('observations-score').textContent = `${v.rows.length} ${v.graphical ? 'correlated graphical positions' : 'acquired samples'}. ${scores.join(' ')}`;
+    $('observations-caption').textContent = v.graphical
+      ? `${channel.name}. Readings, conditional allowances and signed errors use ${v.unit}.`
+      : `${channel.name}. Readings and signed errors use ${v.unit}.`;
+    const notes = ['Signed error is predicted minus measured. The CSV includes every scored row at the precision of the report.'];
+    notes.push(v.graphical ? 'Each position is read on a one-second grid from the published curve. The lower and upper allowances combine reported instrument, figure-reading and timing bounds.'
+      : 'The measured reference at 0 s is interpolated and excluded. The displayed decimals preserve the digitized data for checking the calculation.');
+    if (v.special) notes.push('The closer model has the smaller absolute error before rounding. A tie indicates equality within numerical roundoff.');
+    $('observations-note').textContent = notes.join(' ');
+    const jump = $('observations-jump');
+    jump.replaceChildren();
+    for (let i = 0; i < v.rows.length; i += pageSize) {
+      const last = Math.min(v.rows.length, i + pageSize) - 1;
+      jump.add(new Option(v.rows[i].time + '–' + v.rows[last].time + ' s', String(i / pageSize)));
+    }
+    renderObservationPage();
+    $('observations-csv').disabled = $('observations-note').hidden = $('observations-scroll').hidden = false;
   } catch (error) {
-    $('pressure-score').textContent = 'Sample comparison unavailable. ' + error.message;
-    return false;
+    observations = null;
+    $('observations-score').textContent = 'Sample comparison unavailable. ' + error.message;
   }
 }
+function moveToObservationPage(page) {
+  if (!observations || page < 0 || page * pageSize >= observations.rows.length) return;
+  observationPage = page;
+  renderObservationPage();
+}
+$('observations-jump').addEventListener('change', () => moveToObservationPage($('observations-jump').selectedIndex));
+$('observations-prev').addEventListener('click', () => moveToObservationPage(observationPage - 1));
+$('observations-next').addEventListener('click', () => moveToObservationPage(observationPage + 1));
+$('observations-csv').addEventListener('click', () => {
+  if (!observations) return;
+  const url = URL.createObjectURL(new Blob([observationsCsv(observations)], { type: 'text/csv;charset=utf-8' }));
+  const link = make('a'); link.href = url;
+  link.download = 'openpwr-' + $('measured-case').value + '-' + observations.channel + '.csv';
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
 function drawComparison() {
   const chart = $('measured-chart'); chart.replaceChildren(); $('measurement-metrics').replaceChildren();
   const channel = measured?.channels.find(item => item.name === $('measured-channel').value);
-  const hasPressureTable = pressureReadings(channel);
+  inspectObservations(channel);
   const points = channel?.points?.filter(item => Number.isFinite(item.time)) || [];
   if (!points.length) { chart.append(svg('text', { x: 450, y: 165, fill: '#91acb8', 'text-anchor': 'middle' }, 'No measured comparison available')); return; }
   const contrastKey = measured.schema === 'openpwr-krsko-pressure-spray-development-v1' ? 'originalNoSpray' : 'noWall';
@@ -106,6 +174,8 @@ function drawComparison() {
   $('simulated-legend').replaceChildren(make('i', undefined, 'simulated-key'), document.createTextNode(measured.schema === 'openpwr-krsko-pressure-spray-development-v1' ? 'Conditional spray model' : measured.schema === 'openpwr-krsko-pressure-development-v1' ? 'Finite-phase model with wall' : 'Native model'));
   $('no-wall-legend').hidden = !points.some(point => Number.isFinite(point[contrastKey]));
   $('no-wall-legend').replaceChildren(make('i', undefined, 'no-wall-key'), document.createTextNode(contrastKey === 'originalNoSpray' ? 'Same model without spray' : 'Same model without wall heat transfer'));
+  const scoredTimes = new Set(observations?.rows.map(row => row.time));
+  $('measured-legend').replaceChildren(make('i', undefined, 'measured-key'), document.createTextNode(observations?.graphical ? 'Digitized pressure curve' : 'Digitized plant readings'));
   const bounded = points.filter(point => Number.isFinite(point.lowerAllowance) && Number.isFinite(point.upperAllowance));
   if (bounded.length) {
     const polygon = [...bounded.map(point => `${x(point.time)},${y(point.upperAllowance)}`), ...bounded.slice().reverse().map(point => `${x(point.time)},${y(point.lowerAllowance)}`)].join(' ');
@@ -113,19 +183,21 @@ function drawComparison() {
   }
   for (const [key, color] of [[contrastKey, '#e5b46f'], ['baseline', '#81929d'], ['measured', '#ecb3db'], ['simulated', '#86dfd0']]) {
     let path = '', previous = false;
-    for (const point of points) {
+    for (const [index, point] of points.entries()) {
       if (!Number.isFinite(point[key])) { previous = false; continue; }
       path += `${previous ? ' L' : ' M'}${x(point.time)} ${y(point[key])}`; previous = true;
-      const acquiredTimes = measured.protocol?.reference?.metricSampleTimesSeconds;
-      if (key === 'measured' && (!Array.isArray(acquiredTimes) || acquiredTimes.includes(point.time))
-          && (points.length < 100 || points.indexOf(point) % 10 === 0)) chart.append(svg('circle', { cx: x(point.time), cy: y(point[key]), r: 2.8, fill: color }));
+      if (key === 'measured' && scoredTimes.has(point.time)
+          && (points.length < 100 || index % 10 === 0 || index === points.length - 1)) chart.append(svg('circle', { cx: x(point.time), cy: y(point[key]), r: 2.8, fill: color }));
     }
     chart.append(svg('path', { d: path, stroke: color, fill: 'none', 'stroke-width': 2, 'stroke-dasharray': key === 'baseline' ? '6 5' : key === contrastKey ? '2 4' : 'none', 'stroke-linejoin': 'round' }));
   }
-  $('measured-caption').textContent = `${channel.label || channel.name} · ${channel.unit} · ${channel.metrics?.samples ?? points.filter(point => Number.isFinite(point.measured)).length} comparison points. ${channel.description || 'Published measurements compared with the boundary-driven native model.'}${bounded.length ? ' Shading combines the documented reading, timing and instrument allowances; it is not a statistical confidence interval.' : ''}`;
-  if (['openpwr-continuous-measured-v1','openpwr-krsko-pressure-development-v1','openpwr-krsko-pressure-spray-development-v1'].includes(measured.schema)) $('measured-caption').textContent += ' Errors use the eight acquired samples at 1–15 s; the displayed t=0 measurement is interpolated and excluded from scoring.';
+  const timing = observations?.graphical
+    ? 'Dots mark selected positions on the digitized curve. Shading shows the conditional allowance from reading, timing and instrument bounds.'
+    : 'Dots mark acquired readings. The measured value at 0 s is interpolated and excluded from scoring.';
+  chart.setAttribute('aria-label', channel.name + ' in ' + channel.unit + ' versus time in seconds.');
+  $('measured-caption').textContent = `${channel.label || channel.name} · ${channel.unit}. ${channel.description || 'Published measurements compared with the boundary-driven native model.'} ${observations ? timing : ''}`;
   for (const [key, value] of Object.entries(channel.metrics || {})) {
-    if (hasPressureTable && ['samples', 'rmse', 'releasedBaselineRmse', 'meanError'].includes(key)) continue;
+    if (observations && ['samples', 'rmse', 'releasedBaselineRmse', 'v07BaselineRmse', 'meanError'].includes(key)) continue;
     const article = make('article'); article.append(make('span', label(key)), make('strong', format(value))); $('measurement-metrics').append(article);
   }
 }
@@ -143,7 +215,7 @@ async function measuredEvidence() {
   $('no-wall-legend').hidden = true;
   drawComparison();
   try {
-    const parent = await readMeasured(path);
+    const { report: parent, source } = await readMeasured(path);
     const chosen = $('measured-case').value;
     const report = chosen === 'pactel-holdout' ? parent.holdoutComparison : chosen === 'pressure-spray' ?
       (parent.conditionalSpray ? {...parent, ...parent.conditionalSpray, schema:'openpwr-krsko-pressure-spray-development-v1'} : null) : parent;
@@ -161,6 +233,7 @@ async function measuredEvidence() {
     $('measured-scope').append(make('strong', report.conclusion || 'Read the comparison scope and assumptions.'), make('p', report.scope || 'A boundary-driven thermal-system comparison; no full-plant qualification is established.'));
     const identity = $('measured-identity');
     definition(identity, 'Source revision', report.gitRevision); definition(identity, 'Benchmark FMU', report.runtime.model);
+    if (source) definition(identity, 'Complete report SHA-256', source.sha256);
     definition(identity, 'Benchmark FMU SHA-256', report.runtime.fmuSha256); definition(identity, 'Measured data SHA-256', report.inputDataSha256);
     if (report.coldSourceSha256) definition(identity, 'Shared startup thermal source SHA-256', report.coldSourceSha256);
     if (report.pressureSourceSha256) definition(identity, 'Pressure model source SHA-256', report.pressureSourceSha256);

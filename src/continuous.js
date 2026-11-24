@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-import {controls, outputs, validateState, validateHealth, validateEvidence, motion, operatingState, synchronization, formatReading} from './continuous-state.js';
-import {replayPath, decodeRecording, sampleIndex} from './continuous-replay.js';
+import {controls, outputs, validateState, validateHealth, motion, operatingState, synchronization, formatReading} from './continuous-state.js';
+import {replayPath, replaySha256, currentReplayPath, startupIndexPath, validateStartupIndex, decodeRecording, sampleIndex} from './continuous-replay.js';
 const $ = id => document.getElementById(id);
 const fmt = formatReading;
 const clock = seconds => [Math.floor(seconds/3600),Math.floor(seconds/60)%60,Math.floor(seconds)%60].map(n=>String(n).padStart(2,'0')).join(':');
@@ -9,6 +9,7 @@ let history=[], scenarios=[], evidence=null, nextStep=0, lastFrame=performance.n
 const flowPhases={primary:0,steam:0,exhaust:0,feed:0,cooling:0,electrical:0};
 let historyQueued=false;
 let recording=null, recordedView=null, openingRecording=false;
+let evidenceRequest=null;
 let playingRecording=false, replayStart=0, replayOffset=0, replayIndex=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const planned=()=>['ready','running'].includes(state?.experiment?.status);
@@ -44,6 +45,7 @@ function availability(){
   $('continuous-speed').disabled=disabled;
   $('continuous-connect').disabled=busy || viewingRecording;
   $('recording-load').disabled=busy || viewingRecording || Boolean(pendingAction) || Object.keys(pendingControls).length>0;
+  $('recording-source').disabled=viewingRecording;
   $('continuous-run').textContent=running?'Pause':'Run model';$('continuous-run').setAttribute('aria-pressed',String(running));
 }
 function connection(ok,detail){
@@ -127,12 +129,22 @@ function drawCharts(history){
   draw(history,'temperature-chart',['hotLegTemperatureC','secondaryTemperatureC'],'C');draw(history,'pressure-chart',['primaryPressureMPa','secondaryPressureMPa'],'MPa');
   $('continuous-samples').textContent=`${history.length} retained native observations · ${clock(history[0]?.time||0)}–${clock(history.at(-1)?.time||0)} simulated · zero neutron power is omitted from the logarithmic axis`;
 }
-async function loadEvidence(){
-  try{
-    const r=validateEvidence(await request('./continuous-verification.json'));
+function loadEvidence(){
+  if(evidenceRequest)return evidenceRequest;
+  evidenceRequest=(async()=>{
+    const response=await fetch(startupIndexPath,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+    if(response.status===404)throw new Error('This build has no published startup index. The archived v0.11.0 recording is available.');
+    if(!response.ok)throw new Error(`Startup index download returned HTTP ${response.status}.`);
+    const r=validateStartupIndex(await response.json());
     evidence=r;showEvidence();
     $('continuous-checks').replaceChildren();for(const c of r.checks){const li=document.createElement('li');li.textContent=`${c.pass?'✓':'✕'} ${c.name}`;$('continuous-checks').append(li);}
-  }catch{$('continuous-evidence').textContent='No current numerical report is available. Run npm run engineering:continuous:verify to generate it.';}
+    return r;
+  })().catch(error=>{
+    evidenceRequest=null;
+    $('continuous-evidence').textContent=error.message;
+    throw error;
+  });
+  return evidenceRequest;
 }
 function showEvidence(){
   if(!evidence)return;
@@ -240,9 +252,12 @@ async function openRecording() {
   status.hidden=false;
   status.textContent='Loading the recorded startup…';
   try {
-    const response=await fetch(replayPath,{signal:AbortSignal.timeout(20000)});
+    const current=$('recording-source').value==='current';
+    const index=current?await loadEvidence():undefined;
+    const path=current?currentReplayPath:replayPath;
+    const response=await fetch(path,{signal:AbortSignal.timeout(20000)});
     if(!response.ok)throw new Error(`Recording download returned HTTP ${response.status}.`);
-    recording=await decodeRecording(await response.arrayBuffer());
+    recording=await decodeRecording(await response.arrayBuffer(),index);
     const jump=$('recording-jump');
     const stages=new Set();
     for(const point of recording.points) {
@@ -252,16 +267,21 @@ async function openRecording() {
       jump.add(new Option(`${label} · ${clock(point.time)}`,String(point.time)));
     }
     document.body.classList.add('recording-active');
-    for(const id of ['recording-load','continuous-connection','local-instructions','continuous-run','continuous-speed'])$(id).hidden=true;
+    for(const id of ['recording-picker','continuous-connection','local-instructions','continuous-run','continuous-speed'])$(id).hidden=true;
     for(const el of document.querySelectorAll('[data-live-only]'))el.hidden=true;
-    $('recording-description').textContent='Playing back the v0.11 native simulation. Every reading comes from a recorded 30-second sample.';
+    const source=recording.source;
+    $('recording-description').textContent=`Recorded native simulation · ${source.release}. ${recording.points.length} observations at ${recording.sampleIntervalSeconds}-second intervals.`;
+    $('recording-report').href=source.url;
+    $('recording-report').textContent=`Full source report · ${source.release}`;
+    $('recording-data').href=path;
+    $('recording-provenance').textContent=`Scenario ${source.scenarioId}\nSource revision ${source.gitRevision}${source.gitDirty?' (modified working tree)':''}\nFMU SHA-256 ${source.fmuSha256}\nFull report SHA-256 ${source.reportSha256}\nRecording SHA-256 ${index?.recording.sha256??replaySha256}`;
     $('recording-player').hidden=false;
     $('recording-exit').hidden=false;
     $('recording-time').max=recording.durationSeconds;
     $('recording-time').step=recording.sampleIntervalSeconds;
-    $('continuous-identity').textContent=`Recorded ContinuousPlant · v0.11.0\nFMU SHA-256: ${recording.source.fmuSha256}`;
-    $('continuous-performance').textContent='30 s between recorded samples';
-    $('continuous-timing').textContent='Recorded FMI output · v0.11.0';
+    $('continuous-identity').textContent=`Recorded ContinuousPlant · ${source.release}\nFMU SHA-256: ${source.fmuSha256}`;
+    $('continuous-performance').textContent=`${recording.sampleIntervalSeconds} s between recorded samples`;
+    $('continuous-timing').textContent=`Recorded FMI output · ${source.release}`;
     message('');
     showRecordedTime(0);
     showEvidence();
@@ -317,6 +337,6 @@ $('evidence-disclosure').addEventListener('toggle',async event=>{
   if(!event.target.open || evidence || loadingEvidence)return;
   loadingEvidence=true;
   $('continuous-evidence').textContent='Loading published numerical evidence…';
-  try{await loadEvidence();}finally{loadingEvidence=false;}
+  try{await loadEvidence();}catch{ /* loadEvidence displays the source error. */ }finally{loadingEvidence=false;}
 });
 setInterval(work,100);requestAnimationFrame(animate);connect();

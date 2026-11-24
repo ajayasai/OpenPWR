@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.0
+
+- The measured-response explorer covers all 18 case and channel combinations. Signed-error tables and CSV downloads use each report’s scoring grid, units, reference data fingerprint and model identity. PACTEL tables include the report’s conditional allowances and support jumps to a time window.
+- The Krško pressure comparison and coupled-plant check list now load about 69 kB of evidence JSON. Previously the page loaded nearly 40 MB. The full reports are still downloadable and the compact files identify their sources by SHA-256.
+- The startup player offers the current release’s verified native run and the historical v0.11 recording. It checks the selected recording against its published fingerprint. The engineering check list loads from a compact index.
+- Release CI now runs the built site in Firefox, checks its downloads against the original reports and exercises recording selection and recovery.
+
 ## 0.13.0
 
 - Run a matched load comparison in the public simulator. Both branches inherit the complete browser plant state, including controller settings and thermal history. Change demand in one branch and inspect the difference in generation, reactor heat, primary pressure and steam pressure at each sampled time.

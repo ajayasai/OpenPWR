@@ -4,6 +4,8 @@ import { resolve, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
+import { makeEvidenceView } from './evidence-view.mjs';
 import { verifyContinuousEvidence } from './continuous-evidence.mjs';
 import { verifyContinuousMeasuredEvidence } from './continuous-measured-evidence.mjs';
 import { verifyKrskoPressureEvidence } from './krsko-pressure-evidence.mjs';
@@ -45,7 +47,23 @@ try {
   if (process.argv.includes('--require-native')) throw new Error(`Native evidence required: ${error.message}`);
   console.log('Native reports omitted; build/verify the current native model to include them.');
 }
-let includePlant = false;
+// Generate derivatives before replacing dist, and publish the same canonical bytes
+// that produced their hash. Strict release checks continue to validate full reports.
+const evidenceFiles = new Map();
+async function publishVerifiedReport(filename, verified) {
+  const bytes = await readFile(resolve(root, 'artifacts', filename));
+  if (!isDeepStrictEqual(verified, JSON.parse(bytes))) throw new Error(filename + ' changed during verification');
+  if (filename === 'continuous-verification.json') {
+    const { makeStartupViews } = await import('./startup-recording.mjs');
+    const { index, recording } = makeStartupViews(bytes);
+    evidenceFiles.set('continuous-index.json', index);
+    evidenceFiles.set('continuous-recording.json', recording);
+  } else {
+    evidenceFiles.set(filename.replace('.json', '.view.json'), makeEvidenceView(filename, bytes));
+  }
+  evidenceFiles.set(filename, bytes);
+}
+
 try {
   const report = JSON.parse(await readFile(resolve(root, 'artifacts/plant-verification.json'), 'utf8'));
   const manifest = JSON.parse(await readFile(resolve(root, 'artifacts/modelica/plant-manifest.json'), 'utf8'));
@@ -61,7 +79,7 @@ try {
       || kineticsManifest.fmuSha256 !== kineticsHash || report.kineticsManifest?.fmuSha256 !== kineticsHash
       || !Array.isArray(report.checks) || !report.checks.length || report.checks.some(item => item.pass !== true)
       || report.passed !== report.checks.length || report.total !== report.checks.length) throw new Error('Coupled plant report or compiled model is stale or unsuccessful');
-  includePlant = true;
+  await publishVerifiedReport('plant-verification.json', report);
 } catch (error) {
   if (process.argv.includes('--require-plant')) throw new Error(`Coupled plant evidence required: ${error.message}`);
   console.log('Coupled plant report omitted; build and verify the current native plant to include it.');
@@ -157,26 +175,23 @@ try {
   if (process.argv.includes('--require-cold')) throw new Error(`Cold startup evidence required: ${error.message}`);
   console.log('Cold startup report omitted; build and verify the current native cold model to include it.');
 }
-let includeContinuousMeasured = false;
 try {
-  await verifyContinuousMeasuredEvidence({root,version:pkg.version,revision});
-  includeContinuousMeasured = true;
+  const report = await verifyContinuousMeasuredEvidence({root,version:pkg.version,revision});
+  await publishVerifiedReport('continuous-measured-validation.json', report);
 } catch (error) {
   if (process.argv.includes('--require-continuous-measured')) throw new Error(`Continuous thermal measured evidence required: ${error.message}`);
   console.log('Continuous thermal measured report omitted; build and run its current reference case to include it.');
 }
-let includeKrskoPressure = false;
 try {
-  await verifyKrskoPressureEvidence({root,version:pkg.version,revision});
-  includeKrskoPressure = true;
+  const report = await verifyKrskoPressureEvidence({root,version:pkg.version,revision});
+  await publishVerifiedReport('krsko-pressure-development.json', report);
 } catch (error) {
   if (process.argv.includes('--require-krsko-pressure')) throw new Error(`Krško pressure development evidence required: ${error.message}`);
   console.log('Krško pressure development evidence omitted; run the current paired native comparison to include it.');
 }
-let includeContinuous = false;
 try {
-  await verifyContinuousEvidence({root,version:pkg.version,revision});
-  includeContinuous = true;
+  const report = await verifyContinuousEvidence({root,version:pkg.version,revision});
+  await publishVerifiedReport('continuous-verification.json', report);
 } catch (error) {
   if (process.argv.includes('--require-continuous')) throw new Error(`Continuous startup evidence required: ${error.message}`);
   console.log('Continuous startup report omitted; build and verify the current continuous native model to include it.');
@@ -233,7 +248,6 @@ function checkPressureBaseline(channel, prior) {
     if (!Number.isFinite(channel.metrics?.[key]) || Math.abs(channel.metrics[key] - expected) > 1e-12) throw new Error('Pressure baseline discrepancy metric is inconsistent');
   }
 }
-let includeMeasured = false;
 try {
   const report = JSON.parse(await readFile(resolve(root, 'artifacts/measured-validation.json'), 'utf8'));
   const sources = { ...comparisonSources('krsko2005', 'KrskoTransient'),
@@ -243,12 +257,11 @@ try {
   checkComparisonResults(report);
   // An inconclusive or failed physical comparison remains publishable evidence.
   // Requiring provenance must never silently discard unfavorable measurements.
-  includeMeasured = true;
+  await publishVerifiedReport('measured-validation.json', report);
 } catch (error) {
   if (process.argv.includes('--require-measured')) throw new Error(`Measured comparison required: ${error.message}`);
   console.log('Measured comparison omitted; run the current measured-case model to include it.');
 }
-let includePressurizer = false;
 try {
   const report = JSON.parse(await readFile(resolve(root, 'artifacts/pressurizer-validation.json'), 'utf8'));
   const sources = { ...comparisonSources('pactel1998', 'PactelPressurizer'),
@@ -305,7 +318,7 @@ try {
       || held.channels[0].points.some((point, index) => point.time !== index + 5)
       || !Array.isArray(held.trace) || held.trace.length !== 296 || held.trace.some((point, index) => point.time !== index || !Number.isFinite(point.pressureMPa))
       || !Array.isArray(held.refinedTrace) || held.refinedTrace.length !== 296 || held.refinedTrace.some((point, index) => point.time !== index || !Number.isFinite(point.pressureMPa))) throw new Error('Reserved event window or identity differs from its protocol');
-  includePressurizer = true;
+  await publishVerifiedReport('pressurizer-validation.json', report);
 } catch (error) {
   if (process.argv.includes('--require-pressurizer')) throw new Error(`Pressurizer comparison required: ${error.message}`);
   console.log('Pressurizer comparison omitted; run the current independent pressurizer case to include it.');
@@ -328,13 +341,8 @@ for (const directory of ['validation/grid_return', 'validation/startup_output'])
   });
 }
 if (includeNative) for (const [from, to] of nativeFiles) await cp(resolve(root, 'artifacts', from), resolve(output, to));
-if (includePlant) await cp(resolve(root, 'artifacts/plant-verification.json'), resolve(output, 'plant-verification.json'));
+for (const [name, data] of evidenceFiles) await writeFile(resolve(output, name), data);
 if (includeCold) await cp(resolve(root, 'artifacts/cold-verification.json'), resolve(output, 'cold-verification.json'));
-if (includeContinuous) await cp(resolve(root, 'artifacts/continuous-verification.json'), resolve(output, 'continuous-verification.json'));
-if (includeContinuousMeasured) await cp(resolve(root, 'artifacts/continuous-measured-validation.json'), resolve(output, 'continuous-measured-validation.json'));
-if (includeKrskoPressure) await cp(resolve(root, 'artifacts/krsko-pressure-development.json'), resolve(output, 'krsko-pressure-development.json'));
-if (includeMeasured) await cp(resolve(root, 'artifacts/measured-validation.json'), resolve(output, 'measured-validation.json'));
-if (includePressurizer) await cp(resolve(root, 'artifacts/pressurizer-validation.json'), resolve(output, 'pressurizer-validation.json'));
 for (const name of ['verification.json', 'benchmarks.json']) {
   try {
     await cp(resolve(root, 'artifacts', name), resolve(output, name));

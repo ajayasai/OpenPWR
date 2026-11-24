@@ -5,18 +5,27 @@
 <p class="intro">Numerical verification of the native coupled plant, followed by comparisons with an operating PWR and an independent pressurizer experiment. Read the scope of each result before interpreting its accuracy.</p>
 <section><p class="eyebrow">01 / COUPLED MODEL</p><h2>Native system verification</h2><div id="plant-status" class="report-status" role="status">Loading verification…</div><dl id="plant-identity" class="identity-grid"></dl><div id="plant-checks" class="native-checks"></div><p><a href="./plant-verification.json">Complete verification report JSON ↗</a> · <a href="./docs/NATIVE_PLANT.md">Equations and operating envelope ↗</a></p></section>
 <section><p class="eyebrow">02 / MEASURED RESPONSE</p><h2>Native models against measurements</h2><div class="trace-controls"><label for="measured-case">Reference experiment<select id="measured-case"><option value="pressure-spray">Krško 2005 · conditional spray response</option><option value="pressure">Krško 2005 · pressure model development</option><option value="continuous">Krško 2005 · continuous startup thermal kernel</option><option value="krsko">Krško 2005 · plant thermal response</option><option value="pactel">PACTEL ATWS-10 · pressurizer development comparison</option><option value="pactel-holdout">PACTEL ATWS-11 · post-unblinding development</option></select></label></div><div id="measured-status" class="report-status" role="status">Loading measured comparison…</div><div id="measured-scope" class="scope-note"></div><details class="numerical-evidence"><summary>Source and executable identity</summary><dl id="measured-identity" class="identity-grid"></dl></details><div id="measurement-links" class="links"></div><p class="section-intro">Each comparison names its measured inputs, predicted outputs, parameter sources and missing information. The independent pressurizer experiment tests one component; it does not validate the entire coupled plant.</p>
-<div class="trace-controls"><label for="measured-channel">Measured channel<select id="measured-channel" disabled></select></label></div><div class="measurement-legend"><span><i class="measured-key"></i>Measured reference</span><span id="simulated-legend"><i class="simulated-key"></i>Native model</span><span id="no-wall-legend" hidden><i class="no-wall-key"></i>Same model without wall heat transfer</span><span id="baseline-legend" hidden><i class="baseline-key"></i>Published v0.5 baseline</span></div><svg id="measured-chart" viewBox="0 0 900 330" role="img" aria-label="Measured observations and native predictions against time"></svg><p id="measured-caption" class="report-scope">Awaiting recorded comparison.</p><div id="measurement-metrics" class="measurement-metrics"></div>
-<div id="acquired-pressure" hidden>
-  <h3 id="pressure-table-title">Primary pressure at each acquired sample</h3>
-  <p id="pressure-score" class="pressure-score"></p>
-  <div class="pressure-table-scroll" role="region" aria-labelledby="pressure-table-title" tabindex="0">
+<div class="trace-controls"><label for="measured-channel">Measured channel<select id="measured-channel" disabled></select></label></div><div class="measurement-legend"><span id="measured-legend"><i class="measured-key"></i>Measured reference</span><span id="simulated-legend"><i class="simulated-key"></i>Native model</span><span id="no-wall-legend" hidden><i class="no-wall-key"></i>Same model without wall heat transfer</span><span id="baseline-legend" hidden><i class="baseline-key"></i>Published v0.5 baseline</span></div><svg id="measured-chart" viewBox="0 0 900 330" role="img" aria-label="Measured observations and native predictions against time"></svg><p id="measured-caption" class="report-scope">Awaiting recorded comparison.</p><div id="measurement-metrics" class="measurement-metrics"></div>
+<div id="aligned-observations" hidden>
+  <div class="observation-header">
+    <h3 id="observations-title">Scored observations</h3>
+    <button id="observations-csv" type="button">Download sample CSV</button>
+  </div>
+  <p id="observations-score" class="pressure-score"></p>
+  <div id="observations-scroll" class="pressure-table-scroll" role="region" aria-labelledby="observations-title" tabindex="0">
     <table class="pressure-table">
-      <caption id="pressure-series"></caption>
-      <thead><tr><th scope="col">Time (s)</th><th scope="col">Measured (MPa)</th><th scope="col">Released (MPa)</th><th scope="col">Candidate (MPa)</th><th scope="col">Released error (MPa)</th><th scope="col">Candidate error (MPa)</th><th scope="col">Closer model</th></tr></thead>
-      <tbody id="pressure-rows"></tbody>
+      <caption id="observations-caption"></caption>
+      <thead><tr id="observations-head"></tr></thead>
+      <tbody id="observations-rows"></tbody>
     </table>
   </div>
-  <p id="pressure-note" class="report-scope">Signed error is predicted minus measured pressure. The displayed decimals allow the score calculation to be checked. Measurement precision is limited by the source figure and digitization. The closer model has the smaller absolute error before rounding. A tie indicates equality within numerical roundoff. The interpolated 0 s reference is excluded.</p>
+  <div id="observations-pages" class="observation-pagination" hidden>
+    <label>Time window <select id="observations-jump" aria-label="Jump to a scored time window"></select></label>
+    <button id="observations-prev" type="button">Previous</button>
+    <span id="observations-page" role="status"></span>
+    <button id="observations-next" type="button">Next</button>
+  </div>
+  <p id="observations-note" class="report-scope"></p>
 </div>
 <h3>Inputs, assumptions and limits</h3><ul id="measurement-assumptions"></ul><details class="numerical-evidence"><summary>Numerical diagnostics and comparison protocol</summary><dl id="measurement-numerics" class="identity-grid"></dl></details><p><a id="measured-report-link" href="./measured-validation.json">Complete measured comparison JSON ↗</a> · <a href="./docs/MEASURED_VALIDATION.md">Data provenance and reproduction ↗</a></p></section>
 <p><a href="./startup-evidence.html">Explore measured generator output during a return to service ↗</a></p>

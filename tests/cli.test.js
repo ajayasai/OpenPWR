@@ -181,6 +181,7 @@ test('local preview serves only public files, blocks traversal, and implements H
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts']) await mkdir(join(dir, name));
   await cp(join(root, 'scripts/serve.mjs'), join(dir, 'scripts/serve.mjs'));
+  await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await writeFile(join(dir, 'index.html'), '<!doctype html><title>Test plant</title>');
   await writeFile(join(dir, 'experiments.html'), '<!doctype html><title>Load comparison test</title>');
   await writeFile(join(dir, 'continuous.html'), '<!doctype html><title>Continuous test</title>');
@@ -218,6 +219,15 @@ test('local preview serves only public files, blocks traversal, and implements H
     const pressurizerHead = await fetch(origin + '/pressurizer-validation.json', { method: 'HEAD' });
     assert.equal(pressurizerHead.status, 200);
     assert.equal(await pressurizerHead.text(), '');
+    const compact = await (await fetch(origin + '/pressurizer-validation.view.json')).json();
+    assert.deepEqual(compact.report, JSON.parse(pressurizerBytes));
+    assert.deepEqual(compact.source, { file: 'pressurizer-validation.json', bytes: Buffer.byteLength(pressurizerBytes),
+      sha256: createHash('sha256').update(pressurizerBytes).digest('hex') });
+    const compactHead = await fetch(origin + '/pressurizer-validation.view.json', { method: 'HEAD' });
+    assert.equal(compactHead.status, 200);
+    assert.ok(Number(compactHead.headers.get('content-length')) > 0);
+    assert.equal(await compactHead.text(), '');
+    assert.equal((await fetch(origin + '/unknown.view.json')).status, 404);
     assert.match(await (await fetch(origin + '/experiments.html')).text(), /Load comparison test/);
     assert.match(await (await fetch(origin + '/continuous.html')).text(), /Continuous test/);
     assert.deepEqual(await (await fetch(origin + '/continuous-verification.json')).json(), {case:'continuous'});
@@ -236,6 +246,7 @@ test('release build rejects stale or failed evidence without replacing the last 
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
   for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   await cp(join(root, 'scripts/krsko-pressure-evidence.mjs'), join(dir, 'scripts/krsko-pressure-evidence.mjs'));
@@ -266,6 +277,7 @@ test('native release evidence binds both reports to the exact compiled bytes bef
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
   for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
+  await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
   await cp(join(root, 'scripts/continuous-measured-evidence.mjs'), join(dir, 'scripts/continuous-measured-evidence.mjs'));
   await cp(join(root, 'scripts/krsko-pressure-evidence.mjs'), join(dir, 'scripts/krsko-pressure-evidence.mjs'));

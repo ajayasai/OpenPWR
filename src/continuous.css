@@ -10,6 +10,10 @@
 .recording-panel { margin: 0 0 16px; padding: 18px 20px; border-color: #36585e; }
 .recording-heading, .recording-transport { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; }
 .recording-heading { justify-content: space-between; }
+#recording-picker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+#recording-picker label, .recording-provenance { color: #b6cbd0; font-size: 12px; }
+.recording-provenance { margin-top: 8px; }
+#recording-provenance { white-space: pre-line; overflow-wrap: anywhere; }
 .recording-panel h2 { font-size: 16px; color: #deebe8; }
 .recording-panel p { font-size: 12px; line-height: 1.6; color: #acc0c8; margin: 6px 0 0; }
 .recording-panel a { color: #9de2d7; }

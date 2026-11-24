@@ -5,6 +5,7 @@ tests host boundaries only and is never exposed as an application backend.
 """
 # SPDX-License-Identifier: Apache-2.0
 import csv
+import hashlib
 import http.client
 import io
 import json
@@ -174,6 +175,24 @@ class HttpFixture(HostFixture):
 
 
 class HttpTest(HttpFixture, unittest.TestCase):
+    def test_compact_evidence_requires_matching_canonical_bytes(self):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir(exist_ok=True)
+        raw = b'{"test":1}'
+        source = artifacts / "krsko-pressure-development.json"
+        source.write_bytes(raw)
+        name = "krsko-pressure-development.view.json"
+        self.assertEqual(self.request("GET", "/" + name)[0], 404)
+        metadata = {"source": {"file": source.name, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}}
+        expected = json.dumps(metadata).encode()
+        (artifacts / name).write_bytes(expected)
+        status, body, headers = self.request("GET", "/" + name)
+        self.assertEqual((status, body, headers["Content-Length"]), (200, expected, str(len(expected))))
+        # Same-length replacement must invalidate the former view.
+        source.write_bytes(b'{"test":2}')
+        self.assertEqual(self.request("GET", "/" + name)[0], 404)
+        self.assertEqual(self.request("GET", "/" + source.name)[1], b'{"test":2}')
+
     def test_http_control_and_export(self):
         status, body, _ = self.request("POST", "/api/control", {"pumpCommand": 0.5})
         self.assertEqual(status, 200)

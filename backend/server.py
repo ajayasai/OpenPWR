@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import mimetypes
@@ -212,7 +213,48 @@ class Handler(BaseHTTPRequestHandler):
             "measured-validation.json": "artifacts/measured-validation.json",
             "pressurizer-validation.json": "artifacts/pressurizer-validation.json",
         }
-        if name in report_paths:
+        compact_sources = {source.replace(".json", ".view.json"): source for source in (
+            "plant-verification.json", "measured-validation.json", "pressurizer-validation.json",
+            "krsko-pressure-development.json", "continuous-measured-validation.json",
+        )}
+        compact_sources.update({view: "continuous-verification.json" for view in (
+            "continuous-index.json", "continuous-recording.json",
+        )})
+        data = None
+        if name in compact_sources:
+            # Portable native distributions ship compact views in artifacts. A source
+            # checkout may have a more recent static build alongside an older bundle.
+            source_name = compact_sources[name]
+            raw = (self.server.root / report_paths[source_name]).resolve()
+            if not raw.is_relative_to(self.server.root) or not raw.is_file():
+                raise ServiceError(404, "not_found", "The full evidence report is unavailable.")
+            raw_digest = None
+            for directory in ("artifacts", "dist"):
+                path = (self.server.root / directory / name).resolve()
+                if not path.is_relative_to(self.server.root) or not path.is_file():
+                    continue
+                candidate = path.read_bytes()
+                meta = json.loads(candidate)["source"]
+                if name.endswith(".view.json"):
+                    if meta["file"] != source_name:
+                        raise ServiceError(422, "invalid_view", "The evidence view names an unexpected source.")
+                    expected_digest, expected_size = meta["sha256"], meta["bytes"]
+                else:
+                    expected_digest, expected_size = meta["reportSha256"], meta["reportBytes"]
+                if expected_size != raw.stat().st_size:
+                    continue
+                if raw_digest is None:
+                    digest = hashlib.sha256()
+                    with raw.open("rb") as stream:
+                        for block in iter(lambda: stream.read(1024 * 1024), b""):
+                            digest.update(block)
+                    raw_digest = digest.hexdigest()
+                if expected_digest == raw_digest:
+                    data = candidate
+                    break
+            if data is None:
+                raise ServiceError(404, "not_found", "No compact view for the current full evidence report.")
+        elif name in report_paths:
             path = self.server.root / report_paths[name]
         elif (len(parts) in (3, 4) and parts[0] == "validation"
               and parts[1] in {"grid_return", "startup_output"}
@@ -226,7 +268,8 @@ class Handler(BaseHTTPRequestHandler):
         path = path.resolve()
         if not path.is_relative_to(self.server.root) or not path.is_file():
             raise ServiceError(404, "not_found", "Not found.")
-        data = path.read_bytes()
+        if data is None:
+            data = path.read_bytes()
         kind = {".js": "text/javascript", ".css": "text/css", ".html": "text/html", ".json": "application/json", ".md": "text/plain"}.get(path.suffix)
         kind = kind or mimetypes.guess_type(path.name)[0] or "application/octet-stream"
         if kind.startswith("text/") or kind == "application/json":

@@ -8,7 +8,8 @@
   <div class="page-heading"><div><p class="eyebrow">ONE NATIVE MODEL / COLD → CRITICALITY → GRID</p><h1>One continuous plant.<br><span>From cold to full power.</span></h1><p class="intro">Follow neutron power, stored heat and shaft motion through the same native model. Start a repeatable experiment or take control of its inputs.</p></div><div class="session-controls"><div class="clock-label">SIMULATION TIME<strong id="continuous-clock">00:00:00</strong></div><button id="continuous-run" class="button button-primary" disabled>Run model</button><select id="continuous-speed" aria-label="Simulation speed" disabled><option value="1">1× speed</option><option value="20">20× speed</option><option value="120">120× speed</option><option value="480" selected>480× speed</option></select></div></div>
   <section class="recording-panel panel" aria-labelledby="recording-title">
     <div class="recording-heading"><div><h2 id="recording-title">Recorded startup</h2><p id="recording-description">Explore the native model’s 7½-hour startup. Scrub through recorded plant readings or play the run.</p></div>
-      <button id="recording-load" class="button button-primary" aria-controls="recording-player">Open recording</button>
+      <div id="recording-picker"><label for="recording-source">Recording</label><select id="recording-source"><option value="current">This build</option><option value="archive">Archived v0.11.0</option></select>
+        <button id="recording-load" class="button button-primary" aria-controls="recording-player">Open recording</button></div>
       <button id="recording-exit" class="button" hidden>Exit recording</button>
     </div>
     <div id="recording-player" hidden>
@@ -18,7 +19,8 @@
       </div>
       <label class="recording-timeline" for="recording-time">Recorded time <output id="recording-position" for="recording-time">00:00:00</output></label>
       <input id="recording-time" type="range" min="0" max="27000" step="30" value="0" aria-valuetext="00:00:00">
-      <p><a href="https://github.com/ajayasai/OpenPWR/releases/download/v0.11.0/continuous-verification.json">Source recording · v0.11.0</a> · <a href="./startup-evidence.html">Compare electrical output with grid observations</a> · <a href="./experiments.html">Try a load change in the browser model</a></p>
+      <p><a id="recording-report" href="./continuous-verification.json">Full source report</a> · <a id="recording-data" href="./continuous-recording.json" download>Download recording JSON</a> · <a href="./startup-evidence.html">Compare archived v0.11.0 output with grid observations</a> · <a href="./experiments.html">Try a load change in the browser model</a></p>
+      <details class="recording-provenance"><summary>Recording source and checksums</summary><p id="recording-provenance"></p></details>
     </div>
     <p id="recording-status" role="status" hidden></p>
   </section>
