@@ -29,6 +29,7 @@ def run(model_key='primary'):
         'kinetics': ('OpenPWR.KineticsReference', 'KineticsReference', 'kinetics-manifest.json'),
         'cold': ('ColdStartPlant', 'ColdStartPlant', 'cold-manifest.json'),
         'continuous': ('ContinuousPlant', 'ContinuousPlant', 'continuous-manifest.json'),
+        'shippingport': ('ShippingportStartup', 'ShippingportStartup', 'shippingport-manifest.json'),
     }[model_key]
     source_hash = sha(SOURCE)
     # Load the shared pressure component before the plant that instantiates it.
@@ -36,9 +37,11 @@ def run(model_key='primary'):
     model_sources = {
         'pressureSourceSha256': ROOT / 'models/FinitePhasePressurizer.mo',
         'coldSourceSha256': ROOT / 'models/ColdStartPlant.mo',
-    } if model_key in ('cold', 'continuous') else {}
-    if model_key == 'continuous':
+    } if model_key in ('cold', 'continuous', 'shippingport') else {}
+    if model_key in ('continuous', 'shippingport'):
         model_sources['continuousSourceSha256'] = ROOT / 'models/ContinuousPlant.mo'
+    if model_key == 'shippingport':
+        model_sources['shippingportSourceSha256'] = ROOT / 'models/ShippingportStartup.mo'
     model_hashes = {key: sha(path) for key, path in model_sources.items()}
     bound_inputs = {key: ROOT / path for key, path in {
         'verificationScriptSha256': f'backend/verify_{model_key}.py',
@@ -46,6 +49,15 @@ def run(model_key='primary'):
         'hostScriptSha256': 'backend/fmi_host.py',
         'profileScriptSha256': 'backend/profiles.py',
     }.items()} if model_sources else {}
+    if model_key == 'shippingport':
+        bound_inputs.update({key: ROOT / path for key, path in {
+            'verificationScriptSha256': 'validation/shippingport_development/run_native.py',
+            'protocolSha256': 'validation/shippingport_development/protocol.json',
+            'boundaryProfileSha256': 'validation/shippingport_development/thermal-boundaries.json',
+            'conservationProtocolSha256': 'validation/continuous/protocol.json',
+            'buildScriptSha256': 'scripts/modelica/build.py',
+            'packagingScriptSha256': 'scripts/modelica/package_fmu.py',
+        }.items()})
     if model_key == 'continuous':
         bound_inputs.update({key: ROOT / path for key, path in {
             'protocolSha256': 'validation/continuous/protocol.json',
@@ -119,5 +131,5 @@ def run(model_key='primary'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics', 'cold', 'continuous'), default='primary')
+    parser.add_argument('--model', choices=('primary', 'plant', 'kinetics', 'cold', 'continuous', 'shippingport'), default='primary')
     run(parser.parse_args().model)

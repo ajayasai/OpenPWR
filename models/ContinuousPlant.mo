@@ -196,6 +196,7 @@ model ContinuousPlant "One continuous cold-to-power native engineering experimen
   output Real fullPowerReady=if connected and netPowerMW>=975 and netPowerMW<=1025 and neutronPowerFraction>=0.98 and neutronPowerFraction<=1.02 then 1 else 0;
   output Boolean valid;
 protected
+  Real referenceBoundaryHeatMW = 0 "Additional deposited heat for historical thermal boundary experiments";
   Real rodTarget;
   Real targetReactivityPcm;
   discrete Boolean reactorTrip(start=false,fixed=true);
@@ -250,7 +251,7 @@ equation
     reactorTrip=true;
   end when;
   when turbineTripCommand>.5 or reactorTrip or turbineRpm>3300 then turbineTrip=true; end when;
-  thermal.startupHeatMW=reactorPowerMW;
+  thermal.startupHeatMW=reactorPowerMW+referenceBoundaryHeatMW;
   thermal.pumpCommand=pumpCommand;
   thermal.heaterPowerMW=heaterPowerMW;
   thermal.shutdownCoolingFraction=shutdownCoolingFraction;

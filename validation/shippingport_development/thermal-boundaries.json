@@ -1,0 +1,11 @@
+{
+  "schema": "openpwr-shippingport-effective-boundaries-v1",
+  "note": "Aggregate heat and gas-removal histories for the historical thermal comparison. The station did not measure these effective inputs. Heat rates apply to the simulator inventory.",
+  "intervals": [
+    {"startS": 1080, "endS": 24060, "effectiveHeatMW": 3.80539},
+    {"startS": 80220, "endS": 95400, "effectiveHeatMW": 15.79881},
+    {"startS": 1080, "endS": 24060, "heaterPowerMW": 0.51294},
+    {"startS": 3900, "endS": 12900, "ventFraction": 0.03395},
+    {"startS": 80220, "endS": 90900, "heaterPowerMW": 1.33038}
+  ]
+}
