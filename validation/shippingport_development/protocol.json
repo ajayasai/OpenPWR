@@ -1,0 +1,34 @@
+{
+  "schema": "openpwr-shippingport-development-protocol-v1",
+  "caseId": "shippingport-dls163-conditioned",
+  "scope": "Retrospective, within-event test of the temperature and absolute pressure outputs of a shippingport-conditioned native whole-plant thermal startup. All original station data were already public in v0.16.0. The split was chosen from the acquisition times before scoring the revised model. No independent-unit or independent-startup validation is claimed.",
+  "observations": {
+    "path": "validation/startup_holdout/shippingport/observations.json",
+    "sha256": "777415fb53124dc761d127611be2f63ff4dffad4bed024863c3996ae71f41bec",
+    "source": "https://digital.library.unt.edu/ark:/67531/metadc1240466/",
+    "pdfSha256": "8baeace24944da512f3ba5450e2d0db2ee4b9cf06640872ec6dc80c6d101ac5b"
+  },
+  "genericPrediction": {
+    "path": "validation/startup_holdout/prediction.json",
+    "sha256": "821affffa988aae547596135c0164aed0c19b0e9179a4aa2e829064cf02b85d8",
+    "durationS": 27000,
+    "scope": "The unchanged generic v0.15.0 trace ends after 7.5 hours. Compare the candidate, generic prediction, and persistence only at identical eligible observation times within both prediction windows."
+  },
+  "origin": "1958-06-24T13:00",
+  "end": "1958-06-25T18:00",
+  "clock": "Use the complete historical local elapsed clock starting at the first logged event. Retain the overnight station interruption. Linearly interpolate continuous simulation outputs only between retained samples. No time shifts, intervention at reserved readings, smoothing, crossing a data gap with interpolated observations, or extrapolation.",
+  "targets": {
+    "primaryPressure": "Reactor gauge instrument in psig; absolute MPa = 0.101325 + psig * 0.006894757293168. Use native absolute primary pressure.",
+    "averageCoolantTemperature": "Reported mean primary coolant temperature in degrees Fahrenheit; Celsius = (F - 32) * 5/9. Use the arithmetic mean of native hot-leg and cold-leg temperatures. Station averaging weights and instrument uncertainty are unknown."
+  },
+  "withheldBlocks": [
+    {"key": "withheldEarly", "start": "1958-06-24T17:00", "end": "1958-06-24T17:35", "description": "Reserved interior block; model development may use readings before and after it. This measures retrospective interpolation."},
+    {"key": "withheldLate", "start": "1958-06-25T16:00", "end": "1958-06-25T18:00", "description": "Reserved terminal block; no subsequent development readings. This measures an extrapolation conditional on the case assumptions."}
+  ],
+  "split": "Both block endpoints are inclusive. Remove source-flagged measurements first. Assign each target's first remaining observed value to initialization. Assign all later eligible observations to their reserved block or to development if outside both blocks. Never score initialization or excluded values.",
+  "conditioning": "Use only initialization and development measurements from the two target channels to estimate starting conditions, boundary magnitudes or parameters. Common clock, documented event times and coarse interruption may be used as external timing information. No reserved response values or concurrent proxy channel values (including pressurizer temperature and loop cold-leg readings) may inform calibration, switch times, boundary selection or model selection. Do not supply the withheld response histories to the solver. Freeze the candidate before inspecting withheld scores. No retuning after evaluation in this comparison.",
+  "persistence": "At each target reading, use the most recent strictly earlier initialization or development reading of that target. Update the persistence comparator only after scoring an eligible development reading. Never update it from withheld, excluded or unreadable data. No initial observation is scored.",
+  "scores": "Report unweighted per-channel n, mean signed error (prediction minus observation), mean absolute error, root mean square error and maximum absolute error, plus the first and last compared elapsed times. Calculate development, individual reserved block, combined reserved and all eligible scores separately. Report frozen-generic metrics only on the common support, with candidate and persistence recomputed on identical rows. Retain raw times, units, source pages, predicted values and source flags. Print missing coverage, never score missing predictions as zero.",
+  "coverage": "Require a single uninterrupted native trajectory over [0, 104400] seconds with 60-second samples and finite predictions for both complete reserved blocks. A missing sample or endpoint invalidates the assessment. Preserve the old model prediction outside the 27000-second support as null.",
+  "interpretation": "For each target report whether combined reserved RMSE strictly improves on causal persistence, and whether common-support reserved RMSE strictly improves on the frozen generic model wherever such comparisons exist. Report both individual reserved blocks, sample counts, signed errors and development fit even when a comparison is unfavorable. An overall improvement versus both comparators requires improvement on both targets for both applicable checks. No engineering acceptance tolerance, independent-event predictive accuracy or full-power validation is established by this test."
+}
