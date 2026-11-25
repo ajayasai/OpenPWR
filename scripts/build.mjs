@@ -335,6 +335,7 @@ for (const name of ['index.html', 'experiments.html', 'engineering.html', 'engin
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
 await cp(resolve(root, 'validation/startup_holdout/result.json'), resolve(output, 'shippingport-startup.json'));
+await cp(resolve(root, 'validation/shippingport_development/result.json'), resolve(output, 'shippingport-development.json'));
 for (const directory of ['validation/grid_return', 'validation/startup_output']) {
   await cp(resolve(root, directory), resolve(output, directory), {
     recursive: true,

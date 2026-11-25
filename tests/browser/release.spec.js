@@ -26,6 +26,46 @@ function recordPageTraffic(page) {
   return files;
 }
 
+test('Shippingport development shows withheld residuals and compares models on identical readings', async ({ page, request }) => {
+  const response = await request.get('shippingport-development.json');
+  expect(response.ok()).toBe(true);
+  const report = await response.json();
+  expect(report.schema).toBe('openpwr-shippingport-development-v1');
+  const format = n => new Intl.NumberFormat('en', {maximumFractionDigits: 3}).format(n);
+  await page.goto('startup-evidence.html#shippingport-development');
+  await expect(page.locator('#development-results')).toBeVisible();
+  if (report.channels.every(c => c.scores.withheld.persistence.rmse < c.scores.withheld.candidate.rmse)) {
+    await expect(page.locator('#development-status')).toContainText('last available reading gave lower RMSE for both quantities');
+  }
+  await expect(page.locator('#development-plot .test-interval')).toHaveCount(report.withheldBlocks.length);
+  await page.locator('#shippingport-development details summary').click();
+  for (const channel of report.channels) {
+    await page.locator('#development-channel').selectOption(channel.key);
+    await page.locator('#development-group').selectOption('common');
+    await page.locator('#development-view').selectOption('response');
+    const held = channel.points.filter(p => p.split === 'withheldEarly' || p.split === 'withheldLate');
+    await expect(page.locator('#development-plot .test-reading')).toHaveCount(held.length);
+    await expect(page.locator('#development-rows tr')).toHaveCount(channel.points.length);
+    const common = channel.scores.withheld.commonGeneric;
+    for (const [i, key] of ['candidate', 'generic', 'persistence'].entries()) {
+      const row = page.locator('#development-scores tr').nth(i);
+      await expect(row.locator('td').first()).toHaveText(String(common[key].n));
+      await expect(row.locator('td').last()).toHaveText(format(common[key].rmse));
+    }
+    await page.locator('#development-view').selectOption('residual');
+    await expect(page.locator('#development-plot .historical-error')).toHaveCount(held.length);
+    await expect(page.locator('#development-plot .generic-error')).toHaveCount(common.generic.n);
+    await page.locator('#development-original').uncheck();
+    await expect(page.locator('#development-plot .generic-error')).toHaveCount(0);
+    await expect(page.locator('#development-plot .historical-error')).toHaveCount(held.length);
+    await page.locator('#development-original').check();
+    await page.locator('#development-group').selectOption('withheldLate');
+    const late = channel.scores.withheldLate.candidate;
+    await expect(page.locator('#development-scores tr')).toHaveCount(2);
+    await expect(page.locator('#development-scores tr').first().locator('td').last()).toHaveText(format(late.rmse));
+  }
+});
+
 test('Shippingport shows the full event, unpaired observations and an open station breaker', async ({ page, request }) => {
   const canonical = await request.get('shippingport-startup.json');
   expect(canonical.ok()).toBe(true);

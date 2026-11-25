@@ -17,10 +17,63 @@
     </nav>
     <header>
       <h1>Measured startup comparisons</h1>
-      <p><a href="#shippingport">Shippingport startup</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
+      <p><a href="#shippingport-development">Shippingport model development</a> · <a href="#shippingport">Original Shippingport comparison</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
     </header>
+    <section id="shippingport-development" class="card historical development" aria-labelledby="development-title">
+      <h2 id="development-title">Shippingport coolant heatup and pressure</h2>
+      <p id="development-status" class="status" role="status">Loading the revised native run and station readings…</p>
+      <div id="development-results" hidden>
+        <p id="development-split-note" class="definition"></p>
+        <div class="historical-grid">
+          <div>
+            <div class="fields">
+              <div><label for="development-channel">Measured quantity</label><select id="development-channel"></select></div>
+              <div><label for="development-view">Chart view</label>
+                <select id="development-view"><option value="response">Plant response</option><option value="residual">Model − measured</option></select>
+              </div>
+            </div>
+            <figure>
+              <svg id="development-plot" viewBox="0 0 540 226" role="img" aria-labelledby="development-caption"></svg>
+              <figcaption id="development-caption"></figcaption>
+            </figure>
+            <ul id="development-legend" class="plot-legend" aria-label="Chart legend"></ul>
+            <label class="baseline-control"><input id="development-original" type="checkbox" checked> Show original run on chart</label>
+          </div>
+          <div class="historical-results">
+            <h3>Error on matched readings</h3>
+            <label for="development-group">Readings to score</label>
+            <select id="development-group">
+              <option value="withheld">All withheld</option>
+              <option value="common">Withheld · both native runs</option>
+              <option value="withheldEarly">Early withheld window</option>
+              <option value="withheldLate">Late withheld window</option>
+              <option value="development">Used for fitting</option>
+            </select>
+            <p id="development-window"></p>
+            <table class="historical-table score-table">
+              <caption id="development-score-caption"></caption>
+              <thead><tr><th scope="col">Estimate</th><th scope="col">Readings</th><th scope="col"><abbr title="Root-mean-square error">RMSE</abbr></th></tr></thead>
+              <tbody id="development-scores"></tbody>
+            </table>
+            <p id="development-coverage"></p>
+          </div>
+        </div>
+        <details>
+          <summary>Inspect individual readings and errors</summary>
+          <div class="historical-scroll" tabindex="0" role="region" aria-label="Shippingport historical model readings and errors">
+            <table class="historical-table">
+              <caption id="development-table-caption"></caption>
+              <thead><tr><th scope="col">Station clock</th><th scope="col">Role</th><th scope="col">Measured</th><th scope="col">Revised</th><th scope="col">Revised − measured</th><th scope="col">Original − measured</th><th scope="col">Source page</th></tr></thead>
+              <tbody id="development-rows"></tbody>
+            </table>
+          </div>
+        </details>
+        <p id="development-limits" class="definition"></p>
+        <p class="links"><a href="./shippingport-development.json" download>Download comparison JSON</a><a href="https://github.com/ajayasai/OpenPWR/blob/b10094f85ca9fa3f8b474c5e336554cdc1377679/validation/shippingport_development/protocol.json">Fit and test protocol ↗</a><a href="https://digital.library.unt.edu/ark:/67531/metadc1240466/">Station test report ↗</a><a href="#shippingport">Original validation result ↓</a></p>
+      </div>
+    </section>
     <section id="shippingport" class="card historical" aria-labelledby="shippingport-title">
-      <h2 id="shippingport-title">Shippingport startup, June 24–25, 1958</h2>
+      <h2 id="shippingport-title">Original Shippingport comparison, June 24–25, 1958</h2>
       <p id="shippingport-status" class="status" role="status">Loading the recorded observations and native model comparison…</p>
       <div id="shippingport-results" hidden>
         <p id="shippingport-scope" class="definition"></p>

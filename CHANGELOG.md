@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.0
+
+- Added a Shippingport historical case to the native whole-plant model. One instance evolves coolant temperature and absolute pressure for 29 hours with fitted heat and gas-removal inputs. The original generic startup remains available.
+- Published the calibration code, the frozen candidate, the station readings, and separate development and reserved-window scores. At the times covered by the original run, the historical case reduced early pressure RMSE from 13.67 to 0.205 MPa (four readings) and coolant-temperature error from 154.10 to 19.65 °C (one reading).
+- Across both reserved windows the revised model scored 0.470 MPa and 10.15 °C RMSE. Carrying forward the last available development reading scored 0.211 MPa and 8.56 °C. A half-step repeat changed the model predictions by less than 0.000058 MPa and 0.000022 °C on the shared minute grid. [Full results](validation/shippingport_development/README.md)
+
 ## 0.16.0
 
 - Published an independent measured-event test of the released native whole-plant startup trajectory. The Shippingport archive contributes 96 numerical observations across four channels. Thirty can be scored on the model clock.

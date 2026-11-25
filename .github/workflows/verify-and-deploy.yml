@@ -25,6 +25,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+      - name: Recompute the Shippingport development scores
+        run: python validation/shippingport_development/assess.py --check
       - run: npm run verify
       - run: npm run build
   engineering:
@@ -50,6 +52,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends omc omlibrary
       - run: npm run engineering:setup
+      - name: Rebuild and execute the 29-hour Shippingport thermal case
+        run: npm run engineering:shippingport -- --build
+      - name: Verify the new native trace and reserved measurements
+        run: python3 validation/shippingport_development/assess.py --repeat artifacts/shippingport-conditioned-native.json
       - run: npm run engineering:build
       - run: npm run engineering:test
         env:
@@ -112,6 +118,7 @@ jobs:
             artifacts/cold-verification.json
             artifacts/cold-verification.log
             artifacts/continuous-verification.json
+            artifacts/shippingport-conditioned-native.json
             artifacts/continuous-verification.log
             artifacts/measured-validation.json
             artifacts/continuous-measured-validation.json

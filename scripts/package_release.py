@@ -2,7 +2,7 @@
 
 Run after downloading the successful CI artifact for this exact commit. This
 command reruns the strict publication gate, verifies source bytes against Git,
-then packages source, 19 FMUs, their manifests and nine evidence reports.
+then packages the source, native FMUs, manifests and evidence reports.
 """
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
@@ -14,6 +14,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import zipfile
 import xml.etree.ElementTree as ET
 
@@ -22,6 +23,7 @@ COMPILED = (
     ('PrimaryLoop', 'manifest.json'), ('PropertyReferenceChecks', 'property-manifest.json'),
     ('CoupledPlant', 'plant-manifest.json'), ('ColdStartPlant', 'cold-manifest.json'),
     ('ContinuousPlant', 'continuous-manifest.json'),
+    ('ShippingportStartup', 'shippingport-manifest.json'),
     ('KrskoContinuousThermal', 'continuous-measured-manifest.json'),
     ('KrskoPressureEquilibrium', 'krsko-pressure-equilibrium-manifest.json'),
     ('KrskoPressureCandidate', 'krsko-pressure-candidate-manifest.json'),
@@ -55,6 +57,20 @@ CONTINUOUS_SOURCES = {**COLD_SOURCES,
     'commonVerifierSha256': 'backend/verify.py',
     'kineticsReferenceSha256': 'validation/continuous/kinetics-reference.json',
     'buildScriptSha256': 'scripts/modelica/build.py', 'packagingScriptSha256': 'scripts/modelica/package_fmu.py'}
+SHIPPINGPORT_SOURCES = {
+    'pressureSourceSha256': 'models/FinitePhasePressurizer.mo',
+    'coldSourceSha256': 'models/ColdStartPlant.mo',
+    'continuousSourceSha256': 'models/ContinuousPlant.mo',
+    'shippingportSourceSha256': 'models/ShippingportStartup.mo',
+    'verificationScriptSha256': 'validation/shippingport_development/run_native.py',
+    'conservationProtocolSha256': 'validation/continuous/protocol.json',
+    'boundaryProfileSha256': 'validation/shippingport_development/thermal-boundaries.json',
+    'profileScriptSha256': 'backend/profiles.py',
+    'protocolSha256': 'validation/shippingport_development/protocol.json',
+    'sharedRunnerSha256': 'validation/native_fmi.py',
+    'buildScriptSha256': 'scripts/modelica/build.py',
+    'packagingScriptSha256': 'scripts/modelica/package_fmu.py',
+}
 PACTEL_SOURCES = {key: 'validation/pactel1998/' + name for key, name in (
     ('holdoutDataSha256', 'holdout-measured.csv'), ('holdoutMetadataSha256', 'holdout-provenance.json'),
     ('holdoutComparatorSha256', 'holdout_compare.py'), ('holdoutExtractorSha256', 'holdout_extract.py'),
@@ -156,7 +172,7 @@ def verify(version, revision):
         check_identity(manifest, version, revision, manifest_name)
         fmu = ROOT / 'artifacts/modelica' / f'{model}.fmu'
         require(manifest.get('fmuSha256') == sha(fmu), f'{model}: binary differs from its manifest')
-        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant', 'KrskoContinuousThermal', *PRESSURE_MODELS) else f'OpenPWR.{model}'),
+        require(manifest.get('model') == (model if model in ('ColdStartPlant', 'ContinuousPlant', 'ShippingportStartup', 'KrskoContinuousThermal', *PRESSURE_MODELS) else f'OpenPWR.{model}'),
             f'{model}: wrong native model')
         with zipfile.ZipFile(fmu) as archive:
             require(any(name.startswith(('binaries/linux64/', 'binaries/x86_64-linux/')) and name.endswith('.so')
@@ -165,7 +181,7 @@ def verify(version, revision):
             simulation = description.find('CoSimulation')
             require(description.find('ModelExchange') is not None and simulation is not None
                 and simulation.get('maxOutputDerivativeOrder') == '0', f'{model}: wrong native export capabilities')
-            if model in ('ColdStartPlant', 'ContinuousPlant', 'KrskoContinuousThermal', *PRESSURE_MODELS):
+            if model in ('ColdStartPlant', 'ContinuousPlant', 'ShippingportStartup', 'KrskoContinuousThermal', *PRESSURE_MODELS):
                 pressure_source = 'sources/FinitePhasePressurizer.mo'
                 require(pressure_source in archive.namelist(), f'{model}: shared pressure source is missing from FMU')
                 require(hashlib.sha256(archive.read(pressure_source)).hexdigest() == manifest.get('pressureSourceSha256'),
@@ -183,6 +199,9 @@ def verify(version, revision):
         sources = comparison_sources('krsko2005', 'KrskoTransient')
         sources.update(parameterSourcesSha256='validation/krsko2005/reference-plant.json', baselineSha256='validation/baselines/krsko-v0.5.json')
         bound_sources(manifests[model], sources, model)
+    bound_sources(manifests['ShippingportStartup'], SHIPPINGPORT_SOURCES, 'ShippingportStartup')
+    subprocess.run([sys.executable, 'validation/shippingport_development/assess.py', '--repeat',
+                    'artifacts/shippingport-conditioned-native.json'], cwd=ROOT, check=True)
     for model in ('PactelPressurizer', 'PactelCoarse', 'PactelRadialRefined', 'PactelSpatialRefined'):
         bound_sources(manifests[model], {**comparison_sources('pactel1998', 'PactelPressurizer'), **PACTEL_SOURCES}, model)
     reports = {}
@@ -194,7 +213,7 @@ def verify(version, revision):
         require(sha(ROOT / path) == sha(ROOT / 'dist' / web_name), f'{path}: web evidence differs from release evidence')
         reports[model] = report
     require(reports['CoupledPlant']['kineticsManifest']['fmuSha256'] == manifests['KineticsReference']['fmuSha256'], 'Kinetics reference differs')
-    require(reports['KrskoTransient']['equilibriumComparison']['runtime']['fmuSha256'] == manifests['KrskoEquilibrium']['fmuSha256'], 'Krško equilibrium runtime differs')
+    require(reports['KrskoTransient']['equilibriumComparison']['runtime']['fmuSha256'] == manifests['KrskoEquilibrium']['fmuSha256'], 'KrÃ…Â¡ko equilibrium runtime differs')
     for case in (*reports['KrskoPressureCandidate']['cases'], *reports['KrskoPressureCandidate']['conditionalSpray']['cases']):
         for step in ('nominal', 'refined'):
             require(case[step]['runtime']['fmuSha256'] == manifests[case['model']]['fmuSha256'], 'Pressure ablation/mesh runtime differs')
@@ -228,7 +247,7 @@ published point-kinetics values, conservation, synchronization rejection and
 acceptance, trip response, and timestep refinement. These are mathematical
 and numerical checks, not measured whole-plant startup validation.
 
-The Krško reference configuration now evaluates the same thermal equations used
+The KrÃ…Â¡ko reference configuration now evaluates the same thermal equations used
 inside continuous startup. Measured heat and secondary flows are imposed;
 pressure and temperatures remain predictions. Unknown plant parameters and
 controls leave physical validation inconclusive. Kinetics, synchronization and
@@ -244,13 +263,21 @@ The separately frozen spray extension retains its five declared conditional
 cases and the original failed attempt. The source archive includes the exact
 historical report, sources, manifests and binaries in a frozen ZIP; its original
 dirty-checkout identity remains disclosed. Spray capacity, feedback and contact
-efficiency are assumptions, not a measured Krško control history.
+efficiency are assumptions, not a measured KrÃ…Â¡ko control history.
 
 The original cold heatup and hot coupled-plant models remain separate experiments.
 The experimental two-temperature pressurizer is used by measured reference cases.
 None is a qualified full-scope plant simulator. Measured discrepancies and the
 exact v0.7 baseline remain visible. ATWS-11 is a post-unblinding development
 comparison, not a renewed holdout.
+
+The Shippingport comparison includes the source measurements, frozen reference
+run and fitted historical boundaries. Inside this archive, run
+`python3 validation/shippingport_development/assess.py --check` to recompute
+the scored results. To verify a fresh execution with Git provenance, check out
+tag v{version} and copy this archive's artifacts/ directory into that clean
+checkout, or rebuild the case there with
+`npm run engineering:shippingport -- --build`.
 
 Install the open-source toolchain in docs/ENGINEERING.md. Run:
 
@@ -261,6 +288,8 @@ Install the open-source toolchain in docs/ENGINEERING.md. Run:
     npm run engineering:cold:verify
     npm run engineering:continuous:verify
     npm run engineering:continuous:measured
+    npm run engineering:shippingport
+    python3 validation/shippingport_development/assess.py --repeat artifacts/shippingport-conditioned-native.json
     npm run engineering:pressure:verify
     npm run engineering:pressure
     npm run engineering:measured
@@ -300,8 +329,8 @@ def package(version, revision):
                 archive_bytes(archive, prefix + path.relative_to(ROOT).as_posix(), path.read_bytes(), timestamp)
         for path, _, _ in REPORTS:
             archive_bytes(archive, prefix + path, (ROOT / path).read_bytes(), timestamp)
-        component_path = 'artifacts/pressure-component-verification.json'
-        archive_bytes(archive, prefix + component_path, (ROOT / component_path).read_bytes(), timestamp)
+        for evidence_path in ('artifacts/pressure-component-verification.json', 'artifacts/shippingport-conditioned-native.json'):
+            archive_bytes(archive, prefix + evidence_path, (ROOT / evidence_path).read_bytes(), timestamp)
         # The local FMI host serves these same release-built views beside the full reports.
         views = ('plant-verification.view.json', 'krsko-pressure-development.view.json',
                  'continuous-measured-validation.view.json', 'measured-validation.view.json',
@@ -313,11 +342,14 @@ def package(version, revision):
         for path in sorted((ROOT / 'dist').rglob('*')):
             if path.is_file():
                 archive_bytes(archive, path.relative_to(ROOT / 'dist').as_posix(), path.read_bytes(), timestamp)
-    shippingport = out / 'shippingport-startup.json'
-    require(sha(ROOT / 'validation/startup_holdout/result.json') == sha(ROOT / 'dist' / shippingport.name),
-            'Shippingport comparison differs from the web evidence')
-    shutil.copyfile(ROOT / 'dist' / shippingport.name, shippingport)
-    assets = [native, web, shippingport]
+    assets = [native, web]
+    for folder, name in (('startup_holdout', 'shippingport-startup.json'),
+                         ('shippingport_development', 'shippingport-development.json')):
+        require(sha(ROOT / 'validation' / folder / 'result.json') == sha(ROOT / 'dist' / name),
+                f'{name} differs from the checked-in evidence')
+        destination = out / name
+        shutil.copyfile(ROOT / 'dist' / name, destination)
+        assets.append(destination)
     for path, _, _ in REPORTS:
         destination = out / Path(path).name
         shutil.copyfile(ROOT / path, destination)

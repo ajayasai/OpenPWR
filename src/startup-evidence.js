@@ -254,29 +254,22 @@ void loadReleased();
 
 const measuredNumber = new Intl.NumberFormat('en', {maximumFractionDigits: 3});
 const hms = seconds => (seconds < 0 ? '−' : '') + elapsed(Math.abs(seconds));
+const formatValue = value => Number.isFinite(value) ? measuredNumber.format(value) : '—';
 
-function shippingportPlot(report, channel, wholeEvent) {
-  const chart = byId('shippingport-plot');
+function historicalAxes(chart, xmin, xmax, values, unit, uncoveredAfter) {
   // Size the coordinate system for the actual column so mobile axis labels remain legible.
   const width = Math.max(260, Math.round(chart.getBoundingClientRect().width || 540));
   chart.setAttribute('viewBox', `0 0 ${width} 220`);
-  const duration = report.prediction.durationSeconds;
-  const observedTimes = report.channels.flatMap(c => c.points.map(p => p.elapsedS));
-  const xmin = wholeEvent ? Math.min(0, ...observedTimes) : 0;
-  const xmax = wholeEvent ? Math.max(duration, report.milestone.observedSeconds, ...observedTimes) : duration;
-  const points = channel.points.filter(p => p.elapsedS >= xmin && p.elapsedS <= xmax);
-  const values = [...points.map(p => p.observed), ...channel.modelTrace.map(p => p.value)];
   const low = Math.min(...values), high = Math.max(...values);
   const pad = Math.max((high - low) * .08, .01);
   const left = 50, right = width - 22, top = 27, bottom = 174;
   const x = s => left + (right - left) * (s - xmin) / (xmax - xmin);
   const y = value => bottom - (bottom - top) * (value - low + pad) / (high - low + 2 * pad);
   chart.replaceChildren();
-  chart.setAttribute('aria-label', channel.label + ' in ' + channel.unit + ', station observations and native simulation. Recorded values are available in the table below.');
-  if (xmax > duration) chart.append(svgElement('rect', {
-    x: x(duration), y: top, width: right - x(duration), height: bottom - top, class: 'uncovered',
+  if (Number.isFinite(uncoveredAfter) && xmax > uncoveredAfter) chart.append(svgElement('rect', {
+    x: x(uncoveredAfter), y: top, width: right - x(uncoveredAfter), height: bottom - top, class: 'uncovered',
   }));
-  chart.append(svgElement('text', {x: left, y: 16}, channel.unit));
+  chart.append(svgElement('text', {x: left, y: 16}, unit));
   const divisions = width < 400 ? 3 : 4;
   for (let i = 0; i <= divisions; i++) {
     const value = low - pad + (high - low + 2 * pad) * i / divisions;
@@ -286,8 +279,25 @@ function shippingportPlot(report, channel, wholeEvent) {
     chart.append(svgElement('text', {x: x(time), y: bottom + 16, 'text-anchor': 'middle'}, powerFormat.format(time / 3600)));
   }
   chart.append(svgElement('text', {x: (left + right) / 2, y: 211, 'text-anchor': 'middle'}, 'Elapsed time (hours)'));
-  const trace = channel.modelTrace.map((p, i) => (i ? 'L' : 'M') + x(p.elapsedS).toFixed(2) + ' ' + y(p.value).toFixed(2)).join(' ');
-  chart.append(svgElement('path', {d: trace, class: 'predicted-line'}));
+  return {x, y, top, bottom, left, right};
+}
+
+function historicalTrace(chart, samples, x, y, className) {
+  const trace = samples.map((p, i) => (i ? 'L' : 'M') + x(p.elapsedS).toFixed(2) + ' ' + y(p.value).toFixed(2)).join(' ');
+  chart.append(svgElement('path', {d: trace, class: className}));
+}
+
+function shippingportPlot(report, channel, wholeEvent) {
+  const chart = byId('shippingport-plot');
+  const duration = report.prediction.durationSeconds;
+  const observedTimes = report.channels.flatMap(c => c.points.map(p => p.elapsedS));
+  const xmin = wholeEvent ? Math.min(0, ...observedTimes) : 0;
+  const xmax = wholeEvent ? Math.max(duration, report.milestone.observedSeconds, ...observedTimes) : duration;
+  const points = channel.points.filter(p => p.elapsedS >= xmin && p.elapsedS <= xmax);
+  const values = [...points.map(p => p.observed), ...channel.modelTrace.map(p => p.value)];
+  const {x, y, top, bottom} = historicalAxes(chart, xmin, xmax, values, channel.unit, duration);
+  chart.setAttribute('aria-label', channel.label + ' in ' + channel.unit + ', station observations and native simulation. Recorded values are available in the table below.');
+  historicalTrace(chart, channel.modelTrace, x, y, 'predicted-line');
   const synchronism = report.milestone.observedSeconds;
   if (synchronism >= xmin && synchronism <= xmax) {
     chart.append(svgElement('line', {x1: x(synchronism), x2: x(synchronism), y1: top, y2: bottom, class: 'marker'}));
@@ -312,7 +322,6 @@ function showShippingport(report) {
   shippingportPlot(report, channel, byId('shippingport-window').value === 'event');
   const {scores} = channel;
   byId('shippingport-channel-note').textContent = channel.description;
-  const formatValue = value => Number.isFinite(value) ? measuredNumber.format(value) : '—';
   byId('shippingport-score').textContent = scores.n
     ? `Root-mean-square error ${formatValue(scores.rmse)} ${channel.unit}. Mean signed error ${formatValue(scores.bias)} ${channel.unit}. Positive error means the model predicts a higher value.`
     : 'There are no eligible observations on the model clock for this quantity.';
@@ -335,11 +344,15 @@ function showShippingport(report) {
   }
 }
 
+async function fetchComparison(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
 async function loadShippingport() {
   try {
-    const response = await fetch('./shippingport-startup.json');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const report = await response.json();
+    const report = await fetchComparison('./shippingport-startup.json');
     if (report.schema !== 'openpwr-shippingport-startup-v1' || report.status !== 'inconclusive'
         || !Array.isArray(report.channels) || !report.channels.length || !Array.isArray(report.limitations)
         || !(report.prediction?.durationSeconds > 0) || !Number.isFinite(report.milestone?.observedSeconds)) {
@@ -388,3 +401,167 @@ async function loadShippingport() {
 }
 
 void loadShippingport();
+
+const readingRoles = {
+  initialization: 'Initialization', development: 'Fit', withheldEarly: 'Early test',
+  withheldLate: 'Late test', excluded: 'Excluded',
+};
+
+function developmentMark(kind, x, y) {
+  if (kind.endsWith('-trace')) return svgElement('line', {x1: x - 10, x2: x + 10, y1: y, y2: y, class: kind});
+  if (kind === 'test-reading') return svgElement('path', {d: `M${x} ${y - 4.5}l4.5 4.5 -4.5 4.5 -4.5 -4.5z`, class: kind});
+  if (kind === 'generic-error') return svgElement('rect', {x: x - 3.4, y: y - 3.4, width: 6.8, height: 6.8, class: kind});
+  if (kind === 'excluded-reading') return svgElement('path', {d: `M${x - 4} ${y - 4}l8 8m0 -8l-8 8`, class: kind});
+  return svgElement('circle', {cx: x, cy: y, r: 3.4, class: kind});
+}
+
+function drawDevelopment(report, channel) {
+  const residual = byId('development-view').value === 'residual';
+  const showGeneric = byId('development-original').checked;
+  const marks = [];
+  const legend = new Map();
+  const addMark = (point, value, kind, label) => {
+    marks.push({point, value, kind, label});
+    legend.set(kind, label);
+  };
+  if (!residual) {
+    legend.set('historical-trace', 'Revised native');
+    if (showGeneric) legend.set('generic-trace', 'Original generic');
+  }
+  for (const point of channel.points) {
+    const withheld = point.split === 'withheldEarly' || point.split === 'withheldLate';
+    if (residual) {
+      if (!withheld) continue;
+      if (Number.isFinite(point.predicted)) addMark(point, point.predicted - point.observed, 'historical-error', 'Revised native');
+      if (showGeneric && Number.isFinite(point.generic)) addMark(point, point.generic - point.observed, 'generic-error', 'Original generic');
+    } else if (point.excluded) {
+      addMark(point, point.observed, 'excluded-reading', 'Source exclusion');
+    } else if (withheld) {
+      addMark(point, point.observed, 'test-reading', 'Withheld reading');
+    } else {
+      addMark(point, point.observed, 'fit-reading', 'Fit or initialization');
+    }
+  }
+  const chart = byId('development-plot');
+  const values = marks.map(m => m.value);
+  if (residual) values.push(0);
+  else {
+    for (const point of channel.modelTrace) values.push(point.value);
+    if (showGeneric) for (const point of channel.genericTrace) values.push(point.value);
+  }
+  const {x, y, top, bottom, left, right} = historicalAxes(chart, 0, report.durationS, values, channel.unit);
+  for (const block of report.withheldBlocks) {
+    chart.prepend(svgElement('rect', {x: x(block.startS), y: top, width: x(block.endS) - x(block.startS), height: bottom - top, class: 'test-interval'}));
+  }
+  if (residual) chart.append(svgElement('line', {x1: left, x2: right, y1: y(0), y2: y(0), class: 'zero-line'}));
+  else {
+    if (showGeneric) historicalTrace(chart, channel.genericTrace, x, y, 'generic-trace');
+    historicalTrace(chart, channel.modelTrace, x, y, 'historical-trace');
+  }
+  for (const {point, value, kind, label} of marks) {
+    const mark = developmentMark(kind, x(point.elapsedS), y(value));
+    mark.append(svgElement('title', {}, `${point.at} · ${readingRoles[point.split]} · ${label} ${formatValue(value)} ${channel.unit}`));
+    chart.append(mark);
+  }
+  byId('development-caption').textContent = `${channel.label} · ${channel.unit}. Shading marks the two withheld windows. ` +
+    (residual ? 'Each marker gives a model error at a withheld station reading. Positive values indicate overprediction.' :
+      `The original generic run ends after ${powerFormat.format(report.genericDurationS / 3600)} hours.`);
+  const key = byId('development-legend');
+  key.replaceChildren();
+  for (const [kind, label] of legend) {
+    const item = document.createElement('li');
+    const symbol = svgElement('svg', {viewBox: '0 0 20 14', 'aria-hidden': 'true'});
+    symbol.append(developmentMark(kind, 10, 7));
+    item.append(symbol, document.createTextNode(label));
+    key.append(item);
+  }
+}
+
+function appendEvidenceRow(body, heading, values) {
+  const row = body.insertRow();
+  const th = document.createElement('th');
+  th.scope = 'row';
+  th.textContent = heading;
+  row.append(th);
+  for (const value of values) row.insertCell().textContent = value;
+}
+
+function developmentScores(channel) {
+  const group = byId('development-group').value;
+  const scores = group === 'common' ? channel.scores.withheld.commonGeneric : channel.scores[group];
+  const body = byId('development-scores');
+  body.replaceChildren();
+  const estimates = [['Revised native', scores.candidate], ['Last available reading', scores.persistence]];
+  if (group === 'common') estimates.splice(1, 0, ['Original generic', scores.generic]);
+  for (const [label, result] of estimates) appendEvidenceRow(body, label, [result.n, formatValue(result.rmse)]);
+  byId('development-score-caption').textContent = `Root-mean-square error in ${channel.unit}`;
+  const n = scores.candidate.n;
+  byId('development-window').textContent = group === 'development'
+    ? 'Fit errors use readings available during development.'
+    : group === 'common' ? 'All three estimates use the same withheld timestamps.' : 'The revised run and persistence use the same withheld timestamps.';
+  if (n === 0) byId('development-window').append(' This channel has no readings in this selection.');
+  const all = channel.scores.withheld.candidate;
+  byId('development-coverage').textContent = group === 'withheld'
+    ? 'Persistence carries the last initialization or fit reading forward throughout each test window.'
+    : `Across both withheld windows, RMSE is ${formatValue(all.rmse)} ${channel.unit} for the revised model and ${formatValue(channel.scores.withheld.persistence.rmse)} ${channel.unit} for carrying forward the last available reading (${all.n} readings).`;
+}
+
+function developmentRows(channel) {
+  byId('development-table-caption').textContent = `${channel.label} · ${channel.unit}. A dash marks an unavailable prediction or an excluded error.`;
+  const body = byId('development-rows');
+  body.replaceChildren();
+  for (const p of channel.points) {
+    const error = value => Number.isFinite(value) && !p.excluded ? formatValue(value - p.observed) : '—';
+    appendEvidenceRow(body, p.at.replace('T', ' '), [readingRoles[p.split], formatValue(p.observed), formatValue(p.predicted), error(p.predicted), error(p.generic), p.page]);
+  }
+}
+
+async function loadDevelopment() {
+  try {
+    const report = await fetchComparison('./shippingport-development.json');
+    if (report.schema !== 'openpwr-shippingport-development-v1' || !(report.durationS > 0) ||
+        !Array.isArray(report.channels) || !report.channels.length || !Array.isArray(report.withheldBlocks)) {
+      throw new Error('Unexpected historical model report.');
+    }
+    const picker = byId('development-channel');
+    for (const channel of report.channels) picker.add(new Option(channel.label + ' (' + channel.unit + ')', channel.key));
+    const channel = () => report.channels[picker.selectedIndex];
+    const update = () => {
+      drawDevelopment(report, channel());
+      developmentRows(channel());
+      developmentScores(channel());
+    };
+    byId('development-limits').textContent = report.limitations.join(' ');
+    const stationClock = timestamp => timestamp.slice(8, 10) + ' June at ' + timestamp.slice(11);
+    const windows = report.withheldBlocks.map(block => stationClock(block.start) + '–' + block.end.slice(11));
+    byId('development-split-note').textContent = `The revised native case uses measurements from the 1958 Shippingport startup. The reserved test windows were ${windows.join(' and ')} (station time).`;
+    picker.addEventListener('change', update);
+    byId('development-group').addEventListener('change', () => developmentScores(channel()));
+    byId('development-view').addEventListener('change', () => drawDevelopment(report, channel()));
+    byId('development-original').addEventListener('change', () => drawDevelopment(report, channel()));
+    byId('development-results').hidden = false;
+    update();
+    let plotWidth = 0;
+    new ResizeObserver(([entry]) => {
+      const width = Math.round(entry.contentRect.width);
+      if (width && width !== plotWidth) { plotWidth = width; drawDevelopment(report, channel()); }
+    }).observe(byId('development-plot').parentElement);
+    const comparisons = report.channels.filter(c => c.scores.withheld.commonGeneric.candidate.n).map(c => {
+      const {candidate, generic} = c.scores.withheld.commonGeneric;
+      return `from ${formatValue(generic.rmse)} to ${formatValue(candidate.rmse)} ${c.unit} for ${c.label.toLowerCase()} (${candidate.n} ${candidate.n === 1 ? 'reading' : 'readings'})`;
+    });
+    const persistenceWins = report.channels.filter(c => c.scores.withheld.persistence.rmse < c.scores.withheld.candidate.rmse);
+    const conclusion = persistenceWins.length === report.channels.length
+      ? 'Across both test windows, carrying forward the last available reading gave lower RMSE for both quantities.'
+      : 'The full-window comparison below also scores the last available reading as a predictor.';
+    const comparison = comparisons.length
+      ? 'Compared with the original generic run, early withheld RMSE changed ' + comparisons.join(' and ') + '.'
+      : 'The original run covers no withheld readings.';
+    status('development-status', comparison + ' ' + conclusion);
+  } catch (error) {
+    byId('development-results').hidden = true;
+    status('development-status', 'The historical model comparison is unavailable. ' + error.message, true);
+  }
+}
+
+void loadDevelopment();

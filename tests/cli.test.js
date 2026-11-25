@@ -194,6 +194,8 @@ test('local preview serves only public files, blocks traversal, and implements H
   await writeFile(join(dir, 'artifacts/pressurizer-validation.json'), pressurizerBytes);
   await writeFile(join(dir, 'artifacts/continuous-verification.json'), '{"case":"continuous"}');
   await writeFile(join(dir, 'artifacts/continuous-measured-validation.json'), '{"case":"continuous-measured"}');
+  await mkdir(join(dir, 'validation/shippingport_development'), { recursive: true });
+  await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{"case":"conditioned-startup"}');
   const port = await unusedPort();
   const child = spawn(process.execPath, [join(dir, 'scripts/serve.mjs'), '--source', `--port=${port}`], { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   try {
@@ -232,6 +234,7 @@ test('local preview serves only public files, blocks traversal, and implements H
     assert.match(await (await fetch(origin + '/continuous.html')).text(), /Continuous test/);
     assert.deepEqual(await (await fetch(origin + '/continuous-verification.json')).json(), {case:'continuous'});
     assert.deepEqual(await (await fetch(origin + '/continuous-measured-validation.json')).json(), {case:'continuous-measured'});
+    assert.deepEqual(await (await fetch(origin + '/shippingport-development.json')).json(), {case:'conditioned-startup'});
     for (const route of ['/package.json', '/scripts/serve.mjs', '/src/a%2f..%2f..%2fpackage.json', '/src/%5c..%5cpackage.json', '/%FF']) {
       const response = await fetch(origin + route);
       assert.equal(response.status, 404, `excluded route ${route}`);
@@ -244,8 +247,9 @@ test('local preview serves only public files, blocks traversal, and implements H
 test('release build rejects stale or failed evidence without replacing the last build', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
-  for (const name of ['grid_return', 'startup_output', 'startup_holdout']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
+  await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{}');
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
@@ -276,8 +280,9 @@ test('release build rejects stale or failed evidence without replacing the last 
 test('native release evidence binds both reports to the exact compiled bytes before replacing dist', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
-  for (const name of ['grid_return', 'startup_output', 'startup_holdout']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development']) await mkdir(join(dir, 'validation', name), { recursive: true });
   await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
+  await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{}');
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
