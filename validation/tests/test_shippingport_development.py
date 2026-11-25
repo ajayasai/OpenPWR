@@ -4,7 +4,9 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
+from zipfile import ZipFile
 
 path = Path(__file__).resolve().parents[1] / "shippingport_development" / "assess.py"
 spec = importlib.util.spec_from_file_location("shippingport_assessment", path)
@@ -15,6 +17,47 @@ spec.loader.exec_module(case)
 class ShippingportAssessmentTests(unittest.TestCase):
     def setUp(self):
         self.protocol = json.loads(case.PROTOCOL_FILE.read_bytes())
+
+    def test_candidate_archive_and_trace_are_pinned(self):
+        raw = case.NATIVE_FILE.read_bytes()
+        reference = case.frozen_model(raw)
+        with self.assertRaisesRegex(ValueError, "trace fingerprint"):
+            case.frozen_model(raw + b" ")
+        archived = case.frozen_runner_sources()
+        for name, source in archived.items():
+            self.assertEqual(case.sha256(source).hexdigest(), reference["sourceHashes"][name])
+        case.validate_source_lineage(reference, reference, fresh=False)
+
+    def test_fresh_case_requires_all_original_physics_and_development_inputs(self):
+        reference = case.frozen_model(case.NATIVE_FILE.read_bytes())
+        fresh = copy.deepcopy(reference)
+        hashes = fresh["sourceHashes"]
+        hashes[case.HISTORICAL_BASE] = hashes.pop(case.ORIGINAL_BASE)
+        for name in case.ARCHIVED_RUNNERS:
+            hashes[name] = case.sha256(case.checkout_source(name)).hexdigest()
+        case.validate_source_lineage(fresh, reference, fresh=True)
+        hashes[case.HISTORICAL_BASE] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "changed a frozen input"):
+            case.validate_source_lineage(fresh, reference, fresh=True)
+        del hashes[case.HISTORICAL_BASE]
+        with self.assertRaisesRegex(ValueError, "missing a candidate input"):
+            case.validate_source_lineage(fresh, reference, fresh=True)
+
+    def test_embedded_base_and_specialization_must_match_original_compilation_sources(self):
+        reference = case.frozen_model(case.NATIVE_FILE.read_bytes())
+        sources = {"sources/ContinuousPlant.mo": case.checkout_source(case.HISTORICAL_BASE),
+                   "sources/ShippingportStartup.mo": case.checkout_source("models/ShippingportStartup.mo")}
+        with TemporaryDirectory() as temp:
+            fmu = Path(temp) / "model.fmu"
+            for changed in (None, *sources):
+                with ZipFile(fmu, "w") as out:
+                    for name, data in sources.items():
+                        out.writestr(name, data + b" " if name == changed else data)
+                if changed is None:
+                    case.verify_embedded_sources(fmu, reference["sourceHashes"])
+                else:
+                    with self.assertRaisesRegex(ValueError, "frozen historical Modelica source"):
+                        case.verify_embedded_sources(fmu, reference["sourceHashes"])
 
     def test_development_view_excludes_both_windows_source_flags_and_proxy_channels(self):
         data = case.development_data()

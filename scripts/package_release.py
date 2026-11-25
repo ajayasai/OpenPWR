@@ -60,7 +60,7 @@ CONTINUOUS_SOURCES = {**COLD_SOURCES,
 SHIPPINGPORT_SOURCES = {
     'pressureSourceSha256': 'models/FinitePhasePressurizer.mo',
     'coldSourceSha256': 'models/ColdStartPlant.mo',
-    'continuousSourceSha256': 'models/ContinuousPlant.mo',
+    'continuousSourceSha256': 'validation/shippingport_development/model/ContinuousPlant.mo',
     'shippingportSourceSha256': 'models/ShippingportStartup.mo',
     'verificationScriptSha256': 'validation/shippingport_development/run_native.py',
     'conservationProtocolSha256': 'validation/continuous/protocol.json',

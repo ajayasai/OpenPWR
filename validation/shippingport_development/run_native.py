@@ -23,7 +23,7 @@ SOURCES = {
     'sourceSha256': 'models/OpenPWR/package.mo',
     'coldSourceSha256': 'models/ColdStartPlant.mo',
     'pressureSourceSha256': 'models/FinitePhasePressurizer.mo',
-    'continuousSourceSha256': 'models/ContinuousPlant.mo',
+    'continuousSourceSha256': 'validation/shippingport_development/model/ContinuousPlant.mo',
     'shippingportSourceSha256': 'models/ShippingportStartup.mo',
     'sharedRunnerSha256': 'validation/native_fmi.py',
     'protocolSha256': 'validation/shippingport_development/protocol.json',

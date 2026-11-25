@@ -41,6 +41,8 @@ def run(model_key='primary'):
     if model_key in ('continuous', 'shippingport'):
         model_sources['continuousSourceSha256'] = ROOT / 'models/ContinuousPlant.mo'
     if model_key == 'shippingport':
+        # Compile the exact registered thermal-boundary variant for this historical case.
+        model_sources['continuousSourceSha256'] = ROOT / 'validation/shippingport_development/model/ContinuousPlant.mo'
         model_sources['shippingportSourceSha256'] = ROOT / 'models/ShippingportStartup.mo'
     model_hashes = {key: sha(path) for key, path in model_sources.items()}
     bound_inputs = {key: ROOT / path for key, path in {

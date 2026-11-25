@@ -56,6 +56,8 @@ python -m unittest discover -s validation/tests -p test_shippingport_development
 
 The first command emits only the case-development inputs. The second checks the archived prediction and observation fingerprints, the frozen scoring protocol and the complete numerical result. On a clean native build, the following commands re-execute the historical case and compare all 1,741 retained samples with the published trajectory.
 
+The frozen run identifies both its executable and its source revision. Two files changed when the generic and historical builds were separated. Their original Git bytes are included in the [frozen runner archive](frozen-runners-701d7d342354.zip). The [historical base class](model/ContinuousPlant.mo) retains the original candidate source bytes. The rebuild check verifies this class and the Shippingport specialization inside the newly compiled FMU, checks current build provenance, and compares the results with the original record.
+
 ```sh
 npm run engineering:shippingport -- --build
 python validation/shippingport_development/assess.py --repeat artifacts/shippingport-conditioned-native.json

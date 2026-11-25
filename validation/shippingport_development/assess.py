@@ -3,12 +3,14 @@
 import argparse
 from datetime import datetime
 from hashlib import sha256
+from io import BytesIO
 import json
 import math
 from pathlib import Path
 import re
 from statistics import fmean
 import subprocess
+from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -21,6 +23,14 @@ DURATION = 104400
 STEP = 60
 PROTOCOL_REVISION = "b10094f85ca9fa3f8b474c5e336554cdc1377679"
 PROTOCOL_SHA256 = "9013c39c1049b0ee972b8717436367dd8669c79879107429cd78f944472eafb1"
+CANDIDATE_REVISION = "86dc3f20212182502ecfbe12eea9cf8da48131eb"
+REFERENCE_SHA256 = "cce59a95823dd0502b55bad69980c7e0da1033bac83f77723dbbcc0a18fd5673"
+FIT_SHA256 = "6aedcb84b511f7b7066c14bc3d89d599583d1cface37c94845cdc796163822c8"
+ARCHIVE_SHA256 = "701d7d34235466adb80c4d588a6dabc4ca26057081a60d3c7bfd19b13aba96c6"
+ARCHIVE_FILE = HERE / "frozen-runners-701d7d342354.zip"
+ARCHIVED_RUNNERS = {"scripts/modelica/build.py", "validation/shippingport_development/run_native.py"}
+ORIGINAL_BASE = "models/ContinuousPlant.mo"
+HISTORICAL_BASE = "validation/shippingport_development/model/ContinuousPlant.mo"
 REPEAT_ABSOLUTE_TOLERANCE = {"primaryPressure": 0.001, "averageCoolantTemperature": 0.01}
 
 
@@ -101,7 +111,61 @@ def generic_traces(protocol):
     }
 
 
-def validate_provenance(model, fresh=False):
+def frozen_runner_sources():
+    raw = ARCHIVE_FILE.read_bytes()
+    require(sha256(raw).hexdigest() == ARCHIVE_SHA256, "Frozen candidate runner archive fingerprint mismatch.")
+    with ZipFile(BytesIO(raw)) as archive:
+        require(sorted(archive.namelist()) == sorted(ARCHIVED_RUNNERS), "Unexpected archived runner source list.")
+        return {name: archive.read(name) for name in archive.namelist()}
+
+
+def checkout_source(relative):
+    path = (ROOT / relative).resolve()
+    require(path.is_relative_to(ROOT) and path.is_file(), "Missing native source: " + relative)
+    return path.read_bytes()
+
+
+def frozen_model(raw):
+    require(sha256(raw).hexdigest() == REFERENCE_SHA256, "Frozen candidate trace fingerprint mismatch.")
+    return json.loads(raw)["model"]
+
+
+def validate_source_lineage(model, reference, fresh):
+    frozen_hashes = reference["sourceHashes"]
+    archived = frozen_runner_sources()
+    require(sha256((HERE / "fit.py").read_bytes()).hexdigest() == FIT_SHA256, "Frozen fitting source mismatch.")
+    require(reference["gitRevision"] == reference["buildGitRevision"] == CANDIDATE_REVISION
+            and reference["gitDirty"] is False and reference["buildGitDirty"] is False,
+            "Original native evidence must identify the clean candidate checkpoint.")
+    for original, expected in frozen_hashes.items():
+        if original in archived:
+            actual = archived[original]
+        else:
+            path = HISTORICAL_BASE if original == ORIGINAL_BASE else original
+            actual = checkout_source(path)
+        require(sha256(actual).hexdigest() == expected, "Frozen input differs from candidate: " + original)
+    if not fresh:
+        require(model == reference, "Original evidence has unexpected native provenance.")
+        return
+    current = model["sourceHashes"]
+    for original, expected in frozen_hashes.items():
+        now = HISTORICAL_BASE if original == ORIGINAL_BASE else original
+        require(now in current, "Current build is missing a candidate input: " + now)
+        if original not in archived:
+            require(current[now] == expected, "Fresh native case changed a frozen input: " + now)
+    for name, expected in current.items():
+        require(sha256(checkout_source(name)).hexdigest() == expected, "Current build source hash mismatch: " + name)
+
+
+def verify_embedded_sources(fmu_path, frozen_hashes):
+    with ZipFile(fmu_path) as fmu:
+        for original in (ORIGINAL_BASE, "models/ShippingportStartup.mo"):
+            member = "sources/" + Path(original).name
+            require(fmu.namelist().count(member) == 1 and sha256(fmu.read(member)).hexdigest() == frozen_hashes[original],
+                    "Compiled FMU does not contain the frozen historical Modelica source: " + member)
+
+
+def validate_provenance(model, reference, fresh):
     require(model.get("class") == "ShippingportStartup" and model.get("extends") == "ContinuousPlant",
             "A native ShippingportStartup whole-plant run is required.")
     require(re.fullmatch("[a-f0-9]{64}", model.get("fmuSha256", "")) and
@@ -111,17 +175,7 @@ def validate_provenance(model, fresh=False):
             execution.get("samples") == 1 + DURATION // STEP and
             execution.get("instances") == 1 and execution.get("resets") == 0 and
             execution.get("allSamplesWithinNativeDomain") is True, "Incomplete native execution record.")
-    hashes = model.get("sourceHashes", {})
-    required = {"models/ShippingportStartup.mo", "models/ContinuousPlant.mo", "models/ColdStartPlant.mo",
-                "models/FinitePhasePressurizer.mo", "models/OpenPWR/package.mo", "validation/native_fmi.py",
-                "validation/shippingport_development/run_native.py", "validation/shippingport_development/protocol.json",
-                "validation/shippingport_development/thermal-boundaries.json", "scripts/modelica/build.py",
-                "scripts/modelica/package_fmu.py"}
-    require(required <= hashes.keys(), "Incomplete native source fingerprints.")
-    for relative, expected in hashes.items():
-        path = (ROOT / relative).resolve()
-        require(path.is_relative_to(ROOT) and path.is_file() and sha256(path.read_bytes()).hexdigest() == expected,
-                "Native input hash differs from this checkout: " + relative)
+    validate_source_lineage(model, reference, fresh)
     require(json.loads((HERE / "thermal-boundaries.json").read_bytes()) == model.get("boundaries"),
             "Native report and frozen effective boundaries disagree.")
     if not fresh:
@@ -137,8 +191,11 @@ def validate_provenance(model, fresh=False):
     manifest = json.loads((ROOT / model["manifestPath"]).read_bytes())
     require(manifest.get("model") == model["class"] and manifest.get("gitRevision") == head and
             manifest.get("dirty") is False and manifest.get("fmuSha256") == model["fmuSha256"] and
+            manifest.get("continuousSourceSha256") == model["sourceHashes"][HISTORICAL_BASE] and
+            manifest.get("shippingportSourceSha256") == model["sourceHashes"]["models/ShippingportStartup.mo"] and
             sha256((ROOT / model["fmuPath"]).read_bytes()).hexdigest() == model["fmuSha256"],
             "Fresh native FMU, build manifest or revision mismatch.")
+    verify_embedded_sources(ROOT / model["fmuPath"], reference["sourceHashes"])
 
 
 def native_traces(native):
@@ -215,13 +272,14 @@ def compare_channel(channel, native, generic):
     }
 
 
-def make_report(raw):
+def make_report(raw, *, fresh=False):
     protocol_bytes = PROTOCOL_FILE.read_bytes()
     require(sha256(protocol_bytes).hexdigest() == PROTOCOL_SHA256, "Assessment differs from the published split protocol.")
     protocol = json.loads(protocol_bytes)
     native = json.loads(raw)
     conditioned = native_traces(native)
-    validate_provenance(native["model"])
+    reference = frozen_model(NATIVE_FILE.read_bytes() if fresh else raw)
+    validate_provenance(native["model"], reference, fresh)
     generic = generic_traces(protocol)
     channels = [compare_channel(c, conditioned[c["key"]], generic[c["key"]]) for c in observations(protocol)]
     blocks = [{**b, "startS": seconds(b["start"], protocol["origin"]), "endS": seconds(b["end"], protocol["origin"])}
@@ -281,9 +339,8 @@ def main():
     if args.repeat:
         repeat_raw = args.repeat.read_bytes()
         repeat = json.loads(repeat_raw)
-        validate_provenance(repeat["model"], fresh=True)
         print("Maximum absolute differences on the repeated native grid:", compare_repeat(json.loads(raw), repeat))
-        new_scores = make_report(repeat_raw)
+        new_scores = make_report(repeat_raw, fresh=True)
         for frozen, fresh in zip(result["channels"], new_scores["channels"]):
             key = frozen["key"]
             require(key == fresh["key"] and frozen["verdict"] == fresh["verdict"],
