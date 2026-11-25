@@ -1,0 +1,28 @@
+{
+  "schema": "openpwr-startup-challenge-protocol-v1",
+  "caseId": "shippingport-dls163",
+  "source": {
+    "title": "Shippingport Station Start-up Test DL-S-163 (T-554923), AECU-4028",
+    "url": "https://digital.library.unt.edu/ark:/67531/metadc1240466/",
+    "pdfSha256": "8baeace24944da512f3ba5450e2d0db2ee4b9cf06640872ec6dc80c6d101ac5b"
+  },
+  "prediction": {
+    "release": "v0.15.0",
+    "revision": "ae7780fbc68fd5cc510d4287ea86a5c5410c9089",
+    "reportUrl": "https://github.com/ajayasai/OpenPWR/releases/download/v0.15.0/continuous-verification.json",
+    "reportSha256": "7b7405589ba690559d8e4a13b2ebb39c7dac35e858cbfc333dfba173d0aca2cd",
+    "model": "ContinuousPlant",
+    "fmuSha256": "dc25d6b2f7700a5f7c094d81353f7941a4ff5478bdc3535a7cd278c168ec8168",
+    "scenario": "full-startup",
+    "durationSeconds": 27000,
+    "sampleIntervalSeconds": 30,
+    "channels": ["hotLegTemperatureC", "coldLegTemperatureC", "primaryPressureMPa", "pressurizerTemperatureC"],
+    "syncField": "breakerClosingTimeS"
+  },
+  "selection": "One identified, independent operating-plant startup with a shared clock from initially cold equipment to generator synchronization. Freeze the released prediction and scoring rules before comparing transcribed response values.",
+  "clock": "Use the reported start of the station startup test. If no unambiguous test-start clock is documented, use the first dated initial-condition observation and label the origin as a proxy. Keep every elapsed minute, including delays. No time stretch, fitted shift or restart at criticality.",
+  "channels": "Compare reported reactor-coolant hot-leg, cold-leg, primary pressure and pressurizer temperature only where sensor identity and units support the mapping. Use the source-reported loop average if available, otherwise the arithmetic mean of available identified operating-loop readings of the same type and timestamp with coverage disclosed. Do not treat multiple instruments as independent time samples. Preserve original readings and their source pages.",
+  "units": "Convert Fahrenheit to Celsius using (F-32)*5/9. Convert explicitly gauge psi to absolute MPa using psi*0.006894757293168+0.101325. For an explicitly absolute scale omit the atmospheric offset. Do not silently assign a pressure basis if the report does not establish it.",
+  "scoring": "Use all legible eligible observations on common time support. Linearly interpolate only the continuous model output between its original 30-second samples. Never interpolate measured gaps or extrapolate beyond either record. Report n, signed mean error (model minus observed), mean absolute error, RMSE, maximum absolute error, time span and unpaired counts per channel. Each acquisition time has equal weight. Exclude a source-identified erroneous pressure reading from pressure scores only and disclose it. Report observed and model synchronization elapsed times and their signed difference even when the event is outside continuous trace overlap.",
+  "interpretation": "An external challenge to the unmodified whole-plant prediction under its own inputs. No tuning, measured forcing, inferred controls or pooled multi-unit score. Document initial conditions, boundary mismatches, missing observations and instrument uncertainty. No plant-specific acceptance tolerance has been established. Report discrepancies and distinguish scored outputs from untested criticality, turbine, electrical and full-power behavior."
+}
