@@ -37,7 +37,37 @@ async function loadReport(url, statusId, render) {
   } catch (error) {
     $(statusId).textContent = error.message;
     $(statusId).classList.add('fail');
+    if (statusId === 'benchmark-status') $('feedwater-benchmark-status').textContent = error.message;
   }
+}
+
+function renderFeedwaterBenchmark(comparison) {
+  const status = $('feedwater-benchmark-status');
+  if (!comparison?.rows?.length) {
+    status.textContent = 'The selected benchmark report has no compressed-feedwater reference points.';
+    return;
+  }
+  const { rows, units, legacyRmse, currentRmse } = comparison;
+  const picker = $('feedwater-point');
+  for (const [index, point] of rows.entries()) {
+    picker.add(new Option(`${point.temperatureC} °C · ${point.pressureMPa} MPa`, String(index)));
+  }
+  const nominal = rows.findIndex(row => row.temperatureC === 220 && row.pressureMPa === 6);
+  picker.selectedIndex = nominal >= 0 ? nominal : 0;
+  function showPoint() {
+    const { reference, legacy, current } = rows[picker.selectedIndex];
+    for (const [id, value] of [['water-reference', reference], ['water-legacy', legacy], ['water-current', current]]) {
+      $(id).textContent = `${number(value)} ${units}`;
+    }
+    $('water-error').textContent = `At this state the absolute error is ${number(Math.abs(legacy - reference))} ${units} with the earlier model and ${number(Math.abs(current - reference))} ${units} with the pressure-dependent model.`;
+  }
+  showPoint();
+  picker.addEventListener('change', showPoint);
+  $('water-summary').textContent = `Across ${rows.length} reference states, root-mean-square error changes from ${number(legacyRmse)} to ${number(currentRmse)} ${units}. This comparison covers liquid-water enthalpy at the stated conditions.`;
+  const link = sourceLink(comparison.source);
+  if (link) $('water-source').append(link);
+  $('feedwater-benchmark').hidden = false;
+  status.hidden = true;
 }
 function sourceLink(source) {
   if (!source || typeof source !== 'object') return null;
@@ -53,6 +83,7 @@ function sourceLink(source) {
 await Promise.all([
   loadReport('./benchmarks.json', 'benchmark-status', (report) => {
     $('benchmark-scope').textContent = report.scope || '';
+    renderFeedwaterBenchmark(report.feedwaterComparison);
     for (const check of report.checks) {
       const row = document.createElement('tr');
       const description = document.createElement('td');

@@ -107,6 +107,15 @@
           <p class="animation-caption">Motion follows modeled flow and rotor speed, slowed for clarity.<span class="diagram-scroll-hint"> Swipe the diagram to explore the plant.</span></p>
           </div>
           <div class="mobile-equipment" aria-label="Plant equipment readings"><div><span class="equipment-number">01</span><span>Reactor vessel<small id="m-core-sub">Fuel — °C</small></span><strong id="m-core">— MWth</strong></div><div><span class="equipment-number">02</span><span>Primary coolant<small id="m-primary-sub">Hot leg — °C</small></span><strong id="m-primary">— MPa</strong></div><div><span class="equipment-number">03</span><span>Steam generators<small id="m-sg-sub">Inventory —%</small></span><strong id="m-sg">— MPa</strong></div><div><span class="equipment-number">04</span><span>Turbine / generator<small id="m-turbine-sub">— rpm</small></span><strong id="m-turbine">— MWe</strong></div><div><span class="equipment-number">05</span><span>Condenser<small>Heat rejection to cooling water</small></span><strong id="m-condenser">— kPa</strong></div><div><span class="equipment-number">06</span><span>Feedwater<small>Return to steam generators</small></span><strong id="m-feed">— kg/s</strong></div></div>
+          <details class="feedwater-panel" id="feedwater-properties">
+            <summary>Feedwater at the steam-generator inlet</summary>
+            <dl aria-label="Live inlet properties">
+              <div><dt>Temperature</dt><dd id="feed-temperature">—</dd></div>
+              <div><dt>Property pressure</dt><dd id="feed-pressure">—</dd></div>
+              <div><dt>Specific enthalpy</dt><dd id="feed-enthalpy">—</dd></div>
+            </dl>
+            <p><span id="feed-law"></span> <a href="./verification.html#feedwater-reference" target="_blank" rel="noopener">Check against NIST water tables ↗</a></p>
+          </details>
           <div class="diagram-footer"><span><span class="tiny-dot"></span>Coupled physical model · fixed 50 ms steps</span><span id="balance-reading">Thermal balance residual — MW</span></div>
         </section>
 

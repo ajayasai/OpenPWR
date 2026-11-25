@@ -1,0 +1,108 @@
+{
+  "format": "openpwr-paired-run",
+  "version": 1,
+  "modelRevision": "paired-0.05s-v1/f91d368c45ffc62df8d9f7c5a1d90b4316b6fdf33f7e00bfb1a32d46f081cfe6",
+  "model": {
+    "schema": "openpwr-state-v2",
+    "model": "OpenPWR reduced-order PWR 2.0",
+    "controls": {
+      "demand": 0.79,
+      "autoReactor": true,
+      "rodReactivity": 0,
+      "primaryPump": 1,
+      "autoFeedwater": true,
+      "feedwater": 0.73,
+      "autoTurbine": true,
+      "turbineValve": 0.73,
+      "cooling": 0.73,
+      "startupPower": 0.01
+    },
+    "faults": {
+      "primaryPumpTrip": false,
+      "feedwaterTrip": false,
+      "turbineTrip": false,
+      "lossOfHeatSink": false
+    },
+    "state": {
+      "time": 5.14999999999999,
+      "neutronPower": 0.7510348620870679,
+      "precursors": [
+        0.7306488112184859,
+        0.7315479442098729,
+        0.7349478393184723,
+        0.7402238214596659,
+        0.7473689683662142,
+        0.7496442957572685
+      ],
+      "decay": [
+        0.009710618765871133,
+        0.011805318888295512,
+        0.008784001460963371,
+        0.007303523027675612,
+        0.005840426822924786,
+        0.005110037403895001
+      ],
+      "fuelTemp": 514.3478506554616,
+      "coolantTemp": 298.86564114629624,
+      "steamTemp": 275.2683728653317,
+      "steamMass": 149837.24300019632,
+      "primaryPressure": 15.498494199175523,
+      "condenserTemp": 40.025212262882135,
+      "pumpSpeed": 1,
+      "turbineValve": 0.7813712775971494,
+      "feedFlow": 1232.740288621189,
+      "turbineSpeed": 3000,
+      "iodine": 0.7300015661318618,
+      "xenon": 0.8405254408380808,
+      "autoRod": -276.5623666735449,
+      "reactivity": 11.175066541622641,
+      "tripped": false,
+      "tripReason": "",
+      "domainExceeded": false,
+      "domainReason": "",
+      "energyResidual": -2.1423147700261325e-9,
+      "integratedEnergyResidualMJ": 5.387164492276501e-10,
+      "integratedBoundaryEnergyMJ": -471.73199865310795,
+      "thermalPower": 2250.0614626768406,
+      "decayPower": 145.66177910887623,
+      "electricPower": 768.4565198568156,
+      "grossPower": 818.4565198568156,
+      "steamFlow": 1270.2965525079824,
+      "turbineSteamFlow": 1270.2965525079824,
+      "bypassSteamFlow": 0,
+      "heatToSteam": 2217.7222349641906,
+      "heatToCoolant": 2209.725463455041,
+      "condenserHeat": 1520.4550124838315,
+      "coolingHeat": 1425.2662533942687,
+      "energyInMJ": 17298.83007827571,
+      "energyOutMJ": 17770.562076928818,
+      "startupMode": false,
+      "startupStage": "power",
+      "gridConnected": true,
+      "rotorEnergyMJ": 2000,
+      "auxiliaryHeatMW": 0,
+      "ambientLossMW": 0,
+      "sourceStrength": 0,
+      "heatupTarget": 0,
+      "heatupRateCPerHour": -26.17125221331662,
+      "mechanicalPowerMW": 818.4565198568156,
+      "rotorLossMW": 0,
+      "rotorEnergyResidualMW": 0,
+      "feedwaterTemp": 220
+    },
+    "events": [
+      {
+        "time": 0,
+        "level": "info",
+        "message": "Initialized at 73% reactor power; equilibrium precursor and decay inventory"
+      },
+      {
+        "time": 0,
+        "level": "info",
+        "message": "demand: 0.79"
+      }
+    ]
+  },
+  "demand": 0.62,
+  "durationS": 12
+}

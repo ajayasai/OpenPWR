@@ -4,6 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { PWRPlant } from '../src/engine.js';
+import { if97Region1 } from '../src/water-properties.js';
 import { createColdStartDirector } from '../src/scenarios.js';
 import { pairedRunCsv, runPairedExperiment, validatePairedRecipe } from '../src/paired-run.js';
 
@@ -37,6 +38,19 @@ add('Thermal storage energy accounting', steady.maxResidual < 1e-5,
   `Maximum absolute discrete energy-balance residual ${steady.maxResidual.toExponential(3)} MW. Acceptance < 1e-5 MW; applies only to the documented fuel/primary/SG thermal boundary.`);
 
 const follow = new PWRPlant();
+const inletRun = new PWRPlant();
+inletRun.setControl('demand', 0.9);
+let maxInletErrorMW = 0;
+let inlet = inletRun.snapshot();
+for (let step = 0; step < 400; step++) {
+  const before = inlet;
+  inlet = inletRun.step(0.05);
+  const recordedFlux = (inlet.energyInMJ - before.energyInMJ) / 0.05 - inlet.thermalPower - inlet.auxiliaryHeatMW;
+  const expectedFlux = inlet.feedFlow * if97Region1(inlet.feedwaterTemp + 273.15, inlet.feedwaterPressureMPa).h / 1000;
+  maxInletErrorMW = Math.max(maxInletErrorMW, Math.abs(recordedFlux - expectedFlux));
+}
+add('Feedwater energy crossing the steam-generator inlet', !inlet.domainExceeded && Math.abs(inlet.time - 20) < 1e-8 && maxInletErrorMW < 0.02,
+  `Over a 20 s load change, the largest difference between the metered inlet energy rate and flow times IF97 liquid enthalpy was ${maxInletErrorMW.toExponential(3)} MW. Acceptance is below 0.02 MW at every 50 ms step.`);
 const capture = follow.exportState();
 const paired = await runPairedExperiment(capture, { demand: 0.75, durationS: 30 });
 const recipe = validatePairedRecipe(JSON.parse(JSON.stringify(paired.recipe)));

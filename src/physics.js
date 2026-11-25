@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Original implementations of public mathematical correlations; no third-party code.
-import { if97SaturationPressure, if97Region1, if97Region2 } from './water-properties.js';
+import { if97SaturationPressure, if97Region1, if97Region1Enthalpy, if97Region2 } from './water-properties.js';
 
 export const GENERATION_TIME = 1e-4; // seconds, generic thermal reactor assumption
 export const DELAYED_GROUPS = Object.freeze([
@@ -89,7 +89,7 @@ export function saturationTemperature(pressureMPa) {
 // Production saturated-water enthalpies, MJ/kg, evaluated from IF97 regions 1/2.
 // A 0.25 C cache makes property access O(1). Linear interpolation is also used
 // by the energy inverse, so interpolation does not introduce an accounting leak.
-// Saturated-liquid enthalpy remains an approximation for compressed feedwater.
+// The saturated-liquid curve describes the steam generator's lumped stored inventory.
 export const ENTHALPY_TABLE_STEP = 0.25;
 export const ENTHALPY_MAX_TEMP = 350;
 const ENTHALPY_TABLE = Array.from({ length: ENTHALPY_MAX_TEMP / ENTHALPY_TABLE_STEP + 1 }, (_, i) => {
@@ -109,6 +109,12 @@ function enthalpy(tempC, phase) {
 }
 export const liquidEnthalpy = tempC => enthalpy(tempC, 0);
 export const vaporEnthalpy = tempC => enthalpy(tempC, 1);
+
+/** Feedwater inlet enthalpy in MJ/kg at the given Celsius temperature and absolute MPa. */
+export function compressedLiquidEnthalpy(tempC, pressureMPa) {
+  if (!Number.isFinite(tempC)) throw new RangeError('Feedwater temperature must be finite');
+  return if97Region1Enthalpy(tempC + 273.15, pressureMPa) / 1000;
+}
 
 export function steamStoredEnergy(tempC, massKg, metalCapacity) {
   return metalCapacity * tempC + massKg * liquidEnthalpy(tempC);

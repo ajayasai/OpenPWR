@@ -1254,6 +1254,23 @@ input[type=range]:disabled::-webkit-slider-thumb {
 #compare-state {
   grid-column:1 / -1
 }
+.feedwater-panel {
+  border-top:1px solid #283844;
+  padding:14px 18px;
+  color:#c3d5df;
+  font-size:13px
+}
+.feedwater-panel summary {cursor:pointer}
+.feedwater-panel dl {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:12px 18px;
+  margin:17px 0 9px
+}
+.feedwater-panel dt {color:#a0b6c5;font-size:12px}
+.feedwater-panel dd {margin:5px 0;font:15px var(--mono);color:#d6f0e9}
+.feedwater-panel p {line-height:1.6;margin:8px 0 0}
+.feedwater-panel a {color:var(--cyan)}
 .session-buttons .button {
   font-size:10px
 }

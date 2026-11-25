@@ -20,7 +20,7 @@ if (!Number.isFinite(duration) || duration < 1 || duration > 86400) throw new Er
 if (!Number.isFinite(dt) || dt < 0.001 || dt > 0.1) throw new Error('dt must be 0.001..0.1 s');
 const plant = new PWRPlant(scenario === 'cold-start' ? { mode: 'cold' } : {});
 const director = scenario === 'cold-start' ? createColdStartDirector() : null;
-const fields = ['time', 'electricPower', 'thermalPower', 'neutronPower', 'decayPower', 'fuelTemp', 'hotLegTemp', 'coldLegTemp', 'primaryPressure', 'steamPressure', 'steamLevel', 'steamFlow', 'feedFlow', 'condenserPressure', 'reactivity', 'xenon', 'energyResidual', 'tripped', 'startupStage', 'gridConnected', 'turbineSpeed', 'auxiliaryHeatMW', 'rotorEnergyMJ'];
+const fields = ['time', 'electricPower', 'thermalPower', 'neutronPower', 'decayPower', 'fuelTemp', 'hotLegTemp', 'coldLegTemp', 'primaryPressure', 'steamPressure', 'steamLevel', 'steamFlow', 'feedFlow', 'condenserPressure', 'reactivity', 'xenon', 'energyResidual', 'tripped', 'startupStage', 'gridConnected', 'turbineSpeed', 'auxiliaryHeatMW', 'rotorEnergyMJ', 'feedwaterTemp', 'feedwaterPressureMPa', 'feedwaterEnthalpyKJkg', 'feedwaterPropertyModel'];
 const rows = [fields.join(',')];
 let triggered = false, nextSample = 0, final, lastRecordedTime = -1, nextDecision = 0;
 while (plant.snapshot().time < duration - 1e-9) {
@@ -45,6 +45,6 @@ if (Math.abs(final.time - lastRecordedTime) > 1e-9) rows.push(fields.map(f => fi
 const target = resolve(output);
 await mkdir(dirname(target), { recursive: true });
 await writeFile(target, rows.join('\n') + '\n');
-await writeFile(target + '.json', JSON.stringify({ schema: 'openpwr-run/v1', scenario, requestedDuration: duration, dt, units: { time: 's', electricPower: 'MW net', thermalPower: 'MW', temperatures: 'degC', primaryPressure: 'MPa', steamPressure: 'MPa', condenserPressure: 'kPa', reactivity: 'pcm', energyResidual: 'MW', turbineSpeed: 'rpm', auxiliaryHeatMW: 'MW', rotorEnergyMJ: 'MJ' }, actions: director?.actions ?? [], final }, null, 2));
+await writeFile(target + '.json', JSON.stringify({ schema: 'openpwr-run/v1', scenario, requestedDuration: duration, dt, units: { time: 's', electricPower: 'MW net', thermalPower: 'MW', temperatures: 'degC', primaryPressure: 'MPa', steamPressure: 'MPa', condenserPressure: 'kPa', reactivity: 'pcm', energyResidual: 'MW', turbineSpeed: 'rpm', auxiliaryHeatMW: 'MW', rotorEnergyMJ: 'MJ', feedwaterTemp: 'degC', feedwaterPressureMPa: 'MPa', feedwaterEnthalpyKJkg: 'kJ/kg' }, actions: director?.actions ?? [], final }, null, 2));
 console.log(JSON.stringify({ scenario, simulationTime: final.time, electricPowerMW: final.electricPower, tripped: final.tripped, domainExceeded: final.domainExceeded ?? false, csv: target }, null, 2));
 if (final.domainExceeded) process.exitCode = 2;

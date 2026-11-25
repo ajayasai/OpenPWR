@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0
+
+- The browser engine uses IF97 compressed-liquid enthalpy at the steam-generator inlet in the feedwater, steam-cycle and thermal energy balances. Rated steam flow is 1,630.53 kg/s at 3,000 MWth and 1,000 MWe.
+- Added 14 independent compressed-water reference points from NISTIR 5078, a state-by-state comparison against the previous model and a check on the energy entering the plant during a load change. The reference test covers feedwater enthalpy.
+- The control room and CSV histories expose the inlet temperature, property pressure, enthalpy and active property model. New saves identify the pressure-dependent model. Historical saves and recipes continue on their original equations and flow calibration.
+
 ## 0.14.0
 
 - The measured-response explorer covers all 18 case and channel combinations. Signed-error tables and CSV downloads use each report’s scoring grid, units, reference data fingerprint and model identity. PACTEL tables include the report’s conditional allowances and support jumps to a time window.

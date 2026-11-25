@@ -11,7 +11,15 @@ const metrics = Object.keys(PAIRED_METRICS);
 const stepsPerSecond = 1 / PARAMETERS.maxStepS;
 // SHA-256 of the normalized sources used by the browser plant (checked by the
 // regression suite). Change the protocol prefix when command or sampling order changes.
-export const PAIRED_MODEL_REVISION = 'paired-0.05s-v1/f91d368c45ffc62df8d9f7c5a1d90b4316b6fdf33f7e00bfb1a32d46f081cfe6';
+const LEGACY_MODEL_REVISION = 'paired-0.05s-v1/f91d368c45ffc62df8d9f7c5a1d90b4316b6fdf33f7e00bfb1a32d46f081cfe6';
+export const PAIRED_MODEL_REVISION = 'paired-0.05s-v1/c2641847b6495f519dc702ddc72c3992a88283222670a9b5f59009ac596e2488';
+
+function revisionForState(model) {
+  // The engine has validated the state and upgraded any v1 save to v2.
+  if (model.schema === 'openpwr-state-v2') return LEGACY_MODEL_REVISION;
+  if (model.schema === 'openpwr-state-v3') return PAIRED_MODEL_REVISION;
+  throw new TypeError('Unsupported plant state for paired experiments.');
+}
 
 function observation(elapsedS, baseline, alternative) {
   const row = { elapsedS, time: baseline.time, baseline: { tripped: baseline.tripped },
@@ -49,10 +57,10 @@ export function validatePairedRecipe(recipe) {
       || recipe.format !== 'openpwr-paired-run' || recipe.version !== 1) {
     throw new TypeError('Unsupported paired experiment recipe or version.');
   }
-  if (recipe.modelRevision !== PAIRED_MODEL_REVISION) throw new TypeError('Paired recipe requires a different browser model revision.');
   const { demand, durationS } = recipe;
   validateOptions(demand, durationS);
   const model = restoreOperatingPlant(recipe.model).exportState();
+  if (recipe.modelRevision !== revisionForState(model)) throw new TypeError('Paired recipe revision does not match the saved browser model.');
   return { model, demand, durationS };
 }
 
@@ -64,12 +72,13 @@ export async function runPairedExperiment(model, { demand, durationS }, { signal
   let base = baseline.snapshot();
   const alternative = new PWRPlant();
   let alt = alternative.importState(model);
+  const checkpoint = baseline.exportState();
   const result = {
     startTime: base.time, durationS, elapsedS: 0, baselineDemand: base.controls.demand, demand,
     complete: false, stopReason: '', stopElapsedS: null, baselineTrip: null, alternativeTrip: null,
     rows: [observation(0, base, alt)],
-    recipe: { format: 'openpwr-paired-run', version: 1, modelRevision: PAIRED_MODEL_REVISION,
-      model: baseline.exportState(), demand, durationS },
+    recipe: { format: 'openpwr-paired-run', version: 1, modelRevision: revisionForState(checkpoint),
+      model: checkpoint, demand, durationS },
   };
   alternative.setControl('demand', demand);
   onProgress?.(0);

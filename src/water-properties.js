@@ -71,25 +71,43 @@ function properties(temperatureK, pressureMPa, pi, tau, gamma, gammaPi, gammaTau
   };
 }
 
-/** Stable liquid, IF97 region 1. Input K and MPa; output units documented above. */
-export function if97Region1(temperatureK, pressureMPa) {
+function checkRegion1(temperatureK, pressureMPa) {
   if (!Number.isFinite(temperatureK) || temperatureK < 273.15 || temperatureK > 623.15
       || !Number.isFinite(pressureMPa) || pressureMPa > 100
       || pressureMPa < if97SaturationPressure(temperatureK) * (1 - 1e-12)) {
     throw new RangeError('State outside IF97 region 1');
   }
+}
+
+function region1GammaTau(x, y) {
+  let gammaTau = 0;
+  for (const [i, j, n] of R1) {
+    if (j) gammaTau += n * x ** i * j * y ** (j - 1);
+  }
+  return gammaTau;
+}
+
+/** Region 1 specific enthalpy in kJ/kg, from the same Gibbs derivative as the full evaluator. */
+export function if97Region1Enthalpy(temperatureK, pressureMPa) {
+  checkRegion1(temperatureK, pressureMPa);
+  const tau = 1386 / temperatureK;
+  return WATER_GAS_CONSTANT * temperatureK * tau * region1GammaTau(7.1 - pressureMPa / 16.53, tau - 1.222);
+}
+
+/** Stable liquid, IF97 region 1. Input K and MPa; output units documented above. */
+export function if97Region1(temperatureK, pressureMPa) {
+  checkRegion1(temperatureK, pressureMPa);
   const pi = pressureMPa / 16.53;
   const tau = 1386 / temperatureK;
   const x = 7.1 - pi;
   const y = tau - 1.222;
-  let gamma = 0, gammaPi = 0, gammaTau = 0, gammaTauTau = 0;
+  let gamma = 0, gammaPi = 0, gammaTauTau = 0;
   for (const [i, j, n] of R1) {
     gamma += n * x ** i * y ** j;
     if (i) gammaPi -= n * i * x ** (i - 1) * y ** j;
-    if (j) gammaTau += n * x ** i * j * y ** (j - 1);
     if (j && j !== 1) gammaTauTau += n * x ** i * j * (j - 1) * y ** (j - 2);
   }
-  return properties(temperatureK, pressureMPa, pi, tau, gamma, gammaPi, gammaTau, gammaTauTau);
+  return properties(temperatureK, pressureMPa, pi, tau, gamma, gammaPi, region1GammaTau(x, y), gammaTauTau);
 }
 
 /** Stable vapor, IF97 region 2 (not the metastable-vapor extension). */

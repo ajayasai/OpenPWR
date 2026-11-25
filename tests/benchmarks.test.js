@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runBenchmarks, KINETICS_REFERENCES, evaluateKineticsReference } from '../src/benchmarks.js';
+import { runBenchmarks, KINETICS_REFERENCES, evaluateKineticsReference, compareFeedwaterEnthalpy } from '../src/benchmarks.js';
 import { if97Region1, if97Region2, if97SaturationPressure } from '../src/water-properties.js';
 import { liquidEnthalpy, vaporEnthalpy, steamStoredEnergy, steamTemperatureFromEnergy,
   stepKinetics, DELAYED_GROUPS, GENERATION_TIME } from '../src/physics.js';
@@ -17,6 +17,32 @@ test('production kernels meet independently published CATS, IAPWS and NIST refer
     assert.equal(row.error, Math.abs(row.reference - row.measured));
     assert.equal(row.pass, Number.isFinite(row.measured) && row.error <= row.tolerance);
   }
+});
+
+test('the feedwater comparison retains its release baseline and scores each NIST liquid state once', () => {
+  const report = compareFeedwaterEnthalpy();
+  const keys = new Set(report.rows.map(row => `${row.temperatureC}/${row.pressureMPa}`));
+  assert.equal(keys.size, 14);
+  assert.equal(report.rows.length, keys.size);
+  assert.equal(report.units, 'kJ/kg');
+  assert.equal(report.absoluteTolerance, 0.20);
+  assert.equal(report.legacyRelease, 'v0.14.0');
+  for (const p of [3, 6, 7]) {
+    for (const t of [20, 100, 160, 220]) assert.ok(keys.has(`${t}/${p}`));
+  }
+  assert.ok(keys.has('20/0.1') && keys.has('100/1'));
+  const nominal = report.rows.find(row => row.temperatureC === 220 && row.pressureMPa === 6);
+  assert.equal(nominal.reference, 944.61);
+  assert.equal(nominal.page, 50);
+  assert.equal(nominal.legacy, 943.6416987005725);
+  for (const model of ['legacy', 'current']) {
+    const errors = report.rows.map(row => row[model] - row.reference);
+    const independentlyScored = Math.hypot(...errors) / Math.sqrt(errors.length);
+    assert.ok(Math.abs(report[model + 'Rmse'] - independentlyScored) < 1e-12);
+    assert.equal(report[model + 'MaxAbsoluteError'], Math.max(...errors.map(Math.abs)));
+  }
+  assert.ok(report.currentMaxAbsoluteError <= report.absoluteTolerance);
+  assert.ok(report.currentRmse < report.legacyRmse);
 });
 
 test('published negative-step and zigzag cases converge under time-step refinement', () => {

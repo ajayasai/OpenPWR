@@ -2,13 +2,88 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PWRPlant, PARAMETERS } from '../src/engine.js';
-import { stepKinetics, DELAYED_GROUPS, saturationPressure, saturationTemperature } from '../src/physics.js';
+import { stepKinetics, DELAYED_GROUPS, saturationPressure, saturationTemperature, compressedLiquidEnthalpy, vaporEnthalpy } from '../src/physics.js';
+import { if97Region1, if97SaturationPressure } from '../src/water-properties.js';
 
 const finiteSnapshot = snapshot => {
   for (const [key, value] of Object.entries(snapshot)) {
     if (typeof value === 'number') assert.ok(Number.isFinite(value), `${key} must be finite`);
   }
 };
+
+test('compressed inlet enthalpy sets nominal steam flow and drives the actual feed energy flux', () => {
+  const plant = new PWRPlant();
+  const initial = plant.snapshot();
+  const nominalH = if97Region1(493.15, 6).h;
+  assert.equal(initial.feedwaterPropertyModel, 'compressed');
+  assert.equal(initial.feedwaterPressureMPa, 6);
+  assert.equal(initial.feedwaterEnthalpyKJkg, nominalH);
+  assert.equal(initial.steamFlow, 3000 / (vaporEnthalpy(initial.steamTemp) - nominalH / 1000));
+  plant.setControl('demand', 0.75);
+  plant.step(20);
+  const before = plant.snapshot();
+  const after = plant.step(0.05);
+  assert.ok(Math.abs(before.steamPressure - initial.steamPressure) > 0.01);
+  assert.equal(after.feedwaterPressureMPa, before.steamPressure);
+  const feedH = if97Region1(after.feedwaterTemp + 273.15, before.steamPressure).h;
+  assert.equal(after.feedwaterEnthalpyKJkg, feedH);
+  const boundaryMW = after.thermalPower + after.auxiliaryHeatMW + after.feedFlow * feedH / 1000;
+  assert.ok(Math.abs((after.energyInMJ - before.energyInMJ) / 0.05 - boundaryMW) < 1e-8);
+  assert.ok(Math.abs(after.energyResidual) < 1e-6);
+  assert.deepEqual(new PWRPlant().importState(plant.exportState()), after);
+});
+
+test('the cold inlet uses atmospheric absolute pressure and deep cooldown keeps its feed liquid', () => {
+  const cold = new PWRPlant({ mode: 'cold' });
+  const initial = cold.snapshot();
+  assert.equal(initial.feedFlow, 0);
+  assert.equal(initial.feedwaterTemp, 25);
+  assert.equal(initial.feedwaterPressureMPa, 0.101325);
+  assert.equal(initial.feedwaterEnthalpyKJkg, if97Region1(298.15, 0.101325).h);
+  assert.equal(cold.step(1).domainExceeded, false);
+  const warmReturn = new PWRPlant({ mode: 'cold' }).exportState();
+  warmReturn.state.condenserTemp = 95;
+  cold.importState(warmReturn);
+  const warmed = cold.step(0.05);
+  assert.equal(warmed.feedwaterEnthalpyKJkg, if97Region1(368.15, 0.101325).h);
+
+  const cooled = new PWRPlant();
+  const state = cooled.exportState();
+  state.state.steamTemp = 180;
+  cooled.importState(state);
+  const next = cooled.step(0.05);
+  assert.equal(next.feedwaterTemp, 145);
+  assert.equal(next.feedwaterPressureMPa, saturationPressure(180));
+  assert.ok(next.feedwaterPressureMPa > if97SaturationPressure(145 + 273.15));
+  assert.equal(next.domainExceeded, false);
+});
+
+test('compressed feedwater rejects phase violations and inconsistent saved property inputs atomically', () => {
+  assert.throws(() => compressedLiquidEnthalpy(220, 0.1), RangeError);
+  assert.throws(() => compressedLiquidEnthalpy(null, 6), RangeError);
+  const plant = new PWRPlant();
+  const original = plant.exportState();
+  for (const [pressure, terminal] of [[0.1, false], [1, true], [99, true]]) {
+    const invalid = structuredClone(original);
+    invalid.state.feedwaterPressureMPa = pressure;
+    invalid.state.domainExceeded = terminal;
+    assert.throws(() => plant.importState(invalid), RangeError);
+    assert.deepEqual(plant.exportState(), original);
+  }
+  // A future input schedule can encounter a two-phase inlet. Preserve the
+  // last committed T, p and diagnostic enthalpy on that first excluded step.
+  const cold = new PWRPlant({ mode: 'cold' });
+  const accepted = cold.snapshot();
+  cold.state.condenserTemp = 110;
+  const stopped = cold.step(0.05);
+  assert.equal(stopped.domainExceeded, true);
+  assert.match(stopped.domainReason, /Feedwater inlet/);
+  assert.equal(stopped.time, accepted.time);
+  assert.equal(stopped.feedwaterTemp, accepted.feedwaterTemp);
+  assert.equal(stopped.feedwaterPressureMPa, accepted.feedwaterPressureMPa);
+  assert.equal(stopped.feedwaterEnthalpyKJkg, accepted.feedwaterEnthalpyKJkg);
+  assert.deepEqual(new PWRPlant().importState(cold.exportState()), stopped);
+});
 
 test('fuel-primary-SG storage change equals its integrated boundary energy during a feed transient', () => {
   const plant = new PWRPlant();

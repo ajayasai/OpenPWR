@@ -56,6 +56,17 @@ h2 {
 section {
   margin-top:44px
 }
+#feedwater-benchmark {
+  padding:18px 20px;
+  border:1px solid #33495c;
+  border-radius:8px;
+  background:#142130
+}
+#feedwater-benchmark label,.water-readings dt {font-size:13px;color:#a8bfcc}
+#feedwater-point {font:inherit;background:#101d29;color:#e5edf7;border:1px solid #4c6778;border-radius:4px;padding:6px 10px}
+.water-readings {display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px}
+.water-readings dd {font-variant-numeric:tabular-nums;color:#d6f0e9;font-size:19px;margin:5px 0 0}
+#feedwater-benchmark p {font-size:14px;line-height:1.6;margin:12px 0 0}
 .report-status {
   padding:20px 0;
   border-bottom:1px solid #26364a;

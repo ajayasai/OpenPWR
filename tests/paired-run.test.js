@@ -17,6 +17,32 @@ test('paired recipes pin the browser equations and the 0.05 s integration protoc
   assert.equal(PAIRED_MODEL_REVISION, 'paired-0.05s-v1/' + hash.digest('hex'));
 });
 
+test('a released v0.14.0 recipe preserves its state, revision and original trajectories', async () => {
+  const fixture = new URL('./fixtures/v0.14.0-paired-recipe.json', import.meta.url);
+  const original = JSON.parse(await readFile(fixture, 'utf8'));
+  const replay = validatePairedRecipe(original);
+  const result = await runPairedExperiment(replay.model, replay);
+  assert.deepEqual(result.recipe, original);
+  const expected = await readFile(new URL('./fixtures/v0.14.0-paired-output.csv', import.meta.url), 'utf8');
+  const [header, ...rows] = pairedRunCsv(result).trimEnd().split('\n');
+  const [expectedHeader, ...expectedRows] = expected.trimEnd().split(/\r?\n/);
+  assert.equal(header, expectedHeader);
+  assert.equal(rows.length, expectedRows.length);
+  rows.forEach((row, i) => {
+    const expectedFields = expectedRows[i].split(',');
+    const fields = row.split(',');
+    assert.equal(fields.length, expectedFields.length);
+    assert.deepEqual(fields.slice(0, 6), expectedFields.slice(0, 6)); // times, demands and trip flags
+    fields.slice(6).forEach((value, j) => {
+      assert.ok(Math.abs(Number(value) - Number(expectedFields[6 + j])) < 1e-10,
+        `Released CSV reading at row ${i + 1}, column ${j + 7}`);
+    });
+  });
+  // A changed revision cannot silently choose a different enthalpy law.
+  assert.throws(() => validatePairedRecipe({ ...original, modelRevision: PAIRED_MODEL_REVISION }), /revision/);
+  assert.throws(() => validatePairedRecipe({ ...original, model: new PWRPlant().exportState() }), /revision/);
+});
+
 test('paired trajectories match direct control-room steps from a fractional, evolving checkpoint', async () => {
   const live = new PWRPlant();
   live.setControl('demand', 0.94);

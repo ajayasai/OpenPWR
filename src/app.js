@@ -61,7 +61,7 @@ function notify(message, persistent = false) {
   if (!persistent) noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 6500);
 }
 function sample(s) {
-  const keys = ['time', 'neutronPower', 'thermalPower', 'electricPower', 'grossPower', 'decayPower', 'fuelTemp', 'hotLegTemp', 'coldLegTemp', 'primaryPressure', 'steamPressure', 'steamTemp', 'steamLevel', 'steamFlow', 'feedFlow', 'primaryFlow', 'condenserPressure', 'condenserTemp', 'turbineSpeed', 'reactivity', 'rodReactivity', 'xenon', 'iodine', 'pumpSpeed', 'turbineValve', 'energyResidual', 'efficiency', 'heatupTarget', 'heatupRateCPerHour', 'rotorEnergyMJ', 'auxiliaryHeatMW', 'sourceStrength'];
+  const keys = ['time', 'neutronPower', 'thermalPower', 'electricPower', 'grossPower', 'decayPower', 'fuelTemp', 'hotLegTemp', 'coldLegTemp', 'primaryPressure', 'steamPressure', 'steamTemp', 'steamLevel', 'steamFlow', 'feedFlow', 'primaryFlow', 'condenserPressure', 'condenserTemp', 'turbineSpeed', 'reactivity', 'rodReactivity', 'xenon', 'iodine', 'pumpSpeed', 'turbineValve', 'energyResidual', 'efficiency', 'heatupTarget', 'heatupRateCPerHour', 'rotorEnergyMJ', 'auxiliaryHeatMW', 'sourceStrength', 'feedwaterTemp', 'feedwaterPressureMPa', 'feedwaterEnthalpyKJkg', 'feedwaterPropertyModel'];
   const out = {};
   for (const key of keys) out[key] = s[key];
   out.tripped = s.tripped;
@@ -140,6 +140,12 @@ function render(s) {
   setText('sim-time', clock(s.time));
   setText('net-power', fmt(s.electricPower));
   setText('thermal-power', fmt(s.thermalPower));
+  setText('feed-temperature', `${fmt(s.feedwaterTemp, 2)} °C`);
+  setText('feed-pressure', `${fmt(s.feedwaterPressureMPa, 4)} MPa`);
+  setText('feed-enthalpy', `${fmt(s.feedwaterEnthalpyKJkg, 3)} kJ/kg`);
+  setText('feed-law', s.feedwaterPropertyModel === 'legacy-saturated'
+    ? 'This saved run uses saturated-liquid enthalpy at the feedwater temperature.'
+    : 'The inlet energy balance uses liquid enthalpy at the modeled steam-generator pressure.');
   setText('primary-pressure', fmt(s.primaryPressure, 2));
   setText('efficiency', fmt(s.efficiency, 1));
   setText('net-percent', s.electricPower < 0 ? `Auxiliary import ${fmt(Math.abs(s.electricPower))} MWe` : `${fmt(s.electricPower / 10, 1)}% of nominal`);
@@ -473,7 +479,7 @@ $('state-file').addEventListener('change', async (event) => {
   event.target.value = '';
 });
 $('export-csv').addEventListener('click', () => {
-  const units = { time: 's', neutronPower: 'fraction', thermalPower: 'MW', electricPower: 'MWe', grossPower: 'MWe', decayPower: 'MW', fuelTemp: 'C', hotLegTemp: 'C', coldLegTemp: 'C', primaryPressure: 'MPa', steamPressure: 'MPa', steamTemp: 'C', steamLevel: 'percent', steamFlow: 'kg_s', feedFlow: 'kg_s', primaryFlow: 'kg_s', condenserPressure: 'kPa', condenserTemp: 'C', turbineSpeed: 'rpm', reactivity: 'pcm', rodReactivity: 'pcm', xenon: 'equilibrium_ratio', iodine: 'equilibrium_ratio', pumpSpeed: 'fraction', turbineValve: 'fraction', energyResidual: 'MW', efficiency: 'percent', tripped: 'boolean', gridConnected: 'boolean', heatupTarget: 'thermal_fraction', heatupRateCPerHour: 'C_per_hour', rotorEnergyMJ: 'MJ', auxiliaryHeatMW: 'MW', sourceStrength: 'normalized_source', startupStage: 'stage' };
+  const units = { time: 's', neutronPower: 'fraction', thermalPower: 'MW', electricPower: 'MWe', grossPower: 'MWe', decayPower: 'MW', fuelTemp: 'C', hotLegTemp: 'C', coldLegTemp: 'C', primaryPressure: 'MPa', steamPressure: 'MPa', steamTemp: 'C', steamLevel: 'percent', steamFlow: 'kg_s', feedFlow: 'kg_s', primaryFlow: 'kg_s', condenserPressure: 'kPa', condenserTemp: 'C', turbineSpeed: 'rpm', reactivity: 'pcm', rodReactivity: 'pcm', xenon: 'equilibrium_ratio', iodine: 'equilibrium_ratio', pumpSpeed: 'fraction', turbineValve: 'fraction', energyResidual: 'MW', efficiency: 'percent', tripped: 'boolean', gridConnected: 'boolean', heatupTarget: 'thermal_fraction', heatupRateCPerHour: 'C_per_hour', rotorEnergyMJ: 'MJ', auxiliaryHeatMW: 'MW', sourceStrength: 'normalized_source', startupStage: 'stage', feedwaterTemp: 'C', feedwaterPressureMPa: 'MPa', feedwaterEnthalpyKJkg: 'kJ_per_kg', feedwaterPropertyModel: 'model' };
   // Include the current observation even when an action happened while paused,
   // before the next 1 Hz sample. Avoid a duplicate timestamp at an exact boundary.
   const samples = history.slice(historyOffset);

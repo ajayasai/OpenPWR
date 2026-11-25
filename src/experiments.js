@@ -35,6 +35,8 @@ function activateState(model, source) {
   element('start-clock').textContent = seconds(initial.time);
   element('start-output').textContent = displayNumber(initial.electricPower, 1) + ' MWe';
   element('start-demand').textContent = percent(initial.controls.demand);
+  element('feedwater-law').textContent = checkpoint.schema === 'openpwr-state-v2'
+    ? 'Saturation curve (v2)' : 'Pressure-dependent (v3)';
   for (const [id, field] of [['reactor-mode', 'autoReactor'], ['turbine-mode', 'autoTurbine'], ['feedwater-mode', 'autoFeedwater']]) {
     element(id).textContent = initial.controls[field] ? 'Automatic' : 'Manual';
   }

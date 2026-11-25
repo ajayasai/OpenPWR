@@ -18,7 +18,7 @@ Internally, time is seconds; power is MW = MJ/s; stored energy is MJ; mass is kg
 | Fuel / primary thermal capacity | 60 / 1,100 MJ/K | Generic effective capacities |
 | Steam-generator liquid inventory | 150,000 kg | 50% of a generic 300,000 kg level scale |
 | Steam-generator metal capacity | 400 MJ/K | Generic effective capacity |
-| Regenerative feedwater temperature | 220 °C | Fixed algebraic boundary assumption |
+| Regenerative feedwater temperature | 220 °C at nominal load | Upper target of the algebraic heater model |
 | Condenser / cooling-water temperature | 40 / 20 °C | Generic reference conditions |
 | Condenser thermal capacity | 12,000 MJ/K | Generic effective capacity |
 | Turbine conversion / auxiliary demand | 35% / 50 MW at nominal pumps | Calibrated to the nominal electrical output |
@@ -94,7 +94,9 @@ Stored energy is `E = Cmetal T + M h_liquid(T)`. Each step updates mass and ener
 
 Saturation pressure uses the published IAPWS Wagner correlation; its inverse is found by monotone bisection. Version 0.2 replaces the fitted enthalpy curves with original implementations of the [IAPWS-IF97 region 1/2 Gibbs equations and region 4 saturation relation](https://iapws.org/technical-guidance/release/IF97-Rev.download). The production enthalpy functions interpolate a 0.25 °C saturated-water table from 0 to 350 °C. The storage inverse uses that same interpolation, maintaining consistent energy accounting across table cells. Reference comparisons use the official IF97 verification tables and [NIST saturated-water tables](https://www.nist.gov/document/nistir5078-tab1pdf); interpolation tests also check temperatures between cache nodes.
 
-This is **not a complete IF97 package**. Regions 3 and 5, transport properties, and a two-phase mixture equation of state are absent. The primary loop still uses a fixed effective heat capacity; feedwater uses saturated-liquid enthalpy as a compressed-water approximation. Improved property functions do not validate the inventory, heat-transfer, turbine, or pressure closures. The direct IF97 helper exposes `h`, `u`, `v`, `s`, and `cp`, while the coupled plant currently uses its saturated enthalpies. [BENCHMARKS.md](BENCHMARKS.md) gives the exact implemented scope and reference conditions.
+Beginning in v0.15, feedwater enters the steam-generator energy balance with the IF97 region 1 enthalpy evaluated at the modeled feedwater temperature and receiving steam-generator pressure. The same inlet enthalpy sets the cycle enthalpy difference. The nominal steam flow is calculated from the 3,000 MW thermal rating divided by the difference between the outlet-steam and inlet-water enthalpies at the rated state. The inlet pressure shown in the control room is the value used for the most recent energy flux. A new run records the temperature and pressure needed to reproduce that flux.
+
+Region 1 covers stable compressed liquid up to its saturation boundary in the supported range. Regions 3 and 5, transport properties and a two-phase mixture equation of state are outside this browser implementation. The primary loop uses a fixed effective heat capacity. The [published checks](BENCHMARKS.md) compare individual water properties with independent reference tables.
 
 Automatic feedwater tracks steam outflow plus an inventory correction, with a 4 s actuator lag and a maximum flow. Turbine steam flow scales with valve opening and the square root of steam pressure. An idealized steam bypass opens on high secondary pressure and supplies a residual steam path after trip. It is not a plant-specific auxiliary-feedwater or emergency-cooling train.
 
@@ -102,7 +104,7 @@ Automatic feedwater tracks steam outflow plus an inventory correction, with a 4 
 
 Gross electrical power is turbine steam flow times the available cycle enthalpy difference times a calibrated conversion efficiency. Efficiency decreases with condenser temperature. Auxiliary load is `30 + 20 × pumpSpeed³` MW; the net meter therefore shows grid import after generator disconnection. A fixed infinite grid holds connected rotor speed at 3,000 rpm; a tripped rotor coasts down with a 45 s lag. Generator electromagnetic transients, shaft torsion, moisture separation/reheat, synchronizing procedures, and grid-frequency dynamics are absent.
 
-For hot initialization the feed-heating train is an algebraic closure returning condensate to a fixed feed enthalpy. The cold-start path uses the temperature-dependent closure below. The condenser integrates rejected heat minus a conductance-based cooling-water heat sink. There is no cooling-tower weather model or separate condensate inventory. This reduced cycle is useful for interaction studies around its reference operating regime; it is not a full Rankine-cycle performance or equipment-sizing model.
+The feed-heating train uses the temperature schedule below in new hot and cold runs. Older saved runs retain the earlier feedwater-temperature schedule and saturated-liquid enthalpy law, including their corresponding nominal steam-flow calibration. The condenser integrates rejected heat minus a conductance-based cooling-water heat sink. There is no cooling-tower weather model or separate condensate inventory. This reduced cycle is useful for interaction studies around its reference operating regime; it is not a full Rankine-cycle performance or equipment-sizing model.
 
 ## Generic cold-start experiment
 
