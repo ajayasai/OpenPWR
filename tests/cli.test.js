@@ -244,7 +244,8 @@ test('local preview serves only public files, blocks traversal, and implements H
 test('release build rejects stale or failed evidence without replacing the last build', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
-  for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));
@@ -275,7 +276,8 @@ test('release build rejects stale or failed evidence without replacing the last 
 test('native release evidence binds both reports to the exact compiled bytes before replacing dist', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
-  for (const name of ['grid_return', 'startup_output']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
   await cp(join(root, 'scripts/build.mjs'), join(dir, 'scripts/build.mjs'));
   await cp(join(root, 'scripts/evidence-view.mjs'), join(dir, 'scripts/evidence-view.mjs'));
   await cp(join(root, 'scripts/continuous-evidence.mjs'), join(dir, 'scripts/continuous-evidence.mjs'));

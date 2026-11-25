@@ -66,9 +66,33 @@ button { font-size: .82rem; cursor: pointer; }
 .context { margin-top: 22px; padding-top: 19px; border-top: 1px solid var(--edge); max-width: 920px; }
 .context h2 { font-weight: 600; font-size: 1.18rem; }
 .context p { margin-top: 8px; }
+.historical { --series: #81decb; }
+.historical h2, .case-intro h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 600; letter-spacing: -.035em; }
+.historical h3 { margin: 17px 0 6px; font-size: .98rem; font-weight: 600; }
+.historical .status { margin-top: 8px; }
+.historical .definition { max-width: 95ch; }
+.historical-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; margin-top: 18px; }
+.historical-results { padding: 0 16px 14px; background: #0c1722; border: 1px solid var(--edge); border-radius: 5px; }
+.historical-results p { font-size: .88rem; line-height: 1.65; color: #c7d7e1; }
+.historical-scroll { max-width: 100%; overflow-x: auto; }
+.historical-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .85rem; }
+.historical-table caption { text-align: left; padding: 12px 0 5px; color: var(--muted); }
+.historical-table th, .historical-table td { text-align: right; font-weight: normal; padding: 7px 9px; border-bottom: 1px solid #293c48; }
+.historical-table thead th { font-weight: 600; }
+.historical-table tr > :first-child { text-align: left; }
+.historical ul { padding-left: 20px; }
+.historical .links { margin-top: 14px; }
+.historical .observed-point { fill: #e9b5d8; stroke: #101d2a; stroke-width: 1; }
+.historical .predicted-line { fill: none; stroke: #81decb; stroke-width: 1.5; }
+.historical .excluded-point { fill: none; stroke: #ffc18f; stroke-width: 1.8; }
+.historical .uncovered { fill: #203040; opacity: .55; }
+.historical-results p + p { margin-top: 8px; }
+.historical-table td:last-child, .historical-table th:last-child { text-align: left; }
+.case-intro { margin: 36px 0 17px; }
+.case-intro p { font-size: .95rem; margin-top: 8px; color: var(--muted); line-height: 1.6; }
 :focus-visible { outline: 2px solid #a2e5dd; outline-offset: 3px; }
 @media (max-width: 780px) {
-  .charts { grid-template-columns: 1fr; }
+  .charts, .historical-grid { grid-template-columns: 1fr; }
   main { max-width: 660px; }
 }
 @media (max-width: 420px) {

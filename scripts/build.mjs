@@ -334,6 +334,7 @@ await mkdir(output, { recursive: true });
 for (const name of ['index.html', 'experiments.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
+await cp(resolve(root, 'validation/startup_holdout/result.json'), resolve(output, 'shippingport-startup.json'));
 for (const directory of ['validation/grid_return', 'validation/startup_output']) {
   await cp(resolve(root, directory), resolve(output, directory), {
     recursive: true,

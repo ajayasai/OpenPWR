@@ -25,9 +25,11 @@ const server = createServer(async (req, res) => {
     const viewSource = startupView ? 'continuous-verification.json' : viewSources.get(route);
     if (source && reports[route]) route = reports[route];
     const startupData = /^validation\/(grid_return|startup_output)\/(raw\/)?[\w.-]+\.(json|md)$/.test(route);
-    if (!viewSource && !startupData && !/^(experiments\.html|startup-evidence\.html|krsko-pressure-development\.json|continuous\.html|continuous-verification\.json|continuous-measured-validation\.json|startup\.html|cold-verification\.json|index\.html|engineering\.html|engineering-evidence\.html|plant\.html|plant-evidence\.html|verification\.html|verification\.json|benchmarks\.json|engineering-verification\.json|modelica-property-verification\.json|plant-verification\.json|measured-validation\.json|pressurizer-validation\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(krsko-pressure-development|continuous-verification|continuous-measured-validation|cold-verification|verification|benchmarks|modelica-verification|plant-verification|measured-validation|pressurizer-validation|modelica\/property-verification)\.json)$/.test(route)) {
+    const shippingport = route === 'shippingport-startup.json';
+    if (!shippingport && !viewSource && !startupData && !/^(experiments\.html|startup-evidence\.html|krsko-pressure-development\.json|continuous\.html|continuous-verification\.json|continuous-measured-validation\.json|startup\.html|cold-verification\.json|index\.html|engineering\.html|engineering-evidence\.html|plant\.html|plant-evidence\.html|verification\.html|verification\.json|benchmarks\.json|engineering-verification\.json|modelica-property-verification\.json|plant-verification\.json|measured-validation\.json|pressurizer-validation\.json|version\.json|LICENSE|NOTICE|src\/[^.][\w./-]*|docs\/[^.][\w./-]*|artifacts\/(krsko-pressure-development|continuous-verification|continuous-measured-validation|cold-verification|verification|benchmarks|modelica-verification|plant-verification|measured-validation|pressurizer-validation|modelica\/property-verification)\.json)$/.test(route)) {
       res.writeHead(404); res.end('Not found'); return;
     }
+    if (source && shippingport) route = 'validation/startup_holdout/result.json';
     const path = resolve(root, source && viewSource ? reports[viewSource] : route);
     if (!path.startsWith(root + sep) || !(await stat(path)).isFile()) throw new Error('Not a public file');
     let data = await readFile(path);

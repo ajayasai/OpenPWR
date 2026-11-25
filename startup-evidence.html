@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Return to power · OpenPWR</title>
+  <title>Measured startup comparisons · OpenPWR</title>
   <link rel="stylesheet" href="./src/startup-evidence.css">
 </head>
 <body>
@@ -16,9 +16,56 @@
       <a href="./plant-evidence.html">Plant evidence</a>
     </nav>
     <header>
-      <h1>Return to power</h1>
-      <p>Explore the electricity recorded at Sizewell B as its two generators returned to service in December 2024, alongside a continuous startup from OpenPWR’s 1,000 MWe model.</p>
+      <h1>Measured startup comparisons</h1>
+      <p><a href="#shippingport">Shippingport startup</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
     </header>
+    <section id="shippingport" class="card historical" aria-labelledby="shippingport-title">
+      <h2 id="shippingport-title">Shippingport startup, June 24–25, 1958</h2>
+      <p id="shippingport-status" class="status" role="status">Loading the recorded observations and native model comparison…</p>
+      <div id="shippingport-results" hidden>
+        <p id="shippingport-scope" class="definition"></p>
+        <p id="shippingport-alignment" class="definition"></p>
+        <div class="historical-grid">
+          <div>
+            <div class="fields">
+              <div><label for="shippingport-channel">Measured quantity</label><select id="shippingport-channel" disabled></select></div>
+              <div><label for="shippingport-window">Chart window</label>
+                <select id="shippingport-window"><option value="event">Full event</option><option value="native">Native run</option></select>
+              </div>
+            </div>
+            <figure>
+              <svg id="shippingport-plot" viewBox="0 0 540 220" role="img" aria-label="Measured and simulated values against elapsed time"></svg>
+              <figcaption id="shippingport-caption"></figcaption>
+            </figure>
+            <p id="shippingport-channel-note" class="definition"></p>
+          </div>
+          <div class="historical-results">
+            <h3>Comparison result</h3>
+            <p id="shippingport-score"></p>
+            <p id="shippingport-count"></p>
+            <h3>Startup timing</h3>
+            <p id="shippingport-milestone"></p>
+          </div>
+        </div>
+        <details>
+          <summary>Inspect the recorded values</summary>
+          <div class="historical-scroll" tabindex="0" role="region" aria-label="Shippingport observation table">
+            <table class="historical-table">
+              <caption id="shippingport-table-caption"></caption>
+              <thead><tr><th scope="col">Station clock</th><th scope="col">Elapsed time</th><th scope="col">Measured</th><th scope="col">Model</th><th scope="col">Model − measured</th><th scope="col">Source page</th><th scope="col">Comparison</th></tr></thead>
+              <tbody id="shippingport-rows"></tbody>
+            </table>
+          </div>
+        </details>
+        <h3>Validation limits</h3>
+        <ul id="shippingport-limits" class="definition"></ul>
+        <p class="links"><a id="shippingport-source">Station test report ↗</a><a id="shippingport-native">Native prediction ↗</a><a href="./shippingport-startup.json" download>Download comparison JSON</a></p>
+      </div>
+    </section>
+    <div class="case-intro" id="sizewell">
+      <h2>Sizewell B return to generation</h2>
+      <p>Explore the electricity recorded at Sizewell B as its two generators returned to service in December 2024, alongside a continuous startup from OpenPWR’s 1,000 MWe model.</p>
+    </div>
     <div class="charts">
       <section class="card plant" aria-labelledby="plant-title">
         <div class="card-heading">

@@ -26,6 +26,37 @@ function recordPageTraffic(page) {
   return files;
 }
 
+test('Shippingport shows the full event, unpaired observations and an open station breaker', async ({ page, request }) => {
+  const canonical = await request.get('shippingport-startup.json');
+  expect(canonical.ok()).toBe(true);
+  const report = await canonical.json();
+  expect(report.milestone.breakerObserved).toBe(false);
+  await page.goto('startup-evidence.html#shippingport');
+  await expect(page.locator('#shippingport-status')).toContainText('inconclusive');
+  await expect(page.locator('#shippingport-milestone')).toContainText('station breaker remained open');
+  await expect(page.locator('#shippingport-source')).toHaveAttribute('href', report.source.url);
+  await expect(page.locator('#shippingport-window')).toHaveValue('event');
+  await page.locator('#shippingport details summary').click();
+  let laterReadings = 0;
+  for (const channel of report.channels) {
+    await page.locator('#shippingport-channel').selectOption(channel.key);
+    await expect(page.locator('#shippingport-table-caption')).toContainText(channel.unit);
+    const rows = page.locator('#shippingport-rows tr');
+    await expect(rows).toHaveCount(channel.points.length);
+    const index = channel.points.findIndex(p => p.elapsedS > report.prediction.durationSeconds && !p.excluded);
+    if (index >= 0) {
+      expect(channel.points[index].predicted).toBeNull();
+      await expect(rows.nth(index)).toContainText('Outside model coverage');
+      laterReadings++;
+    }
+  }
+  expect(laterReadings).toBeGreaterThan(0);
+  await expect(page.locator('#shippingport-plot .uncovered')).toHaveCount(1);
+  await page.locator('#shippingport-window').selectOption('native');
+  await expect(page.locator('#shippingport-plot .uncovered')).toHaveCount(0);
+  await expect(page.locator('#plant-channel')).toBeEnabled();
+});
+
 test('live feedwater reading, CSV and NIST comparison agree at rated load', async ({ page, request }) => {
   const { feedwaterComparison } = await (await request.get('benchmarks.json')).json();
   const rated = feedwaterComparison.rows.find(row => row.temperatureC === 220 && row.pressureMPa === 6);

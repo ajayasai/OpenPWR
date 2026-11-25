@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.0
+
+- Published an independent measured-event test of the released native whole-plant startup trajectory. The Shippingport archive contributes 96 numerical observations across four channels. Thirty can be scored on the model clock.
+- Published the negative result, the two-read transcription, source exclusions, model and source fingerprints, a browser explorer, and a reproducible comparison. Release CI also checks a fresh whole-model execution against the original v0.15.0 trajectory.
+- Historical turbine synchronism occurred with the main breaker open. Grid coupling, full-power loading and whole-plant predictive accuracy remain unvalidated.
+
 ## 0.15.0
 
 - The browser engine uses IF97 compressed-liquid enthalpy at the steam-generator inlet in the feedwater, steam-cycle and thermal energy balances. Rated steam flow is 1,630.53 kg/s at 3,000 MWth and 1,000 MWe.

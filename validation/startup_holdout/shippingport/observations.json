@@ -1,0 +1,836 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "authors": "Gerald E. Eckenrode / Duquesne Light Company, Power Stations Department",
+    "title": "Station Start-up Test. Test Results DL-S-163 (T-554923). Section 1",
+    "report": "AECU-4028",
+    "published": "1959-01-31",
+    "repository": "UNT Digital Library, TRAIL Microcard Collection",
+    "catalogUrl": "https://digital.library.unt.edu/ark:/67531/metadc1240466/",
+    "pdfUrl": "https://digital.library.unt.edu/ark:/67531/metadc1240466/m2/1/high_res_d/metadc1240466.pdf",
+    "pdfSha256": "8baeace24944da512f3ba5450e2d0db2ee4b9cf06640872ec6dc80c6d101ac5b",
+    "pdfBytes": 1977869,
+    "pageReference": "One-based PDF scan page. Printed report page equals PDF page minus one.",
+    "pageUrlPattern": "https://digital.library.unt.edu/ark:/67531/metadc1240466/m1/{page}/",
+    "rights": "UNT lists the scan's copyright status as undetermined. The numeric readings here are independently transcribed facts. The report and its illustrations remain at the archive.",
+    "rightsUrl": "https://digital.library.unt.edu/ark:/67531/metadc1240466/citation/"
+  },
+  "origin": "1958-06-24T13:00",
+  "originBasis": "First timed entry of the station's event log (Table I, PDF page 6). The report starts its formal indicator logging at 14:02 on June 24. Civil clocks are transcribed without a time-zone offset.",
+  "synchronism": "1958-06-25T17:59",
+  "synchronismPage": 11,
+  "synchronismBasis": "The event log reports turbine synchronism at 1,800 rpm with the main generator breaker open.",
+  "periodicLoggingGap": {
+    "lastBefore": "1958-06-24T21:35",
+    "firstAfter": "1958-06-25T11:15",
+    "note": "Table II has no intervening columns. Table I separately records a 09:30 observation on June 25."
+  },
+  "channels": [
+    {
+      "key": "primaryPressure",
+      "label": "Reactor pressure",
+      "unit": "MPa absolute",
+      "rawUnit": "psig",
+      "conversion": "value = 0.101325 + raw * 0.006894757293168",
+      "description": "Table II reactor pressure and Table I entries that explicitly report reactor pressure in psig. Indicator identity across tables and local atmospheric pressure are unspecified. Gauge readings use one standard atmosphere for conversion.",
+      "points": [
+        {
+          "at": "1958-06-24T14:05",
+          "raw": 400,
+          "value": 2.859227917,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T14:35",
+          "raw": 225,
+          "value": 1.652645391,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T14:50",
+          "raw": 225,
+          "value": 1.652645391,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T15:05",
+          "raw": 225,
+          "value": 1.652645391,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T15:20",
+          "raw": 225,
+          "value": 1.652645391,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T15:35",
+          "raw": 210,
+          "value": 1.549224032,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T15:50",
+          "raw": 200,
+          "value": 1.480276459,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T16:05",
+          "raw": 200,
+          "value": 1.480276459,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T16:20",
+          "raw": 200,
+          "value": 1.480276459,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T16:35",
+          "raw": 200,
+          "value": 1.480276459,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T16:50",
+          "raw": 210,
+          "value": 1.549224032,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T17:05",
+          "raw": 210,
+          "value": 1.549224032,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T17:19",
+          "raw": 270,
+          "value": 1.962909469,
+          "page": 6,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T17:20",
+          "raw": 260,
+          "value": 1.893961896,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T17:35",
+          "raw": 260,
+          "value": 1.893961896,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T17:50",
+          "raw": 260,
+          "value": 1.893961896,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T18:05",
+          "raw": 300,
+          "value": 2.169752188,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T18:35",
+          "raw": 350,
+          "value": 2.514490053,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T18:50",
+          "raw": 360,
+          "value": 2.583437626,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T19:05",
+          "raw": 400,
+          "value": 2.859227917,
+          "page": 12,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T19:20",
+          "raw": 492,
+          "value": 3.493545588,
+          "page": 13,
+          "excluded": "The report flags a probable logging error. Its recorder chart could not substantiate this pressure (PDF p. 3)."
+        },
+        {
+          "at": "1958-06-24T19:35",
+          "raw": 410,
+          "value": 2.92817549,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T19:41",
+          "raw": 440,
+          "value": 3.135018209,
+          "page": 7,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T19:50",
+          "raw": 420,
+          "value": 2.997123063,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T20:05",
+          "raw": 400,
+          "value": 2.859227917,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T20:20",
+          "raw": 400,
+          "value": 2.859227917,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T20:35",
+          "raw": 400,
+          "value": 2.859227917,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T20:50",
+          "raw": 410,
+          "value": 2.92817549,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T21:05",
+          "raw": 410,
+          "value": 2.92817549,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T21:20",
+          "raw": 435,
+          "value": 3.100544423,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T21:35",
+          "raw": 435,
+          "value": 3.100544423,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T09:30",
+          "raw": 400,
+          "value": 2.859227917,
+          "page": 7,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T11:15",
+          "raw": 425,
+          "value": 3.03159685,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T11:17",
+          "raw": 425,
+          "value": 3.03159685,
+          "page": 7,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T11:30",
+          "raw": 450,
+          "value": 3.203965782,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T11:45",
+          "raw": 500,
+          "value": 3.548703647,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T12:00",
+          "raw": 550,
+          "value": 3.893441511,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T12:30",
+          "raw": 725,
+          "value": 5.100024038,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T12:45",
+          "raw": 800,
+          "value": 5.617130835,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T13:00",
+          "raw": 900,
+          "value": 6.306606564,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T13:30",
+          "raw": 1200,
+          "value": 8.375033752,
+          "page": 13,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T13:45",
+          "raw": 1500,
+          "value": 10.44346094,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:15",
+          "raw": 1975,
+          "value": 13.718470654,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:30",
+          "raw": 1950,
+          "value": 13.546101722,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:45",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:00",
+          "raw": 1975,
+          "value": 13.718470654,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:15",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:45",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:00",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:15",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:30",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:45",
+          "raw": 2000,
+          "value": 13.890839586,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:15",
+          "raw": 2020,
+          "value": 14.028734732,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T18:00",
+          "raw": 2020,
+          "value": 14.028734732,
+          "page": 14,
+          "excluded": null
+        }
+      ]
+    },
+    {
+      "key": "averageCoolantTemperature",
+      "label": "Average primary coolant temperature",
+      "unit": "°C",
+      "rawUnit": "°F",
+      "conversion": "value = (raw - 32) * 5 / 9",
+      "description": "Table I explicitly reported average coolant temperature and Table II Avg. Coolant Temp. Loop weighting and averaging method are unspecified. The arithmetic mean of the model hot- and cold-leg temperatures is an observation proxy.",
+      "points": [
+        {
+          "at": "1958-06-24T13:18",
+          "raw": 190,
+          "value": 87.777777778,
+          "page": 6,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T17:19",
+          "raw": 205,
+          "value": 96.111111111,
+          "page": 6,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T19:41",
+          "raw": 270,
+          "value": 132.222222222,
+          "page": 7,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T09:30",
+          "raw": 270,
+          "value": 132.222222222,
+          "page": 7,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T11:17",
+          "raw": 271,
+          "value": 132.777777778,
+          "page": 7,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T12:25",
+          "raw": 340,
+          "value": 171.111111111,
+          "page": 8,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:30",
+          "raw": 501,
+          "value": 260.555555556,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:45",
+          "raw": 501,
+          "value": 260.555555556,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:15",
+          "raw": 501,
+          "value": 260.555555556,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:30",
+          "raw": 501,
+          "value": 260.555555556,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:45",
+          "raw": 502.8,
+          "value": 261.555555556,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:00",
+          "raw": 514,
+          "value": 267.777777778,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:15",
+          "raw": 522,
+          "value": 272.222222222,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:30",
+          "raw": 522.2,
+          "value": 272.333333333,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:45",
+          "raw": 521,
+          "value": 271.666666667,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T18:00",
+          "raw": 522.2,
+          "value": 272.333333333,
+          "page": 14,
+          "excluded": null
+        }
+      ]
+    },
+    {
+      "key": "coldLegTemperature",
+      "label": "Loop 1A cold-leg temperature",
+      "unit": "°C",
+      "rawUnit": "°F",
+      "conversion": "value = (raw - 32) * 5 / 9",
+      "description": "Table I explicitly identifies Tc for loop 1A, sometimes with the same value for 1B. Only the 1A reading is counted. Log entries describing earlier extrema without exact observation times are omitted.",
+      "points": [
+        {
+          "at": "1958-06-25T15:10",
+          "raw": 499,
+          "value": 259.444444444,
+          "page": 9,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:28",
+          "raw": 499.2,
+          "value": 259.555555556,
+          "page": 9,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:48",
+          "raw": 499.2,
+          "value": 259.555555556,
+          "page": 9,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:30",
+          "raw": 499.4,
+          "value": 259.666666667,
+          "page": 10,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:43",
+          "raw": 501,
+          "value": 260.555555556,
+          "page": 10,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:55",
+          "raw": 507.1,
+          "value": 263.944444444,
+          "page": 10,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:12",
+          "raw": 520,
+          "value": 271.111111111,
+          "page": 10,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:35",
+          "raw": 519.3,
+          "value": 270.722222222,
+          "page": 11,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:55",
+          "raw": 521.2,
+          "value": 271.777777778,
+          "page": 11,
+          "excluded": null
+        }
+      ]
+    },
+    {
+      "key": "pressurizerTemperature",
+      "label": "Pressurizer temperature",
+      "unit": "°C",
+      "rawUnit": "°F",
+      "conversion": "value = (raw - 32) * 5 / 9",
+      "description": "Table I observed pressurizer temperatures and Table II Pressurizer Temp. The 14:40 control objective is excluded. The report attributes pressurizer temperature to a recorder (PDF p. 3).",
+      "points": [
+        {
+          "at": "1958-06-24T13:18",
+          "raw": 250,
+          "value": 121.111111111,
+          "page": 6,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-24T14:31",
+          "raw": 370,
+          "value": 187.777777778,
+          "page": 6,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:00",
+          "raw": 618,
+          "value": 325.555555556,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:15",
+          "raw": 634,
+          "value": 334.444444444,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:30",
+          "raw": 632,
+          "value": 333.333333333,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T14:45",
+          "raw": 635,
+          "value": 335,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:00",
+          "raw": 634,
+          "value": 334.444444444,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:15",
+          "raw": 635,
+          "value": 335,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:30",
+          "raw": 634,
+          "value": 334.444444444,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T15:45",
+          "raw": 635,
+          "value": 335,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:00",
+          "raw": 635.5,
+          "value": 335.277777778,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:15",
+          "raw": 635,
+          "value": 335,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T16:30",
+          "raw": 635,
+          "value": 335,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:00",
+          "raw": 637,
+          "value": 336.111111111,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:15",
+          "raw": 637,
+          "value": 336.111111111,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T17:30",
+          "raw": 633,
+          "value": 333.888888889,
+          "page": 14,
+          "excluded": null
+        },
+        {
+          "at": "1958-06-25T18:00",
+          "raw": 636,
+          "value": 335.555555556,
+          "page": 14,
+          "excluded": null
+        }
+      ]
+    }
+  ],
+  "unreadable": [
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-24T14:20",
+      "rawText": "?00",
+      "page": 12,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-24T18:20",
+      "rawText": "3?0",
+      "page": 12,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T12:15",
+      "rawText": "6?0",
+      "page": 13,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T13:15",
+      "rawText": "10?0",
+      "page": 13,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T14:00",
+      "rawText": "18?0",
+      "page": 14,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T15:30",
+      "rawText": "19?0",
+      "page": 14,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T17:00",
+      "rawText": "20?0",
+      "page": 14,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T17:30",
+      "rawText": "19??",
+      "page": 14,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "primaryPressure",
+      "at": "1958-06-25T17:45",
+      "rawText": "19?0",
+      "page": 14,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "averageCoolantTemperature",
+      "at": "1958-06-25T16:00",
+      "rawText": "50?",
+      "page": 14,
+      "reason": "Unresolved digits in the source scan."
+    },
+    {
+      "channel": "pressurizerTemperature",
+      "at": "1958-06-25T16:45",
+      "rawText": "636.?",
+      "page": 14,
+      "reason": "Unresolved final digit in the source scan."
+    },
+    {
+      "channel": "pressurizerTemperature",
+      "at": "1958-06-25T17:45",
+      "rawText": "636.?",
+      "page": 14,
+      "reason": "Unresolved final digit in the source scan."
+    }
+  ],
+  "limitations": [
+    "The measured event includes an extended interruption for instrument repair and a later loss of one coolant loop. Its initial conditions, design and heatup schedule differ from the generic model.",
+    "The source does not report a continuous reactor power record. The selected event ends at turbine synchronism with the generator breaker still open. Grid loading and sustained full-power operation have no observed trajectory in this record.",
+    "The event log records temperatures at selected times. Some leg values refer to earlier extrema or an unspecified leg. Those entries are omitted from the 1A channel.",
+    "The report plots hot and cold leg temperatures together in Figure 1. Overlap and the chart's compressed time break limit separate digitization. This dataset uses directly tabulated and logged measurements.",
+    "Instrument calibration, measurement error bounds, local barometric pressure and the averaging method for bulk primary temperature are unspecified. Decimal conversion precision does not express instrument accuracy.",
+    "Unresolved digits are recorded by timestamp in unreadable. The source-flagged 19:20 reactor pressure retains its raw value and an explicit exclusion. Source dashes in the temperature row remain missing."
+  ]
+}

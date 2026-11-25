@@ -254,6 +254,8 @@ class Handler(BaseHTTPRequestHandler):
                     break
             if data is None:
                 raise ServiceError(404, "not_found", "No compact view for the current full evidence report.")
+        elif name == "shippingport-startup.json":
+            path = self.server.root / "validation" / "startup_holdout" / "result.json"
         elif name in report_paths:
             path = self.server.root / report_paths[name]
         elif (len(parts) in (3, 4) and parts[0] == "validation"

@@ -313,7 +313,11 @@ def package(version, revision):
         for path in sorted((ROOT / 'dist').rglob('*')):
             if path.is_file():
                 archive_bytes(archive, path.relative_to(ROOT / 'dist').as_posix(), path.read_bytes(), timestamp)
-    assets = [native, web]
+    shippingport = out / 'shippingport-startup.json'
+    require(sha(ROOT / 'validation/startup_holdout/result.json') == sha(ROOT / 'dist' / shippingport.name),
+            'Shippingport comparison differs from the web evidence')
+    shutil.copyfile(ROOT / 'dist' / shippingport.name, shippingport)
+    assets = [native, web, shippingport]
     for path, _, _ in REPORTS:
         destination = out / Path(path).name
         shutil.copyfile(ROOT / path, destination)
