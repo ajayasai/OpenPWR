@@ -114,7 +114,8 @@ def ohi(index, fixture):
                 and obs["elapsedHours"] == day * 24, "Unexpected Ohi station clock")
         station = {"primaryPressureMPa": round(number(obs["pressureMPaGauge"]) + ATM_MPA, 6),
                    "averageCoolantTemperatureC": number(obs["coolantTemperatureC"]),
-                   "generatorGrossMW": obs["generatorMW"]}
+                   "generatorGrossMW": obs["generatorMW"],
+                   "steamGeneratorThermalMW": number(obs["thermalMW"]), "operatingMode": obs["operatingMode"]}
         if station["generatorGrossMW"] is not None:
             number(station["generatorGrossMW"])
         row = row_at(index, day * 86400, station)
@@ -135,13 +136,31 @@ def score():
     lock = load(HERE / "freeze.json")
     for relative, expected in lock["sha256"].items():
         require(digest(ROOT / relative) == expected, f"Changed frozen input: {relative}")
-    index = grid(load(HERE / "native.json"))
+    native = load(HERE / "native.json")
+    require(native["observationsUsed"] == native["stateResetsAfterInitialization"] == 0
+            and native["numericalVerificationPassed"], "Unverified native candidate")
+    require(native["runRevision"] == native["modelBuildRevision"] == lock["candidateRevision"]
+            and native["runDirty"] is False and native["modelBuildDirty"] is False,
+            "Frozen run differs from the registered candidate build")
+    for name, expected in native["sourceSha256"].items():
+        require(digest(ROOT / name) == expected, f"Changed native implementation: {name}")
+    index = grid(native)
+    run = native["nativeRuns"][-1]
+    grid_h = run["firstNativeGridConnectionS"] / 3600
+    rated_h = run["terminalRatedDwellStartS"] / 3600
     return {
         "schema": "openpwr-native-open-loop-validation-v1",
         "provenance": lock,
         "nativeSamples": len(index), "nativeDurationHours": 500,
         "pressureUnit": "MPa absolute", "temperatureUnit": "degrees Celsius",
         "reference": "Station hour-zero pressure and temperature carried forward through the event",
+        "milestones": {
+            "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/09/0709_3j_01.pdf#page=2",
+            "ohiGridConnectionHours": 210, "nativeGridConnectionHours": grid_h,
+            "gridDifferenceHours": grid_h - 210,
+            "ohiRatedThermalHours": 300, "nativeSustainedRatedEnvelopeStartHours": rated_h,
+            "ratedDifferenceHours": rated_h - 300,
+            "ratedDefinitions": "The operator reported the start of constant rated thermal output. The native time is the first five-minute sample in its sustained full-power envelope."},
         "ohi": ohi(index, load(HERE / "ohi/observations.json")),
         "westinghouse": westinghouse(index, load(HERE / "measured/observations.json")),
     }

@@ -1,0 +1,91 @@
+{
+  "publisher": "The Kansai Electric Power Co., Inc.",
+  "timezone": "Asia/Tokyo",
+  "publisherIndex": "https://www.kepco.co.jp/corporate/pr/2012/index.html",
+  "sources": [
+    {
+      "date": "2012-06-26",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/26/0626_1j_01_1.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817172042id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/26/0626_1j_01_1.pdf",
+      "sha256": "cf5f0345818aa8429b694f8e8975611f220813c4246fd509bbf341a4ea0d7767"
+    },
+    {
+      "date": "2012-06-27",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/27/0627_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817172037id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/27/0627_1j_01.pdf",
+      "sha256": "b18cd7a015312188dab62a4a16d6657754b0c4d34bd6872ef0ce1e6408fa2fed"
+    },
+    {
+      "date": "2012-06-28",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/28/0628_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817172025id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/28/0628_1j_01.pdf",
+      "sha256": "e34e95c11bd8dabde7e0c849bd55b7466397af31956f37ac8affaafb271a0f39"
+    },
+    {
+      "date": "2012-06-29",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/29/0629_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817172016id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/29/0629_1j_01.pdf",
+      "sha256": "729a268640d9454d64d48d11492b87080060b147b1caad76cf9c17da272cf301"
+    },
+    {
+      "date": "2012-06-30",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0630_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171945id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0630_1j_01.pdf",
+      "sha256": "733edd9219a170994067f687e43e64f558dcf95a8240757ed8a4df429bf412ca"
+    },
+    {
+      "date": "2012-07-01",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0701_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171943id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0701_1j_01.pdf",
+      "sha256": "ccc330bd77aa7071fe69776dcbc23812ecd123a94024f41395dce8940a5bb308"
+    },
+    {
+      "date": "2012-07-02",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/02/0702_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171936id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/02/0702_1j_01.pdf",
+      "sha256": "4bdaac0f69b2d8e8e9a59a84074093af1a6b5162e180e47068809c65fdaf3862"
+    },
+    {
+      "date": "2012-07-03",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/03/0703j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171932id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/03/0703j_01.pdf",
+      "sha256": "0d6563af45095681163345fdbd7f70f9a6f092d656903bd4aebe0e3a8eddb206"
+    },
+    {
+      "date": "2012-07-04",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/04/0704_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171923id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/04/0704_1j_01.pdf",
+      "sha256": "0abc00dc6af0b0b442505df6c53d7127cbac431864e7831e2b4d4aab9d276cf8"
+    },
+    {
+      "date": "2012-07-05",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/05/0705_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171913id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/05/0705_1j_01.pdf",
+      "sha256": "53f4d39c0f76c5c7aed853d708a04c37bc0ea0b57dec4da1d03f02a96b2a3493"
+    },
+    {
+      "date": "2012-07-06",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/06/0706_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171856id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/06/0706_1j_01.pdf",
+      "sha256": "e9c8b6a323e25fa60aff516ff6c2f9a3e04d936bbe49b34f98870d94542ba962"
+    },
+    {
+      "date": "2012-07-07",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/07/0707_2j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171849id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/07/0707_2j_01.pdf",
+      "sha256": "1001a60d4d95c9a656ac1a825b4095a8f791e4da90aedcd052715f863f015b05"
+    },
+    {
+      "date": "2012-07-08",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/08/0708_1j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171846id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/08/0708_1j_01.pdf",
+      "sha256": "410e452c4faa723266ff782b5d185a9787f73f2e2e093e1ef13de9c0a084ab11"
+    },
+    {
+      "date": "2012-07-09",
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/09/0709_3j_01.pdf",
+      "archiveUrl": "https://web.archive.org/web/20170817171840id_/http://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/09/0709_3j_01.pdf",
+      "sha256": "3dcad0cb7b07ba4dbea9d0fa2472c1223a56f1d39793433e9fbdc52d0e1d685d"
+    }
+  ]
+}
