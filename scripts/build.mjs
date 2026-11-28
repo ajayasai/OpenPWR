@@ -334,6 +334,8 @@ await mkdir(output, { recursive: true });
 for (const name of ['index.html', 'experiments.html', 'engineering.html', 'engineering-evidence.html', 'plant.html', 'startup.html', 'startup-evidence.html', 'continuous.html', 'plant-evidence.html', 'verification.html', 'src', 'docs', 'LICENSE', 'NOTICE']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
+await cp(resolve(root, 'validation/open_loop_startup/native.json'), resolve(output, 'open-loop-startup-native.json'));
+await cp(resolve(root, 'validation/open_loop_startup/result.json'), resolve(output, 'open-loop-startup.json'));
 await cp(resolve(root, 'validation/startup_transfer/result.json'), resolve(output, 'startup-transfer.json'));
 await cp(resolve(root, 'validation/startup_holdout/result.json'), resolve(output, 'shippingport-startup.json'));
 await cp(resolve(root, 'validation/shippingport_development/result.json'), resolve(output, 'shippingport-development.json'));

@@ -1,0 +1,497 @@
+{
+  "caseId": "epri-mrp393-westinghouse-heatup",
+  "source": "https://restservice.epri.com/publicdownload/000000003002003085/0/Product",
+  "page": 19,
+  "figure": "2-1",
+  "pageContentSha256": "35ab24494549dd7482533d5b55bdab12286d47f505514d8e3085f4bda3791684",
+  "records": [
+    {
+      "elapsedS": 0,
+      "hotF": 116.9,
+      "coldF": 115.8,
+      "pressurePsig": 164,
+      "averageCoolantTemperatureC": 46.861111,
+      "primaryPressureMPa": 1.232065
+    },
+    {
+      "elapsedS": 3600,
+      "hotF": 116.7,
+      "coldF": 115.6,
+      "pressurePsig": 163,
+      "averageCoolantTemperatureC": 46.75,
+      "primaryPressureMPa": 1.22517
+    },
+    {
+      "elapsedS": 7200,
+      "hotF": 116.5,
+      "coldF": 115.4,
+      "pressurePsig": 162,
+      "averageCoolantTemperatureC": 46.638889,
+      "primaryPressureMPa": 1.218276
+    },
+    {
+      "elapsedS": 10800,
+      "hotF": 116.3,
+      "coldF": 115.2,
+      "pressurePsig": 162,
+      "averageCoolantTemperatureC": 46.527778,
+      "primaryPressureMPa": 1.218276
+    },
+    {
+      "elapsedS": 14400,
+      "hotF": 116.1,
+      "coldF": 115.1,
+      "pressurePsig": 161,
+      "averageCoolantTemperatureC": 46.444444,
+      "primaryPressureMPa": 1.211381
+    },
+    {
+      "elapsedS": 18000,
+      "hotF": 115.9,
+      "coldF": 114.9,
+      "pressurePsig": 161,
+      "averageCoolantTemperatureC": 46.333333,
+      "primaryPressureMPa": 1.211381
+    },
+    {
+      "elapsedS": 21600,
+      "hotF": 115.7,
+      "coldF": 114.7,
+      "pressurePsig": 160,
+      "averageCoolantTemperatureC": 46.222222,
+      "primaryPressureMPa": 1.204486
+    },
+    {
+      "elapsedS": 25200,
+      "hotF": 115.5,
+      "coldF": 114.5,
+      "pressurePsig": 159,
+      "averageCoolantTemperatureC": 46.111111,
+      "primaryPressureMPa": 1.197591
+    },
+    {
+      "elapsedS": 28800,
+      "hotF": 115.3,
+      "coldF": 114.3,
+      "pressurePsig": 159,
+      "averageCoolantTemperatureC": 46.0,
+      "primaryPressureMPa": 1.197591
+    },
+    {
+      "elapsedS": 32400,
+      "hotF": 115.3,
+      "coldF": 114.2,
+      "pressurePsig": 160,
+      "averageCoolantTemperatureC": 45.972222,
+      "primaryPressureMPa": 1.204486
+    },
+    {
+      "elapsedS": 36000,
+      "hotF": 116.3,
+      "coldF": 114.7,
+      "pressurePsig": 164,
+      "averageCoolantTemperatureC": 46.388889,
+      "primaryPressureMPa": 1.232065
+    },
+    {
+      "elapsedS": 39600,
+      "hotF": 118.2,
+      "coldF": 115.8,
+      "pressurePsig": 158,
+      "averageCoolantTemperatureC": 47.222222,
+      "primaryPressureMPa": 1.190697
+    },
+    {
+      "elapsedS": 43200,
+      "hotF": 118.2,
+      "coldF": 116.4,
+      "pressurePsig": 159,
+      "averageCoolantTemperatureC": 47.388889,
+      "primaryPressureMPa": 1.197591
+    },
+    {
+      "elapsedS": 46800,
+      "hotF": 117.9,
+      "coldF": 117.0,
+      "pressurePsig": 160,
+      "averageCoolantTemperatureC": 47.472222,
+      "primaryPressureMPa": 1.204486
+    },
+    {
+      "elapsedS": 50400,
+      "hotF": 117.6,
+      "coldF": 117.3,
+      "pressurePsig": 161,
+      "averageCoolantTemperatureC": 47.472222,
+      "primaryPressureMPa": 1.211381
+    },
+    {
+      "elapsedS": 54000,
+      "hotF": 117.3,
+      "coldF": 116.9,
+      "pressurePsig": 162,
+      "averageCoolantTemperatureC": 47.277778,
+      "primaryPressureMPa": 1.218276
+    },
+    {
+      "elapsedS": 57600,
+      "hotF": 117.1,
+      "coldF": 116.6,
+      "pressurePsig": 162,
+      "averageCoolantTemperatureC": 47.138889,
+      "primaryPressureMPa": 1.218276
+    },
+    {
+      "elapsedS": 61200,
+      "hotF": 116.8,
+      "coldF": 116.2,
+      "pressurePsig": 210,
+      "averageCoolantTemperatureC": 46.944444,
+      "primaryPressureMPa": 1.549224
+    },
+    {
+      "elapsedS": 64800,
+      "hotF": 118.1,
+      "coldF": 118.1,
+      "pressurePsig": 334,
+      "averageCoolantTemperatureC": 47.833333,
+      "primaryPressureMPa": 2.404174
+    },
+    {
+      "elapsedS": 68400,
+      "hotF": 142.2,
+      "coldF": 142.2,
+      "pressurePsig": 332,
+      "averageCoolantTemperatureC": 61.222222,
+      "primaryPressureMPa": 2.390384
+    },
+    {
+      "elapsedS": 72000,
+      "hotF": 166.9,
+      "coldF": 167.2,
+      "pressurePsig": 335,
+      "averageCoolantTemperatureC": 75.027778,
+      "primaryPressureMPa": 2.411069
+    },
+    {
+      "elapsedS": 75600,
+      "hotF": 181.8,
+      "coldF": 182.7,
+      "pressurePsig": 336,
+      "averageCoolantTemperatureC": 83.472222,
+      "primaryPressureMPa": 2.417963
+    },
+    {
+      "elapsedS": 79200,
+      "hotF": 182.4,
+      "coldF": 184.1,
+      "pressurePsig": 327,
+      "averageCoolantTemperatureC": 84.027778,
+      "primaryPressureMPa": 2.355911
+    },
+    {
+      "elapsedS": 82800,
+      "hotF": 182.9,
+      "coldF": 184.5,
+      "pressurePsig": 329,
+      "averageCoolantTemperatureC": 84.277778,
+      "primaryPressureMPa": 2.3697
+    },
+    {
+      "elapsedS": 86400,
+      "hotF": 183.5,
+      "coldF": 185.0,
+      "pressurePsig": 332,
+      "averageCoolantTemperatureC": 84.583333,
+      "primaryPressureMPa": 2.390384
+    },
+    {
+      "elapsedS": 90000,
+      "hotF": 184.2,
+      "coldF": 185.5,
+      "pressurePsig": 333,
+      "averageCoolantTemperatureC": 84.916667,
+      "primaryPressureMPa": 2.397279
+    },
+    {
+      "elapsedS": 93600,
+      "hotF": 184.9,
+      "coldF": 186.2,
+      "pressurePsig": 335,
+      "averageCoolantTemperatureC": 85.305556,
+      "primaryPressureMPa": 2.411069
+    },
+    {
+      "elapsedS": 97200,
+      "hotF": 186.0,
+      "coldF": 187.0,
+      "pressurePsig": 342,
+      "averageCoolantTemperatureC": 85.833333,
+      "primaryPressureMPa": 2.459332
+    },
+    {
+      "elapsedS": 100800,
+      "hotF": 188.5,
+      "coldF": 189.7,
+      "pressurePsig": 353,
+      "averageCoolantTemperatureC": 87.277778,
+      "primaryPressureMPa": 2.535174
+    },
+    {
+      "elapsedS": 104400,
+      "hotF": 193.2,
+      "coldF": 194.5,
+      "pressurePsig": 354,
+      "averageCoolantTemperatureC": 89.916667,
+      "primaryPressureMPa": 2.542069
+    },
+    {
+      "elapsedS": 108000,
+      "hotF": 224.6,
+      "coldF": 225.7,
+      "pressurePsig": 355,
+      "averageCoolantTemperatureC": 107.305556,
+      "primaryPressureMPa": 2.548964
+    },
+    {
+      "elapsedS": 111600,
+      "hotF": 260.4,
+      "coldF": 261.3,
+      "pressurePsig": 356,
+      "averageCoolantTemperatureC": 127.138889,
+      "primaryPressureMPa": 2.555859
+    },
+    {
+      "elapsedS": 115200,
+      "hotF": 286.2,
+      "coldF": 286.7,
+      "pressurePsig": 357,
+      "averageCoolantTemperatureC": 141.361111,
+      "primaryPressureMPa": 2.562753
+    },
+    {
+      "elapsedS": 118800,
+      "hotF": 310.9,
+      "coldF": 311.6,
+      "pressurePsig": 351,
+      "averageCoolantTemperatureC": 155.138889,
+      "primaryPressureMPa": 2.521385
+    },
+    {
+      "elapsedS": 122400,
+      "hotF": 337.2,
+      "coldF": 338.0,
+      "pressurePsig": 349,
+      "averageCoolantTemperatureC": 169.777778,
+      "primaryPressureMPa": 2.507595
+    },
+    {
+      "elapsedS": 126000,
+      "hotF": 339.3,
+      "coldF": 340.2,
+      "pressurePsig": 347,
+      "averageCoolantTemperatureC": 170.972222,
+      "primaryPressureMPa": 2.493806
+    },
+    {
+      "elapsedS": 129600,
+      "hotF": 339.7,
+      "coldF": 339.5,
+      "pressurePsig": 349,
+      "averageCoolantTemperatureC": 170.888889,
+      "primaryPressureMPa": 2.507595
+    },
+    {
+      "elapsedS": 133200,
+      "hotF": 340.1,
+      "coldF": 340.0,
+      "pressurePsig": 351,
+      "averageCoolantTemperatureC": 171.138889,
+      "primaryPressureMPa": 2.521385
+    },
+    {
+      "elapsedS": 136800,
+      "hotF": 340.4,
+      "coldF": 341.4,
+      "pressurePsig": 372,
+      "averageCoolantTemperatureC": 171.611111,
+      "primaryPressureMPa": 2.666175
+    },
+    {
+      "elapsedS": 140400,
+      "hotF": 342.1,
+      "coldF": 342.3,
+      "pressurePsig": 391,
+      "averageCoolantTemperatureC": 172.333333,
+      "primaryPressureMPa": 2.797175
+    },
+    {
+      "elapsedS": 144000,
+      "hotF": 378.4,
+      "coldF": 378.9,
+      "pressurePsig": 519,
+      "averageCoolantTemperatureC": 192.583333,
+      "primaryPressureMPa": 3.679704
+    },
+    {
+      "elapsedS": 147600,
+      "hotF": 417.7,
+      "coldF": 418.4,
+      "pressurePsig": 802,
+      "averageCoolantTemperatureC": 214.472222,
+      "primaryPressureMPa": 5.63092
+    },
+    {
+      "elapsedS": 151200,
+      "hotF": 433.4,
+      "coldF": 435.5,
+      "pressurePsig": 922,
+      "averageCoolantTemperatureC": 223.583333,
+      "primaryPressureMPa": 6.458291
+    },
+    {
+      "elapsedS": 154800,
+      "hotF": 458.4,
+      "coldF": 458.9,
+      "pressurePsig": 1106,
+      "averageCoolantTemperatureC": 237.027778,
+      "primaryPressureMPa": 7.726927
+    },
+    {
+      "elapsedS": 158400,
+      "hotF": 487.5,
+      "coldF": 488.3,
+      "pressurePsig": 1480,
+      "averageCoolantTemperatureC": 253.277778,
+      "primaryPressureMPa": 10.305566
+    },
+    {
+      "elapsedS": 162000,
+      "hotF": 516.5,
+      "coldF": 517.0,
+      "pressurePsig": 1811,
+      "averageCoolantTemperatureC": 269.305556,
+      "primaryPressureMPa": 12.58773
+    },
+    {
+      "elapsedS": 165600,
+      "hotF": 542.0,
+      "coldF": 543.0,
+      "pressurePsig": 2196,
+      "averageCoolantTemperatureC": 283.611111,
+      "primaryPressureMPa": 15.242212
+    },
+    {
+      "elapsedS": 169200,
+      "hotF": 558.9,
+      "coldF": 560.0,
+      "pressurePsig": 2235,
+      "averageCoolantTemperatureC": 293.027778,
+      "primaryPressureMPa": 15.511108
+    },
+    {
+      "elapsedS": 172800,
+      "hotF": 558.4,
+      "coldF": 559.3,
+      "pressurePsig": 2236,
+      "averageCoolantTemperatureC": 292.694444,
+      "primaryPressureMPa": 15.518002
+    },
+    {
+      "elapsedS": 176400,
+      "hotF": 557.8,
+      "coldF": 558.6,
+      "pressurePsig": 2235,
+      "averageCoolantTemperatureC": 292.333333,
+      "primaryPressureMPa": 15.511108
+    },
+    {
+      "elapsedS": 180000,
+      "hotF": 558.5,
+      "coldF": 559.5,
+      "pressurePsig": 2233,
+      "averageCoolantTemperatureC": 292.777778,
+      "primaryPressureMPa": 15.497318
+    },
+    {
+      "elapsedS": 183600,
+      "hotF": 558.8,
+      "coldF": 558.1,
+      "pressurePsig": 2232,
+      "averageCoolantTemperatureC": 292.472222,
+      "primaryPressureMPa": 15.490423
+    },
+    {
+      "elapsedS": 187200,
+      "hotF": 557.3,
+      "coldF": 557.9,
+      "pressurePsig": 2234,
+      "averageCoolantTemperatureC": 292.0,
+      "primaryPressureMPa": 15.504213
+    },
+    {
+      "elapsedS": 190800,
+      "hotF": 557.0,
+      "coldF": 557.7,
+      "pressurePsig": 2234,
+      "averageCoolantTemperatureC": 291.861111,
+      "primaryPressureMPa": 15.504213
+    },
+    {
+      "elapsedS": 194400,
+      "hotF": 556.8,
+      "coldF": 557.5,
+      "pressurePsig": 2234,
+      "averageCoolantTemperatureC": 291.75,
+      "primaryPressureMPa": 15.504213
+    },
+    {
+      "elapsedS": 198000,
+      "hotF": 556.5,
+      "coldF": 557.3,
+      "pressurePsig": 2233,
+      "averageCoolantTemperatureC": 291.611111,
+      "primaryPressureMPa": 15.497318
+    },
+    {
+      "elapsedS": 201600,
+      "hotF": 556.2,
+      "coldF": 557.1,
+      "pressurePsig": 2233,
+      "averageCoolantTemperatureC": 291.472222,
+      "primaryPressureMPa": 15.497318
+    },
+    {
+      "elapsedS": 205200,
+      "hotF": 555.9,
+      "coldF": 556.9,
+      "pressurePsig": 2232,
+      "averageCoolantTemperatureC": 291.333333,
+      "primaryPressureMPa": 15.490423
+    },
+    {
+      "elapsedS": 208800,
+      "hotF": 557.9,
+      "coldF": 558.7,
+      "pressurePsig": 2232,
+      "averageCoolantTemperatureC": 292.388889,
+      "primaryPressureMPa": 15.490423
+    },
+    {
+      "elapsedS": 212400,
+      "hotF": 558.9,
+      "coldF": 559.9,
+      "pressurePsig": 2232,
+      "averageCoolantTemperatureC": 293.0,
+      "primaryPressureMPa": 15.490423
+    },
+    {
+      "elapsedS": 216000,
+      "hotF": 558.3,
+      "coldF": 559.2,
+      "pressurePsig": 2231,
+      "averageCoolantTemperatureC": 292.638889,
+      "primaryPressureMPa": 15.483529
+    }
+  ]
+}

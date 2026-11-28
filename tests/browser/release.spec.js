@@ -20,6 +20,49 @@ test('paired workbench restores the v0.14 feedwater law when reopening its recip
   expect(JSON.parse(await readFile(await downloaded.path(), 'utf8'))).toEqual(original);
 });
 
+test('open-loop startup shows discrete station readings and the uninterrupted native trajectory', async ({ page, request }) => {
+  const response = await request.get('open-loop-startup.json');
+  expect(response.ok()).toBe(true);
+  const data = await response.json();
+  const format = new Intl.NumberFormat('en', {maximumFractionDigits: 3});
+  await page.goto('startup-evidence.html#open-loop');
+  await expect(page.locator('#ol-results')).toBeVisible();
+  for (const key of ['ohi', 'westinghouse']) {
+    const event = data[key];
+    await page.locator('#ol-event').selectOption(key);
+    for (const [channel, unit] of [['primaryPressureMPa', 'MPa abs'], ['averageCoolantTemperatureC', '°C']]) {
+      await page.locator('#ol-channel').selectOption(channel);
+      await expect(page.locator('#ol-chart .observed-point')).toHaveCount(event.rows.length);
+      await expect(page.locator('#ol-chart path')).toHaveCount(1);
+      await expect(page.locator('#ol-score')).toContainText(format.format(event.scores[channel].native.rmse) + ' ' + unit);
+      const last = event.rows.at(-1);
+      await page.locator('#ol-jump').selectOption(String(last.elapsedHours * 3600));
+      await expect(page.locator('#ol-native-value')).toHaveText(format.format(last.native[channel]) + ' ' + unit);
+      await expect(page.locator('#ol-station-value')).toHaveText(format.format(last.station[channel]) + ' ' + unit);
+      await page.locator('#ol-time').press('ArrowLeft');
+      await expect(page.locator('#ol-station-value')).toHaveText('No reading at this time');
+    }
+  }
+  await expect(page.locator('#ol-channel option[value=power]')).toBeDisabled();
+  await page.locator('#ol-event').selectOption('ohi');
+  await page.locator('#ol-channel').selectOption('power');
+  const available = data.ohi.rows.filter(row => row.stationGrossLoadFraction != null);
+  await expect(page.locator('#ol-chart .observed-point')).toHaveCount(available.length);
+  await page.locator('#ol-jump').selectOption(String(available.at(-1).elapsedHours * 3600));
+  await expect(page.locator('#ol-station-value')).toHaveText(format.format(available.at(-1).stationGrossLoadFraction * 100) + ' % rated');
+  await page.locator('#ol-window').selectOption('native');
+  await page.locator('#ol-time').press('End');
+  await expect(page.locator('#ol-elapsed')).toHaveText('500 h');
+  await expect(page.locator('#ol-grid')).toHaveText('Rated power');
+  await expect(page.locator('#ol-station-value')).toHaveText('No reading at this time');
+  await page.locator('#ol-play').click();
+  await expect(page.locator('#ol-play')).toHaveText('Pause');
+  await expect(page.locator('#ol-time')).not.toHaveValue('0');
+  await page.locator('#ol-play').click();
+  await expect(page.locator('#ol-play')).toHaveText('Play');
+  expect(await page.locator('#open-loop').evaluate(card => card.scrollWidth <= card.clientWidth + 1)).toBe(true);
+});
+
 test('startup forecasts show event-specific errors and forecast origins at each horizon', async ({ page, request }) => {
   const response = await request.get('startup-transfer.json');
   expect(response.ok()).toBe(true);

@@ -129,6 +129,9 @@ def ohi(index, fixture):
             "initialError": residual(rows[0]), "finalError": residual(rows[-1]),
             "scores": summarize(rows[1:], rows[0]["station"]),
             "pressureRawAsAbsoluteSensitivity": stats(errors_raw),
+            "exploratoryTemperatureSensorSensitivity": {
+                key: stats([row["native"][key] - row["station"][CHANNELS[1]] for row in rows[1:]])
+                for key in ("hotLegTemperatureC", "coldLegTemperatureC")},
             "rows": rows}
 
 

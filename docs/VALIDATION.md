@@ -1,6 +1,6 @@
 # Verification and validation status
 
-OpenPWR includes numerical verification and comparisons against published point-kinetics and water-property benchmarks. It has **not** been validated against a specific plant's measured transient data, qualified operator simulator, or an independently validated whole-plant code. Passing component benchmarks does not establish physical accuracy of cold startup or the whole plant.
+The browser engine has numerical tests and published point-kinetics and water-property benchmarks. The native models have separate measured-event comparisons, including pressure and coolant temperature from cold shutdown through rated operation at Ōi Unit 3. That test quantifies error on 14 daily station snapshots under a generic startup schedule. It leaves intra-day accuracy and applicability to other plants unresolved. OpenPWR is an educational simulator. [Measured startup results](../validation/open_loop_startup/README.md) · [Coverage by event](STARTUP_MEASURED_EVIDENCE.md)
 
 ## Reproduce the checks
 

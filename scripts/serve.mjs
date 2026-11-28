@@ -8,6 +8,8 @@ import { makeEvidenceView, viewSources } from './evidence-view.mjs';
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = process.argv.includes('--source');
 const startupReports = new Map([
+  ['open-loop-startup-native.json', 'validation/open_loop_startup/native.json'],
+  ['open-loop-startup.json', 'validation/open_loop_startup/result.json'],
   ['startup-transfer.json', 'validation/startup_transfer/result.json'],
   ['shippingport-startup.json', 'validation/startup_holdout/result.json'],
   ['shippingport-development.json', 'validation/shippingport_development/result.json'],

@@ -1,0 +1,18 @@
+{
+  "protocolRevision": "ea36e3c761de5813616e2b1beaa4d5aa995afc89",
+  "ohiProtocolRevision": "dddd86e139bc395ddd8ec5e8a1450a7cf5afafe9",
+  "candidateRevision": "63b5668f800d9c319e52d64af47826ba96525360",
+  "predictionRevision": "0a53e39f6593341658170a94aa9dafbc36ce7c4c",
+  "predictionUrl": "https://github.com/ajayasai/OpenPWR/blob/0a53e39f6593341658170a94aa9dafbc36ce7c4c/validation/open_loop_startup/native.json",
+  "sha256": {
+    "validation/open_loop_startup/protocol.json": "eb3c0e3093e7668adc658ff837a1bc7916e4aab9264d4596f5e7bafaf508d559",
+    "validation/open_loop_startup/ohi-protocol.json": "41ecdeda70f8c581f45c24991f85271d724457941ec42e5f825d157ac3c52270",
+    "validation/open_loop_startup/native-scenario.json": "09ba24f3c76107d8c02a6d004c9ddff4cbb36e0e6bb30b2474a0034a5eeb66fe",
+    "validation/open_loop_startup/native.json": "ead15232755630e5faa9ca64ddf2a26639b9b60eebe8943a76568d957e8a617f",
+    "validation/open_loop_startup/measured/extract.py": "beddfcf3c16bc64d84574c3c67adec156683877ac4b4ce787c9e73a7b19ba2cf",
+    "validation/open_loop_startup/measured/observations.json": "f62c6f5803d30b8a3d16c79bd166e55e3784660e3004aedc68eca420f8e3f55c",
+    "validation/open_loop_startup/ohi/extract.py": "99b738b555ed4f97f38386339320b8bc39a66243b1eed5f444bc4eb034659be4",
+    "validation/open_loop_startup/ohi/sources.json": "85982f6036f78b787a40391e4db094a4280bf71c2be3b5f26a4a7bbf5c4d8587",
+    "validation/open_loop_startup/ohi/observations.json": "f4cecf0290f8a9bc56e8fad98317f9f49db8cd9da4b38e9c438a74ed7efe8e76"
+  }
+}

@@ -36,7 +36,9 @@ async function fixture(t) {
   const dir = await mkdtemp(prefix);
   t.after(async () => { assert.ok(resolve(dir).startsWith(resolve(prefix))); await rm(dir, { recursive: true, force: true }); });
   for (const path of ['scripts', 'src', 'docs', 'backend', 'models/OpenPWR', 'validation/krsko2005', 'validation/pactel1998', 'validation/baselines', 'artifacts/modelica']) await mkdir(join(dir, path), { recursive: true });
-  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development', 'startup_transfer']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development', 'startup_transfer', 'open_loop_startup']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  await writeFile(join(dir, 'validation/open_loop_startup/result.json'), '{}');
+  await writeFile(join(dir, 'validation/open_loop_startup/native.json'), '{}');
   await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
   await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{}');
   await writeFile(join(dir, 'validation/startup_transfer/result.json'), '{}');

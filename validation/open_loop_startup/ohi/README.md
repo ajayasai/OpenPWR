@@ -16,7 +16,9 @@ The operator recorded grid connection on July 5 at 07:00 (+210 h) and the start 
 | `thermalMW` | Measured steam-generator thermal output in MWt. The operator indicates rated thermal operation separately from the daily instrument values. |
 | `operatingMode` | Operating mode shown on the particular Unit 3 panel. |
 
-The extractor keeps each numerical indication at its printed precision. All four numerical channels are present on all 14 panels. The PDF headings, station operating mode, dates and times identify the event. Readings between snapshots are unobserved. The measured record includes primary-system inspection, preparation and operator holds. [Unit 3/4 engineering documentation, Table 1](https://www.nra.go.jp/data/000466017.pdf) · [Scoring protocol](../ohi-protocol.json)
+Kansai defines Unit 3 average coolant temperature elsewhere as the mean of the coolant temperatures entering and leaving the reactor. The 2012 panels give a shorter channel label. IAEA lists the station's gross electrical rating as 1,180 MW. [Unit 3 average-temperature definition, note 2](https://www.kepco.co.jp/corporate/pr/2009/0114-1j.html) · [Unit 3/4 engineering documentation, Table 1](https://www.nra.go.jp/data/000466017.pdf) · [IAEA reactor data, entry JP-51](https://www-pub.iaea.org/MTCD/Publications/PDF/RDS-2-43_web.pdf)
+
+The extractor reads the printed numerical indications. All four numerical channels are present on all 14 panels. The PDF headings, station operating mode, dates and times identify the event. Readings between snapshots are unobserved. The measured record includes primary-system inspection, preparation and operator holds. [Scoring protocol](../ohi-protocol.json)
 
 ## Reproduce the fixture
 

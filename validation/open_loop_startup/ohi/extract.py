@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 import re
 import unicodedata
-from urllib.error import URLError
 from urllib.request import urlopen
 
 from pypdf import PdfReader
@@ -49,7 +48,7 @@ def read_pdf(source, directory, fetch):
             directory.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
             return data
-        except (OSError, URLError) as exc:
+        except OSError as exc:
             errors.append(f"{url}: {exc}")
     raise OSError("\n".join(errors))
 

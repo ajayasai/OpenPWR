@@ -1,0 +1,1592 @@
+{
+  "schema": "openpwr-native-open-loop-validation-v1",
+  "provenance": {
+    "protocolRevision": "ea36e3c761de5813616e2b1beaa4d5aa995afc89",
+    "ohiProtocolRevision": "dddd86e139bc395ddd8ec5e8a1450a7cf5afafe9",
+    "candidateRevision": "63b5668f800d9c319e52d64af47826ba96525360",
+    "predictionRevision": "0a53e39f6593341658170a94aa9dafbc36ce7c4c",
+    "predictionUrl": "https://github.com/ajayasai/OpenPWR/blob/0a53e39f6593341658170a94aa9dafbc36ce7c4c/validation/open_loop_startup/native.json",
+    "sha256": {
+      "validation/open_loop_startup/protocol.json": "eb3c0e3093e7668adc658ff837a1bc7916e4aab9264d4596f5e7bafaf508d559",
+      "validation/open_loop_startup/ohi-protocol.json": "41ecdeda70f8c581f45c24991f85271d724457941ec42e5f825d157ac3c52270",
+      "validation/open_loop_startup/native-scenario.json": "09ba24f3c76107d8c02a6d004c9ddff4cbb36e0e6bb30b2474a0034a5eeb66fe",
+      "validation/open_loop_startup/native.json": "ead15232755630e5faa9ca64ddf2a26639b9b60eebe8943a76568d957e8a617f",
+      "validation/open_loop_startup/measured/extract.py": "beddfcf3c16bc64d84574c3c67adec156683877ac4b4ce787c9e73a7b19ba2cf",
+      "validation/open_loop_startup/measured/observations.json": "f62c6f5803d30b8a3d16c79bd166e55e3784660e3004aedc68eca420f8e3f55c",
+      "validation/open_loop_startup/ohi/extract.py": "99b738b555ed4f97f38386339320b8bc39a66243b1eed5f444bc4eb034659be4",
+      "validation/open_loop_startup/ohi/sources.json": "85982f6036f78b787a40391e4db094a4280bf71c2be3b5f26a4a7bbf5c4d8587",
+      "validation/open_loop_startup/ohi/observations.json": "f4cecf0290f8a9bc56e8fad98317f9f49db8cd9da4b38e9c438a74ed7efe8e76"
+    }
+  },
+  "nativeSamples": 6001,
+  "nativeDurationHours": 500,
+  "pressureUnit": "MPa absolute",
+  "temperatureUnit": "degrees Celsius",
+  "reference": "Station hour-zero pressure and temperature carried forward through the event",
+  "milestones": {
+    "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/09/0709_3j_01.pdf#page=2",
+    "ohiGridConnectionHours": 210,
+    "nativeGridConnectionHours": 33.0,
+    "gridDifferenceHours": -177.0,
+    "ohiRatedThermalHours": 300,
+    "nativeSustainedRatedEnvelopeStartHours": 55.083333333333336,
+    "ratedDifferenceHours": -244.91666666666666,
+    "ratedDefinitions": "The operator reported the start of constant rated thermal output. The native time is the first five-minute sample in its sustained full-power envelope."
+  },
+  "ohi": {
+    "id": "kepco-ohi3-2012",
+    "measuredScope": "Daily snapshots from cold shutdown through rated thermal power",
+    "clock": "13:00 JST each day, June 26 through July 9, 2012",
+    "initialError": {
+      "primaryPressureMPa": -2.571325,
+      "averageCoolantTemperatureC": -18.3
+    },
+    "finalError": {
+      "primaryPressureMPa": -0.021325,
+      "averageCoolantTemperatureC": 6.818375
+    },
+    "scores": {
+      "primaryPressureMPa": {
+        "native": {
+          "n": 13,
+          "rmse": 4.667258,
+          "mae": 1.954764,
+          "bias": 1.686367,
+          "maxAbsoluteError": 12.648674
+        },
+        "originPersistence": {
+          "n": 13,
+          "rmse": 11.775974,
+          "mae": 10.945385,
+          "bias": -10.942308,
+          "maxAbsoluteError": 13.95
+        },
+        "beatsOriginPersistence": true
+      },
+      "averageCoolantTemperatureC": {
+        "native": {
+          "n": 13,
+          "rmse": 94.091318,
+          "mae": 54.678718,
+          "bias": 54.678718,
+          "maxAbsoluteError": 258.546378
+        },
+        "originPersistence": {
+          "n": 13,
+          "rmse": 213.07281,
+          "mae": 198.392308,
+          "bias": -195.884615,
+          "maxAbsoluteError": 247.5
+        },
+        "beatsOriginPersistence": true
+      }
+    },
+    "pressureRawAsAbsoluteSensitivity": {
+      "n": 13,
+      "rmse": 4.704817,
+      "mae": 1.983077,
+      "bias": 1.787692,
+      "maxAbsoluteError": 12.749999
+    },
+    "exploratoryTemperatureSensorSensitivity": {
+      "hotLegTemperatureC": {
+        "n": 13,
+        "rmse": 101.49224,
+        "mae": 69.936962,
+        "bias": 69.936962,
+        "maxAbsoluteError": 270.384175
+      },
+      "coldLegTemperatureC": {
+        "n": 13,
+        "rmse": 88.956644,
+        "mae": 43.869016,
+        "bias": 39.420474,
+        "maxAbsoluteError": 246.70858
+      }
+    },
+    "rows": [
+      {
+        "elapsedHours": 0,
+        "station": {
+          "primaryPressureMPa": 2.871325,
+          "averageCoolantTemperatureC": 58.3,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 5
+        },
+        "native": {
+          "primaryPressureMPa": 0.3,
+          "averageCoolantTemperatureC": 40.0,
+          "hotLegTemperatureC": 40.0,
+          "coldLegTemperatureC": 40.0,
+          "reactorPowerMW": 2.802e-05,
+          "netPowerMW": -2.5,
+          "gridConnected": 0.0
+        },
+        "timestamp": "2012-06-26T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/26/0626_1j_01_1.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": -0.0025
+      },
+      {
+        "elapsedHours": 24,
+        "station": {
+          "primaryPressureMPa": 16.821325,
+          "averageCoolantTemperatureC": 99.8,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 4
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999883613854,
+          "averageCoolantTemperatureC": 275.87487739361893,
+          "hotLegTemperatureC": 275.97445857759317,
+          "coldLegTemperatureC": 275.7752962096447,
+          "reactorPowerMW": 14.97726383407079,
+          "netPowerMW": -41.63377347146129,
+          "gridConnected": 0.0
+        },
+        "timestamp": "2012-06-27T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/27/0627_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": -0.041634
+      },
+      {
+        "elapsedHours": 48,
+        "station": {
+          "primaryPressureMPa": 2.851325,
+          "averageCoolantTemperatureC": 42.0,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 5
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999406229902,
+          "averageCoolantTemperatureC": 300.5463777128579,
+          "hotLegTemperatureC": 312.3841754349718,
+          "coldLegTemperatureC": 288.70857999074406,
+          "reactorPowerMW": 1949.1575250457126,
+          "netPowerMW": 599.9999327966078,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-06-28T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/28/0628_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.6
+      },
+      {
+        "elapsedHours": 72,
+        "station": {
+          "primaryPressureMPa": 4.481325,
+          "averageCoolantTemperatureC": 192.0,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 3
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999997121572,
+          "averageCoolantTemperatureC": 312.61833396424606,
+          "hotLegTemperatureC": 329.565574106129,
+          "coldLegTemperatureC": 295.6710938223631,
+          "reactorPowerMW": 2999.996376453785,
+          "netPowerMW": 999.9969053944969,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-06-29T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/29/0629_1j_01.pdf",
+        "page": 4,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.999997
+      },
+      {
+        "elapsedHours": 96,
+        "station": {
+          "primaryPressureMPa": 15.651325,
+          "averageCoolantTemperatureC": 291.7,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 3
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999996644,
+          "averageCoolantTemperatureC": 312.6183747994573,
+          "hotLegTemperatureC": 329.5656303443868,
+          "coldLegTemperatureC": 295.67111925452775,
+          "reactorPowerMW": 2999.999999358947,
+          "netPowerMW": 999.9962111439562,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-06-30T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0630_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.999996
+      },
+      {
+        "elapsedHours": 120,
+        "station": {
+          "primaryPressureMPa": 15.601325,
+          "averageCoolantTemperatureC": 292.2,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 3
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999997403,
+          "averageCoolantTemperatureC": 312.61837480668964,
+          "hotLegTemperatureC": 329.565630354341,
+          "coldLegTemperatureC": 295.6711192590383,
+          "reactorPowerMW": 2999.999999999833,
+          "netPowerMW": 999.9974652459846,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-01T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0701_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.999997
+      },
+      {
+        "elapsedHours": 144,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 291.9,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 0.0,
+          "operatingMode": 2
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999995577,
+          "averageCoolantTemperatureC": 312.61837480666844,
+          "hotLegTemperatureC": 329.56563035432544,
+          "coldLegTemperatureC": 295.67111925901145,
+          "reactorPowerMW": 3000.0000000000546,
+          "netPowerMW": 999.9939301880624,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-02T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/02/0702_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.999994
+      },
+      {
+        "elapsedHours": 168,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 294.2,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 176.8,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.4999999999968,
+          "averageCoolantTemperatureC": 312.61837480668544,
+          "hotLegTemperatureC": 329.56563035434,
+          "coldLegTemperatureC": 295.6711192590309,
+          "reactorPowerMW": 3000.000000000012,
+          "netPowerMW": 999.995934964713,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-03T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/03/0703j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.999996
+      },
+      {
+        "elapsedHours": 192,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 294.2,
+          "generatorGrossMW": 0.0,
+          "steamGeneratorThermalMW": 207.4,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999997437,
+          "averageCoolantTemperatureC": 312.6183748066921,
+          "hotLegTemperatureC": 329.5656303543451,
+          "coldLegTemperatureC": 295.6711192590391,
+          "reactorPowerMW": 2999.9999999999645,
+          "netPowerMW": 999.9971410453445,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-04T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/04/0704_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.0,
+        "nativeNetLoadFraction": 0.999997
+      },
+      {
+        "elapsedHours": 216,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 294.8,
+          "generatorGrossMW": 246.6,
+          "steamGeneratorThermalMW": 961.6,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999994953,
+          "averageCoolantTemperatureC": 312.6183748066689,
+          "hotLegTemperatureC": 329.5656303543244,
+          "coldLegTemperatureC": 295.6711192590134,
+          "reactorPowerMW": 3000.000000000039,
+          "netPowerMW": 999.9980525947337,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-05T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/05/0705_1j_01.pdf",
+        "page": 3,
+        "stationGrossLoadFraction": 0.208983,
+        "nativeNetLoadFraction": 0.999998
+      },
+      {
+        "elapsedHours": 240,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 298.4,
+          "generatorGrossMW": 594.2,
+          "steamGeneratorThermalMW": 1886.7,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999995916,
+          "averageCoolantTemperatureC": 312.6183748066811,
+          "hotLegTemperatureC": 329.56563035433646,
+          "coldLegTemperatureC": 295.6711192590258,
+          "reactorPowerMW": 3000.000000000024,
+          "netPowerMW": 999.9953192301349,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-06T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/06/0706_1j_01.pdf",
+        "page": 4,
+        "stationGrossLoadFraction": 0.503559,
+        "nativeNetLoadFraction": 0.999995
+      },
+      {
+        "elapsedHours": 264,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 301.9,
+          "generatorGrossMW": 893.0,
+          "steamGeneratorThermalMW": 2634.6,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999999999698,
+          "averageCoolantTemperatureC": 312.61837480668925,
+          "hotLegTemperatureC": 329.56563035434306,
+          "coldLegTemperatureC": 295.67111925903544,
+          "reactorPowerMW": 2999.9999999999836,
+          "netPowerMW": 999.9968025264199,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-07T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/07/0707_2j_01.pdf",
+        "page": 4,
+        "stationGrossLoadFraction": 0.75678,
+        "nativeNetLoadFraction": 0.999997
+      },
+      {
+        "elapsedHours": 288,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 305.5,
+          "generatorGrossMW": 1181.0,
+          "steamGeneratorThermalMW": 3363.2,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999999999682,
+          "averageCoolantTemperatureC": 312.6183748066868,
+          "hotLegTemperatureC": 329.56563035433885,
+          "coldLegTemperatureC": 295.67111925903475,
+          "reactorPowerMW": 2999.9999999999554,
+          "netPowerMW": 999.9978572512232,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-08T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/08/0708_1j_01.pdf",
+        "page": 4,
+        "stationGrossLoadFraction": 1.000847,
+        "nativeNetLoadFraction": 0.999998
+      },
+      {
+        "elapsedHours": 312,
+        "station": {
+          "primaryPressureMPa": 15.521325,
+          "averageCoolantTemperatureC": 305.8,
+          "generatorGrossMW": 1196.0,
+          "steamGeneratorThermalMW": 3406.1,
+          "operatingMode": 1
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999996106,
+          "averageCoolantTemperatureC": 312.61837480668174,
+          "hotLegTemperatureC": 329.56563035433703,
+          "coldLegTemperatureC": 295.67111925902645,
+          "reactorPowerMW": 3000.00000000003,
+          "netPowerMW": 999.9950013616269,
+          "gridConnected": 1.0
+        },
+        "timestamp": "2012-07-09T13:00:00+09:00",
+        "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/09/0709_3j_01.pdf",
+        "page": 4,
+        "stationGrossLoadFraction": 1.013559,
+        "nativeNetLoadFraction": 0.999995
+      }
+    ]
+  },
+  "westinghouse": {
+    "id": "epri-mrp393-westinghouse-heatup",
+    "sourceUrl": "https://restservice.epri.com/publicdownload/000000003002003085/0/Product",
+    "measuredScope": "Station heatup at zero reactor power",
+    "clock": "Figure elapsed hours 0 through 60",
+    "initialError": {
+      "primaryPressureMPa": -0.932065,
+      "averageCoolantTemperatureC": -6.861111
+    },
+    "scores": {
+      "primaryPressureMPa": {
+        "native": {
+          "n": 60,
+          "rmse": 8.668045,
+          "mae": 6.502744,
+          "bias": 6.28471,
+          "maxAbsoluteError": 13.933397
+        },
+        "originPersistence": {
+          "n": 60,
+          "rmse": 7.513629,
+          "mae": 4.684643,
+          "bias": -4.672922,
+          "maxAbsoluteError": 14.285937
+        },
+        "beatsOriginPersistence": false
+      },
+      "averageCoolantTemperatureC": {
+        "native": {
+          "n": 60,
+          "rmse": 103.663037,
+          "mae": 83.842818,
+          "bias": 83.840137,
+          "maxAbsoluteError": 191.291544
+        },
+        "originPersistence": {
+          "n": 60,
+          "rmse": 144.089029,
+          "mae": 104.494445,
+          "bias": -104.32037,
+          "maxAbsoluteError": 246.166667
+        },
+        "beatsOriginPersistence": true
+      }
+    },
+    "blocks": [
+      {
+        "fromHourExclusive": 0,
+        "toHourInclusive": 20,
+        "scores": {
+          "primaryPressureMPa": {
+            "native": {
+              "n": 20,
+              "rmse": 6.647602,
+              "mae": 4.812364,
+              "bias": 4.163548,
+              "maxAbsoluteError": 13.933397
+            },
+            "originPersistence": {
+              "n": 20,
+              "rmse": 0.459121,
+              "mae": 0.208911,
+              "bias": -0.173748,
+              "maxAbsoluteError": 1.179004
+            },
+            "beatsOriginPersistence": false
+          },
+          "averageCoolantTemperatureC": {
+            "native": {
+              "n": 20,
+              "rmse": 91.234679,
+              "mae": 78.712271,
+              "bias": 78.704227,
+              "maxAbsoluteError": 144.973161
+            },
+            "originPersistence": {
+              "n": 20,
+              "rmse": 7.089823,
+              "mae": 2.580556,
+              "bias": -2.058333,
+              "maxAbsoluteError": 28.166667
+            },
+            "beatsOriginPersistence": false
+          }
+        }
+      },
+      {
+        "fromHourExclusive": 20,
+        "toHourInclusive": 40,
+        "scores": {
+          "primaryPressureMPa": {
+            "native": {
+              "n": 20,
+              "rmse": 12.940606,
+              "mae": 12.937671,
+              "bias": 12.937671,
+              "maxAbsoluteError": 13.14392
+            },
+            "originPersistence": {
+              "n": 20,
+              "rmse": 1.358283,
+              "mae": 1.329999,
+              "bias": -1.329999,
+              "maxAbsoluteError": 2.447639
+            },
+            "beatsOriginPersistence": false
+          },
+          "averageCoolantTemperatureC": {
+            "native": {
+              "n": 20,
+              "rmse": 151.363592,
+              "mae": 147.343584,
+              "bias": 147.343584,
+              "maxAbsoluteError": 191.291544
+            },
+            "originPersistence": {
+              "n": 20,
+              "rmse": 88.91292,
+              "mae": 79.131945,
+              "bias": -79.131945,
+              "maxAbsoluteError": 145.722222
+            },
+            "beatsOriginPersistence": false
+          }
+        }
+      },
+      {
+        "fromHourExclusive": 40,
+        "toHourInclusive": 60,
+        "scores": {
+          "primaryPressureMPa": {
+            "native": {
+              "n": 20,
+              "rmse": 3.708792,
+              "mae": 1.758196,
+              "bias": 1.75291,
+              "maxAbsoluteError": 9.869079
+            },
+            "originPersistence": {
+              "n": 20,
+              "rmse": 12.934765,
+              "mae": 12.515019,
+              "bias": -12.515019,
+              "maxAbsoluteError": 14.285937
+            },
+            "beatsOriginPersistence": true
+          },
+          "averageCoolantTemperatureC": {
+            "native": {
+              "n": 20,
+              "rmse": 31.676046,
+              "mae": 25.4726,
+              "bias": 25.4726,
+              "maxAbsoluteError": 76.800253
+            },
+            "originPersistence": {
+              "n": 20,
+              "rmse": 233.08619,
+              "mae": 231.770833,
+              "bias": -231.770833,
+              "maxAbsoluteError": 246.166667
+            },
+            "beatsOriginPersistence": true
+          }
+        }
+      }
+    ],
+    "rows": [
+      {
+        "elapsedHours": 0,
+        "station": {
+          "primaryPressureMPa": 1.232065,
+          "averageCoolantTemperatureC": 46.861111
+        },
+        "native": {
+          "primaryPressureMPa": 0.3,
+          "averageCoolantTemperatureC": 40.0,
+          "hotLegTemperatureC": 40.0,
+          "coldLegTemperatureC": 40.0,
+          "reactorPowerMW": 2.802e-05,
+          "netPowerMW": -2.5,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 1,
+        "station": {
+          "primaryPressureMPa": 1.22517,
+          "averageCoolantTemperatureC": 46.75
+        },
+        "native": {
+          "primaryPressureMPa": 0.32753289992503903,
+          "averageCoolantTemperatureC": 46.669556908193556,
+          "hotLegTemperatureC": 46.691934389806136,
+          "coldLegTemperatureC": 46.647179426580976,
+          "reactorPowerMW": 2.98792259841969,
+          "netPowerMW": -17.779572157118828,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 2,
+        "station": {
+          "primaryPressureMPa": 1.218276,
+          "averageCoolantTemperatureC": 46.638889
+        },
+        "native": {
+          "primaryPressureMPa": 0.36460874202301363,
+          "averageCoolantTemperatureC": 55.0900856244497,
+          "hotLegTemperatureC": 55.112568674705926,
+          "coldLegTemperatureC": 55.06760257419347,
+          "reactorPowerMW": 2.992814832014899,
+          "netPowerMW": -17.779572157118828,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 3,
+        "station": {
+          "primaryPressureMPa": 1.218276,
+          "averageCoolantTemperatureC": 46.527778
+        },
+        "native": {
+          "primaryPressureMPa": 0.4193481649900844,
+          "averageCoolantTemperatureC": 63.53850321543467,
+          "hotLegTemperatureC": 63.561066795044724,
+          "coldLegTemperatureC": 63.51593963582462,
+          "reactorPowerMW": 2.9948344844267614,
+          "netPowerMW": -17.779572157118835,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 4,
+        "station": {
+          "primaryPressureMPa": 1.211381,
+          "averageCoolantTemperatureC": 46.444444
+        },
+        "native": {
+          "primaryPressureMPa": 0.5019655599100985,
+          "averageCoolantTemperatureC": 72.01330709681187,
+          "hotLegTemperatureC": 72.03594884175828,
+          "coldLegTemperatureC": 71.99066535186546,
+          "reactorPowerMW": 2.9962048266852057,
+          "netPowerMW": -17.77957215711883,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 5,
+        "station": {
+          "primaryPressureMPa": 1.211381,
+          "averageCoolantTemperatureC": 46.333333
+        },
+        "native": {
+          "primaryPressureMPa": 0.6259672804082362,
+          "averageCoolantTemperatureC": 80.51424005944506,
+          "hotLegTemperatureC": 80.53695957314261,
+          "coldLegTemperatureC": 80.4915205457475,
+          "reactorPowerMW": 2.9971579251700815,
+          "netPowerMW": -17.77957215711883,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 6,
+        "station": {
+          "primaryPressureMPa": 1.204486,
+          "averageCoolantTemperatureC": 46.222222
+        },
+        "native": {
+          "primaryPressureMPa": 0.17289793318261584,
+          "averageCoolantTemperatureC": 88.97645010924819,
+          "hotLegTemperatureC": 88.99897754325735,
+          "coldLegTemperatureC": 88.95392267523903,
+          "reactorPowerMW": 2.9978347404276144,
+          "netPowerMW": -17.77957215711883,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 7,
+        "station": {
+          "primaryPressureMPa": 1.197591,
+          "averageCoolantTemperatureC": 46.111111
+        },
+        "native": {
+          "primaryPressureMPa": 0.29727018446787606,
+          "averageCoolantTemperatureC": 97.49286556515327,
+          "hotLegTemperatureC": 97.51556800237648,
+          "coldLegTemperatureC": 97.47016312793005,
+          "reactorPowerMW": 2.99829015512142,
+          "netPowerMW": -17.77957215711883,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 8,
+        "station": {
+          "primaryPressureMPa": 1.197591,
+          "averageCoolantTemperatureC": 46.0
+        },
+        "native": {
+          "primaryPressureMPa": 0.486402751890387,
+          "averageCoolantTemperatureC": 106.03534087595091,
+          "hotLegTemperatureC": 106.0581099172141,
+          "coldLegTemperatureC": 106.01257183468772,
+          "reactorPowerMW": 2.9986102949803586,
+          "netPowerMW": -17.77957215711883,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 9,
+        "station": {
+          "primaryPressureMPa": 1.204486,
+          "averageCoolantTemperatureC": 45.972222
+        },
+        "native": {
+          "primaryPressureMPa": 4.211005289351927,
+          "averageCoolantTemperatureC": 114.0424626512931,
+          "hotLegTemperatureC": 114.07047234968633,
+          "coldLegTemperatureC": 114.01445295289989,
+          "reactorPowerMW": 2.9986243621073227,
+          "netPowerMW": -20.27957215711883,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 10,
+        "station": {
+          "primaryPressureMPa": 1.232065,
+          "averageCoolantTemperatureC": 46.388889
+        },
+        "native": {
+          "primaryPressureMPa": 5.999483358224708,
+          "averageCoolantTemperatureC": 122.94015106510122,
+          "hotLegTemperatureC": 122.96271922152431,
+          "coldLegTemperatureC": 122.91758290867813,
+          "reactorPowerMW": 2.99899921527923,
+          "netPowerMW": -17.281122082386318,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 11,
+        "station": {
+          "primaryPressureMPa": 1.190697,
+          "averageCoolantTemperatureC": 47.222222
+        },
+        "native": {
+          "primaryPressureMPa": 5.999741408731817,
+          "averageCoolantTemperatureC": 131.48134535810206,
+          "hotLegTemperatureC": 131.5039094539331,
+          "coldLegTemperatureC": 131.45878126227103,
+          "reactorPowerMW": 2.999109414505386,
+          "netPowerMW": -17.280347930923384,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 12,
+        "station": {
+          "primaryPressureMPa": 1.197591,
+          "averageCoolantTemperatureC": 47.388889
+        },
+        "native": {
+          "primaryPressureMPa": 5.999757423802329,
+          "averageCoolantTemperatureC": 140.02470988263914,
+          "hotLegTemperatureC": 140.04726482563262,
+          "coldLegTemperatureC": 140.00215493964566,
+          "reactorPowerMW": 2.9991863185000356,
+          "netPowerMW": -17.280299885711848,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 13,
+        "station": {
+          "primaryPressureMPa": 1.204486,
+          "averageCoolantTemperatureC": 47.472222
+        },
+        "native": {
+          "primaryPressureMPa": 5.999771901158491,
+          "averageCoolantTemperatureC": 148.56791424727325,
+          "hotLegTemperatureC": 148.59045375369607,
+          "coldLegTemperatureC": 148.54537474085043,
+          "reactorPowerMW": 2.9992404862438873,
+          "netPowerMW": -17.28025645364336,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 14,
+        "station": {
+          "primaryPressureMPa": 1.211381,
+          "averageCoolantTemperatureC": 47.472222
+        },
+        "native": {
+          "primaryPressureMPa": 5.999785182305687,
+          "averageCoolantTemperatureC": 157.10839870701335,
+          "hotLegTemperatureC": 157.13091527655763,
+          "coldLegTemperatureC": 157.08588213746907,
+          "reactorPowerMW": 2.999279034497548,
+          "netPowerMW": -17.28021661020177,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 15,
+        "station": {
+          "primaryPressureMPa": 1.218276,
+          "averageCoolantTemperatureC": 47.277778
+        },
+        "native": {
+          "primaryPressureMPa": 5.999797576610185,
+          "averageCoolantTemperatureC": 165.64336372406265,
+          "hotLegTemperatureC": 165.6658483994736,
+          "coldLegTemperatureC": 165.62087904865172,
+          "reactorPowerMW": 2.9993069485824124,
+          "netPowerMW": -17.280179427288274,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 16,
+        "station": {
+          "primaryPressureMPa": 1.218276,
+          "averageCoolantTemperatureC": 47.138889
+        },
+        "native": {
+          "primaryPressureMPa": 5.999809374247602,
+          "averageCoolantTemperatureC": 174.1697488625393,
+          "hotLegTemperatureC": 174.1921909839707,
+          "coldLegTemperatureC": 174.1473067411079,
+          "reactorPowerMW": 2.9993277305106583,
+          "netPowerMW": -17.28014403437603,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 17,
+        "station": {
+          "primaryPressureMPa": 1.549224,
+          "averageCoolantTemperatureC": 46.944444
+        },
+        "native": {
+          "primaryPressureMPa": 15.48262087706903,
+          "averageCoolantTemperatureC": 184.29506771539297,
+          "hotLegTemperatureC": 184.31786319101246,
+          "coldLegTemperatureC": 184.27227223977349,
+          "reactorPowerMW": 2.999285692839357,
+          "netPowerMW": -17.331709526103243,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 18,
+        "station": {
+          "primaryPressureMPa": 2.404174,
+          "averageCoolantTemperatureC": 47.833333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499813719249321,
+          "averageCoolantTemperatureC": 192.80649369600985,
+          "hotLegTemperatureC": 192.8290414212375,
+          "coldLegTemperatureC": 192.7839459707822,
+          "reactorPowerMW": 2.9993540922657123,
+          "netPowerMW": -17.280130999370854,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 19,
+        "station": {
+          "primaryPressureMPa": 2.390384,
+          "averageCoolantTemperatureC": 61.222222
+        },
+        "native": {
+          "primaryPressureMPa": 15.499818463032632,
+          "averageCoolantTemperatureC": 201.29717054538926,
+          "hotLegTemperatureC": 201.31965462550352,
+          "coldLegTemperatureC": 201.274686465275,
+          "reactorPowerMW": 2.999365305865452,
+          "netPowerMW": -17.28011676802094,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 20,
+        "station": {
+          "primaryPressureMPa": 2.411069,
+          "averageCoolantTemperatureC": 75.027778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499822882777933,
+          "averageCoolantTemperatureC": 209.76625005199026,
+          "hotLegTemperatureC": 209.78865405738367,
+          "coldLegTemperatureC": 209.74384604659684,
+          "reactorPowerMW": 2.9993755472369727,
+          "netPowerMW": -17.28010350878505,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 21,
+        "station": {
+          "primaryPressureMPa": 2.417963,
+          "averageCoolantTemperatureC": 83.472222
+        },
+        "native": {
+          "primaryPressureMPa": 15.499827103197015,
+          "averageCoolantTemperatureC": 218.2095249355559,
+          "hotLegTemperatureC": 218.2318298747391,
+          "coldLegTemperatureC": 218.18721999637268,
+          "reactorPowerMW": 2.9993855400027516,
+          "netPowerMW": -17.280090847527795,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 22,
+        "station": {
+          "primaryPressureMPa": 2.355911,
+          "averageCoolantTemperatureC": 84.027778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499831258011664,
+          "averageCoolantTemperatureC": 226.62246342590137,
+          "hotLegTemperatureC": 226.64464744240638,
+          "coldLegTemperatureC": 226.60027940939636,
+          "reactorPowerMW": 2.999395772860457,
+          "netPowerMW": -17.28007838308384,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 23,
+        "station": {
+          "primaryPressureMPa": 2.3697,
+          "averageCoolantTemperatureC": 84.277778
+        },
+        "native": {
+          "primaryPressureMPa": 15.495098671097,
+          "averageCoolantTemperatureC": 274.1555492227244,
+          "hotLegTemperatureC": 274.19768309059384,
+          "coldLegTemperatureC": 274.11341535485496,
+          "reactorPowerMW": 14.902981084165836,
+          "netPowerMW": -41.573848300946295,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 24,
+        "station": {
+          "primaryPressureMPa": 2.390384,
+          "averageCoolantTemperatureC": 84.583333
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999883613854,
+          "averageCoolantTemperatureC": 275.87487739361893,
+          "hotLegTemperatureC": 275.97445857759317,
+          "coldLegTemperatureC": 275.7752962096447,
+          "reactorPowerMW": 14.97726383407079,
+          "netPowerMW": -41.63377347146129,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 25,
+        "station": {
+          "primaryPressureMPa": 2.397279,
+          "averageCoolantTemperatureC": 84.916667
+        },
+        "native": {
+          "primaryPressureMPa": 15.4999999897779,
+          "averageCoolantTemperatureC": 275.87497885822154,
+          "hotLegTemperatureC": 275.9746093616802,
+          "coldLegTemperatureC": 275.77534835476285,
+          "reactorPowerMW": 14.98467058979325,
+          "netPowerMW": -41.63379056075304,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 26,
+        "station": {
+          "primaryPressureMPa": 2.411069,
+          "averageCoolantTemperatureC": 85.305556
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999993057333,
+          "averageCoolantTemperatureC": 275.875048579963,
+          "hotLegTemperatureC": 275.9747129719158,
+          "coldLegTemperatureC": 275.7753841880102,
+          "reactorPowerMW": 14.989760672706591,
+          "netPowerMW": -41.633804669841176,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 27,
+        "station": {
+          "primaryPressureMPa": 2.459332,
+          "averageCoolantTemperatureC": 85.833333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999995161374,
+          "averageCoolantTemperatureC": 275.875097193619,
+          "hotLegTemperatureC": 275.9747852144294,
+          "coldLegTemperatureC": 275.7754091728086,
+          "reactorPowerMW": 14.993309785804911,
+          "netPowerMW": -41.63381450797614,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 28,
+        "station": {
+          "primaryPressureMPa": 2.535174,
+          "averageCoolantTemperatureC": 87.277778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999996624393,
+          "averageCoolantTemperatureC": 275.875131109404,
+          "hotLegTemperatureC": 275.97483561511376,
+          "coldLegTemperatureC": 275.7754266036942,
+          "reactorPowerMW": 14.995785860218207,
+          "netPowerMW": -41.63382137166131,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 29,
+        "station": {
+          "primaryPressureMPa": 2.542069,
+          "averageCoolantTemperatureC": 89.916667
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999997644919,
+          "averageCoolantTemperatureC": 275.87515477162236,
+          "hotLegTemperatureC": 275.97487077844414,
+          "coldLegTemperatureC": 275.7754387648006,
+          "reactorPowerMW": 14.997513357193476,
+          "netPowerMW": -41.633826160288926,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 30,
+        "station": {
+          "primaryPressureMPa": 2.548964,
+          "averageCoolantTemperatureC": 107.305556
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999998356904,
+          "averageCoolantTemperatureC": 275.87517128019095,
+          "hotLegTemperatureC": 275.9748953110653,
+          "coldLegTemperatureC": 275.7754472493166,
+          "reactorPowerMW": 14.998718590932613,
+          "netPowerMW": -41.633829501201234,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 31,
+        "station": {
+          "primaryPressureMPa": 2.555859,
+          "averageCoolantTemperatureC": 127.138889
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999998853665,
+          "averageCoolantTemperatureC": 275.8751827978276,
+          "hotLegTemperatureC": 275.9749124268933,
+          "coldLegTemperatureC": 275.77545316876194,
+          "reactorPowerMW": 14.99955945400604,
+          "netPowerMW": -41.63383183207648,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 32,
+        "station": {
+          "primaryPressureMPa": 2.562753,
+          "averageCoolantTemperatureC": 141.361111
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999999200236,
+          "averageCoolantTemperatureC": 275.8751908334096,
+          "hotLegTemperatureC": 275.9749243682006,
+          "coldLegTemperatureC": 275.77545729861856,
+          "reactorPowerMW": 15.000146104284953,
+          "netPowerMW": -41.633833458273216,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 33,
+        "station": {
+          "primaryPressureMPa": 2.521385,
+          "averageCoolantTemperatureC": 155.138889
+        },
+        "native": {
+          "primaryPressureMPa": 15.499991903518305,
+          "averageCoolantTemperatureC": 277.707945278148,
+          "hotLegTemperatureC": 278.6972382705029,
+          "coldLegTemperatureC": 276.71865228579304,
+          "reactorPowerMW": 149.56683261806796,
+          "netPowerMW": -42.006922372569946,
+          "gridConnected": 0.0
+        }
+      },
+      {
+        "elapsedHours": 34,
+        "station": {
+          "primaryPressureMPa": 2.507595,
+          "averageCoolantTemperatureC": 169.777778
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999973352856,
+          "averageCoolantTemperatureC": 277.6689699089373,
+          "hotLegTemperatureC": 278.65943689789583,
+          "coldLegTemperatureC": 276.67850291997877,
+          "reactorPowerMW": 149.72656850366886,
+          "netPowerMW": -4.691845985149712e-05,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 35,
+        "station": {
+          "primaryPressureMPa": 2.493806,
+          "averageCoolantTemperatureC": 170.972222
+        },
+        "native": {
+          "primaryPressureMPa": 15.499980336591937,
+          "averageCoolantTemperatureC": 283.71403967938943,
+          "hotLegTemperatureC": 287.59992440452436,
+          "coldLegTemperatureC": 279.8281549542545,
+          "reactorPowerMW": 598.3769367529967,
+          "netPowerMW": 2.4218806956355365e-05,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 36,
+        "station": {
+          "primaryPressureMPa": 2.507595,
+          "averageCoolantTemperatureC": 170.888889
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999010878062,
+          "averageCoolantTemperatureC": 283.5755137096584,
+          "hotLegTemperatureC": 287.46693624126306,
+          "coldLegTemperatureC": 279.6840911780538,
+          "reactorPowerMW": 598.9609163808099,
+          "netPowerMW": 150.00002616139662,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 37,
+        "station": {
+          "primaryPressureMPa": 2.521385,
+          "averageCoolantTemperatureC": 171.138889
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999954280709,
+          "averageCoolantTemperatureC": 283.57974997439567,
+          "hotLegTemperatureC": 287.4731807407477,
+          "coldLegTemperatureC": 279.68631920804364,
+          "reactorPowerMW": 599.2775898354382,
+          "netPowerMW": 150.00004291618137,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 38,
+        "station": {
+          "primaryPressureMPa": 2.666175,
+          "averageCoolantTemperatureC": 171.611111
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999687319864,
+          "averageCoolantTemperatureC": 283.5826718965642,
+          "hotLegTemperatureC": 287.4774878313052,
+          "coldLegTemperatureC": 279.6878559618232,
+          "reactorPowerMW": 599.4960601645822,
+          "netPowerMW": 149.99994900435522,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 39,
+        "station": {
+          "primaryPressureMPa": 2.797175,
+          "averageCoolantTemperatureC": 172.333333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999782016465,
+          "averageCoolantTemperatureC": 283.584709520145,
+          "hotLegTemperatureC": 287.48049140396404,
+          "coldLegTemperatureC": 279.68892763632596,
+          "reactorPowerMW": 599.6484145463623,
+          "netPowerMW": 149.99987754131632,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 40,
+        "station": {
+          "primaryPressureMPa": 3.679704,
+          "averageCoolantTemperatureC": 192.583333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499972840147997,
+          "averageCoolantTemperatureC": 291.45582877921316,
+          "hotLegTemperatureC": 299.02437224705056,
+          "coldLegTemperatureC": 283.88728531137576,
+          "reactorPowerMW": 1197.849169487512,
+          "netPowerMW": 150.00001839768504,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 41,
+        "station": {
+          "primaryPressureMPa": 5.63092,
+          "averageCoolantTemperatureC": 214.472222
+        },
+        "native": {
+          "primaryPressureMPa": 15.499998625962718,
+          "averageCoolantTemperatureC": 291.2724753412597,
+          "hotLegTemperatureC": 298.8511212835019,
+          "coldLegTemperatureC": 283.69382939901743,
+          "reactorPowerMW": 1198.6221565063142,
+          "netPowerMW": 350.0000115254845,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 42,
+        "station": {
+          "primaryPressureMPa": 6.458291,
+          "averageCoolantTemperatureC": 223.583333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999360600222,
+          "averageCoolantTemperatureC": 291.2779292696604,
+          "hotLegTemperatureC": 298.85907633873467,
+          "coldLegTemperatureC": 283.6967822005861,
+          "reactorPowerMW": 1199.0420339691248,
+          "netPowerMW": 350.00002193592815,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 43,
+        "station": {
+          "primaryPressureMPa": 7.726927,
+          "averageCoolantTemperatureC": 237.027778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999562598907,
+          "averageCoolantTemperatureC": 291.28169150920496,
+          "hotLegTemperatureC": 298.86456389854925,
+          "coldLegTemperatureC": 283.6988191198607,
+          "reactorPowerMW": 1199.331739011728,
+          "netPowerMW": 349.9999803118736,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 44,
+        "station": {
+          "primaryPressureMPa": 10.305566,
+          "averageCoolantTemperatureC": 253.277778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999695060815,
+          "averageCoolantTemperatureC": 291.2843151363659,
+          "hotLegTemperatureC": 298.8683906729623,
+          "coldLegTemperatureC": 283.7002395997695,
+          "reactorPowerMW": 1199.533771436337,
+          "netPowerMW": 349.9999749560862,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 45,
+        "station": {
+          "primaryPressureMPa": 12.58773,
+          "averageCoolantTemperatureC": 269.305556
+        },
+        "native": {
+          "primaryPressureMPa": 15.499961498219635,
+          "averageCoolantTemperatureC": 300.7608007115531,
+          "hotLegTemperatureC": 312.57544858341294,
+          "coldLegTemperatureC": 288.94615283969324,
+          "reactorPowerMW": 1947.2861561513794,
+          "netPowerMW": 350.0000263912271,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 46,
+        "station": {
+          "primaryPressureMPa": 15.242212,
+          "averageCoolantTemperatureC": 283.611111
+        },
+        "native": {
+          "primaryPressureMPa": 15.49999813914871,
+          "averageCoolantTemperatureC": 300.53529018156695,
+          "hotLegTemperatureC": 312.36828738652343,
+          "coldLegTemperatureC": 288.70229297661047,
+          "reactorPowerMW": 1948.2629265672501,
+          "netPowerMW": 600.0000466322876,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 47,
+        "station": {
+          "primaryPressureMPa": 15.511108,
+          "averageCoolantTemperatureC": 293.027778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999131964643,
+          "averageCoolantTemperatureC": 300.54185173415266,
+          "hotLegTemperatureC": 312.3776899020345,
+          "coldLegTemperatureC": 288.7060135662708,
+          "reactorPowerMW": 1948.7922954657329,
+          "netPowerMW": 599.999979047114,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 48,
+        "station": {
+          "primaryPressureMPa": 15.518002,
+          "averageCoolantTemperatureC": 292.694444
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999406229902,
+          "averageCoolantTemperatureC": 300.5463777128579,
+          "hotLegTemperatureC": 312.3841754349718,
+          "coldLegTemperatureC": 288.70857999074406,
+          "reactorPowerMW": 1949.1575250457126,
+          "netPowerMW": 599.9999327966078,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 49,
+        "station": {
+          "primaryPressureMPa": 15.511108,
+          "averageCoolantTemperatureC": 292.333333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999586040405,
+          "averageCoolantTemperatureC": 300.54953390742895,
+          "hotLegTemperatureC": 312.38869808643904,
+          "coldLegTemperatureC": 288.71036972841887,
+          "reactorPowerMW": 1949.4122259398964,
+          "netPowerMW": 599.9999752189715,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 50,
+        "station": {
+          "primaryPressureMPa": 15.497318,
+          "averageCoolantTemperatureC": 292.777778
+        },
+        "native": {
+          "primaryPressureMPa": 15.499965868239853,
+          "averageCoolantTemperatureC": 307.77669282761025,
+          "hotLegTemperatureC": 322.64800270458613,
+          "coldLegTemperatureC": 292.90538295063436,
+          "reactorPowerMW": 2547.6755682931125,
+          "netPowerMW": 599.999959172248,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 51,
+        "station": {
+          "primaryPressureMPa": 15.490423,
+          "averageCoolantTemperatureC": 292.472222
+        },
+        "native": {
+          "primaryPressureMPa": 15.499998329934519,
+          "averageCoolantTemperatureC": 307.6003554699608,
+          "hotLegTemperatureC": 322.4913685395827,
+          "coldLegTemperatureC": 292.70934240033887,
+          "reactorPowerMW": 2548.504943507321,
+          "netPowerMW": 799.9999728149152,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 52,
+        "station": {
+          "primaryPressureMPa": 15.504213,
+          "averageCoolantTemperatureC": 292.0
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999202378149,
+          "averageCoolantTemperatureC": 307.6057307459716,
+          "hotLegTemperatureC": 322.4989201236491,
+          "coldLegTemperatureC": 292.71254136829407,
+          "reactorPowerMW": 2548.9603311528813,
+          "netPowerMW": 800.0000692741602,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 53,
+        "station": {
+          "primaryPressureMPa": 15.504213,
+          "averageCoolantTemperatureC": 291.861111
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999453716198,
+          "averageCoolantTemperatureC": 307.6094410765755,
+          "hotLegTemperatureC": 322.5041325910919,
+          "coldLegTemperatureC": 292.71474956205907,
+          "reactorPowerMW": 2549.274736986242,
+          "netPowerMW": 799.9999899836289,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 54,
+        "station": {
+          "primaryPressureMPa": 15.504213,
+          "averageCoolantTemperatureC": 291.75
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999619128143,
+          "averageCoolantTemperatureC": 307.6120285471679,
+          "hotLegTemperatureC": 322.5077675674813,
+          "coldLegTemperatureC": 292.71628952685444,
+          "reactorPowerMW": 2549.494001068471,
+          "netPowerMW": 800.0000523213682,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 55,
+        "station": {
+          "primaryPressureMPa": 15.497318,
+          "averageCoolantTemperatureC": 291.611111
+        },
+        "native": {
+          "primaryPressureMPa": 15.499972113508525,
+          "averageCoolantTemperatureC": 312.78032169847,
+          "hotLegTemperatureC": 329.69931281424806,
+          "coldLegTemperatureC": 295.86133058269195,
+          "reactorPowerMW": 2998.2085556653833,
+          "netPowerMW": 799.9999957268765,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 56,
+        "station": {
+          "primaryPressureMPa": 15.497318,
+          "averageCoolantTemperatureC": 291.472222
+        },
+        "native": {
+          "primaryPressureMPa": 15.499998655030133,
+          "averageCoolantTemperatureC": 312.6053699793,
+          "hotLegTemperatureC": 329.54771955439173,
+          "coldLegTemperatureC": 295.6630204042083,
+          "reactorPowerMW": 2998.8463564015374,
+          "netPowerMW": 999.9954714863131,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 57,
+        "station": {
+          "primaryPressureMPa": 15.490423,
+          "averageCoolantTemperatureC": 291.333333
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999350414813,
+          "averageCoolantTemperatureC": 312.6093312330959,
+          "hotLegTemperatureC": 329.5531752863326,
+          "coldLegTemperatureC": 295.66548717985916,
+          "reactorPowerMW": 2999.1976919964463,
+          "netPowerMW": 999.9962205271747,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 58,
+        "station": {
+          "primaryPressureMPa": 15.490423,
+          "averageCoolantTemperatureC": 292.388889
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999554919512,
+          "averageCoolantTemperatureC": 312.61206617599925,
+          "hotLegTemperatureC": 329.55694198289484,
+          "coldLegTemperatureC": 295.66719036910365,
+          "reactorPowerMW": 2999.440315590918,
+          "netPowerMW": 999.9952710327051,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 59,
+        "station": {
+          "primaryPressureMPa": 15.490423,
+          "averageCoolantTemperatureC": 293.0
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999689684453,
+          "averageCoolantTemperatureC": 312.613973462621,
+          "hotLegTemperatureC": 329.55956876252367,
+          "coldLegTemperatureC": 295.66837816271834,
+          "reactorPowerMW": 2999.609520992503,
+          "netPowerMW": 999.9945157401913,
+          "gridConnected": 1.0
+        }
+      },
+      {
+        "elapsedHours": 60,
+        "station": {
+          "primaryPressureMPa": 15.483529,
+          "averageCoolantTemperatureC": 292.638889
+        },
+        "native": {
+          "primaryPressureMPa": 15.499999783497184,
+          "averageCoolantTemperatureC": 312.61530409593246,
+          "hotLegTemperatureC": 329.56140134204645,
+          "coldLegTemperatureC": 295.66920684981847,
+          "reactorPowerMW": 2999.7275704385193,
+          "netPowerMW": 1000.0009493055423,
+          "gridConnected": 1.0
+        }
+      }
+    ]
+  }
+}

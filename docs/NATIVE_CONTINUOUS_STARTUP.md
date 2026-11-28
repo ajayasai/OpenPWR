@@ -1,5 +1,7 @@
 # Continuous native cold-to-power model
 
+The free-running startup experiment introduced in v0.19 publishes the native pressure, coolant temperature and power every five minutes for 500 hours. A fixed generic scenario drives the FMU from cold shutdown to sustained rated output. A separate scoring program compares those predictions with fixed-time readings from Ōi Unit 3 and a second plant heatup. [Inputs, results and reproduction](../validation/open_loop_startup/README.md)
+
 `ContinuousPlant` extends the native engineering laboratory to one continuous
 trajectory: cold water and a subcritical neutron population, fission heatup,
 source removal, shaft acceleration, electrical synchronization, and a nominal

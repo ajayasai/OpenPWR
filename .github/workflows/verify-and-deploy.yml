@@ -31,6 +31,8 @@ jobs:
           python validation/startup_transfer/compare.py --check
       - name: Recompute the Shippingport development scores
         run: python validation/shippingport_development/assess.py --check
+      - name: Recompute the measured open-loop startup scores
+        run: python validation/open_loop_startup/compare.py --check
       - run: npm run verify
       - run: npm run build
   engineering:
@@ -63,6 +65,10 @@ jobs:
       - name: Verify the new native trace and reserved measurements
         run: python3 validation/shippingport_development/assess.py --repeat artifacts/shippingport-conditioned-native.json
       - run: npm run engineering:build
+      - name: Run the open-loop startup and compare it with the frozen forecast
+        run: |
+          npm run engineering:open-loop
+          python3 validation/open_loop_startup/compare.py --repeat artifacts/open-loop-startup-native.json
       - run: npm run engineering:test
         env:
           OPENPWR_FMU: artifacts/modelica/PrimaryLoop.fmu
@@ -125,6 +131,7 @@ jobs:
             artifacts/cold-verification.log
             artifacts/continuous-verification.json
             artifacts/shippingport-conditioned-native.json
+            artifacts/open-loop-startup-native.json
             artifacts/continuous-verification.log
             artifacts/measured-validation.json
             artifacts/continuous-measured-validation.json

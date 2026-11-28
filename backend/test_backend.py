@@ -227,6 +227,8 @@ class HttpTest(HttpFixture, unittest.TestCase):
             "/measured-validation.json": "artifacts/measured-validation.json",
             "/continuous-measured-validation.json": "artifacts/continuous-measured-validation.json",
             "/krsko-pressure-development.json": "artifacts/krsko-pressure-development.json",
+            "/open-loop-startup.json": "validation/open_loop_startup/result.json",
+            "/open-loop-startup-native.json": "validation/open_loop_startup/native.json",
             "/pressurizer-validation.json": "artifacts/pressurizer-validation.json"}
         for route, relative in reports.items():
             self.assertEqual(self.request("GET", route)[0], 404)

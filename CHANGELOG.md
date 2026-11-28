@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.0
+
+- Added a clock-driven, cold-to-rated native experiment with no measured initialization or subsequent readings. Two native integrations run 500 hours each and check conservation, full-power dwell and solver refinement.
+- Registered and tested the frozen prediction against 14 daily Ōi Unit 3 snapshots spanning cold shutdown through rated thermal power. Pressure and mean coolant temperature scored 4.67 MPa and 94.09 °C RMSE, compared with 11.78 MPa and 213.07 °C for carrying the first readings forward. Grid connection occurred 177 hours early.
+- Scored a second, pre-generation Westinghouse heatup. The native temperature prediction beat the baseline, while the pressure baseline scored better. Added an interactive timeline, source-linked observations, all 6,001 native samples and cross-build verification. [Measured results](validation/open_loop_startup/README.md)
+
 ## 0.18.0
 
 - Added an observation-based startup forecast with a native-model initial rate and a fitted one-hour trend decay time. Users can forecast from timestamped readings or inspect past forecast errors in the browser.

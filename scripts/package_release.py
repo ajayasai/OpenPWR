@@ -165,6 +165,7 @@ def comparison_sources(case, model):
 def verify(version, revision):
     for script in ('model.py', 'compare.py'):
         subprocess.run([sys.executable, f'validation/startup_transfer/{script}', '--check'], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, 'validation/open_loop_startup/compare.py', '--check'], cwd=ROOT, check=True)
     subprocess.run(['node', 'scripts/build.mjs', '--require-native', '--require-plant', '--require-cold',
         '--require-measured', '--require-pressurizer', '--require-continuous', '--require-continuous-measured',
         '--require-krsko-pressure'], cwd=ROOT, check=True)
@@ -194,6 +195,17 @@ def verify(version, revision):
         manifests[model] = manifest
     bound_sources(manifests['ColdStartPlant'], COLD_SOURCES, 'ColdStartPlant')
     bound_sources(manifests['ContinuousPlant'], CONTINUOUS_SOURCES, 'ContinuousPlant')
+    open_loop = read(ROOT / 'artifacts/open-loop-startup-native.json')
+    runtime = open_loop['nativeRuntime']
+    require(runtime['fmuSha256'] == manifests['ContinuousPlant']['fmuSha256'],
+            'Open-loop startup used a different ContinuousPlant binary')
+    require(open_loop['packageVersion'] == version and open_loop['modelBuildPackageVersion'] == version
+            and open_loop['modelBuildRevision'] == revision and open_loop['modelBuildDirty'] is False,
+            'Open-loop startup used a different build version or source revision')
+    require(open_loop['runRevision'] == revision and open_loop['runDirty'] is False,
+            'Open-loop startup runner source differs from the release')
+    subprocess.run([sys.executable, 'validation/open_loop_startup/compare.py', '--repeat',
+                    'artifacts/open-loop-startup-native.json'], cwd=ROOT, check=True)
     bound_sources(manifests['KrskoContinuousThermal'], CONTINUOUS_MEASURED_SOURCES, 'KrskoContinuousThermal')
     for model in PRESSURE_MODELS:
         bound_sources(manifests[model], PRESSURE_SOURCES, model)
@@ -281,6 +293,10 @@ tag v{version} and copy this archive's artifacts/ directory into that clean
 checkout, or rebuild the case there with
 `npm run engineering:shippingport -- --build`.
 
+For the uninterrupted open-loop forecast, the source archive contains the
+frozen predictions and the measured comparisons in validation/open_loop_startup/.
+The release build's independent native repeat is artifacts/open-loop-startup-native.json.
+
 Install the open-source toolchain in docs/ENGINEERING.md. Run:
 
     npm run engineering:setup
@@ -291,6 +307,8 @@ Install the open-source toolchain in docs/ENGINEERING.md. Run:
     npm run engineering:continuous:verify
     npm run engineering:continuous:measured
     npm run engineering:shippingport
+    npm run engineering:open-loop
+    python3 validation/open_loop_startup/compare.py --repeat artifacts/open-loop-startup-native.json
     python3 validation/shippingport_development/assess.py --repeat artifacts/shippingport-conditioned-native.json
     npm run engineering:pressure:verify
     npm run engineering:pressure
@@ -331,7 +349,8 @@ def package(version, revision):
                 archive_bytes(archive, prefix + path.relative_to(ROOT).as_posix(), path.read_bytes(), timestamp)
         for path, _, _ in REPORTS:
             archive_bytes(archive, prefix + path, (ROOT / path).read_bytes(), timestamp)
-        for evidence_path in ('artifacts/pressure-component-verification.json', 'artifacts/shippingport-conditioned-native.json'):
+        for evidence_path in ('artifacts/pressure-component-verification.json', 'artifacts/shippingport-conditioned-native.json',
+                              'artifacts/open-loop-startup-native.json'):
             archive_bytes(archive, prefix + evidence_path, (ROOT / evidence_path).read_bytes(), timestamp)
         # The local FMI host serves these same release-built views beside the full reports.
         views = ('plant-verification.view.json', 'krsko-pressure-development.view.json',
@@ -345,10 +364,12 @@ def package(version, revision):
             if path.is_file():
                 archive_bytes(archive, path.relative_to(ROOT / 'dist').as_posix(), path.read_bytes(), timestamp)
     assets = [native, web]
-    for folder, name in (('startup_holdout', 'shippingport-startup.json'),
-                         ('shippingport_development', 'shippingport-development.json'),
-                         ('startup_transfer', 'startup-transfer.json')):
-        require(sha(ROOT / 'validation' / folder / 'result.json') == sha(ROOT / 'dist' / name),
+    for source, name in (('startup_holdout/result.json', 'shippingport-startup.json'),
+                         ('shippingport_development/result.json', 'shippingport-development.json'),
+                         ('startup_transfer/result.json', 'startup-transfer.json'),
+                         ('open_loop_startup/result.json', 'open-loop-startup.json'),
+                         ('open_loop_startup/native.json', 'open-loop-startup-native.json')):
+        require(sha(ROOT / 'validation' / source) == sha(ROOT / 'dist' / name),
                 f'{name} differs from the checked-in evidence')
         destination = out / name
         shutil.copyfile(ROOT / 'dist' / name, destination)

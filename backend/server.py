@@ -212,6 +212,8 @@ class Handler(BaseHTTPRequestHandler):
             "krsko-pressure-development.json": "artifacts/krsko-pressure-development.json",
             "measured-validation.json": "artifacts/measured-validation.json",
             "pressurizer-validation.json": "artifacts/pressurizer-validation.json",
+            "open-loop-startup.json": "validation/open_loop_startup/result.json",
+            "open-loop-startup-native.json": "validation/open_loop_startup/native.json",
         }
         compact_sources = {source.replace(".json", ".view.json"): source for source in (
             "plant-verification.json", "measured-validation.json", "pressurizer-validation.json",

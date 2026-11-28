@@ -1,0 +1,159 @@
+{
+  "schema": "openpwr-ohi3-2012-observations-v1",
+  "records": [
+    {
+      "timestamp": "2012-06-26T13:00:00+09:00",
+      "elapsedHours": 0,
+      "coolantTemperatureC": 58.3,
+      "pressureMPaGauge": 2.77,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 5,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/26/0626_1j_01_1.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-06-27T13:00:00+09:00",
+      "elapsedHours": 24,
+      "coolantTemperatureC": 99.8,
+      "pressureMPaGauge": 16.72,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 4,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/27/0627_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-06-28T13:00:00+09:00",
+      "elapsedHours": 48,
+      "coolantTemperatureC": 42.0,
+      "pressureMPaGauge": 2.75,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 5,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/28/0628_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-06-29T13:00:00+09:00",
+      "elapsedHours": 72,
+      "coolantTemperatureC": 192.0,
+      "pressureMPaGauge": 4.38,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 3,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/06/29/0629_1j_01.pdf",
+      "page": 4
+    },
+    {
+      "timestamp": "2012-06-30T13:00:00+09:00",
+      "elapsedHours": 96,
+      "coolantTemperatureC": 291.7,
+      "pressureMPaGauge": 15.55,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 3,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0630_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-07-01T13:00:00+09:00",
+      "elapsedHours": 120,
+      "coolantTemperatureC": 292.2,
+      "pressureMPaGauge": 15.5,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 3,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/01/0701_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-07-02T13:00:00+09:00",
+      "elapsedHours": 144,
+      "coolantTemperatureC": 291.9,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 0.0,
+      "thermalMW": 0.0,
+      "operatingMode": 2,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/02/0702_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-07-03T13:00:00+09:00",
+      "elapsedHours": 168,
+      "coolantTemperatureC": 294.2,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 0.0,
+      "thermalMW": 176.8,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/03/0703j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-07-04T13:00:00+09:00",
+      "elapsedHours": 192,
+      "coolantTemperatureC": 294.2,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 0.0,
+      "thermalMW": 207.4,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/04/0704_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-07-05T13:00:00+09:00",
+      "elapsedHours": 216,
+      "coolantTemperatureC": 294.8,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 246.6,
+      "thermalMW": 961.6,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/05/0705_1j_01.pdf",
+      "page": 3
+    },
+    {
+      "timestamp": "2012-07-06T13:00:00+09:00",
+      "elapsedHours": 240,
+      "coolantTemperatureC": 298.4,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 594.2,
+      "thermalMW": 1886.7,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/06/0706_1j_01.pdf",
+      "page": 4
+    },
+    {
+      "timestamp": "2012-07-07T13:00:00+09:00",
+      "elapsedHours": 264,
+      "coolantTemperatureC": 301.9,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 893.0,
+      "thermalMW": 2634.6,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/07/0707_2j_01.pdf",
+      "page": 4
+    },
+    {
+      "timestamp": "2012-07-08T13:00:00+09:00",
+      "elapsedHours": 288,
+      "coolantTemperatureC": 305.5,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 1181.0,
+      "thermalMW": 3363.2,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/08/0708_1j_01.pdf",
+      "page": 4
+    },
+    {
+      "timestamp": "2012-07-09T13:00:00+09:00",
+      "elapsedHours": 312,
+      "coolantTemperatureC": 305.8,
+      "pressureMPaGauge": 15.42,
+      "generatorMW": 1196.0,
+      "thermalMW": 3406.1,
+      "operatingMode": 1,
+      "sourceUrl": "https://www.kepco.co.jp/corporate/pr/2012/__icsFiles/afieldfile/2012/07/09/0709_3j_01.pdf",
+      "page": 4
+    }
+  ]
+}

@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="dark">
   <title>Measured startup comparisons · OpenPWR</title>
   <link rel="stylesheet" href="./src/startup-evidence.css">
+  <link rel="stylesheet" href="./src/open-loop-startup.css">
 </head>
 <body>
   <main>
@@ -17,8 +18,47 @@
     </nav>
     <header>
       <h1>Measured startup comparisons</h1>
-      <p><a href="#startup-transfer">Pressure and temperature forecasts</a> · <a href="#shippingport-development">Shippingport model development</a> · <a href="#shippingport">Original Shippingport comparison</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
+      <p><a href="#open-loop">Cold-to-power forecast</a> · <a href="#startup-transfer">Short-horizon forecasts</a> · <a href="#shippingport-development">Shippingport model development</a> · <a href="#shippingport">Original Shippingport comparison</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
     </header>
+    <section id="open-loop" class="card historical" aria-labelledby="ol-title">
+      <h2 id="ol-title">Cold-to-power forecast</h2>
+      <p class="definition">OpenPWR starts cold and predicts the next 500 hours from a fixed control schedule. The simulator receives no plant readings during the run. Compare the same forecast with two independent station records.</p>
+      <p id="ol-status" class="status" role="status">Loading the frozen native run and measured comparisons…</p>
+      <div id="ol-results" hidden>
+        <div class="transfer-controls">
+          <div><label for="ol-event">Plant record</label><select id="ol-event"><option value="ohi">Ōi Unit 3 · 2012 restart</option><option value="westinghouse">Westinghouse · zero-power heatup</option></select></div>
+          <div><label for="ol-channel">Quantity</label><select id="ol-channel"><option value="primaryPressureMPa">Primary pressure</option><option value="averageCoolantTemperatureC">Coolant temperature</option><option value="power">Electrical output</option></select></div>
+          <div><label for="ol-window">Time window</label><select id="ol-window"><option value="station">Station record</option><option value="native">Full native run</option></select></div>
+        </div>
+        <div class="historical-grid">
+          <div>
+            <figure>
+              <svg id="ol-chart" viewBox="0 0 540 220" role="img" aria-labelledby="ol-caption"></svg>
+              <figcaption id="ol-caption"></figcaption>
+            </figure>
+            <ul class="plot-legend" aria-label="Chart legend"><li><i class="ol-native-key"></i>Native forecast</li><li><i class="ol-station-key"></i>Station readings</li></ul>
+            <div class="inspection">
+              <div class="reading"><label for="ol-time">Inspect elapsed time</label><output id="ol-elapsed" for="ol-time"></output></div>
+              <input type="range" id="ol-time" min="0" value="0" step="1">
+              <div class="ol-transport"><button id="ol-play" type="button">Play</button><label for="ol-jump">Jump to reading</label><select id="ol-jump"></select></div>
+            </div>
+          </div>
+          <div class="historical-results">
+            <h3>At the selected time</h3>
+            <dl class="ol-numbers">
+              <div><dt>Native forecast</dt><dd id="ol-native-value"></dd></div>
+              <div><dt>Station reading</dt><dd id="ol-station-value"></dd></div>
+              <div><dt>Native generator</dt><dd id="ol-grid"></dd></div>
+            </dl>
+            <h3 id="ol-score-title">Forecast error</h3>
+            <p id="ol-score"></p>
+            <p id="ol-milestones" hidden></p>
+          </div>
+        </div>
+        <p class="definition" id="ol-coverage"></p>
+        <p class="links"><a id="ol-source">Station source ↗</a><a href="./open-loop-startup.json" download>Download measured comparisons (JSON)</a><a href="./open-loop-startup-native.json" download>Download native trajectory (JSON)</a></p>
+      </div>
+    </section>
     <section id="startup-transfer" class="card historical transfer" aria-labelledby="transfer-title">
       <h2 id="transfer-title">Forecasting startup pressure and coolant temperature</h2>
       <p id="transfer-status" class="status" role="status">Loading the measured forecast comparisons…</p>
@@ -232,5 +272,6 @@
     </section>
   </main>
   <script type="module" src="./src/startup-evidence.js"></script>
+  <script type="module" src="./src/open-loop-startup.js"></script>
 </body>
 </html>

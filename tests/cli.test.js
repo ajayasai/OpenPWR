@@ -198,6 +198,9 @@ test('local preview serves only public files, blocks traversal, and implements H
   await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{"case":"conditioned-startup"}');
   await mkdir(join(dir, 'validation/startup_transfer'), { recursive: true });
   await writeFile(join(dir, 'validation/startup_transfer/result.json'), '{"case":"transfer"}');
+  await mkdir(join(dir, 'validation/open_loop_startup'), { recursive: true });
+  await writeFile(join(dir, 'validation/open_loop_startup/result.json'), '{"case":"open-loop"}');
+  await writeFile(join(dir, 'validation/open_loop_startup/native.json'), '{"case":"frozen-native"}');
   const port = await unusedPort();
   const child = spawn(process.execPath, [join(dir, 'scripts/serve.mjs'), '--source', `--port=${port}`], { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   try {
@@ -238,6 +241,8 @@ test('local preview serves only public files, blocks traversal, and implements H
     assert.deepEqual(await (await fetch(origin + '/continuous-measured-validation.json')).json(), {case:'continuous-measured'});
     assert.deepEqual(await (await fetch(origin + '/shippingport-development.json')).json(), {case:'conditioned-startup'});
     assert.deepEqual(await (await fetch(origin + '/startup-transfer.json')).json(), {case:'transfer'});
+    assert.deepEqual(await (await fetch(origin + '/open-loop-startup.json')).json(), {case:'open-loop'});
+    assert.deepEqual(await (await fetch(origin + '/open-loop-startup-native.json')).json(), {case:'frozen-native'});
     for (const route of ['/package.json', '/scripts/serve.mjs', '/src/a%2f..%2f..%2fpackage.json', '/src/%5c..%5cpackage.json', '/%FF']) {
       const response = await fetch(origin + route);
       assert.equal(response.status, 404, `excluded route ${route}`);
@@ -250,7 +255,9 @@ test('local preview serves only public files, blocks traversal, and implements H
 test('release build rejects stale or failed evidence without replacing the last build', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts', 'dist']) await mkdir(join(dir, name));
-  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development', 'startup_transfer']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development', 'startup_transfer', 'open_loop_startup']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  await writeFile(join(dir, 'validation/open_loop_startup/result.json'), '{"case":"open-loop"}');
+  await writeFile(join(dir, 'validation/open_loop_startup/native.json'), '{"case":"frozen-native"}');
   await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
   await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{}');
   await writeFile(join(dir, 'validation/startup_transfer/result.json'), '{}');
@@ -278,13 +285,17 @@ test('release build rejects stale or failed evidence without replacing the last 
   assert.equal(await readFile(marker, 'utf8'), 'previous successful build');
   await build();
   assert.deepEqual(JSON.parse(await readFile(join(dir, 'dist/benchmarks.json'), 'utf8')), valid);
+  assert.equal(await readFile(join(dir, 'dist/open-loop-startup.json'), 'utf8'), '{"case":"open-loop"}');
+  assert.equal(await readFile(join(dir, 'dist/open-loop-startup-native.json'), 'utf8'), '{"case":"frozen-native"}');
   await assert.rejects(access(marker), { code: 'ENOENT' });
 });
 
 test('native release evidence binds both reports to the exact compiled bytes before replacing dist', async (t) => {
   const dir = await fixture(t);
   for (const name of ['scripts', 'src', 'docs', 'artifacts/modelica', 'models/OpenPWR']) await mkdir(join(dir, name), { recursive: true });
-  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development', 'startup_transfer']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  for (const name of ['grid_return', 'startup_output', 'startup_holdout', 'shippingport_development', 'startup_transfer', 'open_loop_startup']) await mkdir(join(dir, 'validation', name), { recursive: true });
+  await writeFile(join(dir, 'validation/open_loop_startup/result.json'), '{}');
+  await writeFile(join(dir, 'validation/open_loop_startup/native.json'), '{}');
   await writeFile(join(dir, 'validation/startup_holdout/result.json'), '{}');
   await writeFile(join(dir, 'validation/shippingport_development/result.json'), '{}');
   await writeFile(join(dir, 'validation/startup_transfer/result.json'), '{}');
