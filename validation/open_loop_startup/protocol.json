@@ -1,0 +1,28 @@
+{
+  "schema": "openpwr-native-open-loop-protocol-v1",
+  "question": "What pressure and bulk coolant temperature does a generic native whole plant predict, starting cold and reaching rated generation, when it receives no plant readings? How far does its trajectory agree with a separately measured startup on the original elapsed clock?",
+  "candidate": {
+    "engine": "OpenPWR ContinuousPlant, FMI 2.0 co-simulation",
+    "lengthS": 259200,
+    "initialState": "Use a generic cold design state, including the existing 40 °C primary inventory. No holdout observation even at time zero is allowed for state initialization, forcing or controls.",
+    "inputs": "Freeze schedule, model, all parameter choices and source code before revealing target measurements. Actuator demand and internal controllers may use simulation time and simulated states only. One continuous native instance per run. No empirical pressure or coolant-temperature arrays as inputs or outputs, measured targets, nudging, resets, transfer between models, warp or fitting against the assessment event.",
+    "outputs": "At least elapsed seconds, hot and cold leg temperatures in °C, mean of both legs, primary absolute pressure in MPa, reactor power, net electric output and breaker state, from the compiled model. Retain starting and final samples, including heatup, grid coupling and full power.",
+    "numerical": "Record successful completion inside the native validity domain, mass/energy closure, an independent finer communication step, actual differences on the common time grid, and at least 600 s continuously within the existing full-power numerical envelope at the end. These establish numerical execution; they do not establish empirical accuracy."
+  },
+  "external": {
+    "primary": "Westinghouse PWR plant heatup in MRP-393, Figure 2-1",
+    "source": "https://restservice.epri.com/publicdownload/000000003002003085/0/Product",
+    "pdfSha256": "bc7f19ec848215301f958a39c0854d862c8dccecf1f96f6b60d66085ff734c10",
+    "pageContentSha256": "35ab24494549dd7482533d5b55bdab12286d47f505514d8e3085f4bda3791684",
+    "page": "PDF page 19, printed 2-3",
+    "phase": "Plant heatup before generation. No same-event measured loading or rated-power trajectory in this figure. It is a different example from the v0.18 Combustion Engineering trace. Site and date withheld by source.",
+    "timeOrigin": "Use figure elapsed hour zero as native t=0 without alignment to the responses. The simulator and station can have different initial inventories and unknown prior history. No fitted time shift, rescaling, or assumed measuring after grid closure.",
+    "sampling": "Digitize both leg temperatures (°F) and gauge pressure (psig) at integer hours 0..60 inclusive. Convert pressure to MPa absolute using 0.101325 + psig*0.006894757293168. Use arithmetic mean of hot and cold leg temperatures in °C for both station and simulation. Retain the printed instrument values, rounding and graph resolution. No interpolation of measurements across missing observations. Both model and station must supply all 61 pairs."
+  },
+  "scoring": {
+    "primary": "Pressure and mean coolant temperature on all 60 post-origin hours separately. Report the initial discrepancy separately. Compute root mean square, mean absolute, signed mean and maximum absolute error in physical units, on identical times without outcome-based exclusions. Report errors by elapsed blocks (0,20], (20,40], (40,60].",
+    "baseline": "Carry forward only the independent station's hour-zero reading through all later hours, for each channel. The native solver receives none of those readings. A skill comparison succeeds on a channel only when native RMSE is strictly smaller than this initial-value baseline. This baseline does not use the preceding hour's observation. No plant accuracy tolerance has been established.",
+    "support": "Publish pressure, temperatures and electrical output for the complete native run. Explicitly separate the duration with actual measurements and model-only intervals. The source reports zero power generation throughout the measured heatup. Report native grid/full-power timing relative to that fact, without treating station power as a forcing input. Do not join later figures or other plants to imply an observed cold-to-rated event.",
+    "release": "Pin the independently obtained observation fixture and native candidate, freeze a numerical trajectory before scoring, publish all results even if the model falls short. Rebuild from source and compare every retained primary output and the full-power outcome in CI. Additional documented sources or diagnostics must be labeled separately."
+  }
+}
