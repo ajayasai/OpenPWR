@@ -565,3 +565,114 @@ async function loadDevelopment() {
 }
 
 void loadDevelopment();
+
+function transferPlot(channel) {
+  const chart = byId('transfer-chart');
+  const points = channel.points;
+  if (!points.length) {
+    chart.replaceChildren();
+    byId('transfer-caption').textContent = 'No measured target times in this window.';
+    return;
+  }
+  const times = points.map(p => p.targetS);
+  const start = Math.min(...points.map(p => p.originS), ...times);
+  const end = Math.max(start + 1, ...times);
+  const values = points.flatMap(p => [p.forecast, p.persistence, p.observed]);
+  const {x, y} = historicalAxes(chart, start, end, values, channel.unit);
+  for (const p of points) {
+    const tx = x(p.targetS), fy = y(p.forecast);
+    const observed = svgElement('circle', {cx: tx, cy: y(p.observed), r: 4.2, class: 'observed-point'});
+    const baseline = svgElement('rect', {x: tx - 3.6, y: y(p.persistence) - 3.6, width: 7.2, height: 7.2, class: 'persistence-mark'});
+    const forecast = svgElement('path', {d: 'M ' + tx + ' ' + (fy - 3.3) + ' l 3.3 3.3 -3.3 3.3 -3.3 -3.3 Z', class: 'forecast-mark'});
+    chart.append(observed, baseline, forecast);
+  }
+  byId('transfer-caption').textContent = channel.label + ' at ' + points.length + ' measured target times. The table below gives the forecast origin for each prediction.';
+}
+
+function transferReadings(channel) {
+  const unit = channel.unit;
+  const candidate = channel.candidate.rmse;
+  const persistence = channel.persistence.rmse;
+  const change = Number.isFinite(channel.rmseReductionPct) && channel.rmseReductionPct !== 0
+    ? ' (' + formatValue(Math.abs(channel.rmseReductionPct)) + '% ' + (candidate < persistence ? 'lower' : 'higher') + ')' : '';
+  const count = channel.n + (channel.n === 1 ? ' reading' : ' readings');
+  byId('transfer-score').textContent = candidate === persistence
+    ? 'Both forecasts had the same RMSE of ' + formatValue(candidate) + ' ' + unit + ' across ' + count + '.'
+    : 'Across ' + count + ', forecast RMSE was ' + formatValue(candidate) + ' ' + unit + change + ' and last-reading RMSE was '
+      + formatValue(persistence) + ' ' + unit + '.';
+  const range = channel.deleteOneRmseAdvantageRange;
+  byId('transfer-sensitivity').textContent = Array.isArray(range)
+    ? 'Removing one target at a time gives a last-reading minus forecast RMSE of ' + formatValue(range[0]) + ' to '
+      + formatValue(range[1]) + ' ' + unit + '. Positive values favor the forecast.' : '';
+  byId('transfer-point-caption').textContent = channel.label + ' (' + unit + '). Times are hours:minutes:seconds from the event origin.';
+  const rows = byId('transfer-points');
+  rows.replaceChildren();
+  for (const p of channel.points) {
+    appendEvidenceRow(rows, hms(p.originS), [hms(p.targetS), formatValue(p.observed), formatValue(p.forecast),
+      formatValue(p.persistence), formatValue(p.forecast - p.observed)]);
+  }
+}
+
+async function loadTransfer() {
+  try {
+    const report = await fetchComparison('./startup-transfer.json');
+    if (report.schema !== 'openpwr-startup-transfer-v1' || !report.events?.length) throw new Error('Unexpected forecast record.');
+    const primary = byId('transfer-primary');
+    let improved = 0, total = 0;
+    const eventSelect = byId('transfer-event'), groupSelect = byId('transfer-group'), channelSelect = byId('transfer-channel');
+    for (const event of report.events) {
+      eventSelect.add(new Option(event.label, event.id));
+      for (const group of event.groups.filter(g => g.primary)) {
+        for (const channel of group.channels) {
+          total++;
+          if (channel.improved) improved++;
+          appendEvidenceRow(primary, event.label + ' · ' + group.label, [channel.label, channel.n,
+            formatValue(channel.candidate.rmse) + ' ' + channel.unit, formatValue(channel.persistence.rmse) + ' ' + channel.unit]);
+        }
+      }
+    }
+    if (!total) throw new Error('No primary comparisons found.');
+    let finding = 'The forecast had lower error than carrying the last reading forward on ' + improved + ' of ' + total + ' primary comparisons.';
+    const historical = report.events.find(e => e.id === 'shippingport');
+    const earlyTemp = historical?.groups.find(g => g.id === 'reservedEarly')?.channels.find(c => c.id === 'averageCoolantTemperature');
+    const late = historical?.groups.find(g => g.id === 'reservedLate');
+    if (earlyTemp?.n === 1 && earlyTemp.improved && late?.channels.every(c => c.candidate.rmse === c.persistence.rmse)) {
+      finding += ' The Shippingport temperature gain comes from one early reading. Both channels tied in the late window.';
+    }
+    status('transfer-status', finding);
+    byId('transfer-scope').textContent = 'The forecast extends the latest measured trend and lets its rate decay with time. With one reading available, the native model supplies the initial rate. ' + report.scope;
+    byId('transfer-protocol').href = 'https://github.com/ajayasai/OpenPWR/blob/' + report.protocolRevision + '/validation/startup_transfer/protocol.json';
+    byId('transfer-results').hidden = false;
+    const activeEvent = () => report.events.find(e => e.id === eventSelect.value);
+    const activeGroup = () => activeEvent().groups.find(g => g.id === groupSelect.value);
+    const activeChannel = () => activeGroup().channels.find(c => c.id === channelSelect.value);
+    function showChannel() {
+      transferPlot(activeChannel());
+      transferReadings(activeChannel());
+    }
+    function showGroup() {
+      const previous = channelSelect.value;
+      channelSelect.replaceChildren(...activeGroup().channels.map(c => new Option(c.label, c.id)));
+      if (activeGroup().channels.some(c => c.id === previous)) channelSelect.value = previous;
+      showChannel();
+    }
+    function showEvent() {
+      const event = activeEvent();
+      byId('transfer-description').textContent = event.description;
+      byId('transfer-source').href = event.sourceUrl;
+      groupSelect.replaceChildren(...event.groups.map(g => new Option(g.label, g.id)));
+      groupSelect.value = (event.groups.find(g => g.primary) || event.groups[0]).id;
+      showGroup();
+    }
+    eventSelect.addEventListener('change', showEvent);
+    groupSelect.addEventListener('change', showGroup);
+    channelSelect.addEventListener('change', showChannel);
+    showEvent();
+    new ResizeObserver(() => transferPlot(activeChannel())).observe(byId('transfer-chart'));
+  } catch (error) {
+    byId('transfer-results').hidden = true;
+    status('transfer-status', 'The startup forecast comparison is unavailable. ' + error.message, true);
+  }
+}
+
+void loadTransfer();

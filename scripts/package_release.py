@@ -163,6 +163,8 @@ def comparison_sources(case, model):
 
 
 def verify(version, revision):
+    for script in ('model.py', 'compare.py'):
+        subprocess.run([sys.executable, f'validation/startup_transfer/{script}', '--check'], cwd=ROOT, check=True)
     subprocess.run(['node', 'scripts/build.mjs', '--require-native', '--require-plant', '--require-cold',
         '--require-measured', '--require-pressurizer', '--require-continuous', '--require-continuous-measured',
         '--require-krsko-pressure'], cwd=ROOT, check=True)
@@ -344,7 +346,8 @@ def package(version, revision):
                 archive_bytes(archive, path.relative_to(ROOT / 'dist').as_posix(), path.read_bytes(), timestamp)
     assets = [native, web]
     for folder, name in (('startup_holdout', 'shippingport-startup.json'),
-                         ('shippingport_development', 'shippingport-development.json')):
+                         ('shippingport_development', 'shippingport-development.json'),
+                         ('startup_transfer', 'startup-transfer.json')):
         require(sha(ROOT / 'validation' / folder / 'result.json') == sha(ROOT / 'dist' / name),
                 f'{name} differs from the checked-in evidence')
         destination = out / name

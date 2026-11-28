@@ -20,6 +20,43 @@ test('paired workbench restores the v0.14 feedwater law when reopening its recip
   expect(JSON.parse(await readFile(await downloaded.path(), 'utf8'))).toEqual(original);
 });
 
+test('startup forecasts show event-specific errors and forecast origins at each horizon', async ({ page, request }) => {
+  const response = await request.get('startup-transfer.json');
+  expect(response.ok()).toBe(true);
+  const report = await response.json();
+  expect(report.schema).toBe('openpwr-startup-transfer-v1');
+  const format = new Intl.NumberFormat('en', { maximumFractionDigits: 3 });
+  await page.goto('startup-evidence.html#startup-transfer');
+  await expect(page.locator('#transfer-results')).toBeVisible();
+  const primary = report.events.flatMap(e => e.groups.filter(g => g.primary).flatMap(g => g.channels));
+  const wins = primary.filter(c => c.improved).length;
+  await expect(page.locator('#transfer-status')).toContainText(wins + ' of ' + primary.length);
+  await expect(page.locator('#transfer-primary tr')).toHaveCount(primary.length);
+  await expect(page.locator('#transfer-scope')).toContainText(report.scope);
+  await expect(page.locator('#startup-transfer [download]')).toHaveAttribute('href', './startup-transfer.json');
+  await page.locator('#startup-transfer details summary').click();
+  for (const event of report.events) {
+    await page.locator('#transfer-event').selectOption(event.id);
+    await expect(page.locator('#transfer-source')).toHaveAttribute('href', event.sourceUrl);
+    for (const group of event.groups) {
+      await page.locator('#transfer-group').selectOption(group.id);
+      for (const ch of group.channels) {
+        await page.locator('#transfer-channel').selectOption(ch.id);
+        await expect(page.locator('#transfer-score')).toContainText(format.format(ch.candidate.rmse) + ' ' + ch.unit);
+        await expect(page.locator('#transfer-score')).toContainText(format.format(ch.persistence.rmse) + ' ' + ch.unit);
+        await expect(page.locator('#transfer-chart .forecast-mark')).toHaveCount(ch.n);
+        const rows = page.locator('#transfer-points tr');
+        await expect(rows).toHaveCount(ch.n);
+        const point = ch.points[ch.n - 1];
+        for (const [i, value] of [point.observed, point.forecast, point.persistence].entries()) {
+          await expect(rows.last().locator('td').nth(i + 1)).toHaveText(format.format(value));
+        }
+      }
+    }
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
 function recordPageTraffic(page) {
   const files = [];
   page.on('request', request => files.push(new URL(request.url()).pathname.split('/').at(-1)));

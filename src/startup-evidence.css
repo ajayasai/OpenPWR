@@ -122,3 +122,31 @@ button { font-size: .82rem; cursor: pointer; }
   nav .brand { width: 100%; }
   select { font-size: .8rem; }
 }
+
+.transfer { margin-bottom: 20px; }
+.transfer-controls { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; margin: 10px 0; }
+.transfer h3 { margin-top: 20px; }
+.transfer .links { margin: 9px 0; }
+.transfer-table { min-width: 560px; }
+.transfer .transfer-table td:last-child, .transfer .transfer-table th:last-child { text-align: right; }
+.transfer details .historical-scroll { max-height: 310px; }
+.transfer .plot-legend { padding: 0; margin: 8px 0; }
+.transfer .plot-legend i { width: 9px; height: 9px; display: inline-block; }
+.transfer-observed-key { border-radius: 50%; background: #e9b5d8; }
+.transfer-forecast-key { background: #81decb; transform: rotate(45deg); }
+.transfer-persistence-key { border: 1.5px solid #edc992; }
+.transfer .forecast-mark { fill: #81decb; }
+.transfer .persistence-mark { fill: none; stroke: #edc992; stroke-width: 1.5; }
+@media (max-width: 620px) {
+  .transfer-controls { grid-template-columns: 1fr; }
+  .transfer .historical-scroll:has(#transfer-primary) { overflow: visible; }
+  .transfer-table:has(#transfer-primary) { min-width: 0; }
+  .transfer-table:has(#transfer-primary) thead { position: absolute; clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; }
+  #transfer-primary tr { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; padding: 9px 0; border-bottom: 1px solid var(--edge); }
+  #transfer-primary tr > * { text-align: left; border: 0; padding: 0; }
+  #transfer-primary th { grid-column: 1 / -1; color: var(--muted); font-size: .78rem; }
+  #transfer-primary td:nth-child(2) { font-weight: 600; }
+  #transfer-primary td:nth-child(3)::after { content: ' readings'; }
+  #transfer-primary td:nth-child(4)::before { content: 'Forecast '; color: var(--muted); }
+  #transfer-primary td:nth-child(5)::before { content: 'Last reading '; color: var(--muted); }
+}

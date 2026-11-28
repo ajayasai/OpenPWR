@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0
+
+- Added an observation-based startup forecast with a native-model initial rate and a fitted one-hour trend decay time. Users can forecast from timestamped readings or inspect past forecast errors in the browser.
+- On the two reserved Shippingport windows, pressure and coolant-temperature RMSE improved by 27.9% and 5.3% respectively over carrying the last reading forward. The temperature improvement comes from one early reading.
+- Evaluated the frozen model on a second facility using the EPRI Combustion Engineering heatup record. All 22 one-hour and 19 four-hour forecast origins per channel are included. The one-hour comparison reduced pressure RMSE by 52.7% and coolant-temperature RMSE by 38.8%. [Results, data and reproduction](validation/startup_transfer/README.md)
+
 ## 0.17.0
 
 - Added a Shippingport historical case to the native whole-plant model. One instance evolves coolant temperature and absolute pressure for 29 hours with fitted heat and gas-removal inputs. The original generic startup remains available.

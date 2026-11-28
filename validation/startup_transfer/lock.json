@@ -1,0 +1,15 @@
+{
+  "protocolRevision": "01b91619b80f4d0e51aa6492d57325088704e380",
+  "candidateRevision": "6b58197efae7a7150cdeb719d19fbb214d67dc0d",
+  "sha256": {
+    "validation/startup_transfer/model.py": "c33b421139528d1dff154ca55de9b699208980201e7643922c74ea71a81fbb67",
+    "validation/startup_transfer/parameters.json": "6dc4d81b856b7fd9d5c3c8bccc9fb8928ffb961eddc35d422a980503d4c142a5",
+    "validation/startup_transfer/protocol.json": "90b5dfb3258bd808a91fafb356ed5ab77dd8a0a412cb0a9b992ff50068e49d71",
+    "validation/startup_transfer/compare.py": "54562d453e5b3496b8d9bfef2fce256f30665bec268e521f94eb78d7083abdbd",
+    "validation/shippingport_development/native.json": "cce59a95823dd0502b55bad69980c7e0da1033bac83f77723dbbcc0a18fd5673",
+    "validation/shippingport_development/protocol.json": "9013c39c1049b0ee972b8717436367dd8669c79879107429cd78f944472eafb1",
+    "validation/startup_holdout/shippingport/observations.json": "777415fb53124dc761d127611be2f63ff4dffad4bed024863c3996ae71f41bec",
+    "validation/shippingport_development/assess.py": "c2417674acdfd76f38bf950ce55980a76eb9ad193b1558046c84e5016c8428ef",
+    "validation/startup_transfer/ce_heatup/observations.json": "9262a70a97c9c7e767b8cf358deeb9417ddff14ad7787f9f2765a7a38352c257"
+  }
+}

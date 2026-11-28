@@ -25,6 +25,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+      - name: Refit the causal forecast and reproduce both measured-event comparisons
+        run: |
+          python validation/startup_transfer/model.py --check
+          python validation/startup_transfer/compare.py --check
       - name: Recompute the Shippingport development scores
         run: python validation/shippingport_development/assess.py --check
       - run: npm run verify
@@ -52,6 +56,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends omc omlibrary
       - run: npm run engineering:setup
+      - name: Independently audit the measured C-E heatup and plotting precision
+        run: artifacts/engineering-venv/bin/python validation/startup_transfer/ce_heatup/audit.py
       - name: Rebuild and execute the 29-hour Shippingport thermal case
         run: npm run engineering:shippingport -- --build
       - name: Verify the new native trace and reserved measurements

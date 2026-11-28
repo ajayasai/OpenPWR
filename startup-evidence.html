@@ -17,8 +17,55 @@
     </nav>
     <header>
       <h1>Measured startup comparisons</h1>
-      <p><a href="#shippingport-development">Shippingport model development</a> · <a href="#shippingport">Original Shippingport comparison</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
+      <p><a href="#startup-transfer">Pressure and temperature forecasts</a> · <a href="#shippingport-development">Shippingport model development</a> · <a href="#shippingport">Original Shippingport comparison</a> · <a href="#sizewell">Sizewell B return to generation</a></p>
     </header>
+    <section id="startup-transfer" class="card historical transfer" aria-labelledby="transfer-title">
+      <h2 id="transfer-title">Forecasting startup pressure and coolant temperature</h2>
+      <p id="transfer-status" class="status" role="status">Loading the measured forecast comparisons…</p>
+      <div id="transfer-results" hidden>
+        <p id="transfer-scope" class="definition"></p>
+        <p class="links"><a href="./startup-transfer.json" download>Download forecast results (JSON)</a><a id="transfer-protocol">Scoring protocol ↗</a></p>
+        <div class="historical-scroll" tabindex="0" role="region" aria-label="Primary forecast scores by event and quantity">
+          <table class="historical-table transfer-table">
+            <caption>Primary comparisons · root-mean-square error (RMSE)</caption>
+            <thead><tr><th scope="col">Event and forecast window</th><th scope="col">Quantity</th><th scope="col">Readings</th><th scope="col">Forecast</th><th scope="col">Last reading</th></tr></thead>
+            <tbody id="transfer-primary"></tbody>
+          </table>
+        </div>
+        <h3 id="transfer-inspection-title">Inspect forecasts</h3>
+        <div class="transfer-controls">
+          <div><label for="transfer-event">Startup event</label><select id="transfer-event"></select></div>
+          <div><label for="transfer-group">Forecast window</label><select id="transfer-group"></select></div>
+          <div><label for="transfer-channel">Measured quantity</label><select id="transfer-channel"></select></div>
+        </div>
+        <p class="definition"><span id="transfer-description"></span> <a id="transfer-source">Source measurements ↗</a></p>
+        <div class="historical-grid">
+          <div>
+            <figure>
+              <svg id="transfer-chart" viewBox="0 0 540 220" role="img" aria-labelledby="transfer-caption"></svg>
+              <figcaption id="transfer-caption"></figcaption>
+            </figure>
+            <ul class="plot-legend" aria-label="Chart legend">
+              <li><i class="transfer-observed-key"></i>Measured</li><li><i class="transfer-forecast-key"></i>Forecast</li><li><i class="transfer-persistence-key"></i>Last reading</li>
+            </ul>
+          </div>
+          <div class="historical-results">
+            <h3>Forecast error</h3>
+            <p id="transfer-score"></p><p id="transfer-sensitivity"></p>
+          </div>
+        </div>
+        <details>
+          <summary>Inspect forecast times, measurements and predictions</summary>
+          <div class="historical-scroll" tabindex="0" role="region" aria-label="Pointwise forecast comparison">
+            <table class="historical-table transfer-table">
+              <caption id="transfer-point-caption"></caption>
+              <thead><tr><th scope="col">Forecast made at</th><th scope="col">Target time</th><th scope="col">Measured</th><th scope="col">Forecast</th><th scope="col">Last reading</th><th scope="col">Forecast − measured</th></tr></thead>
+              <tbody id="transfer-points"></tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </section>
     <section id="shippingport-development" class="card historical development" aria-labelledby="development-title">
       <h2 id="development-title">Shippingport coolant heatup and pressure</h2>
       <p id="development-status" class="status" role="status">Loading the revised native run and station readings…</p>
