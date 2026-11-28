@@ -1,0 +1,73 @@
+{
+  "schema": "openpwr-startup-damped-trend-v1",
+  "nativeSha256": "cce59a95823dd0502b55bad69980c7e0da1033bac83f77723dbbcc0a18fd5673",
+  "developmentSha256": "5373d23f800c70ca6c7b982b9208164f68081189701a14ddbfeed69ce45c629b",
+  "medianReportingIntervalS": 900.0,
+  "initialNativeRateIntervalS": 3600,
+  "channels": {
+    "primaryPressure": {
+      "initialRatePerS": -0.00020997526424437974,
+      "nativeRateOriginS": 3900,
+      "developmentForecasts": 42,
+      "memoryS": 3600.0,
+      "developmentRmseByMemory": [
+        {
+          "memoryS": 0.0,
+          "rmse": 0.7564807312
+        },
+        {
+          "memoryS": 225.0,
+          "rmse": 0.6711588286
+        },
+        {
+          "memoryS": 450.0,
+          "rmse": 0.6017174841
+        },
+        {
+          "memoryS": 900.0,
+          "rmse": 0.5154532702
+        },
+        {
+          "memoryS": 1800.0,
+          "rmse": 0.4541366856
+        },
+        {
+          "memoryS": 3600.0,
+          "rmse": 0.4343288838
+        }
+      ]
+    },
+    "averageCoolantTemperature": {
+      "initialRatePerS": 0.00201380046091721,
+      "nativeRateOriginS": 1080,
+      "developmentForecasts": 6,
+      "memoryS": 3600.0,
+      "developmentRmseByMemory": [
+        {
+          "memoryS": 0.0,
+          "rmse": 43.6756422781
+        },
+        {
+          "memoryS": 225.0,
+          "rmse": 42.8825286621
+        },
+        {
+          "memoryS": 450.0,
+          "rmse": 42.1006489336
+        },
+        {
+          "memoryS": 900.0,
+          "rmse": 40.5473808741
+        },
+        {
+          "memoryS": 1800.0,
+          "rmse": 37.4969733192
+        },
+        {
+          "memoryS": 3600.0,
+          "rmse": 32.1352729142
+        }
+      ]
+    }
+  }
+}
