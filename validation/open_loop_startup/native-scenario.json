@@ -1,0 +1,28 @@
+{
+  "id": "generic-cold-to-rated-72h-v1",
+  "basis": "Synthetic normal-startup experiment for the generic 1000 MWe ContinuousPlant model. The clock, intermediate regulator demand and load dwells are engineering assumptions. No measured plant event, control history or temperature/pressure trajectory was used to choose them.",
+  "durationSeconds": 1800000,
+  "startupWindowSeconds": 259200,
+  "reportIntervalSeconds": 300,
+  "communicationStepsSeconds": [10, 5],
+  "controls": [
+    {"hour": 0, "set": {"pumpCommand": 0.5, "reactorDemandPercent": 0.1, "automaticReactorEnable": 1, "shutdownCoolingFraction": 0, "heaterPowerMW": 0.5}},
+    {"hour": 5, "set": {"ventFraction": 1}},
+    {"hour": 6, "set": {"ventFraction": 0}},
+    {"hour": 8, "set": {"pressureControlEnable": 1, "pressureTargetMPa": 6}},
+    {"hour": 16, "set": {"pressureTargetMPa": 15.5}},
+    {"hour": 22, "set": {"pumpCommand": 1, "reactorDemandPercent": 0.5}},
+    {"hour": 32, "set": {"reactorDemandPercent": 5, "sourceEnable": 0, "turbineEnable": 1, "speedDemandRpm": 3000, "excitationCommandPu": 1, "automaticSyncEnable": 1}},
+    {"hour": 33, "set": {"gridBreakerCommand": 1}},
+    {"hour": 34, "set": {"reactorDemandPercent": 20}},
+    {"hour": 35, "set": {"loadDemandMW": 150}},
+    {"hour": 39, "set": {"reactorDemandPercent": 40}},
+    {"hour": 40, "set": {"loadDemandMW": 350}},
+    {"hour": 44, "set": {"reactorDemandPercent": 65}},
+    {"hour": 45, "set": {"loadDemandMW": 600}},
+    {"hour": 49, "set": {"reactorDemandPercent": 85}},
+    {"hour": 50, "set": {"loadDemandMW": 800}},
+    {"hour": 54, "set": {"reactorDemandPercent": 100}},
+    {"hour": 55, "set": {"loadDemandMW": 1000}}
+  ]
+}

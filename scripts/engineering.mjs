@@ -60,6 +60,7 @@ try {
     else if (action === 'experiment') await run([runtime.venvPython, 'backend/experiments.py', ...extra]);
     else if (action === 'measured') await run([runtime.venvPython, 'validation/krsko2005/compare.py', ...extra]);
     else if (action === 'shippingport') await run([runtime.venvPython, 'validation/shippingport_development/run_native.py', ...extra]);
+    else if (action === 'open-loop') await run([runtime.venvPython, 'validation/open_loop_startup/run_native.py', ...extra]);
     else if (action === 'continuous-measured') await run([runtime.venvPython, 'validation/continuous_measured/compare.py', ...extra]);
     else if (action === 'krsko-pressure') await run([runtime.venvPython, 'validation/krsko_pressure/compare.py', ...extra]);
     else if (action === 'pressure-components') await run([runtime.venvPython, 'validation/krsko_pressure/component_checks.py', ...extra]);
@@ -80,6 +81,6 @@ try {
     else if (action === 'verify-plant') await run([runtime.venvPython, 'backend/verify_plant.py', ...extra]);
     else if (action === 'verify-cold') await run([runtime.venvPython, 'backend/verify_cold.py', ...extra]);
     else if (action === 'verify-continuous') await run([runtime.venvPython, 'backend/verify_continuous.py', ...extra]);
-    else throw new Error('Choose setup, build, build-plant, build-cold, build-continuous, start, test, verify, verify-plant, verify-cold, verify-continuous, measured, continuous-measured, shippingport, krsko-pressure, pressurizer, experiment, or profile.');
+    else throw new Error('Choose setup, build, build-plant, build-cold, build-continuous, start, test, verify, verify-plant, verify-cold, verify-continuous, measured, continuous-measured, shippingport, open-loop, krsko-pressure, pressurizer, experiment, or profile.');
   }
 } catch (error) { console.error(error.message); process.exitCode = 1; }
