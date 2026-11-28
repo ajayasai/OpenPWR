@@ -1,0 +1,15 @@
+{
+  "schema": "openpwr-native-open-loop-ohi-protocol-v1",
+  "event": "Kansai Electric, Ohi (Ōi) Unit 3, Japan, 2012 restart",
+  "primarySource": "https://www.kepco.co.jp/corporate/pr/2012/0616-1j.html",
+  "archive": "Kansai Electric daily station reports, Annex 2, Unit 3, 13:00 JST observations",
+  "origin": "2012-06-26T13:00:00+09:00",
+  "end": "2012-07-09T13:00:00+09:00",
+  "window": "Use the last daily report before the first listed primary-side startup inspection through the first daily report after the station reached rated thermal power. Retain all 14 daily samples at elapsed hours 0, 24, ..., 312. Score hours 24..312 inclusive. No clock shifts, rescaling, resampling of observations, interpolation across plant records, phase alignment or later reinitialization.",
+  "model": "Use the same blind generic cold initialization, controls and numerical trajectory as the Westinghouse test. For coverage beyond its 72-hour prefix, continue each original FMU instance to 500 hours, maintaining its final control conditions. Station measurements, inspection dates, rating and milestones are unavailable to the native runner. Only output sampling for the comparison uses the station clock.",
+  "channels": "Compare absolute primary pressure in MPa and bulk coolant temperature in degrees C directly. Interpret the pressure display as gauge by station engineering convention, adding 0.101325 MPa. Also report raw-as-absolute RMSE as sensitivity. Compare the station primary coolant temperature indicator with the arithmetic mean of native legs as a declared proxy. Daily reports do not specify the instrument's averaging weights.",
+  "scores": "Use root mean square error, mean absolute error, signed mean error (native minus station) and maximum absolute error on all 13 post-origin days. Compare each channel with the station origin reading held constant. Report the cold origin and final rated snapshot residual separately. Report every row. Pressure or temperature skill means strictly smaller RMSE than the origin-persistence baseline. No absolute accuracy threshold.",
+  "power": "Record operator generator (gross) MW when available. Show station generator MW / 1180 and native net MW / 1000 as separately labeled relative loads. Do not infer reactor thermal MW from generator MW, score gross against net in MW, or treat percentages as the same physical channel. Compare named station grid connection and rated-thermal milestones with native first connection and sustained full-power envelope, explicitly labeling differences in event definitions.",
+  "limitations": "One observation per day cannot verify intra-day trajectories. The models and plants differ in capacity, control schedule, and starting inventory. The prolonged native continuation after the last observation supplies numerical evidence only.",
+  "release": "Publish the unchanged model and native predictions before unsealing the comparison fixtures. Publish per-channel scores and timing discrepancies regardless of sign. This is a cross-plant transfer test."
+}
